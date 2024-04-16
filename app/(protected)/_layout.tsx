@@ -1,3 +1,4 @@
+import { Octicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import React from "react";
 
@@ -9,7 +10,7 @@ export default function ProtectedLayout() {
 
 	return (
 		<Tabs
-			screenOptions={{
+			screenOptions={({ route }) => ({
 				headerShown: false,
 				tabBarStyle: {
 					backgroundColor:
@@ -18,7 +19,14 @@ export default function ProtectedLayout() {
 							: theme.light.background,
 				},
 				tabBarShowLabel: false,
-			}}
+				tabBarIcon: ({ color }) => {
+					if (route.name === "home") {
+						return <Octicons name="search" size={24} color={color} />;
+					} else if (route.name === "settings") {
+						return <Octicons name="person" size={24} color={color} />;
+					}
+				},
+			})}
 		>
 			<Tabs.Screen name="home" />
 			<Tabs.Screen name="settings" />

@@ -12,6 +12,7 @@
 		"@hookform/resolvers": "^3.1.1",
 		"@supabase/supabase-js": "^2.38.0",
 		"class-variance-authority": "^0.7.0",
+		"classnames": "^2.5.1",
 		"clsx": "^2.1.0",
 		"expo": "~50.0.14",
 		"expo-constants": "~15.4.5",
