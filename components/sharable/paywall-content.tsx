@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-// import { useUserProvider } from "@/providers/UserProvider";
 import { Octicons } from "@expo/vector-icons";
 import cn from "classnames";
 import { useRouter } from "expo-router";

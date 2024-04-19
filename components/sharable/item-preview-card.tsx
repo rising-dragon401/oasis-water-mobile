@@ -1,6 +1,6 @@
-import { useNavigation } from "@react-navigation/native";
+import { Link, useRouter } from "expo-router";
 import React from "react";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import { Image, Text, View } from "react-native";
 
 import Typography from "./typography";
 
@@ -12,7 +12,7 @@ type Props = {
 };
 
 const ItemPreviewCard = ({ item, showWarning }: Props) => {
-	const navigation = useNavigation();
+	const router = useRouter();
 
 	const renderScore = () => {
 		const score = item?.score || 0;
@@ -35,21 +35,19 @@ const ItemPreviewCard = ({ item, showWarning }: Props) => {
 	};
 
 	const determineLink = () => {
-		if (item.type === "tap_water") {
-			return `/search/location/${item.id}?name=${item?.name?.toLowerCase().replace(/ /g, "-")}`;
-		} else if (item.type === "filter") {
-			return `/search/filter/${item.id}?name=${item?.name?.toLowerCase().replace(/ /g, "-")}`;
-		} else {
-			return `/search/item/${item.id}?name=${item?.name?.toLowerCase().replace(/ /g, "-")}`;
-		}
-	};
-
-	const handlePress = () => {
-		// navigation.navigate(determineLink());
+		// let basePath = "";
+		// if (item.type === "tap_water") {
+		// 	basePath = `/search/location/${item.id}`;
+		// } else if (item.type === "filter") {
+		// 	basePath = `/search/filter/${item.id}`;
+		// } else {
+		// 	basePath = `/search/item/${item.id}`;
+		// }
+		return `/search/item/${item.id}`;
 	};
 
 	return (
-		<TouchableOpacity onPress={handlePress} style={{ marginVertical: 10 }}>
+		<Link href={`/search/item/${item.id}`}>
 			<View
 				style={{
 					position: "relative",
@@ -95,7 +93,7 @@ const ItemPreviewCard = ({ item, showWarning }: Props) => {
 					)}
 				</View>
 			</View>
-		</TouchableOpacity>
+		</Link>
 	);
 };
 
