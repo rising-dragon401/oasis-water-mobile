@@ -1,26 +1,29 @@
 import cn from "classnames";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 
 import { Octicons } from "@expo/vector-icons";
 import { Button } from "components/ui/button";
 import { useUserProvider } from "context/user-provider";
-
-import BlurWrapper from "./blur-wrapper";
+import Typography from "./typography";
 
 type PaywallContentProps = {
 	children: React.ReactNode;
 	className?: string;
 	hideButton?: boolean;
 	label: string;
+	title?: string;
+	items?: string[];
 };
 
 const PaywallContent: React.FC<PaywallContentProps> = ({
 	children,
 	className,
 	hideButton = false,
+	title,
 	label,
+	items,
 }) => {
 	const router = useRouter();
 
@@ -29,7 +32,7 @@ const PaywallContent: React.FC<PaywallContentProps> = ({
 
 	const [open, setOpen] = useState(false);
 
-	const handleBlurClick = () => {
+	const handleUpgradeClick = () => {
 		if (!subscription) {
 			router.push("/subscribeModal");
 			setOpen(true);
@@ -41,26 +44,46 @@ const PaywallContent: React.FC<PaywallContentProps> = ({
 	}
 
 	return (
-		<TouchableOpacity
-			className={cn("relative rounded-lg  hover:cursor-pointer", className)}
-			onPress={handleBlurClick}
-		>
-			{!hideButton && (
-				<View className="absolute inset-0 flex justify-center items-center">
-					<Button
-						className="w-14 rounded-full "
-						variant="default"
-						size="default"
-						onPress={handleBlurClick}
-					>
-						<Text>
-							<Octicons name="lock" size={16} color="white" />
-						</Text>
-					</Button>
-				</View>
+		<View className={cn("flex flex-col items-start justify-start", className)}>
+			{title && (
+				<Typography size="xl" fontWeight="bold" className="mb-2">
+					{title}
+				</Typography>
 			)}
-			<BlurWrapper>{children}</BlurWrapper>
-		</TouchableOpacity>
+			<TouchableOpacity onPress={handleUpgradeClick}>
+				<View className="flex hover:cursor-pointer  w-[90vw] bg-card p-4 py-6 rounded-md gap-x-4 items-center gap-y-4">
+					{label && (
+						<Typography size="2xl" fontWeight="normal" className="mb-2">
+							{label}
+						</Typography>
+					)}
+
+					{items && (
+						<View className="flex flex-col gap-4 text-center">
+							{items.map((item, index) => (
+								<Typography
+									key={index}
+									size="base"
+									fontWeight="normal"
+									className="text-primary text-center"
+								>
+									{item}
+								</Typography>
+							))}
+						</View>
+					)}
+
+					<Button
+						variant="default"
+						label="Upgrade now"
+						className="mt-4"
+						onPress={handleUpgradeClick}
+						iconPosition="right"
+						icon={<Octicons name="lock" size={16} color="white" />}
+					/>
+				</View>
+			</TouchableOpacity>
+		</View>
 	);
 };
 

@@ -1,6 +1,6 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import * as React from "react";
-import { Pressable, Text } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import { TextClassContext } from "./text";
 
@@ -63,43 +63,61 @@ const buttonTextVariants = cva(
 
 type ButtonProps = React.ComponentPropsWithoutRef<typeof Pressable> &
 	VariantProps<typeof buttonVariants> & {
-		label?: string; // Add label property
+		label?: string;
+		icon?: React.ReactNode;
+		iconPosition?: "left" | "right";
 	};
 
 const Button = React.forwardRef<
 	React.ElementRef<typeof Pressable>,
 	ButtonProps
->(({ className, variant, size, label, ...props }, ref) => {
-	return (
-		<TextClassContext.Provider
-			value={cn(
-				props.disabled && "web:pointer-events-none",
-				buttonTextVariants({ variant, size }),
-			)}
-		>
-			<Pressable
-				className={cn(
-					props.disabled && "opacity-50 web:pointer-events-none",
-					buttonVariants({ variant, size, className }),
+>(
+	(
+		{ className, variant, size, label, icon, iconPosition = "right", ...props },
+		ref,
+	) => {
+		return (
+			<TextClassContext.Provider
+				value={cn(
+					props.disabled && "web:pointer-events-none",
+					buttonTextVariants({ variant, size }),
 				)}
-				ref={ref}
-				role="button"
-				{...props}
 			>
-				{label && (
-					<Text
-						className={cn(
-							"flex items-center justify-center",
-							buttonTextVariants({ variant, size }),
-						)}
-					>
-						{label}
-					</Text>
-				)}
-			</Pressable>
-		</TextClassContext.Provider>
-	);
-});
+				<Pressable
+					className={cn(
+						props.disabled && "opacity-50 web:pointer-events-none",
+						buttonVariants({ variant, size, className }),
+						"rounded-full flex items-center justify-center",
+					)}
+					ref={ref}
+					role="button"
+					{...props}
+				>
+					{label && (
+						<View className="flex flex-row gap-2 items-center justify-center">
+							{icon && iconPosition === "left" && (
+								<React.Fragment>{icon}</React.Fragment>
+							)}
+
+							<Text
+								className={cn(
+									"flex items-center justify-center",
+									buttonTextVariants({ variant, size }),
+								)}
+							>
+								{label}
+							</Text>
+
+							{icon && iconPosition === "right" && (
+								<React.Fragment>{icon}</React.Fragment>
+							)}
+						</View>
+					)}
+				</Pressable>
+			</TextClassContext.Provider>
+		);
+	},
+);
 Button.displayName = "Button";
 
 export { Button, buttonTextVariants, buttonVariants };

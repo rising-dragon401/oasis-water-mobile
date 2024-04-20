@@ -1,5 +1,6 @@
+import { BlurView } from "expo-blur";
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet } from "react-native";
 
 type BlurWrapperProps = {
 	children: React.ReactNode;
@@ -10,15 +11,18 @@ const BlurWrapper: React.FC<BlurWrapperProps> = ({
 	children,
 	opacity = 0.02, // Default opacity
 }) => {
-	return <View style={[styles.whiteCover, { opacity }]}>{children}</View>;
+	return (
+		<BlurView style={styles.container} intensity={100}>
+			{children}
+		</BlurView>
+	);
 };
 
 const styles = StyleSheet.create({
-	whiteCover: {
-		backgroundColor: "#000", // White color cover
-		borderRadius: 20, // Example of applying a border radius
-		overflow: "hidden",
-		// flex: 1, // Ensure it fills the container as needed, adjust as necessary
+	container: {
+		flex: 1,
+		width: "100%",
+		height: "100%",
 	},
 });
 

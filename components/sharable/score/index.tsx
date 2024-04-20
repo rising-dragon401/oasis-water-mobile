@@ -1,10 +1,10 @@
 "use client";
 
+import { Octicons } from "@expo/vector-icons";
 import { useUserProvider } from "context/user-provider";
 import { useRouter } from "expo-router";
 import { TouchableOpacity, View } from "react-native";
 import { Circle, Svg } from "react-native-svg";
-import PaywallContent from "../paywall-content";
 import Typography from "../typography";
 
 type Props = {
@@ -60,10 +60,14 @@ export default function Score({ score, size }: Props) {
 		}
 	};
 
+	const handleOpenSubscribeModal = () => {
+		router.push("/subscribeModal");
+	};
+
 	if (!subscription) {
 		return (
 			<TouchableOpacity
-				onPress={() => router.push("/subscribeModal")}
+				onPress={handleOpenSubscribeModal}
 				style={{
 					width: svgSize,
 					height: svgSize,
@@ -81,26 +85,18 @@ export default function Score({ score, size }: Props) {
 						cy={svgSize / 2}
 					/>
 				</Svg>
-				<View className="absolute flex-1 flex-col ">
+				<View className="absolute flex-1 flex-col justify-center items-center">
 					<Typography
-						size="xl"
+						size="lg"
 						fontWeight="normal"
 						className="flex gap-2 text-primary mb-0"
 					>
 						Score:
 					</Typography>
-					<View className="flex-1 flex-row">
-						<PaywallContent label="" hideButton>
-							<Typography
-								size="xl"
-								fontWeight="normal"
-								className="text-primary"
-							>
-								{score}
-							</Typography>
-						</PaywallContent>
+					<View className="flex-1 flex-row items-center gap-2">
+						<Octicons name="lock" size={16} color="blue" />
 						<Typography
-							size="xl"
+							size="2xl"
 							fontWeight="normal"
 							className="flex gap-2 text-primary mb-0"
 						>
@@ -152,11 +148,9 @@ export default function Score({ score, size }: Props) {
 					fontWeight="normal"
 					className="flex gap-2 text-secondary mb-0"
 				>
-					<PaywallContent label="" hideButton={true}>
-						<Typography size="xl" fontWeight="normal" className="text-primary">
-							{score}
-						</Typography>
-					</PaywallContent>
+					<Typography size="xl" fontWeight="normal" className="text-primary">
+						{score}
+					</Typography>
 					/ 100
 				</Typography>
 
