@@ -1,10 +1,13 @@
-import { Button } from "@/components/ui/button";
-import { Octicons } from "@expo/vector-icons";
 import cn from "classnames";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
+import { Text, TouchableOpacity, View } from "react-native";
 
+import { Octicons } from "@expo/vector-icons";
+import { Button } from "components/ui/button";
 import { useUserProvider } from "context/user-provider";
+
+import BlurWrapper from "./blur-wrapper";
 
 type PaywallContentProps = {
 	children: React.ReactNode;
@@ -22,13 +25,13 @@ const PaywallContent: React.FC<PaywallContentProps> = ({
 	const router = useRouter();
 
 	// const pathname = usePathname();
-	const { user, subscription, userData } = useUserProvider();
+	const { subscription } = useUserProvider();
 
 	const [open, setOpen] = useState(false);
 
 	const handleBlurClick = () => {
 		if (!subscription) {
-			router.push("/modals/subscribe");
+			router.push("/subscribeModal");
 			setOpen(true);
 		}
 	};
@@ -38,30 +41,26 @@ const PaywallContent: React.FC<PaywallContentProps> = ({
 	}
 
 	return (
-		<>
-			{/* <SubscribeModal open={open} setOpen={setOpen} /> */}
-
-			<div
-				className={cn("relative rounded-lg  hover:cursor-pointer", className)}
-				onClick={handleBlurClick}
-			>
-				{/* Overlay container */}
-				{!hideButton && (
-					<div className="absolute inset-0 flex justify-center items-center">
-						<Button
-							className="w-14 rounded-full "
-							variant="default"
-							size="default"
-							onPress={handleBlurClick}
-						>
+		<TouchableOpacity
+			className={cn("relative rounded-lg  hover:cursor-pointer", className)}
+			onPress={handleBlurClick}
+		>
+			{!hideButton && (
+				<View className="absolute inset-0 flex justify-center items-center">
+					<Button
+						className="w-14 rounded-full "
+						variant="default"
+						size="default"
+						onPress={handleBlurClick}
+					>
+						<Text>
 							<Octicons name="lock" size={16} color="white" />
-						</Button>
-					</div>
-				)}
-				{/* Blurred children content */}
-				<div className="filter blur-md overflow-hidden">{children}</div>
-			</div>
-		</>
+						</Text>
+					</Button>
+				</View>
+			)}
+			<BlurWrapper>{children}</BlurWrapper>
+		</TouchableOpacity>
 	);
 };
 

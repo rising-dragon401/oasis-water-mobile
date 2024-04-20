@@ -1,5 +1,5 @@
 import { Session, User } from "@supabase/supabase-js";
-import { useRouter, useSegments, SplashScreen } from "expo-router";
+import { SplashScreen, useRouter, useSegments } from "expo-router";
 import { createContext, useContext, useEffect, useState } from "react";
 
 import { supabase } from "@/config/supabase";
@@ -81,7 +81,7 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 		const inProtectedGroup = segments[0] === "(protected)";
 
 		if (session && !inProtectedGroup) {
-			router.replace("/(protected)/home");
+			router.replace("/(protected)/search");
 		} else if (!session) {
 			router.replace("/(public)/welcome");
 		}

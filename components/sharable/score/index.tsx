@@ -2,6 +2,8 @@
 
 import { useUserProvider } from "context/user-provider";
 import { useRouter } from "expo-router";
+import { TouchableOpacity, View } from "react-native";
+import { Circle, Svg } from "react-native-svg";
 import PaywallContent from "../paywall-content";
 import Typography from "../typography";
 
@@ -60,80 +62,88 @@ export default function Score({ score, size }: Props) {
 
 	if (!subscription) {
 		return (
-			<>
-				<div
-					onClick={() => router.push("/modals/subscribe")}
-					className="relative flex justify-center items-center"
-					style={{ width: svgSize, height: svgSize }}
-				>
-					<svg
-						className="progress-ring absolute"
-						width={svgSize}
-						height={svgSize}
+			<TouchableOpacity
+				onPress={() => router.push("/subscribeModal")}
+				style={{
+					width: svgSize,
+					height: svgSize,
+					justifyContent: "center",
+					alignItems: "center",
+				}}
+			>
+				<Svg width={svgSize} height={svgSize}>
+					<Circle
+						stroke="gray"
+						strokeWidth={strokeWidth}
+						fill="transparent"
+						r={radius}
+						cx={svgSize / 2}
+						cy={svgSize / 2}
+					/>
+				</Svg>
+				<View className="absolute flex-1 flex-col ">
+					<Typography
+						size="xl"
+						fontWeight="normal"
+						className="flex gap-2 text-primary mb-0"
 					>
-						<circle
-							className={`stroke-gray-400 `}
-							strokeWidth={strokeWidth}
-							fill="transparent"
-							r={radius}
-							cx={svgSize / 2} // Center circle
-							cy={svgSize / 2} // Center circle
-						/>
-					</svg>
-					<div
-						className="absolute flex flex-col justify-center items-center"
-						style={{ width: "100%", height: "100%" }}
-					>
-						<Typography
-							size="lg"
-							fontWeight="normal"
-							className="flex gap-2 text-secondary mb-0"
-						>
-							Score:
-						</Typography>
+						Score:
+					</Typography>
+					<View className="flex-1 flex-row">
+						<PaywallContent label="" hideButton>
+							<Typography
+								size="xl"
+								fontWeight="normal"
+								className="text-primary"
+							>
+								{score}
+							</Typography>
+						</PaywallContent>
 						<Typography
 							size="xl"
 							fontWeight="normal"
-							className="flex gap-2 text-secondary mb-0"
+							className="flex gap-2 text-primary mb-0"
 						>
-							<PaywallContent label="" hideButton={true}>
-								{score}
-							</PaywallContent>
 							/ 100
 						</Typography>
-					</div>
-				</div>
-			</>
+					</View>
+				</View>
+			</TouchableOpacity>
 		);
 	}
 
 	return (
-		<div
-			className="relative flex justify-center items-center"
-			style={{ width: svgSize, height: svgSize }}
+		<View
+			style={{
+				width: svgSize,
+				height: svgSize,
+				justifyContent: "center",
+				alignItems: "center",
+			}}
 		>
-			<svg className="progress-ring absolute" width={svgSize} height={svgSize}>
-				<circle
-					className={`${color} opacity-30`}
+			<Svg width={svgSize} height={svgSize}>
+				<Circle
+					stroke="blue"
 					strokeWidth={strokeWidth}
 					fill="transparent"
 					r={radius}
-					cx={svgSize / 2} // Center circle
-					cy={svgSize / 2} // Center circle
+					cx={svgSize / 2}
+					cy={svgSize / 2}
+					strokeOpacity={0.3}
 				/>
-				<circle
-					className={color}
+				<Circle
+					stroke="blue"
 					strokeWidth={strokeWidth}
 					strokeDasharray={`${circumference} ${circumference}`}
 					strokeDashoffset={offset}
 					strokeLinecap="round"
 					fill="transparent"
 					r={radius}
-					cx={svgSize / 2} // Center circle
-					cy={svgSize / 2} // Center circle
+					cx={svgSize / 2}
+					cy={svgSize / 2}
 				/>
-			</svg>
-			<div
+			</Svg>
+			<View
 				className="absolute flex flex-col justify-center items-center"
 				style={{ width: "100%", height: "100%" }}
 			>
@@ -143,15 +153,22 @@ export default function Score({ score, size }: Props) {
 					className="flex gap-2 text-secondary mb-0"
 				>
 					<PaywallContent label="" hideButton={true}>
-						{score}
+						<Typography size="xl" fontWeight="normal" className="text-primary">
+							{score}
+						</Typography>
 					</PaywallContent>
 					/ 100
 				</Typography>
 
-				<span className="text-secondary" style={{ fontSize: fontSize }}>
+				<Typography
+					size="base"
+					fontWeight="normal"
+					className="text-secondary"
+					style={{ fontSize: fontSize }}
+				>
 					{grade()}
-				</span>
-			</div>
-		</div>
+				</Typography>
+			</View>
+		</View>
 	);
 }

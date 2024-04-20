@@ -1,8 +1,9 @@
-import "../global.css";
 import { Stack } from "expo-router";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import "../global.css";
 
 import { SupabaseProvider } from "@/context/supabase-provider";
+import UserProvider from "@/context/user-provider";
 
 export {
 	// Catch any errors thrown by the Layout component.
@@ -12,22 +13,24 @@ export {
 export default function RootLayout() {
 	return (
 		<SupabaseProvider>
-			<SafeAreaProvider>
-				<Stack
-					screenOptions={{
-						headerShown: false,
-					}}
-				>
-					<Stack.Screen name="(protected)" />
-					<Stack.Screen name="(public)" />
-					<Stack.Screen
-						name="modal"
-						options={{
-							presentation: "modal",
+			<UserProvider>
+				<SafeAreaProvider>
+					<Stack
+						screenOptions={{
+							headerShown: false,
 						}}
-					/>
-				</Stack>
-			</SafeAreaProvider>
+					>
+						<Stack.Screen name="(protected)" />
+						<Stack.Screen name="(public)" />
+						<Stack.Screen
+							name="subscribeModal"
+							options={{
+								presentation: "modal",
+							}}
+						/>
+					</Stack>
+				</SafeAreaProvider>
+			</UserProvider>
 		</SupabaseProvider>
 	);
 }

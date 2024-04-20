@@ -13,6 +13,7 @@ import {
 import { getFiltersByContaminant } from "actions/filters";
 import Link from "expo-router";
 import React, { useEffect, useState } from "react";
+import { View } from "react-native";
 import Typography from "../typography";
 
 type Props = {
@@ -36,7 +37,15 @@ export function ContaminantFiltersDropdown({ contaminantId, align }: Props) {
 	return (
 		<DropdownMenu open={open} onOpenChange={setOpen}>
 			<DropdownMenuTrigger asChild>
-				<Button variant="outline">Filters that remove this</Button>
+				<Button variant="outline">
+					<Typography
+						size="base"
+						fontWeight="normal"
+						className="text-secondary mt-2"
+					>
+						Filters that remove this
+					</Typography>
+				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className="w-72" align={align}>
 				<DropdownMenuLabel>Filters</DropdownMenuLabel>
@@ -44,15 +53,17 @@ export function ContaminantFiltersDropdown({ contaminantId, align }: Props) {
 				<DropdownMenuGroup>
 					{filters.length > 0 ? (
 						filters.map((filter: any) => (
-							<div key={filter.id}>
+							<View key={filter.id}>
 								<DropdownMenuItem key={filter.id}>
 									{/* @ts-ignore */}
 									<Link href={`/search/filter/${filter.id}`}>
-										{filter.name}
+										<Typography size="base" fontWeight="normal">
+											{filter.name}
+										</Typography>
 									</Link>
 								</DropdownMenuItem>
 								<DropdownMenuSeparator />
-							</div>
+							</View>
 						))
 					) : (
 						<DropdownMenuItem>

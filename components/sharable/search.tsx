@@ -15,7 +15,7 @@ export default function Search() {
 	const handleSearch = () => {};
 
 	return (
-		<View className="flex flex-row gap-2">
+		<View className="flex flex-row gap-2 ">
 			<Input
 				placeholder="Search water, filters, location..."
 				value={value}

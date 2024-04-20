@@ -1,12 +1,15 @@
 import { useGlobalSearchParams, useLocalSearchParams } from "expo-router";
 
-import ItemForm from "@/components/sharable/item-form";
+import { ItemForm } from "@/components/sharable/item-form";
 
 export default function Page() {
 	const glob = useGlobalSearchParams();
 	const local = useLocalSearchParams();
 
-	console.log("Local:", local.id, "Global:", glob.id);
+	const id =
+		(Array.isArray(local?.id) ? local?.id[0] : local?.id) ||
+		(Array.isArray(glob?.id) ? glob?.id[0] : glob?.id) ||
+		"1";
 
-	return <ItemForm id={local?.id || glob?.id || "1"} />;
+	return <ItemForm id={id} />;
 }

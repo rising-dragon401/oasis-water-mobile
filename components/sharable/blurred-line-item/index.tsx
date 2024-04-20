@@ -1,5 +1,6 @@
 import { useUserProvider } from "context/user-provider";
 import { useRouter } from "expo-router";
+import { Text, TouchableOpacity, View } from "react-native";
 
 import Typography from "../typography";
 
@@ -17,36 +18,26 @@ export default function BlurredLineItem({
 	const router = useRouter();
 	const { subscription } = useUserProvider();
 
-	const handleOpenPaywall = (e: React.MouseEvent) => {
-		e.stopPropagation();
-
+	const handleOpenPaywall = () => {
 		if (!subscription) {
-			router.push("/modals/subscribe");
+			router.push("/subscribeModal");
 		}
 	};
 
 	const showPaywall = !subscription;
 
 	return (
-		<div>
-			<Typography
-				size="base"
-				fontWeight="normal"
-				className="text-secondary my-0"
-			>
-				<span className={labelClassName}>{label}:</span>{" "}
-				<span
-					onClick={showPaywall ? handleOpenPaywall : undefined}
-					style={{
-						// filter: showPaywall ? 'blur(4px)' : 'none',
-						// cursor: showPaywall ? 'pointer' : 'default',
-						minWidth: "3rem",
-					}}
+		<View>
+			<Typography size="base" fontWeight="normal" className="text-primary my-0">
+				<Text className={labelClassName}>{label}: </Text>
+
+				<TouchableOpacity
+					onPress={showPaywall ? handleOpenPaywall : undefined}
 					className="min-w-14"
 				>
-					{value}
-				</span>
+					<Text>{value}</Text>
+				</TouchableOpacity>
 			</Typography>
-		</div>
+		</View>
 	);
 }

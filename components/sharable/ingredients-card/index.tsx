@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { View } from "react-native";
 import Typography from "../typography";
 
 type Props = {
@@ -14,8 +15,8 @@ export default function IngredientsCard({ ingredients }: Props) {
 	return (
 		<>
 			{nonContaminantIngredients?.map((ingredient, index) => (
-				<div key={index}>
-					<div className="flex flex-row justify-between items-center w-full">
+				<View key={index}>
+					<View className="flex flex-row justify-between items-center w-full">
 						<Typography
 							size="lg"
 							fontWeight="normal"
@@ -30,9 +31,9 @@ export default function IngredientsCard({ ingredients }: Props) {
 						>
 							{ingredient.amount} {ingredient.measure}
 						</Typography>
-					</div>
+					</View>
 
-					<div className="ml-4">
+					<View className="ml-4">
 						<Typography
 							size="base"
 							fontWeight="normal"
@@ -50,8 +51,8 @@ export default function IngredientsCard({ ingredients }: Props) {
 							Harms: {` `}
 							{ingredient.risks}
 						</Typography>
-					</div>
-				</div>
+					</View>
+				</View>
 			))}
 		</>
 	);

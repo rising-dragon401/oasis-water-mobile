@@ -11,6 +11,7 @@ import {
 import { Octicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import { useState } from "react";
+import Typography from "../typography";
 
 type Props = {
 	sources: any[];
@@ -22,7 +23,11 @@ export function ArticlesDropdown({ sources }: Props) {
 	return (
 		<DropdownMenu open={open} onOpenChange={setOpen}>
 			<DropdownMenuTrigger asChild>
-				<Button variant="outline">Articles</Button>
+				<Button variant="outline">
+					<Typography size="base" fontWeight="normal">
+						Articles
+					</Typography>
+				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className="w-96" align="end">
 				<DropdownMenuLabel>Articles</DropdownMenuLabel>
@@ -39,7 +44,9 @@ export function ArticlesDropdown({ sources }: Props) {
 								target="_blank"
 								rel="noopener noreferrer"
 							>
-								{source.label}
+								<Typography size="base" fontWeight="normal">
+									{source.label}
+								</Typography>
 								<Octicons name="arrow-right" size={24} color="black" />
 							</Link>
 						</DropdownMenuItem>

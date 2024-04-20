@@ -28,6 +28,7 @@ interface TypographyProps {
 	fontWeight: WeightType;
 	children?: React.ReactNode;
 	className?: string;
+	style?: any;
 }
 
 const sizes = {
@@ -60,12 +61,14 @@ const Typography: React.FC<TypographyProps> = ({
 	fontWeight,
 	children,
 	className = "",
+	style,
 }) => {
 	const textSize = size ? sizes[size] : "";
 	const textWeight = weights[fontWeight] || weights.normal;
 	return (
 		<Text
-			className={`${textSize} ${textWeight} text-primary text-ellipsis	 ${className} text-red`}
+			className={`${textSize} ${textWeight} text-primary text-ellipsis ${className} text-red`}
+			style={style}
 		>
 			{children}
 		</Text>

@@ -1,6 +1,6 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import * as React from "react";
-import { Pressable } from "react-native";
+import { Pressable, Text } from "react-native";
 
 import { TextClassContext } from "./text";
 
@@ -39,8 +39,8 @@ const buttonTextVariants = cva(
 	{
 		variants: {
 			variant: {
-				default: "text-primary-foreground",
-				destructive: "text-destructive-foreground",
+				default: "text-secondary",
+				destructive: "text-secondary",
 				outline: "group-active:text-accent-foreground",
 				secondary:
 					"text-secondary-foreground group-active:text-secondary-foreground",
@@ -62,12 +62,14 @@ const buttonTextVariants = cva(
 );
 
 type ButtonProps = React.ComponentPropsWithoutRef<typeof Pressable> &
-	VariantProps<typeof buttonVariants>;
+	VariantProps<typeof buttonVariants> & {
+		label?: string; // Add label property
+	};
 
 const Button = React.forwardRef<
 	React.ElementRef<typeof Pressable>,
 	ButtonProps
->(({ className, variant, size, ...props }, ref) => {
+>(({ className, variant, size, label, ...props }, ref) => {
 	return (
 		<TextClassContext.Provider
 			value={cn(
@@ -83,7 +85,18 @@ const Button = React.forwardRef<
 				ref={ref}
 				role="button"
 				{...props}
-			/>
+			>
+				{label && (
+					<Text
+						className={cn(
+							"flex items-center justify-center",
+							buttonTextVariants({ variant, size }),
+						)}
+					>
+						{label}
+					</Text>
+				)}
+			</Pressable>
 		</TextClassContext.Provider>
 	);
 });

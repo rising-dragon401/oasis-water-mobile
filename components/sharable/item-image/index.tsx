@@ -12,7 +12,7 @@ export default function ItemImage({ src, alt }: ItemImageProps) {
 			alt={alt}
 			width={1000}
 			height={1000}
-			className="rounded-lg md:w-[600px] md:h-full w-72 h-72 object-cover"
+			className="rounded-lg w-96 h-96  object-cover p-2"
 		/>
 	);
 }

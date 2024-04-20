@@ -20,7 +20,7 @@ export default function ProtectedLayout() {
 				},
 				tabBarShowLabel: false,
 				tabBarIcon: ({ color }) => {
-					if (route.name === "home") {
+					if (route.name === "search") {
 						return <Octicons name="search" size={24} color={color} />;
 					} else if (route.name === "settings") {
 						return <Octicons name="person" size={24} color={color} />;
@@ -28,7 +28,7 @@ export default function ProtectedLayout() {
 				},
 			})}
 		>
-			<Tabs.Screen name="home" />
+			<Tabs.Screen name="search" />
 			<Tabs.Screen name="settings" />
 		</Tabs>
 	);

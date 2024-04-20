@@ -1,43 +1,42 @@
 "use client";
 
 import { getItemDetails } from "actions/items";
+import { ScrollView, View } from "react-native";
 
 import { Octicons } from "@expo/vector-icons";
-import ContaminantCard from "./contamintant-card";
-
-import Sources from "./sources";
 
 import { Button } from "@/components/ui/button";
 import { Link } from "expo-router";
 import BlurredLineItem from "./blurred-line-item";
 import ItemImage from "./item-image";
-import PaywallContent from "./paywall-content";
 import Score from "./score";
 import Typography from "./typography";
 
 import { useEffect, useState } from "react";
-
+import ContaminantCard from "./contamintant-card";
 import IngredientsCard from "./ingredients-card";
 import MetaDataCard from "./metadata-card";
+import PaywallContent from "./paywall-content";
+import Sources from "./sources";
 
 type Props = {
 	id: string;
 };
 
-export default function ItemForm({ id }: Props) {
+export function ItemForm({ id }: Props) {
 	const [item, setItem] = useState<any>({});
 	const [isLoading, setIsLoading] = useState(true);
 
 	const fetchItem = async (id: string) => {
-		console.log("get item details");
 		const item = await getItemDetails(id);
+
+		console.log("ItemForm -> item", item);
 
 		if (item) {
 			setItem(item);
 		}
 
 		setIsLoading(false);
-		return item;
 	};
 
 	useEffect(() => {
@@ -75,10 +74,10 @@ export default function ItemForm({ id }: Props) {
 				: "No";
 
 	return (
-		<div className="flex-col flex w-full">
-			<div className="md:py-10 pt-2 pb-6 md:px-0 px-4">
-				<div className="flex md:flex-row flex-col gap-6">
-					<div className="flex justify-center w-full md:w-1/2">
+		<ScrollView>
+			<View className="w-full items-center justify-center px-4">
+				<View className="flex flex-col gap-6 justify-center w-full">
+					<View className="flex justify-center w-full p-2">
 						{item.affiliate_url ? (
 							<Link
 								href={item.affiliate_url}
@@ -90,16 +89,15 @@ export default function ItemForm({ id }: Props) {
 						) : (
 							<ItemImage src={item.image} alt={item.name} />
 						)}
-					</div>
+					</View>
 
-					<div className="flex flex-row gap-2 w-full">
-						<div className="flex flex-col md:gap-2 md:w-3/5">
+					<View className="flex flex-row gap-2 w-full">
+						<View className="flex flex-col w-2/3">
 							<Typography size="3xl" fontWeight="normal">
 								{item.name}
 							</Typography>
 							{/* @ts-ignore */}
 							<Link href={`/search/company/${item.company?.name}`}>
-								{" "}
 								<Typography
 									size="base"
 									fontWeight="normal"
@@ -109,9 +107,9 @@ export default function ItemForm({ id }: Props) {
 								</Typography>
 							</Link>
 
-							<>
+							<View>
 								{item.is_indexed !== false ? (
-									<div className="flex flex-col">
+									<View className="flex flex-col">
 										<BlurredLineItem
 											label="Contaminants found"
 											value={contaminants.length}
@@ -119,7 +117,7 @@ export default function ItemForm({ id }: Props) {
 										/>
 
 										<BlurredLineItem
-											label="Toxins above health guidelines"
+											label="Toxins above guidelines"
 											value={contaminantsAboveLimit.length}
 											labelClassName="text-red-500"
 										/>
@@ -146,7 +144,7 @@ export default function ItemForm({ id }: Props) {
 											value={item.metadata?.pfas || "Unknown"}
 										/>
 
-										<div className="flex flex-col md:w-40 w-full md:mt-6 mt-2 gap-2">
+										<View className="flex flex-col md:w-40 w-full md:mt-6 mt-2 gap-2">
 											{item.affiliate_url && (
 												<Button
 													variant={item.score > 70 ? "outline" : "outline"}
@@ -154,7 +152,9 @@ export default function ItemForm({ id }: Props) {
 														window.open(item.affiliate_url, "_blank");
 													}}
 												>
-													Buy Now
+													<Typography size="base" fontWeight="normal">
+														Buy Now
+													</Typography>
 													<Octicons
 														name="arrow-right"
 														size={24}
@@ -162,10 +162,10 @@ export default function ItemForm({ id }: Props) {
 													/>
 												</Button>
 											)}
-										</div>
-									</div>
+										</View>
+									</View>
 								) : (
-									<>
+									<View>
 										<Typography
 											size="base"
 											fontWeight="normal"
@@ -173,7 +173,7 @@ export default function ItemForm({ id }: Props) {
 										>
 											⚠️ NO REPORTS LOCATED – PROCEED WITH CAUTION.
 										</Typography>
-										<div className="flex flex-col gap-6 mt-6">
+										<View className="flex flex-col gap-6 mt-6">
 											<Typography
 												size="base"
 												fontWeight="normal"
@@ -184,39 +184,39 @@ export default function ItemForm({ id }: Props) {
 												their lab reports so we cannot recommend or provide a
 												score for this item.
 											</Typography>
-										</div>
-									</>
+										</View>
+									</View>
 								)}
-							</>
-						</div>
+							</View>
+						</View>
 
-						<div className="flex md:flex-row md:justify-start md:gap-10 md:items-start flex-col-reverse justify-end items-end">
+						<View className="flex w-1/3 flex-col-reverse justify-end items-end">
 							{item.is_indexed !== false && (
 								<Score score={item.score} size="lg" />
 							)}
-						</div>
-					</div>
-				</div>
+						</View>
+					</View>
+				</View>
 
 				{item.is_indexed !== false && (
 					<PaywallContent className="mt-6" label="Unlock All Data & Reports">
 						{sortedContaminants && sortedContaminants.length > 0 && (
-							<div className="flex flex-col gap-6 mt-6">
+							<View className="flex flex-col gap-6 mt-6">
 								<Typography size="2xl" fontWeight="normal">
 									Contaminants ☠️
 								</Typography>
-								<div className="grid md:grid-cols-2 grid-cols-1 gap-6">
+								<View className="grid md:grid-cols-2 grid-cols-1 gap-6">
 									{sortedContaminants.map((contaminant: any, index: number) => (
 										<ContaminantCard
 											key={contaminant.id || index}
 											data={contaminant}
 										/>
 									))}
-								</div>
-							</div>
+								</View>
+							</View>
 						)}
 
-						<div className="grid md:grid-cols-2 md:grid-rows-1 grid-rows-2 gap-4 mt-6">
+						<View className="grid md:grid-cols-2 md:grid-rows-1 grid-rows-2 gap-4 mt-6">
 							<MetaDataCard
 								title="Source"
 								description={item.metadata?.source}
@@ -232,17 +232,17 @@ export default function ItemForm({ id }: Props) {
 										: item.metadata?.treatment_process
 								}
 							/>
-						</div>
+						</View>
 
 						<>
 							{item?.ingredients?.length > 0 && (
-								<div className="flex flex-col gap-6 my-10">
+								<View className="flex flex-col gap-6 my-10">
 									<Typography size="2xl" fontWeight="normal">
 										Other Ingredients
 									</Typography>
 
 									<IngredientsCard ingredients={item.ingredients} />
-								</div>
+								</View>
 							)}
 						</>
 
@@ -251,7 +251,7 @@ export default function ItemForm({ id }: Props) {
 						)}
 					</PaywallContent>
 				)}
-			</div>
-		</div>
+			</View>
+		</ScrollView>
 	);
 }
