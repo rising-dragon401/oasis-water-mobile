@@ -99,3 +99,23 @@ export const getItemDetails = async (id: string) => {
 		return error;
 	}
 };
+
+export const getTenRandomItems = async () => {
+	const { data, error } = await supabase
+		.from("items")
+		.select()
+		.not("score", "is", null)
+		.order("id", { ascending: false })
+		.limit(10);
+
+	if (error) {
+		console.error("error", error);
+		return [];
+	}
+
+	const shuffledData = data.sort(() => 0.5 - Math.random()).slice(0, 10);
+
+	console.log("shuffledData", shuffledData);
+
+	return shuffledData;
+};

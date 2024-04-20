@@ -6,7 +6,7 @@ import { ScrollView, View } from "react-native";
 import { Octicons } from "@expo/vector-icons";
 
 import { Button } from "@/components/ui/button";
-import { Link } from "expo-router";
+import { Link, useNavigation } from "expo-router";
 import BlurredLineItem from "./blurred-line-item";
 import ItemImage from "./item-image";
 import Score from "./score";
@@ -24,8 +24,10 @@ type Props = {
 };
 
 export function ItemForm({ id }: Props) {
+	const navigation = useNavigation();
+
 	const [item, setItem] = useState<any>({});
-	const [isLoading, setIsLoading] = useState(true);
+	const [, setIsLoading] = useState(true);
 
 	const fetchItem = async (id: string) => {
 		const item = await getItemDetails(id);
@@ -34,6 +36,9 @@ export function ItemForm({ id }: Props) {
 
 		if (item) {
 			setItem(item);
+			navigation.setOptions({
+				title: item.name,
+			});
 		}
 
 		setIsLoading(false);
@@ -80,8 +85,8 @@ export function ItemForm({ id }: Props) {
 			}}
 		>
 			<View className="w-full items-center justify-center px-4">
-				<View className="flex flex-col gap-6 justify-center w-full">
-					<View className="flex justify-center w-full p-2">
+				<View className="flex flex-col gap-6 justify-center items-center w-full">
+					<View className="flex justify-center items-center h-80 w-80 p-4">
 						{item.affiliate_url ? (
 							<Link
 								href={item.affiliate_url}
@@ -168,39 +173,38 @@ export function ItemForm({ id }: Props) {
 											)}
 										</View>
 									</View>
-								) : (
-									<View>
-										<Typography
-											size="base"
-											fontWeight="normal"
-											className="text-secondary"
-										>
-											⚠️ NO REPORTS LOCATED – PROCEED WITH CAUTION.
-										</Typography>
-										<View className="flex flex-col gap-6 mt-6">
-											<Typography
-												size="base"
-												fontWeight="normal"
-												className="text-secondary"
-											>
-												This item has not been tested or rated yet. This usally
-												means the company has not publicized or refuses to share
-												their lab reports so we cannot recommend or provide a
-												score for this item.
-											</Typography>
-										</View>
-									</View>
-								)}
+								) : null}
 							</View>
 						</View>
 
 						<View className="flex w-1/3 flex-col-reverse justify-end items-end">
-							{item.is_indexed !== false && (
-								<Score score={item.score} size="lg" />
-							)}
+							<Score score={item.is_indexed ? item.score : 0} size="md" />
 						</View>
 					</View>
 				</View>
+
+				{!item.is_indexed && (
+					<View className="w-full mt-4">
+						<Typography
+							size="base"
+							fontWeight="normal"
+							className="text-primary"
+						>
+							⚠️ NO REPORTS LOCATED – PROCEED WITH CAUTION.
+						</Typography>
+						<View className="flex flex-col gap-6 mt-6">
+							<Typography
+								size="base"
+								fontWeight="normal"
+								className="text-primary"
+							>
+								This item has not been tested or rated yet. This usally means
+								the company has not publicized or refuses to share their lab
+								reports so we cannot recommend or provide a score for this item.
+							</Typography>
+						</View>
+					</View>
+				)}
 
 				{item.is_indexed !== false && (
 					<>

@@ -64,7 +64,8 @@ export default function Score({ score, size }: Props) {
 		router.push("/subscribeModal");
 	};
 
-	if (!subscription) {
+	// Unindexed items have a score of 0
+	if (!subscription && score !== 0) {
 		return (
 			<TouchableOpacity
 				onPress={handleOpenSubscribeModal}
@@ -139,25 +140,25 @@ export default function Score({ score, size }: Props) {
 					cy={svgSize / 2}
 				/>
 			</Svg>
-			<View
-				className="absolute flex flex-col justify-center items-center"
-				style={{ width: "100%", height: "100%" }}
-			>
-				<Typography
-					size="xl"
-					fontWeight="normal"
-					className="flex gap-2 text-secondary mb-0"
-				>
-					<Typography size="xl" fontWeight="normal" className="text-primary">
+			<View className="absolute flex flex-col justify-center items-center">
+				<View className="flex-1 flex-row items-center gap-2">
+					<Typography size="2xl" fontWeight="normal" className="text-primary">
 						{score}
 					</Typography>
-					/ 100
-				</Typography>
+					<Typography
+						size="2xl"
+						fontWeight="normal"
+						className="flex gap-2 text-primary mb-0"
+					>
+						/ 100
+					</Typography>
+				</View>
 
+				{}
 				<Typography
 					size="base"
 					fontWeight="normal"
-					className="text-secondary"
+					className="text-primary mt-1"
 					style={{ fontSize: fontSize }}
 				>
 					{grade()}

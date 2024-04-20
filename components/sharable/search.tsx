@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Octicons } from "@expo/vector-icons";
 
@@ -15,23 +14,19 @@ export default function Search() {
 	const handleSearch = () => {};
 
 	return (
-		<View className="flex flex-row gap-2 ">
+		<View className="flex flex-row gap-2 items-center">
 			<Input
 				placeholder="Search water, filters, location..."
 				value={value}
 				onChangeText={onChangeText}
 				aria-labelledbyledBy="inputLabel"
 				aria-errormessage="inputError"
-				className="w-96 !rounded-full"
+				className="!rounded-full w-80"
 			/>
-			<Button
-				className="w-14 rounded-full "
-				variant="default"
-				size="default"
-				onPress={handleSearch}
-			>
-				<Octicons name="search" size={16} color="white" />
-			</Button>
+
+			<TouchableOpacity onPress={handleSearch}>
+				<Octicons name="search" size={24} color="black" />
+			</TouchableOpacity>
 		</View>
 	);
 }

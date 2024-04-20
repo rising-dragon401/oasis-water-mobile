@@ -6,13 +6,14 @@ type ItemImageProps = {
 };
 
 export default function ItemImage({ src, alt }: ItemImageProps) {
+	console.log("ItemImage -> src", src);
 	return (
 		<Image
 			src={src}
 			alt={alt}
 			width={1000}
 			height={1000}
-			className="rounded-lg w-96 h-96  object-cover p"
+			className="rounded-lg w-full h-full object-cover"
 		/>
 	);
 }

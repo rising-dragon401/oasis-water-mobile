@@ -2,6 +2,8 @@ import { Link, useRouter } from "expo-router";
 import React from "react";
 import { Image, Text, View } from "react-native";
 
+import { Octicons } from "@expo/vector-icons";
+import { useUserProvider } from "context/user-provider";
 import Typography from "./typography";
 
 // import FavoriteButton from "../favorite-button";
@@ -13,20 +15,25 @@ type Props = {
 
 const ItemPreviewCard = ({ item, showWarning }: Props) => {
 	const router = useRouter();
+	const { subscription } = useUserProvider();
 
 	const renderScore = () => {
 		const score = item?.score || 0;
 		const color = "blue";
 
 		return (
-			<View className="flex flex-col gap-0">
-				<Typography
-					size="2xl"
-					fontWeight="normal"
-					className={`!no-underline ${color} text-right`}
-				>
-					{score}
-				</Typography>
+			<View className="flex flex-col gap-0 items-end">
+				{subscription ? (
+					<Typography
+						size="2xl"
+						fontWeight="normal"
+						className={`!no-underline ${color} text-right`}
+					>
+						{score}
+					</Typography>
+				) : (
+					<Octicons name="lock" size={16} color="muted" />
+				)}
 				<Typography size="xs" fontWeight="normal">
 					/100
 				</Typography>
@@ -35,6 +42,7 @@ const ItemPreviewCard = ({ item, showWarning }: Props) => {
 	};
 
 	const determineLink = () => {
+		console.log("item -->", item);
 		// let basePath = "";
 		// if (item.type === "tap_water") {
 		// 	basePath = `/search/location/${item.id}`;
@@ -43,13 +51,13 @@ const ItemPreviewCard = ({ item, showWarning }: Props) => {
 		// } else {
 		// 	basePath = `/search/item/${item.id}`;
 		// }
-		return `/home/item/${item.id}`;
+		return `/search/item/${item.id}`;
 	};
 
 	return (
-		<Link href={`/search/item/${item.id}`}>
+		<Link href={determineLink()}>
 			<View>
-				<View className="relative w-60 h-60">
+				<View className="relative w-40 h-40">
 					<Image
 						source={{ uri: item.image || undefined }}
 						style={{ width: "100%", height: "100%" }}
@@ -69,7 +77,7 @@ const ItemPreviewCard = ({ item, showWarning }: Props) => {
 						</View>
 					)}
 				</View>
-				<View className="flex flex-row justify-between pt-1 md:gap-2 items-start w-60">
+				<View className="flex flex-row justify-between pt-1 md:gap-2 items-start w-40">
 					<View className="flex flex-col">
 						<Typography
 							size="base"
