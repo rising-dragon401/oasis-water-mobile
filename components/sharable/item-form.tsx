@@ -32,8 +32,6 @@ export function ItemForm({ id }: Props) {
 	const fetchItem = async (id: string) => {
 		const item = await getItemDetails(id);
 
-		console.log("ItemForm -> item", item);
-
 		if (item) {
 			setItem(item);
 			navigation.setOptions({

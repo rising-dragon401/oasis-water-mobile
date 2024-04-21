@@ -1,7 +1,6 @@
 import { useRouter } from "expo-router";
 import { View } from "react-native";
 
-import Typography from "@/components/sharable/typography";
 import { Button } from "@/components/ui/button";
 import { H1, Muted } from "@/components/ui/typography";
 
@@ -19,11 +18,8 @@ export default function NotFound() {
 				onPress={() => {
 					router.push("/");
 				}}
-			>
-				<Typography size="base" fontWeight="normal" className="text-secondary">
-					Go to home
-				</Typography>
-			</Button>
+				label="Go to home"
+			/>
 		</View>
 	);
 }

@@ -37,15 +37,7 @@ export function ContaminantFiltersDropdown({ contaminantId, align }: Props) {
 	return (
 		<DropdownMenu open={open} onOpenChange={setOpen}>
 			<DropdownMenuTrigger asChild>
-				<Button variant="outline">
-					<Typography
-						size="base"
-						fontWeight="normal"
-						className="text-secondary mt-2"
-					>
-						Filters that remove this
-					</Typography>
-				</Button>
+				<Button variant="outline" label="Filters" />
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className="w-72" align={align}>
 				<DropdownMenuLabel>Filters</DropdownMenuLabel>

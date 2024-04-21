@@ -65,7 +65,7 @@ export default function ContaminantCard({ data }: Props) {
 					<Typography
 						size="base"
 						fontWeight="bold"
-						className="text-secondary mt-2"
+						className="text-muted-foreground mt-2"
 					>
 						Amount: {data?.amount} {data?.unit} {data?.measure}
 					</Typography>
@@ -74,7 +74,7 @@ export default function ContaminantCard({ data }: Props) {
 					<Typography
 						size="xs"
 						fontWeight="normal"
-						className="text-secondary mt-2"
+						className="text-muted-foreground mt-2"
 					>
 						Health Guideline: {data?.health_guideline} {data?.measure}
 					</Typography>
@@ -83,13 +83,13 @@ export default function ContaminantCard({ data }: Props) {
 					<Typography
 						size="xs"
 						fontWeight="normal"
-						className="text-secondary mt-2"
+						className="text-muted-foreground mt-2"
 					>
 						Legal Limit: {data?.legal_limit} {data?.measure}
 					</Typography>
 				)}
 			</CardContent>
-			<CardFooter className="flex flex-row  w-full justify-between p-0">
+			<CardFooter className="flex flex-row w-full justify-between px-4 pb-4">
 				<ContaminantFiltersDropdown
 					contaminantId={data?.id || ""}
 					align="start"

@@ -23,11 +23,7 @@ export function ArticlesDropdown({ sources }: Props) {
 	return (
 		<DropdownMenu open={open} onOpenChange={setOpen}>
 			<DropdownMenuTrigger asChild>
-				<Button variant="outline">
-					<Typography size="base" fontWeight="normal">
-						Articles
-					</Typography>
-				</Button>
+				<Button variant="outline" label="Articles" />
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className="w-96" align="end">
 				<DropdownMenuLabel>Articles</DropdownMenuLabel>
