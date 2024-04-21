@@ -1,13 +1,43 @@
-"use client";
+import { useEffect, useMemo, useState } from "react";
 
 import { Octicons } from "@expo/vector-icons";
 import { getContaminants } from "actions/ingredients";
-import { useEffect, useState } from "react";
+import { StyleSheet, Text, View } from "react-native";
 import { ContaminantFiltersDropdown } from "./contaminant-filters-dropdown";
 
 type Props = {
 	filteredContaminants: any[];
 };
+
+const styles = StyleSheet.create({
+	container: {
+		flex: 1,
+	},
+	header: {
+		flexDirection: "row",
+		padding: 10,
+		backgroundColor: "#f3f3f3",
+	},
+	row: {
+		flexDirection: "row",
+		borderBottomWidth: 1,
+		borderBottomColor: "#ccc",
+		padding: 10,
+	},
+	cell: {
+		width: "100%",
+		marginRight: 10,
+		flex: 1, // Adjust flex values as needed to allocate space
+	},
+	text: {
+		fontSize: 12,
+	},
+	icon: {
+		width: 24,
+		alignItems: "center",
+		justifyContent: "center",
+	},
+});
 
 export default function ContaminantTable({ filteredContaminants }: Props) {
 	const [contaminants, setContaminants] = useState<any[]>([]);
@@ -19,64 +49,47 @@ export default function ContaminantTable({ filteredContaminants }: Props) {
 	}, []);
 
 	// Sort contaminants: filtered ones first
-	const sortedContaminants = contaminants?.sort((a, b) => {
-		const aIsFiltered = filteredContaminants.some((fc) => fc.id === a.id)
-			? 1
-			: 0;
-		const bIsFiltered = filteredContaminants.some((fc) => fc.id === b.id)
-			? 1
-			: 0;
-		return bIsFiltered - aIsFiltered;
-	});
+	const sortedContaminants = useMemo(
+		() =>
+			contaminants?.sort((a, b) => {
+				const aIsFiltered = filteredContaminants?.some((fc) => fc.id === a.id)
+					? 1
+					: 0;
+				const bIsFiltered = filteredContaminants?.some((fc) => fc.id === b.id)
+					? 1
+					: 0;
+				return bIsFiltered - aIsFiltered;
+			}),
+		[contaminants, filteredContaminants],
+	);
 
 	return (
-		<table className="min-w-full divide-y divide-gray-200 overflow-scroll">
-			<thead className="bg-gray-50">
-				<tr>
-					<th
-						scope="col"
-						className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider max-w-32"
-					>
-						Name
-					</th>
-					<th
-						scope="col"
-						className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider max-w-18"
-					>
-						Filtered?
-					</th>
-
-					<th
-						scope="col"
-						className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-					>
-						Filtered By
-					</th>
-				</tr>
-			</thead>
-			<tbody className="bg-white divide-y divide-gray-200">
-				{sortedContaminants?.map((contaminant, index) => (
-					<tr key={index}>
-						<td className="px-2 py-4  md:text-sm text-xs font-medium text-gray-900 max-w-36 text-wrap">
-							{contaminant.name}
-						</td>
-						<td className="px-2 py-4 whitespace-nowrap text-sm text-gray-500 max-w-14">
-							{filteredContaminants.some((fc) => fc.id === contaminant.id) ? (
-								<Octicons name="check" size={24} color="black" />
-							) : (
-								<Octicons name="x" size={24} color="black" />
-							)}
-						</td>
-
-						<td className="px-2 py-4 whitespace-nowrap text-sm text-gray-500 max-w-24">
-							<ContaminantFiltersDropdown
-								contaminantId={contaminant?.id}
-								align="end"
-							/>
-						</td>
-					</tr>
-				))}
-			</tbody>
-		</table>
+		<View className="w-[92vw]">
+			<View style={styles.header}>
+				<Text style={[styles.cell, styles.text]}>Name</Text>
+				<Text style={[styles.cell, styles.text]}>Filtered?</Text>
+				<Text style={[styles.cell, styles.text]}>Filtered By</Text>
+			</View>
+			{sortedContaminants?.map((contaminant, index) => (
+				<View
+					key={index}
+					style={styles.row}
+					className="flex justify-center items-center text-left w-full"
+				>
+					<Text style={[styles.cell, styles.text]}>{contaminant.name}</Text>
+					<View style={[styles.cell, styles.icon]}>
+						{filteredContaminants?.some((fc) => fc.id === contaminant.id) ? (
+							<Octicons name="check" size={16} color="black" />
+						) : (
+							<Octicons name="x" size={16} color="black" />
+						)}
+					</View>
+					<ContaminantFiltersDropdown
+						contaminantId={contaminant?.id}
+						align="end"
+					/>
+				</View>
+			))}
+		</View>
 	);
 }

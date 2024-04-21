@@ -4,6 +4,7 @@ import "../global.css";
 
 import { SupabaseProvider } from "@/context/supabase-provider";
 import UserProvider from "@/context/user-provider";
+import { PortalHost } from "components/primitives/portal";
 
 export {
 	// Catch any errors thrown by the Layout component.
@@ -30,6 +31,7 @@ export default function RootLayout() {
 						/>
 					</Stack>
 				</SafeAreaProvider>
+				<PortalHost />
 			</UserProvider>
 		</SupabaseProvider>
 	);

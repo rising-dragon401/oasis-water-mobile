@@ -6,7 +6,6 @@ type ItemImageProps = {
 };
 
 export default function ItemImage({ src, alt }: ItemImageProps) {
-	console.log("src: ", src);
 	return (
 		<Image
 			source={{ uri: src }}

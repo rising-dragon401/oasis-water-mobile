@@ -93,11 +93,7 @@ export const getFilterDetails = async (id: string) => {
 		.select()
 		.eq("id", id);
 
-	const { data: allIngredients, error: ingredientsError } = await supabase
-		.from("ingredients")
-		.select();
-
-	if (!item || !allIngredients) {
+	if (!item) {
 		return null;
 	}
 
@@ -108,15 +104,10 @@ export const getFilterDetails = async (id: string) => {
 		contaminantData = (
 			await Promise.all(
 				contaminants.map(async (contaminant: any) => {
-					const data = allIngredients.find(
-						(ingredient) => ingredient.id === contaminant,
-					)
-						? [
-								allIngredients.find(
-									(ingredient) => ingredient.id === contaminant,
-								),
-							]
-						: null;
+					const { data, error } = await supabase
+						.from("ingredients")
+						.select()
+						.eq("id", contaminant);
 
 					if (!data) {
 						return null;

@@ -57,8 +57,8 @@ const ItemPreviewCard = ({ item, showWarning }: Props) => {
 	return (
 		// @ts-ignore
 		<Link href={determineLink()}>
-			<View className="flex flex-col items-center gap-2">
-				<View className="relative rounded-md overflow-hidden h-40 w-40">
+			<View className="flex flex-col items-center gap-2 h-36 w-36">
+				<View className="relative rounded-md overflow-hidden h-full w-full">
 					<Image
 						source={{ uri: item.image || undefined }}
 						style={{
@@ -66,9 +66,9 @@ const ItemPreviewCard = ({ item, showWarning }: Props) => {
 							height: "100%",
 						}}
 					/>
-					<View style={{ position: "absolute", top: 0, right: 0 }}>
-						{/* <FavoriteButton item={item} /> */}
-					</View>
+					{/* <View style={{ position: "absolute", top: 0, right: 0 }}>
+						<FavoriteButton item={item} />
+					</View> */}
 					{item.score && (
 						<View style={{ position: "absolute", bottom: 8, right: 8 }}>
 							{renderScore()}
@@ -80,7 +80,7 @@ const ItemPreviewCard = ({ item, showWarning }: Props) => {
 						</View>
 					)}
 				</View>
-				<View className="flex flex-row justify-between pt-1 md:gap-2 items-start w-40">
+				<View className="flex flex-row justify-between pt-1 md:gap-2 items-start w-36">
 					<View className="flex flex-col">
 						<Typography
 							size="base"

@@ -11,6 +11,7 @@ import {
 } from "components/ui/dropdown-menu";
 import { Link } from "expo-router";
 import React, { useEffect, useState } from "react";
+import { View } from "react-native";
 import Typography from "./typography";
 
 type Props = {
@@ -18,7 +19,10 @@ type Props = {
 	align?: "start" | "end";
 };
 
-export function ContaminantFiltersDropdown({ contaminantId, align }: Props) {
+export function ContaminantFiltersDropdown({
+	contaminantId,
+	align = "end",
+}: Props) {
 	const [filters, setFilters] = useState<any[]>([]);
 	const [open, setOpen] = useState(false);
 
@@ -32,24 +36,35 @@ export function ContaminantFiltersDropdown({ contaminantId, align }: Props) {
 	}, [contaminantId]);
 
 	return (
-		<DropdownMenu open={open} onOpenChange={setOpen} className="relative">
+		<DropdownMenu
+			open={open}
+			onOpenChange={(newVal) => {
+				if (!newVal) {
+					setOpen(false);
+				}
+				setOpen(newVal);
+			}}
+			className="relative"
+		>
 			<DropdownMenuTrigger asChild>
-				<Button variant="outline">Filters that remove this</Button>
+				<Button variant="ghost" label="Filters" />
 			</DropdownMenuTrigger>
-			<DropdownMenuContent className="w-72" align={align}>
+			<DropdownMenuContent className="w-72 z-50" align={align}>
 				<DropdownMenuLabel>Filters</DropdownMenuLabel>
 				<DropdownMenuSeparator />
 				<DropdownMenuGroup>
 					{filters.length > 0 ? (
 						filters.map((filter: any) => (
-							<div key={filter.id}>
+							<View key={filter.id}>
 								<DropdownMenuItem key={filter.id}>
 									<Link href={`/search/filter/${filter.id}`}>
-										{filter.name}
+										<Typography size="base" fontWeight="normal">
+											{filter.name}
+										</Typography>
 									</Link>
 								</DropdownMenuItem>
 								<DropdownMenuSeparator />
-							</div>
+							</View>
 						))
 					) : (
 						<DropdownMenuItem>
