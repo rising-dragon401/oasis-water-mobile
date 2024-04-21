@@ -21,7 +21,7 @@ export default function Search() {
 				onChangeText={onChangeText}
 				aria-labelledbyledBy="inputLabel"
 				aria-errormessage="inputError"
-				className="!rounded-full w-80"
+				className="!rounded-full w-96"
 			/>
 
 			<TouchableOpacity onPress={handleSearch}>

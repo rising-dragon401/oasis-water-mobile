@@ -7,7 +7,6 @@ import * as z from "zod";
 import { SafeAreaView } from "@/components/safe-area-view";
 import { Button } from "@/components/ui/button";
 import { Form, FormField, FormInput } from "@/components/ui/form";
-import { Text } from "@/components/ui/text";
 import { H1, Muted } from "@/components/ui/typography";
 import { useSupabase } from "@/context/supabase-provider";
 
@@ -45,9 +44,7 @@ export default function SignIn() {
 		<SafeAreaView className="flex-1 bg-background p-4">
 			<View className="flex-1">
 				<H1 className="self-start">Sign In</H1>
-				<Muted className="self-start mb-5">
-					to continue to Expo Supabase Starter
-				</Muted>
+				<Muted className="self-start mb-5">to continue to your Oasis</Muted>
 				<Form {...form}>
 					<View className="gap-4">
 						<FormField
@@ -87,12 +84,9 @@ export default function SignIn() {
 					size="default"
 					variant="default"
 					onPress={form.handleSubmit(onSubmit)}
+					label="Sign In"
 				>
-					{form.formState.isSubmitting ? (
-						<ActivityIndicator size="small" />
-					) : (
-						<Text>Sign In</Text>
-					)}
+					{form.formState.isSubmitting && <ActivityIndicator size="small" />}
 				</Button>
 				<Muted
 					className="text-center"

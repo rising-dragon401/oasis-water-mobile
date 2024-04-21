@@ -4,7 +4,6 @@ import { View } from "react-native";
 
 import { SafeAreaView } from "@/components/safe-area-view";
 import { Button } from "@/components/ui/button";
-import { Text } from "@/components/ui/text";
 import { H1, Muted } from "@/components/ui/typography";
 
 export default function WelcomeScreen() {
@@ -13,10 +12,10 @@ export default function WelcomeScreen() {
 	return (
 		<SafeAreaView className="flex flex-1 bg-background p-4">
 			<View className="flex flex-1 items-center justify-center gap-y-4">
-				<H1 className="text-center">Welcome to Expo Supabase Starter</H1>
+				<H1 className="text-center">Welcome to your Oasis</H1>
 				<Muted className="text-center">
-					A comprehensive starter project for developing Expo applications with
-					Supabase as the backend.
+					Search, research and find the the healthiest waters for you based on
+					science.
 				</Muted>
 			</View>
 			<View className="flex flex-row gap-x-4">
@@ -27,9 +26,8 @@ export default function WelcomeScreen() {
 					onPress={() => {
 						router.push("/sign-up");
 					}}
-				>
-					<Text>Sign Up</Text>
-				</Button>
+					label="Sign Up"
+				/>
 				<Button
 					className="flex-1"
 					size="default"
@@ -37,9 +35,8 @@ export default function WelcomeScreen() {
 					onPress={() => {
 						router.push("/sign-in");
 					}}
-				>
-					<Text>Sign In</Text>
-				</Button>
+					label="Sign In"
+				/>
 			</View>
 		</SafeAreaView>
 	);

@@ -1,4 +1,4 @@
-import { Link, useRouter } from "expo-router";
+import { Link } from "expo-router";
 import React from "react";
 import { Image, Text, View } from "react-native";
 
@@ -14,7 +14,6 @@ type Props = {
 };
 
 const ItemPreviewCard = ({ item, showWarning }: Props) => {
-	const router = useRouter();
 	const { subscription } = useUserProvider();
 
 	const renderScore = () => {
@@ -42,8 +41,7 @@ const ItemPreviewCard = ({ item, showWarning }: Props) => {
 	};
 
 	const determineLink = () => {
-		console.log("item -->", item);
-		// let basePath = "";
+		// let basePath = ""
 		// if (item.type === "tap_water") {
 		// 	basePath = `/search/location/${item.id}`;
 		// } else if (item.type === "filter") {
@@ -55,6 +53,7 @@ const ItemPreviewCard = ({ item, showWarning }: Props) => {
 	};
 
 	return (
+		// @ts-ignore
 		<Link href={determineLink()}>
 			<View>
 				<View className="relative w-40 h-40">

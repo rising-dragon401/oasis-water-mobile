@@ -115,7 +115,5 @@ export const getTenRandomItems = async () => {
 
 	const shuffledData = data.sort(() => 0.5 - Math.random()).slice(0, 10);
 
-	console.log("shuffledData", shuffledData);
-
 	return shuffledData;
 };

@@ -1,6 +1,10 @@
 "use client";
 
-import { supabase } from "@/config/supabase";
+import {
+	getCurrentUserData,
+	getSubscription,
+	getUserFavorites,
+} from "actions/user";
 import React, {
 	ReactNode,
 	createContext,
@@ -10,7 +14,10 @@ import React, {
 	useMemo,
 	useState,
 } from "react";
+
 import { useSupabase } from "./supabase-provider";
+
+import { supabase } from "@/config/supabase";
 
 interface UserContextType {
 	uid: string | null | undefined;
@@ -18,10 +25,9 @@ interface UserContextType {
 	user: any;
 	userData: any;
 	userFavorites: any[] | null | undefined;
-	emailSubscriptions: any[] | null | undefined;
 	subscription: any | null | undefined;
 	refreshUserData: () => void;
-	fetchUserFavorites: () => void;
+	fetchUserFavorites: (uid: string | null) => Promise<void>; // Updated this line
 	logout: () => void;
 }
 
@@ -46,9 +52,6 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 	const [userFavorites, setUserFavorites] = useState<any[] | null | undefined>(
 		null,
 	);
-	const [emailSubscriptions, setEmailSubscriptions] = useState<
-		any[] | null | undefined
-	>(null);
 
 	useEffect(() => {
 		setActiveSession(session);
@@ -66,24 +69,27 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 	};
 
 	const fetchUserData = async (uid?: string | null) => {
-		// const data = await getCurrentUserData(uid);
-		// setUserData(data);
+		if (!uid) {
+			return;
+		}
+
+		const data = await getCurrentUserData(uid);
+		setUserData(data);
 	};
 
-	const fetchUserFavorites = async () => {
-		// const favs = await getUserFavorites();
-		// setUserFavorites(favs);
-	};
+	const fetchUserFavorites = async (uid: string | null) => {
+		if (!uid) {
+			return;
+		}
 
-	const fetchEmailSubscriptions = async (uid: string | null | undefined) => {
-		// const res = await getEmailSubscriptions();
-		// setEmailSubscriptions(res);
+		const favs = await getUserFavorites(uid);
+		setUserFavorites(favs);
 	};
 
 	const fetchSubscription = async (uid: string | null) => {
-		// const data = await getSubscription(uid);
-		// setSubscription(data);
-		// return data;
+		const data = await getSubscription(uid);
+		setSubscription(data);
+		return data;
 	};
 
 	const refreshUserData = useCallback(
@@ -95,8 +101,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 			await Promise.all([
 				fetchSubscription(userId),
 				fetchUserData(userId),
-				fetchUserFavorites(),
-				fetchEmailSubscriptions(user?.id),
+				fetchUserFavorites(userId),
 			]);
 		},
 		[user?.id],
@@ -123,7 +128,6 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 			subscription,
 			userData,
 			userFavorites,
-			emailSubscriptions,
 			refreshUserData,
 			fetchUserFavorites,
 			logout,
@@ -135,7 +139,6 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 			subscription,
 			userData,
 			userFavorites,
-			emailSubscriptions,
 			refreshUserData,
 			fetchUserFavorites,
 			logout,
