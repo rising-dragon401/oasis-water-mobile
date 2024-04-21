@@ -15,7 +15,14 @@ export default function SubscribeModal() {
 			<Button
 				className="w-full"
 				variant="default"
-				size="default"
+				label="Subscribe"
+				onPress={() => {
+					console.log("Subscribed");
+				}}
+			/>
+			<Button
+				className="w-full"
+				variant="secondary"
 				label="Not now"
 				onPress={() => {
 					router.back();

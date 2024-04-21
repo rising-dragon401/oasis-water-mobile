@@ -43,12 +43,10 @@ const ItemPreviewCard = ({ item, showWarning }: Props) => {
 	const determineLink = () => {
 		let basePath = "";
 
-		// else if (item.type === "filter") {
-		// 	basePath = `/search/filter/${item.id}`;
-		// }
-
 		if (item.type === "tap_water") {
 			basePath = `/search/location/${item.id}`;
+		} else if (item.type === "filter") {
+			basePath = `/search/filter/${item.id}`;
 		} else {
 			basePath = `/search/item/${item.id}`;
 		}
@@ -59,15 +57,14 @@ const ItemPreviewCard = ({ item, showWarning }: Props) => {
 	return (
 		// @ts-ignore
 		<Link href={determineLink()}>
-			<View>
-				<View className="relative w-40 h-40 rounded-md overflow-hidden">
+			<View className="flex flex-col items-center gap-2">
+				<View className="relative rounded-md overflow-hidden h-40 w-40">
 					<Image
 						source={{ uri: item.image || undefined }}
 						style={{
 							width: "100%",
 							height: "100%",
 						}}
-						resizeMode="cover"
 					/>
 					<View style={{ position: "absolute", top: 0, right: 0 }}>
 						{/* <FavoriteButton item={item} /> */}

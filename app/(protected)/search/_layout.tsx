@@ -26,6 +26,7 @@ export default function SearchLayout() {
 			/>
 			<Stack.Screen name="item" />
 			<Stack.Screen name="location" />
+			<Stack.Screen name="filter" />
 		</Stack>
 	);
 }

@@ -85,17 +85,7 @@ export function ItemForm({ id }: Props) {
 			<View className="w-full items-center justify-center px-4">
 				<View className="flex flex-col gap-6 justify-center items-center w-full">
 					<View className="flex justify-center items-center h-80 w-80 p-4">
-						{item.affiliate_url ? (
-							<Link
-								href={item.affiliate_url}
-								target="_blank"
-								rel="noopener noreferrer"
-							>
-								<ItemImage src={item.image} alt={item.name} />
-							</Link>
-						) : (
-							<ItemImage src={item.image} alt={item.name} />
-						)}
+						<ItemImage src={item.image} alt={item.name} />
 					</View>
 
 					<View className="flex flex-row gap-2 w-full">
@@ -205,71 +195,67 @@ export function ItemForm({ id }: Props) {
 				)}
 
 				{item.is_indexed !== false && (
-					<>
-						<PaywallContent
-							className="mt-6"
-							title="Full data & reports"
-							label="See what's in this water"
-							items={[
-								"Contaminants ☠️",
-								"Source and Treatment Process 💧",
-								"Other ingredients & minerals 🌿",
-								"Lab reports and data 🔬",
-							]}
-						>
-							{sortedContaminants && sortedContaminants.length > 0 && (
-								<View className="flex flex-col gap-6 mt-6">
+					<PaywallContent
+						className="mt-6"
+						title="Full data & reports"
+						label="See what's in this water"
+						items={[
+							"Contaminants ☠️",
+							"Source and Treatment Process 💧",
+							"Other ingredients & minerals 🌿",
+							"Lab reports and data 🔬",
+						]}
+					>
+						{sortedContaminants && sortedContaminants.length > 0 && (
+							<View className="flex flex-col gap-6 mt-6">
+								<Typography size="2xl" fontWeight="normal">
+									Contaminants ☠️
+								</Typography>
+								<View className="grid md:grid-cols-2 grid-cols-1 gap-6">
+									{sortedContaminants.map((contaminant: any, index: number) => (
+										<ContaminantCard
+											key={contaminant.id || index}
+											data={contaminant}
+										/>
+									))}
+								</View>
+							</View>
+						)}
+
+						<View className="grid md:grid-cols-2 md:grid-rows-1 grid-rows-2 gap-4 mt-6">
+							<MetaDataCard
+								title="Source"
+								description={item.metadata?.source}
+							/>
+							<MetaDataCard
+								title="Treatment Process"
+								description={
+									Array.isArray(item.filtration_methods) &&
+									item.filtration_methods.length > 0
+										? item.filtration_methods.join(", ") +
+											". " +
+											item.metadata?.treatment_process
+										: item.metadata?.treatment_process
+								}
+							/>
+						</View>
+
+						<>
+							{item?.ingredients?.length > 0 && (
+								<View className="flex flex-col gap-6 my-10">
 									<Typography size="2xl" fontWeight="normal">
-										Contaminants ☠️
+										Other Ingredients
 									</Typography>
-									<View className="grid md:grid-cols-2 grid-cols-1 gap-6">
-										{sortedContaminants.map(
-											(contaminant: any, index: number) => (
-												<ContaminantCard
-													key={contaminant.id || index}
-													data={contaminant}
-												/>
-											),
-										)}
-									</View>
+
+									<IngredientsCard ingredients={item.ingredients} />
 								</View>
 							)}
+						</>
 
-							<View className="grid md:grid-cols-2 md:grid-rows-1 grid-rows-2 gap-4 mt-6">
-								<MetaDataCard
-									title="Source"
-									description={item.metadata?.source}
-								/>
-								<MetaDataCard
-									title="Treatment Process"
-									description={
-										Array.isArray(item.filtration_methods) &&
-										item.filtration_methods.length > 0
-											? item.filtration_methods.join(", ") +
-												". " +
-												item.metadata?.treatment_process
-											: item.metadata?.treatment_process
-									}
-								/>
-							</View>
-
-							<>
-								{item?.ingredients?.length > 0 && (
-									<View className="flex flex-col gap-6 my-10">
-										<Typography size="2xl" fontWeight="normal">
-											Other Ingredients
-										</Typography>
-
-										<IngredientsCard ingredients={item.ingredients} />
-									</View>
-								)}
-							</>
-
-							{item && item?.sources?.length > 0 && (
-								<Sources data={item.sources} />
-							)}
-						</PaywallContent>
-					</>
+						{item && item?.sources?.length > 0 && (
+							<Sources data={item.sources} />
+						)}
+					</PaywallContent>
 				)}
 			</View>
 		</ScrollView>
