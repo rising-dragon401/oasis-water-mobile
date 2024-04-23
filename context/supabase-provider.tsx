@@ -6,13 +6,22 @@ import { supabase } from "@/config/supabase";
 
 SplashScreen.preventAutoHideAsync();
 
+// type oAuthProviders = "google";
+
 type SupabaseContextProps = {
 	user: User | null;
 	session: Session | null;
 	initialized?: boolean;
 	signUp: (email: string, password: string) => Promise<void>;
 	signInWithPassword: (email: string, password: string) => Promise<void>;
+	// signInWithOAuth: (provider: oAuthProviders) => Promise<void>;
 	signOut: () => Promise<void>;
+
+	getGoogleOAuthUrl: () => Promise<string | null>;
+	setOAuthSession: (tokens: {
+		access_token: string;
+		refresh_token: string;
+	}) => Promise<void>;
 };
 
 type SupabaseProviderProps = {
@@ -25,7 +34,10 @@ export const SupabaseContext = createContext<SupabaseContextProps>({
 	initialized: false,
 	signUp: async () => {},
 	signInWithPassword: async () => {},
+	// signInWithOAuth: async () => {},
 	signOut: async () => {},
+	getGoogleOAuthUrl: async () => "",
+	setOAuthSession: async () => {},
 });
 
 export const useSupabase = () => useContext(SupabaseContext);
@@ -56,6 +68,40 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 			throw error;
 		}
 	};
+
+	const getGoogleOAuthUrl = async (): Promise<string | null> => {
+		const result = await supabase.auth.signInWithOAuth({
+			provider: "google",
+			options: {
+				redirectTo: `${process.env.EXPO_PUBLIC_URL}://google-auth`,
+			},
+		});
+
+		return result.data.url;
+	};
+
+	const setOAuthSession = async (tokens: {
+		access_token: string;
+		refresh_token: string;
+	}) => {
+		const { data, error } = await supabase.auth.setSession({
+			access_token: tokens.access_token,
+			refresh_token: tokens.refresh_token,
+		});
+
+		if (error) throw error;
+
+		setSession(data.session);
+	};
+
+	// const signInWithOAuth = async (provider: "google") => {
+	// 	const { error } = await supabase.auth.signInWithOAuth({
+	// 		provider,
+	// 	});
+	// 	if (error) {
+	// 		throw error;
+	// 	}
+	// };
 
 	const signOut = async () => {
 		const { error } = await supabase.auth.signOut();
@@ -104,7 +150,10 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 				initialized,
 				signUp,
 				signInWithPassword,
+				// signInWithOAuth,
 				signOut,
+				getGoogleOAuthUrl,
+				setOAuthSession,
 			}}
 		>
 			{children}
