@@ -1,6 +1,6 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import * as React from "react";
-import { Pressable, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, Text, View } from "react-native";
 
 import { TextClassContext } from "./text";
 
@@ -66,6 +66,7 @@ type ButtonProps = React.ComponentPropsWithoutRef<typeof Pressable> &
 		label?: string;
 		icon?: React.ReactNode;
 		iconPosition?: "left" | "right";
+		loading?: boolean;
 	};
 
 const Button = React.forwardRef<
@@ -73,7 +74,16 @@ const Button = React.forwardRef<
 	ButtonProps
 >(
 	(
-		{ className, variant, size, label, icon, iconPosition = "right", ...props },
+		{
+			className,
+			variant,
+			size,
+			label,
+			icon,
+			iconPosition = "right",
+			loading,
+			...props
+		},
 		ref,
 	) => {
 		return (
@@ -93,6 +103,11 @@ const Button = React.forwardRef<
 					role="button"
 					{...props}
 				>
+					{loading && (
+						<View className="absolute">
+							<ActivityIndicator size="small" />
+						</View>
+					)}
 					{label && (
 						<View className="flex flex-row gap-2 items-center justify-center">
 							{icon && iconPosition === "left" && (

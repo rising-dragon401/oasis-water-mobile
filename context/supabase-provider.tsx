@@ -1,5 +1,7 @@
 import { Session, User } from "@supabase/supabase-js";
 import { SplashScreen, useRouter, useSegments } from "expo-router";
+import * as SecureStore from "expo-secure-store";
+import * as WebBrowser from "expo-web-browser";
 import { createContext, useContext, useEffect, useState } from "react";
 
 import { supabase } from "@/config/supabase";
@@ -14,9 +16,8 @@ type SupabaseContextProps = {
 	initialized?: boolean;
 	signUp: (email: string, password: string) => Promise<void>;
 	signInWithPassword: (email: string, password: string) => Promise<void>;
-	// signInWithOAuth: (provider: oAuthProviders) => Promise<void>;
+	signInWithGoogle: () => Promise<void>;
 	signOut: () => Promise<void>;
-
 	getGoogleOAuthUrl: () => Promise<string | null>;
 	setOAuthSession: (tokens: {
 		access_token: string;
@@ -34,7 +35,7 @@ export const SupabaseContext = createContext<SupabaseContextProps>({
 	initialized: false,
 	signUp: async () => {},
 	signInWithPassword: async () => {},
-	// signInWithOAuth: async () => {},
+	signInWithGoogle: async () => {},
 	signOut: async () => {},
 	getGoogleOAuthUrl: async () => "",
 	setOAuthSession: async () => {},
@@ -94,14 +95,52 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 		setSession(data.session);
 	};
 
-	// const signInWithOAuth = async (provider: "google") => {
-	// 	const { error } = await supabase.auth.signInWithOAuth({
-	// 		provider,
-	// 	});
-	// 	if (error) {
-	// 		throw error;
-	// 	}
-	// };
+	const onSignInWithGoogle = async () => {
+		try {
+			const url = await getGoogleOAuthUrl();
+			if (!url) return;
+
+			const schemaUrl = `${process.env.EXPO_PUBLIC_URL}://google-auth`;
+
+			const result = await WebBrowser.openAuthSessionAsync(url, schemaUrl, {
+				showInRecents: true,
+			});
+
+			if (result.type === "success") {
+				const data = extractParamsFromUrl(result.url);
+
+				if (!data.access_token || !data.refresh_token) return;
+
+				setOAuthSession({
+					access_token: data.access_token,
+					refresh_token: data.refresh_token,
+				});
+
+				// You can optionally store Google's access token if you need it later
+				SecureStore.setItemAsync(
+					"google-access-token",
+					JSON.stringify(data.provider_token),
+				);
+			}
+		} catch (error) {
+			// Handle error here
+			console.log(error);
+		} finally {
+		}
+	};
+
+	const extractParamsFromUrl = (url: string) => {
+		const params = new URLSearchParams(url.split("#")[1]);
+		const data = {
+			access_token: params.get("access_token"),
+			expires_in: parseInt(params.get("expires_in") || "0"),
+			refresh_token: params.get("refresh_token"),
+			token_type: params.get("token_type"),
+			provider_token: params.get("provider_token"),
+		};
+
+		return data;
+	};
 
 	const signOut = async () => {
 		const { error } = await supabase.auth.signOut();
@@ -150,7 +189,7 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 				initialized,
 				signUp,
 				signInWithPassword,
-				// signInWithOAuth,
+				signInWithGoogle: onSignInWithGoogle,
 				signOut,
 				getGoogleOAuthUrl,
 				setOAuthSession,

@@ -1,13 +1,15 @@
+import { FontAwesome6 } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { ActivityIndicator, View } from "react-native";
+import { View } from "react-native";
 import * as z from "zod";
 
 import { SafeAreaView } from "@/components/safe-area-view";
 import { Button } from "@/components/ui/button";
 import { Form, FormField, FormInput } from "@/components/ui/form";
-import { Text } from "@/components/ui/text";
+import { Separator } from "@/components/ui/separator";
 import { H1, Muted } from "@/components/ui/typography";
 import { useSupabase } from "@/context/supabase-provider";
 
@@ -39,8 +41,10 @@ const formSchema = z
 	});
 
 export default function SignUp() {
-	const { signUp } = useSupabase();
+	const { signUp, signInWithGoogle } = useSupabase();
 	const router = useRouter();
+
+	const [loading, setLoading] = useState(false);
 
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
@@ -61,13 +65,17 @@ export default function SignUp() {
 		}
 	}
 
+	const onSignInWithGoogle = async () => {
+		setLoading(true);
+		await signInWithGoogle();
+		setLoading(false);
+	};
+
 	return (
 		<SafeAreaView className="flex-1 bg-background p-4">
 			<View className="flex-1">
 				<H1 className="self-start">Sign Up</H1>
-				<Muted className="self-start mb-5">
-					to continue to Expo Supabase Starter
-				</Muted>
+				<Muted className="self-start mb-5">to start building your Oasis</Muted>
 				<Form {...form}>
 					<View className="gap-4">
 						<FormField
@@ -121,13 +129,18 @@ export default function SignUp() {
 					size="default"
 					variant="default"
 					onPress={form.handleSubmit(onSubmit)}
-				>
-					{form.formState.isSubmitting ? (
-						<ActivityIndicator size="small" />
-					) : (
-						<Text>Sign Up</Text>
-					)}
-				</Button>
+					loading={form.formState.isSubmitting}
+					label="Sign Up"
+				/>
+				<Separator orientation="horizontal" />
+				<Button
+					variant="outline"
+					loading={loading}
+					onPress={() => onSignInWithGoogle()}
+					label="Sign Up with Google"
+					icon={<FontAwesome6 name="google" size={12} color="black" />}
+					iconPosition="left"
+				/>
 				<Muted
 					className="text-center"
 					onPress={() => {
