@@ -8,6 +8,7 @@ import { ActivityIndicator, View } from "react-native";
 import * as z from "zod";
 
 import { SafeAreaView } from "@/components/safe-area-view";
+import { AppleAuthButton } from "@/components/sharable/apple-auth-button";
 import { Button } from "@/components/ui/button";
 import { Form, FormField, FormInput } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
@@ -119,6 +120,7 @@ export default function SignIn() {
 					icon={<FontAwesome6 name="google" size={12} color="black" />}
 					iconPosition="left"
 				/>
+				<AppleAuthButton />
 
 				<Muted
 					className="text-center"

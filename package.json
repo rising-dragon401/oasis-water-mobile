@@ -15,6 +15,7 @@
 		"classnames": "^2.5.1",
 		"clsx": "^2.1.0",
 		"expo": "~50.0.14",
+		"expo-apple-authentication": "^6.3.0",
 		"expo-blur": "~12.9.2",
 		"expo-constants": "~15.4.5",
 		"expo-linking": "~6.2.2",

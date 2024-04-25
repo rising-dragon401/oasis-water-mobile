@@ -1,4 +1,5 @@
 import { Session, User } from "@supabase/supabase-js";
+import * as AppleAuthentication from "expo-apple-authentication";
 import { SplashScreen, useRouter, useSegments } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import * as WebBrowser from "expo-web-browser";
@@ -18,6 +19,7 @@ type SupabaseContextProps = {
 	signInWithPassword: (email: string, password: string) => Promise<void>;
 	signInWithGoogle: () => Promise<void>;
 	signOut: () => Promise<void>;
+	signInWithApple: () => Promise<void>;
 	getGoogleOAuthUrl: () => Promise<string | null>;
 	setOAuthSession: (tokens: {
 		access_token: string;
@@ -36,6 +38,7 @@ export const SupabaseContext = createContext<SupabaseContextProps>({
 	signUp: async () => {},
 	signInWithPassword: async () => {},
 	signInWithGoogle: async () => {},
+	signInWithApple: async () => {},
 	signOut: async () => {},
 	getGoogleOAuthUrl: async () => "",
 	setOAuthSession: async () => {},
@@ -95,6 +98,39 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 		setSession(data.session);
 	};
 
+	const signInWithApple = async () => {
+		try {
+			const credential = await AppleAuthentication.signInAsync({
+				requestedScopes: [
+					AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+					AppleAuthentication.AppleAuthenticationScope.EMAIL,
+				],
+			});
+			// Sign in via Supabase Auth.
+			if (credential.identityToken) {
+				const {
+					error,
+					data: { user },
+				} = await supabase.auth.signInWithIdToken({
+					provider: "apple",
+					token: credential.identityToken,
+				});
+				console.log(JSON.stringify({ error, user }, null, 2));
+				if (!error) {
+					// User is signed in.
+				}
+			} else {
+				throw new Error("No identityToken.");
+			}
+		} catch (e: any) {
+			if (e.code === "ERR_REQUEST_CANCELED") {
+				// handle that the user canceled the sign-in flow
+			} else {
+				// handle other errors
+			}
+		}
+	};
+
 	const onSignInWithGoogle = async () => {
 		try {
 			const url = await getGoogleOAuthUrl();
@@ -151,10 +187,13 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 
 	useEffect(() => {
 		const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
+			console.log("onAuthStateChange", event, session);
+
 			setSession(session);
 			setUser(session ? session.user : null);
 			setInitialized(true);
 		});
+
 		return () => {
 			data.subscription.unsubscribe();
 		};
@@ -190,6 +229,7 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 				signUp,
 				signInWithPassword,
 				signInWithGoogle: onSignInWithGoogle,
+				signInWithApple,
 				signOut,
 				getGoogleOAuthUrl,
 				setOAuthSession,
