@@ -2,6 +2,7 @@ import { useUserProvider } from "context/user-provider";
 import { View } from "react-native";
 
 import Typography from "@/components/sharable/typography";
+import UpgradeButton from "@/components/sharable/upgrade-button";
 import { Button } from "@/components/ui/button";
 import { H1 } from "@/components/ui/typography";
 
@@ -13,7 +14,7 @@ export default function TabTwoScreen() {
 
 	return (
 		<View className="flex-1 items-center justify-between bg-background p-4 py-10">
-			<View>
+			<View className="flex flex-col items-center  bg-background p-4 gap-y-4 w-full">
 				<H1 className="text-center mt-20">Profile</H1>
 
 				<Typography
@@ -26,6 +27,8 @@ export default function TabTwoScreen() {
 				<Typography size="base" fontWeight="normal" className="text-center">
 					Subscription: {subscription?.plan || "Free"}
 				</Typography>
+
+				{!subscription && <UpgradeButton />}
 			</View>
 			<Button
 				className="w-full"

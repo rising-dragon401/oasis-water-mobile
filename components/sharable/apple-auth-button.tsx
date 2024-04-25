@@ -1,6 +1,7 @@
-import { useSupabase } from "@/context/supabase-provider";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { Platform } from "react-native";
+
+import { useSupabase } from "@/context/supabase-provider";
 
 export function AppleAuthButton() {
 	const { signInWithApple } = useSupabase();
@@ -10,8 +11,8 @@ export function AppleAuthButton() {
 			<AppleAuthentication.AppleAuthenticationButton
 				buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
 				buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
-				cornerRadius={5}
-				style={{ width: 200, height: 64 }}
+				cornerRadius={100}
+				style={{ width: "100%", height: 42 }}
 				onPress={signInWithApple}
 			/>
 		);
