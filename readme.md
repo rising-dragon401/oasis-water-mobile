@@ -8,6 +8,18 @@ yarn install
 yarn start
 ```
 
+Create build
+
+```
+eas build --profile development --platform ios
+```
+
+```
+npx expo start --dev-client
+```
+
+Then scan the QR code with the Expo Go app on your phone.
+
 # Expo Supabase Starter
 
 [![MIT License](https://img.shields.io/github/license/FlemingVincent/expo-supabase-starter)](https://github.com/FlemingVincent/expo-supabase-starter/blob/main/LICENSE)
@@ -39,5 +51,7 @@ This repository is licensed under the MIT License. You are granted the freedom t
 ## Demo
 
 https://github.com/FlemingVincent/expo-supabase-starter/assets/80268905/884ed027-4e4c-4fac-abc2-1f4a5df958f2
+
 # mobile
+
 # mobile

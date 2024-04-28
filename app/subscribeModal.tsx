@@ -1,8 +1,14 @@
 import { useRouter } from "expo-router";
-import { View } from "react-native";
+import { useEffect, useState } from "react";
+import { Platform, View } from "react-native";
+import Purchases, { PurchasesOffering } from "react-native-purchases";
 
 import { Button } from "@/components/ui/button";
 import { H1, Muted, P } from "@/components/ui/typography";
+
+const APIKeys = {
+	apple: "appl_OIAHthcBxHjpVWGXmtLvBKRTtrR",
+};
 
 const FEATURES = [
 	{
@@ -27,6 +33,27 @@ const FEATURES = [
 
 export default function SubscribeModal() {
 	const router = useRouter();
+
+	const [currentOffering, setCurrentOffering] =
+		useState<PurchasesOffering | null>(null);
+
+	useEffect(() => {
+		const setup = async () => {
+			if (Platform.OS == "ios") {
+				await Purchases.configure({ apiKey: APIKeys.apple });
+			}
+
+			const offerings = await Purchases.getOfferings();
+
+			console.log("offerings", offerings);
+
+			setCurrentOffering(offerings.current);
+		};
+
+		Purchases.setDebugLogsEnabled(true);
+
+		setup().catch(console.log);
+	}, []);
 
 	const handleSubscribe = () => {
 		// router.push("/subscribe");
