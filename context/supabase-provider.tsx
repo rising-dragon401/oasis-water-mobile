@@ -187,8 +187,6 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 
 	useEffect(() => {
 		const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
-			console.log("onAuthStateChange", event, session);
-
 			setSession(session);
 			setUser(session ? session.user : null);
 			setInitialized(true);

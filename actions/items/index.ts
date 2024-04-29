@@ -106,7 +106,7 @@ export const getTenRandomItems = async () => {
 		.select()
 		.not("score", "is", null)
 		.order("id", { ascending: false })
-		.limit(10);
+		.limit(6);
 
 	if (error) {
 		console.error("error", error);

@@ -11,9 +11,10 @@ import Typography from "./typography";
 type Props = {
 	item: any;
 	showWarning?: boolean;
+	width?: number;
 };
 
-const ItemPreviewCard = ({ item, showWarning }: Props) => {
+const ItemPreviewCard = ({ item, showWarning, width }: Props) => {
 	const { subscription } = useUserProvider();
 
 	const renderScore = () => {
@@ -57,7 +58,9 @@ const ItemPreviewCard = ({ item, showWarning }: Props) => {
 	return (
 		// @ts-ignore
 		<Link href={determineLink()}>
-			<View className="flex flex-col items-center gap-2 h-36 w-36">
+			<View
+				className={`flex flex-col items-center gap-2 w-${width || "36"} h-${width || "36"}`}
+			>
 				<View className="relative rounded-md overflow-hidden h-full w-full">
 					<Image
 						source={{ uri: item.image || undefined }}
@@ -80,7 +83,9 @@ const ItemPreviewCard = ({ item, showWarning }: Props) => {
 						</View>
 					)}
 				</View>
-				<View className="flex flex-row justify-between pt-1 md:gap-2 items-start w-36">
+				<View
+					className={`flex flex-row justify-between pt-1 md:gap-2 items-start w-${width || "36"}`}
+				>
 					<View className="flex flex-col">
 						<Typography
 							size="base"
@@ -89,9 +94,8 @@ const ItemPreviewCard = ({ item, showWarning }: Props) => {
 						>
 							{item.name}
 						</Typography>
-
 						{item.company_name && (
-							<Text style={{ color: "#666", fontSize: 14 }}>
+							<Text style={{ color: "#666", fontSize: 10 }}>
 								{item.company_name}
 							</Text>
 						)}

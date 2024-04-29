@@ -46,7 +46,7 @@ export const RevenueCatProvider = ({ children }: any) => {
 
 	useEffect(() => {
 		const setup = async () => {
-			if (Platform.OS == "ios") {
+			if (Platform.OS === "ios") {
 				await Purchases.configure({ apiKey: APIKeys.apple });
 			}
 
@@ -62,6 +62,7 @@ export const RevenueCatProvider = ({ children }: any) => {
 
 	const loadOfferings = async () => {
 		const offerings = await Purchases.getOfferings();
+		console.log("offerings", offerings);
 		setPackages(offerings.current?.availablePackages || []);
 	};
 

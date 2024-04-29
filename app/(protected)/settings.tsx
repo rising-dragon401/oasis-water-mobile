@@ -13,8 +13,8 @@ export default function TabTwoScreen() {
 	const { user, subscription } = useUserProvider();
 
 	return (
-		<View className="flex-1 items-center justify-between bg-background p-4 py-10">
-			<View className="flex flex-col items-center  bg-background p-4 gap-y-4 w-full">
+		<View className="flex-1 items-center justify-between p-4 py-10">
+			<View className="flex flex-col items-center p-4 gap-y-4 w-full">
 				<H1 className="text-center mt-20">Profile</H1>
 
 				<Typography

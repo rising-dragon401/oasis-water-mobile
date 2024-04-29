@@ -90,60 +90,48 @@ export const getSevenRandomFilters = async () => {
 export const getFilterDetails = async (id: string) => {
 	const { data: item, error } = await supabase
 		.from("water_filters")
-		.select()
+		.select(
+			`
+            *,
+            brand:brands(*),
+        	company:companies(*)
+        `,
+		)
 		.eq("id", id);
 
-	if (!item) {
+	console.log("getFilterDetails: ", item);
+
+	if (!item || item.length === 0) {
 		return null;
 	}
 
-	const contaminants = item[0].contaminants_filtered;
+	const filter = item[0];
 
-	let contaminantData: any[] = [];
-	if (contaminants && contaminants.length > 0) {
-		contaminantData = (
-			await Promise.all(
-				contaminants.map(async (contaminant: any) => {
-					const { data, error } = await supabase
-						.from("ingredients")
-						.select()
-						.eq("id", contaminant);
-
-					if (!data) {
-						return null;
-					}
-
-					return data[0];
-				}),
-			)
-		).filter((contaminant) => contaminant !== null); // Filter out null values
+	// Fetching contaminants details in parallel
+	let contaminantData = [];
+	if (filter.contaminants_filtered && filter.contaminants_filtered.length > 0) {
+		contaminantData = await Promise.all(
+			filter.contaminants_filtered.map(async (contaminantId: number) => {
+				const { data } = await supabase
+					.from("ingredients")
+					.select()
+					.eq("id", contaminantId);
+				return data ? data[0] : null;
+			}),
+		);
+		contaminantData = contaminantData.filter(
+			(contaminant) => contaminant !== null,
+		); // Filter out null values
 	}
 
-	const companyId = item[0].company;
-	const brandId = item[0].brand;
+	console.log("filter.brand.name: ", filter.brand.name);
+	console.log("filter.company.name: ", filter.company.name);
 
-	let brand = null;
-	if (brandId) {
-		const { data, error: brandError } = await supabase
-			.from("brands")
-			.select()
-			.eq("id", brandId);
-		brand = data ? data[0] : null;
-	}
-
-	let company = null;
-	if (companyId) {
-		const { data, error: companyError } = await supabase
-			.from("companies")
-			.select()
-			.eq("id", companyId);
-		company = data ? data[0] : null;
-	}
-
+	// Constructing the final object with all details
 	const filterWithDetails = {
-		...item[0],
-		brand,
-		company,
+		...filter,
+		brand: filter.brand.name,
+		company: filter.company.name,
 		contaminants_filtered: contaminantData,
 	};
 

@@ -1,3 +1,4 @@
+import * as Linking from "expo-linking";
 import { useNavigation } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { ScrollView, View } from "react-native";
@@ -138,7 +139,7 @@ export function FilterForm({ id }: Props) {
 								fontWeight="normal"
 								className="text-secondary-foreground"
 							>
-								{filter.brand?.name} - {filter.company?.name}
+								{filter.brand} - {filter.company}
 							</Typography>
 							{/* </Link> */}
 
@@ -163,7 +164,7 @@ export function FilterForm({ id }: Props) {
 								<Button
 									variant={filter.score > 70 ? "default" : "outline"}
 									onPress={() => {
-										window.open(filter.affiliate_url, "_blank");
+										Linking.openURL(filter.affiliate_url);
 									}}
 									className="w-40"
 									label="Buy Now"

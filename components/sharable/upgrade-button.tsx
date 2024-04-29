@@ -3,7 +3,11 @@ import { useRouter } from "expo-router";
 
 import { Button } from "@/components/ui/button";
 
-export default function UpgradeButton() {
+type UpgradeButtonProps = {
+	label?: string;
+};
+
+export default function UpgradeButton({ label }: UpgradeButtonProps) {
 	const { push } = useRouter();
 
 	const handleUpgrade = () => {
@@ -13,7 +17,7 @@ export default function UpgradeButton() {
 		<Button
 			className="w-full"
 			variant="default"
-			label="Upgrade"
+			label={label || "Upgrade"}
 			onPress={handleUpgrade}
 			icon={<Octicons name="plus" size={16} color="white" />}
 		/>

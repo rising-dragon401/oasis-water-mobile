@@ -1,6 +1,8 @@
 "use client";
 
 import { getItemDetails } from "actions/items";
+import * as Linking from "expo-linking";
+import { useEffect, useState } from "react";
 import { ScrollView, View } from "react-native";
 
 import { Octicons } from "@expo/vector-icons";
@@ -12,7 +14,6 @@ import ItemImage from "./item-image";
 import Score from "./score";
 import Typography from "./typography";
 
-import { useEffect, useState } from "react";
 import ContaminantCard from "./contamintant-card";
 import IngredientsCard from "./ingredients-card";
 import MetaDataCard from "./metadata-card";
@@ -146,7 +147,7 @@ export function ItemForm({ id }: Props) {
 												<Button
 													variant={item.score > 70 ? "outline" : "outline"}
 													onPress={() => {
-														window.open(item.affiliate_url, "_blank");
+														Linking.openURL(item.affiliate_url);
 													}}
 													label="Buy Now"
 													icon={

@@ -5,11 +5,14 @@ import Search from "@/components/sharable/search";
 import { H1, Muted } from "@/components/ui/typography";
 
 import ItemRow from "@/components/sharable/item-row";
+import { useColorScheme } from "@/lib/useColorScheme";
 import { getSevenRandomFilters } from "actions/filters";
 import { getTenRandomItems } from "actions/items";
 import { getFeaturedLocations } from "actions/locations";
 
 export default function TabOneScreen() {
+	const { colorScheme } = useColorScheme();
+
 	const [items, setItems] = useState<any[]>([]);
 	const [tapWater, setTapWater] = useState<any[]>([]);
 	const [filters, setFilters] = useState<any[]>([]);
@@ -45,27 +48,27 @@ export default function TabOneScreen() {
 				paddingVertical: 20,
 			}}
 		>
-			<View className="flex flex-col items-center justify-center bg-background p-4 mt-24 ">
+			<View className="flex flex-col items-center justify-center p-4 mt-44">
 				<H1 className="text-center max-w-xs">Find your healthiest water</H1>
 
 				<Muted className="text-center mb-8 max-w-md">
 					90% of water has microplastics, toxins and contaminants.
 				</Muted>
 
-				<View className="mt-2">
+				<View className="mt-2 mb-10">
 					<Search />
 				</View>
 
 				<View className="w-full mt-14">
-					<ItemRow title="Bottled Water" items={items} />
+					<ItemRow title="Bottled Water" items={items} type="item" />
 				</View>
 
 				<View className="w-full mt-10">
-					<ItemRow title="Tap Water" items={tapWater} />
+					<ItemRow title="Tap Water" items={tapWater} type="location" />
 				</View>
 
 				<View className="w-full mt-10">
-					<ItemRow title="Filters" items={filters} />
+					<ItemRow title="Filters" items={filters} type="filter" />
 				</View>
 			</View>
 		</ScrollView>

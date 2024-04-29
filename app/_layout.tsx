@@ -6,6 +6,8 @@ import "../global.css";
 
 import { SupabaseProvider } from "@/context/supabase-provider";
 import UserProvider from "@/context/user-provider";
+import { theme } from "@/lib/constants";
+import { useColorScheme } from "@/lib/useColorScheme";
 import { PortalHost } from "components/primitives/portal";
 
 export {
@@ -14,6 +16,8 @@ export {
 } from "expo-router";
 
 export default function RootLayout() {
+	const { colorScheme } = useColorScheme();
+
 	return (
 		<SupabaseProvider>
 			<UserProvider>
@@ -21,6 +25,12 @@ export default function RootLayout() {
 					<Stack
 						screenOptions={{
 							headerShown: false,
+							contentStyle: {
+								backgroundColor:
+									colorScheme === "dark"
+										? theme.dark.background
+										: theme.light.background,
+							},
 						}}
 					>
 						<Stack.Screen name="(protected)" />

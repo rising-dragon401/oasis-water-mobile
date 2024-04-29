@@ -62,7 +62,7 @@ export default function SignIn() {
 	};
 
 	return (
-		<SafeAreaView className="flex-1 flex-col bg-background p-4">
+		<SafeAreaView className="flex-1 flex-col p-4">
 			<View className="flex-1">
 				<H1 className="self-start">Sign In</H1>
 				<Muted className="self-start mb-5">to continue to your Oasis</Muted>

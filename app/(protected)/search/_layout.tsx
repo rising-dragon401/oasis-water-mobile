@@ -5,6 +5,7 @@ import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function SearchLayout() {
 	const { colorScheme } = useColorScheme();
+
 	return (
 		<Stack
 			screenOptions={{

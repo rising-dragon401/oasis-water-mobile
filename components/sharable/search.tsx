@@ -1,8 +1,8 @@
+import { Octicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 
 import { Input } from "@/components/ui/input";
-import { Octicons } from "@expo/vector-icons";
 
 export default function Search() {
 	const [value, setValue] = useState("");
@@ -14,17 +14,17 @@ export default function Search() {
 	const handleSearch = () => {};
 
 	return (
-		<View className="flex flex-row gap-2 items-center">
+		<View className="flex flex-row gap-2 items-center relative">
 			<Input
 				placeholder="Search water, filters, location..."
 				value={value}
 				onChangeText={onChangeText}
 				aria-labelledbyledBy="inputLabel"
 				aria-errormessage="inputError"
-				className="!rounded-full w-96"
+				className="!rounded-full w-[88vw] pl-4"
 			/>
 
-			<TouchableOpacity onPress={handleSearch}>
+			<TouchableOpacity onPress={handleSearch} className="absolute right-4">
 				<Octicons name="search" size={24} color="black" />
 			</TouchableOpacity>
 		</View>

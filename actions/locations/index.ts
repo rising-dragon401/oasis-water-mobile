@@ -1,5 +1,31 @@
 import { supabase } from "@/config/supabase";
 
+export const getLocations = async () => {
+	try {
+		const { data: locations } = await supabase
+			.from("tap_water_locations")
+			.select();
+
+		if (!locations) {
+			return [];
+		}
+
+		locations.forEach((location) => {
+			if (location && location.utilities && location.utilities.length > 0) {
+				// @ts-ignore
+				location.score = location.utilities[0]?.score;
+			} else {
+				location.score = null;
+			}
+		});
+
+		return locations;
+	} catch (error) {
+		console.error("Error fetching locations:", error);
+		return [];
+	}
+};
+
 export const getFeaturedLocations = async () => {
 	const { data: featuredLocations, error } = await supabase
 		.from("tap_water_locations")

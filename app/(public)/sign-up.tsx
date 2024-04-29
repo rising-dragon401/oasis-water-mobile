@@ -73,7 +73,7 @@ export default function SignUp() {
 	};
 
 	return (
-		<SafeAreaView className="flex-1 bg-background p-4">
+		<SafeAreaView className="flex-1 p-4">
 			<View className="flex-1">
 				<H1 className="self-start">Sign Up</H1>
 				<Muted className="self-start mb-5">to start building your Oasis</Muted>
