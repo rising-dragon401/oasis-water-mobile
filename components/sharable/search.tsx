@@ -107,7 +107,10 @@ export default function Search({ indices }: { indices?: string[] }) {
 					className="!rounded-full w-full pl-4 z-40"
 				/>
 
-				<View className="absolute !right-2 flex flex-row gap-3 mr-4 z-50">
+				<View
+					className="flex flex-row gap-3 mr-4 z-50"
+					style={{ position: "absolute", right: 16 }}
+				>
 					{isLoading && <ActivityIndicator size="small" color="black" />}
 
 					{!value ? (

@@ -42,3 +42,22 @@ export const theme = {
 		ring: "hsl(240 4.9% 83.9%)",
 	},
 };
+
+export const IngredientCategories: string[] = [
+	// 'Chemical Disinfectants',
+	"Heavy Metals",
+	"Haloacetic Acids",
+	"Fluoride",
+	"Herbicides",
+	"Perfluorinated Chemicals (PFAS)",
+	"Pesticides",
+	"Pharmaceuticals",
+	"Phthalates",
+	"Radiological Elements",
+	"Semi-Volatile Compounds",
+	"Volatile Organic Compounds (VOCs)",
+	"Microbiologicals",
+	// 'Microplastics',
+	"Inorganics",
+	"Other",
+];

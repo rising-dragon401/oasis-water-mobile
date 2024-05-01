@@ -74,6 +74,7 @@ export const getSevenRandomFilters = async () => {
 		.from("water_filters")
 		.select()
 		.not("score", "is", null)
+		.not("is_indexed", "is", false)
 		.order("id", { ascending: false })
 		.limit(7);
 

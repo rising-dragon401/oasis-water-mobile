@@ -81,13 +81,13 @@ const AccordionTrigger = React.forwardRef<
 				<AccordionPrimitive.Trigger ref={ref} {...props} asChild>
 					<Trigger
 						className={cn(
-							"flex flex-row web:flex-1 items-center justify-between py-4 web:transition-all group web:focus-visible:outline-none web:focus-visible:ring-1 web:focus-visible:ring-muted-foreground",
+							"flex flex-row web:flex-1 items-center justify-between py-4  group ",
 							className,
 						)}
 					>
 						<>{children}</>
 						<Animated.View style={chevronStyle}>
-							<Octicons name="chevron-down" size={14} color="text-foreground" />
+							<Octicons name="chevron-down" size={1} color="black" />
 						</Animated.View>
 					</Trigger>
 				</AccordionPrimitive.Trigger>

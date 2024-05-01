@@ -1,7 +1,7 @@
 import * as Linking from "expo-linking";
 import { useNavigation } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import { ScrollView, View } from "react-native";
+import { ActivityIndicator, ScrollView, View } from "react-native";
 
 import { getContaminants } from "actions/ingredients";
 
@@ -23,7 +23,7 @@ type Props = {
 export function FilterForm({ id }: Props) {
 	const navigation = useNavigation();
 
-	const [, setIsLoading] = useState(true);
+	const [isLoading, setIsLoading] = useState(true);
 	const [filter, setFilter] = useState<any>({});
 	const [contaminants, setContaminants] = useState<any[]>([]);
 
@@ -44,7 +44,7 @@ export function FilterForm({ id }: Props) {
 			setFilter(filter);
 
 			navigation.setOptions({
-				title: filter.name || "Filter",
+				title: filter?.name || "Filter",
 			});
 		}
 
@@ -110,6 +110,12 @@ export function FilterForm({ id }: Props) {
 		[uncommonContaminantsFiltered, uncommonContaminants],
 	);
 
+	// get categories filtred (if any)
+	const categoriesFiltered = useMemo(
+		() => filter.filtered_contaminant_categories ?? [],
+		[filter.filtered_contaminant_categories],
+	);
+
 	if (filter.is_draft) {
 		return (
 			<View>This filter has not been rated yet. Please check back later.</View>
@@ -125,7 +131,11 @@ export function FilterForm({ id }: Props) {
 			<View className="w-full items-center justify-center px-8">
 				<View className="flex flex-col gap-6 justify-center items-center w-full">
 					<View className="flex justify-center items-center h-80 w-80 p-4">
-						<ItemImage src={filter.image} alt={filter.name} />
+						{isLoading ? (
+							<ActivityIndicator />
+						) : (
+							<ItemImage src={filter.image} alt={filter.name} />
+						)}
 					</View>
 
 					<View className="flex flex-row justify-between gap-2">
@@ -191,6 +201,7 @@ export function FilterForm({ id }: Props) {
 					<View className="flex flex-col gap-6 mt-10">
 						<ContaminantTable
 							filteredContaminants={filter.contaminants_filtered}
+							categories={categoriesFiltered}
 						/>
 					</View>
 

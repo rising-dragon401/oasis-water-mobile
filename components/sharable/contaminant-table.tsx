@@ -1,95 +1,154 @@
-import { useEffect, useMemo, useState } from "react";
-
 import { Octicons } from "@expo/vector-icons";
-import { getContaminants } from "actions/ingredients";
-import { StyleSheet, Text, View } from "react-native";
+import { useMemo } from "react";
+import { View } from "react-native";
+import useSWR from "swr";
+
+import { getContaminants } from "@/actions/ingredients";
 import { ContaminantFiltersDropdown } from "./contaminant-filters-dropdown";
+import Typography from "./typography";
+
+import {
+	Accordion,
+	AccordionContent,
+	AccordionItem,
+	AccordionTrigger,
+} from "@/components/ui/accordion";
+
+import { IngredientCategories } from "@/lib/constants";
 
 type Props = {
 	filteredContaminants: any[];
+	categories?: any[];
 };
 
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-	},
-	header: {
-		flexDirection: "row",
-		padding: 10,
-		backgroundColor: "#f3f3f3",
-	},
-	row: {
-		flexDirection: "row",
-		borderBottomWidth: 1,
-		borderBottomColor: "#ccc",
-		padding: 10,
-	},
-	cell: {
-		width: "100%",
-		marginRight: 10,
-		flex: 1, // Adjust flex values as needed to allocate space
-	},
-	text: {
-		fontSize: 12,
-	},
-	icon: {
-		width: 24,
-		alignItems: "center",
-		justifyContent: "center",
-	},
-});
-
-export default function ContaminantTable({ filteredContaminants }: Props) {
-	const [contaminants, setContaminants] = useState<any[]>([]);
-
-	useEffect(() => {
-		getContaminants().then((data) => {
-			setContaminants(data);
-		});
-	}, []);
-
-	// Sort contaminants: filtered ones first
-	const sortedContaminants = useMemo(
-		() =>
-			contaminants?.sort((a, b) => {
-				const aIsFiltered = filteredContaminants?.some((fc) => fc.id === a.id)
-					? 1
-					: 0;
-				const bIsFiltered = filteredContaminants?.some((fc) => fc.id === b.id)
-					? 1
-					: 0;
-				return bIsFiltered - aIsFiltered;
-			}),
-		[contaminants, filteredContaminants],
+export default function ContaminantTable({
+	filteredContaminants,
+	categories,
+}: Props) {
+	const { data: allContaminants } = useSWR(
+		"water-contaminants",
+		getContaminants,
 	);
 
+	// Some filters only list the categories
+	const categoryNames = categories?.map((item) => item.category);
+
+	const contaminantsByCategory = useMemo(() => {
+		return IngredientCategories.map((category) => {
+			const contaminantsInCategory = allContaminants?.filter(
+				(contaminant: any) => contaminant.category === category,
+			);
+
+			let filteredInCategory = [];
+			let percentageFiltered = 0;
+			let name = "";
+
+			// Check for case where filter simply lists category and % filtered
+			if (categories && categoryNames?.includes(category)) {
+				filteredInCategory = (contaminantsInCategory ?? []).map(
+					(contaminant: any) => {
+						return {
+							id: contaminant.id,
+							name: contaminant.name,
+							is_common: contaminant.is_common,
+							isFiltered: "unknown",
+						};
+					},
+				);
+				percentageFiltered = categories.find(
+					(item) => item.category === category,
+				)?.percentage;
+				name = categories.find((item) => item.category === category)?.name;
+			} else {
+				filteredInCategory = (contaminantsInCategory ?? []).map(
+					(contaminant: any) => {
+						return {
+							id: contaminant.id,
+							name: contaminant.name,
+							is_common: contaminant.is_common,
+							isFiltered: filteredContaminants?.some(
+								(fc) => fc.id === contaminant.id,
+							),
+						};
+					},
+				);
+
+				const totalFiltered =
+					filteredInCategory?.filter(
+						(contaminant: any) => contaminant.isFiltered,
+					).length ?? 0;
+				const totalInCategory = contaminantsInCategory?.length;
+
+				percentageFiltered = Math.round(
+					totalInCategory ? (totalFiltered / totalInCategory) * 100 : 0,
+				);
+			}
+
+			return {
+				category,
+				percentageFiltered,
+				contaminants: filteredInCategory,
+			};
+		});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [allContaminants, filteredContaminants]);
+
 	return (
-		<View className="w-[92vw]">
-			<View style={styles.header}>
-				<Text style={[styles.cell, styles.text]}>Name</Text>
-				<Text style={[styles.cell, styles.text]}>Filtered?</Text>
-				<Text style={[styles.cell, styles.text]}>Filtered By</Text>
-			</View>
-			{sortedContaminants?.map((contaminant, index) => (
-				<View
-					key={index}
-					style={styles.row}
-					className="flex justify-center items-center text-left w-full"
+		<>
+			<Typography size="xl" fontWeight="normal" className="text-secondary">
+				Contaminants filtered
+			</Typography>
+
+			{contaminantsByCategory.map((item) => (
+				<Accordion
+					key={item.category}
+					type="single"
+					collapsible
+					className="w-[90vw]"
 				>
-					<Text style={[styles.cell, styles.text]}>{contaminant.name}</Text>
-					<View style={[styles.cell, styles.icon]}>
-						{filteredContaminants?.some((fc) => fc.id === contaminant.id) ? (
-							<Octicons name="check" size={16} color="black" />
-						) : (
-							<Octicons name="x" size={16} color="black" />
-						)}
-					</View>
-					<ContaminantFiltersDropdown
-						contaminantId={contaminant?.id}
-						align="end"
-					/>
-				</View>
+					<AccordionItem value="item-1">
+						<AccordionTrigger>
+							<View className="flex w-full flex-row gap-6 justify-between items-center">
+								<Typography size="lg" fontWeight="normal">
+									{item.category}
+								</Typography>
+								<Typography size="base" fontWeight="normal">
+									{item.percentageFiltered}%
+								</Typography>
+							</View>
+						</AccordionTrigger>
+						<AccordionContent>
+							<View className="flex flex-col gap-y-4">
+								{item.contaminants?.map((contaminant: any) => (
+									<View
+										// @ts-ignore
+										// href={determineLink(contaminant)}
+										className="flex flex-row gap-6 justify-between items-center"
+										key={contaminant.name}
+									>
+										<View className="w-96" key={contaminant.name}>
+											<Typography size="base" fontWeight="normal">
+												{contaminant.name} {contaminant?.is_common ? "(c)" : ""}
+											</Typography>
+										</View>
+										<View className="w-14">
+											{contaminant.isFiltered ? (
+												<Octicons name="check" size={12} color="black" />
+											) : (
+												<Octicons name="x" size={12} color="black" />
+											)}
+										</View>
+										<ContaminantFiltersDropdown
+											contaminantId={contaminant?.id}
+											align="end"
+										/>
+									</View>
+								))}
+							</View>
+						</AccordionContent>
+					</AccordionItem>
+				</Accordion>
 			))}
-		</View>
+		</>
 	);
 }

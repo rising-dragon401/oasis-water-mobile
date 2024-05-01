@@ -10,6 +10,7 @@ import UserProvider from "@/context/user-provider";
 import { theme } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
 import { PortalHost } from "components/primitives/portal";
+import { SWRConfig } from "swr";
 
 export {
 	// Catch any errors thrown by the Layout component.
@@ -23,29 +24,31 @@ export default function RootLayout() {
 		<SupabaseProvider>
 			<UserProvider>
 				<RevenueCatProvider>
-					<SafeAreaProvider>
-						<Stack
-							screenOptions={{
-								headerShown: false,
-								contentStyle: {
-									backgroundColor:
-										colorScheme === "dark"
-											? theme.dark.background
-											: theme.light.background,
-								},
-							}}
-						>
-							<Stack.Screen name="(protected)" />
-							<Stack.Screen name="(public)" />
-							<Stack.Screen
-								name="subscribeModal"
-								options={{
-									presentation: "modal",
+					<SWRConfig>
+						<SafeAreaProvider>
+							<Stack
+								screenOptions={{
+									headerShown: false,
+									contentStyle: {
+										backgroundColor:
+											colorScheme === "dark"
+												? theme.dark.background
+												: theme.light.background,
+									},
 								}}
-							/>
-						</Stack>
-					</SafeAreaProvider>
-					<PortalHost />
+							>
+								<Stack.Screen name="(protected)" />
+								<Stack.Screen name="(public)" />
+								<Stack.Screen
+									name="subscribeModal"
+									options={{
+										presentation: "modal",
+									}}
+								/>
+							</Stack>
+						</SafeAreaProvider>
+						<PortalHost />
+					</SWRConfig>
 				</RevenueCatProvider>
 			</UserProvider>
 		</SupabaseProvider>
