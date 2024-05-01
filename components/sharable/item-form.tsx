@@ -83,7 +83,7 @@ export function ItemForm({ id }: Props) {
 				paddingBottom: 80,
 			}}
 		>
-			<View className="w-full items-center justify-center px-4">
+			<View className="w-full items-center justify-center px-8">
 				<View className="flex flex-col gap-6 justify-center items-center w-full">
 					<View className="flex justify-center items-center h-80 w-80 p-4">
 						<ItemImage src={item.image} alt={item.name} />
@@ -223,7 +223,7 @@ export function ItemForm({ id }: Props) {
 							</View>
 						)}
 
-						<View className="grid md:grid-cols-2 md:grid-rows-1 grid-rows-2 gap-4 mt-6">
+						<View className="grid md:grid-cols-2 md:grid-rows-1 grid-rows-2 gap-4 mt-6 w-full">
 							<MetaDataCard
 								title="Source"
 								description={item.metadata?.source}
@@ -247,7 +247,6 @@ export function ItemForm({ id }: Props) {
 									<Typography size="2xl" fontWeight="normal">
 										Other Ingredients
 									</Typography>
-
 									<IngredientsCard ingredients={item.ingredients} />
 								</View>
 							)}

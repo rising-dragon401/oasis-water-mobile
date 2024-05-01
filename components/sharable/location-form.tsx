@@ -66,7 +66,7 @@ export function LocationForm({ id }: Props) {
 				paddingBottom: 80,
 			}}
 		>
-			<View className="flex-col flex w-full px-4">
+			<View className="flex-col flex w-full px-8">
 				<View className="md:py-10 py-6 px-2">
 					<View className="flex flex-col items-center gap-6 w-full">
 						<View className="flex justify-center items-center h-80 w-80 p-4">
@@ -129,7 +129,7 @@ export function LocationForm({ id }: Props) {
 												className="mt-8"
 												label="View contaminants"
 											>
-												<View className="grid md:grid-cols-2 grid-cols-1 gap-6">
+												<View className="grid md:grid-cols-2 grid-cols-1 gap-6 w-full">
 													{utility.contaminants.map((contaminant: any) => (
 														<ContaminantCard
 															key={contaminant.id}

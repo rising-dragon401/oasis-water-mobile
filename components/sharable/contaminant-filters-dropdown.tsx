@@ -11,7 +11,7 @@ import {
 } from "components/ui/dropdown-menu";
 import { Link } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { View } from "react-native";
+import { FlatList, View } from "react-native";
 import Typography from "./typography";
 
 type Props = {
@@ -54,18 +54,23 @@ export function ContaminantFiltersDropdown({
 				<DropdownMenuSeparator />
 				<DropdownMenuGroup>
 					{filters.length > 0 ? (
-						filters.map((filter: any) => (
-							<View key={filter.id}>
-								<DropdownMenuItem key={filter.id}>
-									<Link href={`/search/filter/${filter.id}`}>
-										<Typography size="base" fontWeight="normal">
-											{filter.name}
-										</Typography>
-									</Link>
-								</DropdownMenuItem>
-								<DropdownMenuSeparator />
-							</View>
-						))
+						<FlatList
+							data={filters}
+							keyExtractor={(item) => item.id.toString()}
+							renderItem={({ item }) => (
+								<View>
+									<DropdownMenuItem>
+										<Link href={`/search/filter/${item.id}`}>
+											<Typography size="base" fontWeight="normal">
+												{item.name}
+											</Typography>
+										</Link>
+									</DropdownMenuItem>
+									<DropdownMenuSeparator />
+								</View>
+							)}
+							style={{ height: 200 }}
+						/>
 					) : (
 						<DropdownMenuItem>
 							<Typography

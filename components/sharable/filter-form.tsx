@@ -122,7 +122,7 @@ export function FilterForm({ id }: Props) {
 				paddingBottom: 80,
 			}}
 		>
-			<View className="w-full items-center justify-center px-6">
+			<View className="w-full items-center justify-center px-8">
 				<View className="flex flex-col gap-6 justify-center items-center w-full">
 					<View className="flex justify-center items-center h-80 w-80 p-4">
 						<ItemImage src={filter.image} alt={filter.name} />

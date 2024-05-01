@@ -5,7 +5,7 @@ import Typography from "../typography";
 
 export default function Sources({ data }: any) {
 	return (
-		<View className="flex flex-col gap-6 my-10">
+		<View className="flex flex-col gap-6 my-10 w-full">
 			<Typography size="2xl" fontWeight="normal">
 				Sources
 			</Typography>
@@ -17,11 +17,7 @@ export default function Sources({ data }: any) {
 								Linking.openURL(source.url);
 							}}
 						>
-							<Typography
-								size="base"
-								fontWeight="normal"
-								className="text-secondary underline"
-							>
+							<Typography size="base" fontWeight="normal" className="underline">
 								{source.label}
 							</Typography>
 						</TouchableOpacity>
