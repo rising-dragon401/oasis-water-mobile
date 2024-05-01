@@ -16,7 +16,5 @@ export const determineLink = (item: any) => {
 		basePath = `/search/item/${item?.id}`;
 	}
 
-	console.log("basePath", basePath);
-
 	return basePath;
 };

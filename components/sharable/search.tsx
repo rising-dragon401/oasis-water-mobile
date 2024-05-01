@@ -1,7 +1,7 @@
 import { Octicons } from "@expo/vector-icons";
 import algoliasearch from "algoliasearch";
 import { useEffect, useState } from "react";
-import { TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 
 import ResultsRow from "./results-row";
 
@@ -17,7 +17,7 @@ const searchClient = algoliasearch(
 
 export default function Search({ indices }: { indices?: string[] }) {
 	const [results, setResults] = useState<any[]>([]);
-	const [, setIsLoading] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
 	const [, setQueryCompleted] = useState(false);
 	const [value, setValue] = useState("");
 
@@ -34,6 +34,12 @@ export default function Search({ indices }: { indices?: string[] }) {
 
 	const onChangeText = (text: string) => {
 		setValue(text);
+	};
+
+	const handleClear = () => {
+		console.log("clearing search");
+		setValue("");
+		setResults([]);
 	};
 
 	const handleSearch = async (query: string) => {
@@ -98,15 +104,24 @@ export default function Search({ indices }: { indices?: string[] }) {
 					onChangeText={onChangeText}
 					aria-labelledbyledBy="inputLabel"
 					aria-errormessage="inputError"
-					className="!rounded-full w-full pl-4"
+					className="!rounded-full w-full pl-4 z-40"
 				/>
 
-				<TouchableOpacity
-					// onPress={() => handleSearch(value)}
-					className="absolute right-6"
-				>
-					<Octicons name="search" size={18} color="black" />
-				</TouchableOpacity>
+				<View className="absolute !right-2 flex flex-row gap-3 mr-4 z-50">
+					{isLoading && <ActivityIndicator size="small" color="black" />}
+
+					{!value ? (
+						<TouchableOpacity
+						// onPress={() => handleSearch(value)}
+						>
+							<Octicons name="search" size={18} color="black" />
+						</TouchableOpacity>
+					) : (
+						<TouchableOpacity onPress={handleClear}>
+							<Octicons name="x-circle-fill" size={18} color="black" />
+						</TouchableOpacity>
+					)}
+				</View>
 			</View>
 			{results.length > 0 && <ResultsRow results={results} />}
 		</>
