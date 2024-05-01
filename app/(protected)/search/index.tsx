@@ -5,14 +5,11 @@ import Search from "@/components/sharable/search";
 import { H1, Muted } from "@/components/ui/typography";
 
 import ItemRow from "@/components/sharable/item-row";
-import { useColorScheme } from "@/lib/useColorScheme";
 import { getSevenRandomFilters } from "actions/filters";
 import { getTenRandomItems } from "actions/items";
 import { getFeaturedLocations } from "actions/locations";
 
 export default function TabOneScreen() {
-	const { colorScheme } = useColorScheme();
-
 	const [items, setItems] = useState<any[]>([]);
 	const [tapWater, setTapWater] = useState<any[]>([]);
 	const [filters, setFilters] = useState<any[]>([]);

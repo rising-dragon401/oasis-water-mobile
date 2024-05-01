@@ -2,6 +2,7 @@ import { Link } from "expo-router";
 import React from "react";
 import { Image, Text, View } from "react-native";
 
+import { determineLink } from "@/lib/utils";
 import { Octicons } from "@expo/vector-icons";
 import { useUserProvider } from "context/user-provider";
 import Typography from "./typography";
@@ -41,26 +42,12 @@ const ItemPreviewCard = ({ item, showWarning, size }: Props) => {
 		);
 	};
 
-	const determineLink = () => {
-		let basePath = "";
-
-		if (item.type === "tap_water") {
-			basePath = `/search/location/${item.id}`;
-		} else if (item.type === "filter") {
-			basePath = `/search/filter/${item.id}`;
-		} else {
-			basePath = `/search/item/${item.id}`;
-		}
-
-		return basePath;
-	};
-
 	const width = size === "sm" ? 96 : size === "md" ? 192 : 288; // 24*4, 48*4, 72*4 pixels
 	const height = size === "sm" ? 96 : size === "md" ? 192 : 288; // 24*4, 48*4, 72*4 pixels
 
 	return (
 		// @ts-ignore
-		<Link href={determineLink()}>
+		<Link href={determineLink(item)}>
 			<View
 				className="flex flex-col items-center gap-2"
 				style={{ width: width, height: height }}

@@ -82,10 +82,10 @@ export async function getSubscription(uid: string | null) {
 			plan: planPlan,
 		};
 
-		console.log(
-			"subscriptionDetails",
-			JSON.stringify(subscriptionDetails, null, 2),
-		);
+		// console.log(
+		// 	"subscriptionDetails",
+		// 	JSON.stringify(subscriptionDetails, null, 2),
+		// );
 
 		return subscriptionDetails;
 	} catch (error) {
