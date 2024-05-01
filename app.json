@@ -1,48 +1,43 @@
 {
-  "expo": {
-    "name": "Oasis",
-    "slug": "Oasis",
-    "scheme": "oasisapp",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "automatic",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
-    "ios": {
-      "supportsTablet": false,
-      "config": {
-        "usesNonExemptEncryption": false
-      },
-      "usesAppleSignIn": true,
-      "bundleIdentifier": "com.oasis.oaisis"
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
-    },
-    "experiments": {
-      "typedRoutes": true
-    },
-    "plugins": [
-      "expo-router",
-      "expo-apple-authentication"
-    ],
-    "extra": {
-      "router": {
-        "origin": false
-      },
-      "eas": {
-        "projectId": "ba3ea707-c8f6-4baf-becd-c2dedfa41b76"
-      }
-    }
-  }
+	"expo": {
+		"name": "Oasis",
+		"slug": "Oasis",
+		"scheme": "oasisapp",
+		"version": "1.0.0",
+		"orientation": "portrait",
+		"icon": "./assets/icon.png",
+		"userInterfaceStyle": "automatic",
+		"splash": {
+			"image": "./assets/splash.png",
+			"resizeMode": "contain",
+			"backgroundColor": "#ffffff"
+		},
+		"assetBundlePatterns": ["**/*"],
+		"ios": {
+			"supportsTablet": false,
+			"config": {
+				"usesNonExemptEncryption": false
+			},
+			"usesAppleSignIn": true,
+			"bundleIdentifier": "com.liveoasis.oasis"
+		},
+		"android": {
+			"adaptiveIcon": {
+				"foregroundImage": "./assets/adaptive-icon.png",
+				"backgroundColor": "#ffffff"
+			}
+		},
+		"experiments": {
+			"typedRoutes": true
+		},
+		"plugins": ["expo-router", "expo-apple-authentication"],
+		"extra": {
+			"router": {
+				"origin": false
+			},
+			"eas": {
+				"projectId": "ba3ea707-c8f6-4baf-becd-c2dedfa41b76"
+			}
+		}
+	}
 }

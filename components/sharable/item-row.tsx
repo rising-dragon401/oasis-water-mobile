@@ -41,7 +41,7 @@ export default function ItemRow({ title, items, type }: Props) {
 			<ScrollView horizontal showsHorizontalScrollIndicator={false}>
 				{items.map((item, index) => (
 					<View key={item.id} className="mr-5">
-						<ItemPreviewCard item={item} width={48} />
+						<ItemPreviewCard item={item} size="md" />
 					</View>
 				))}
 			</ScrollView>

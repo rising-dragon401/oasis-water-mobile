@@ -44,7 +44,7 @@ export function FilterForm({ id }: Props) {
 			setFilter(filter);
 
 			navigation.setOptions({
-				title: filter.name,
+				title: filter.name || "Filter",
 			});
 		}
 

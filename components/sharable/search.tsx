@@ -21,11 +21,11 @@ export default function Search() {
 				onChangeText={onChangeText}
 				aria-labelledbyledBy="inputLabel"
 				aria-errormessage="inputError"
-				className="!rounded-full w-[88vw] pl-4"
+				className="!rounded-full w-full pl-4"
 			/>
 
-			<TouchableOpacity onPress={handleSearch} className="absolute right-4">
-				<Octicons name="search" size={24} color="black" />
+			<TouchableOpacity onPress={handleSearch} className="absolute right-6">
+				<Octicons name="search" size={18} color="black" />
 			</TouchableOpacity>
 		</View>
 	);

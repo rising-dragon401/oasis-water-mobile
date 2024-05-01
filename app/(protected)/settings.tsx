@@ -25,7 +25,8 @@ export default function TabTwoScreen() {
 					Signed in as {user?.email}
 				</Typography>
 				<Typography size="base" fontWeight="normal" className="text-center">
-					Subscription: {subscription?.plan || "Free"}
+					Subscription: {subscription?.plan || "Free"}{" "}
+					{subscription?.plan === "Pro" && "💫"}
 				</Typography>
 
 				{!subscription && <UpgradeButton />}

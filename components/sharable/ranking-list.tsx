@@ -64,7 +64,7 @@ export default function RankingList({ title, items, loading }: Props) {
 
 	return (
 		<View className="pb-14">
-			<View className="py-4 mb-4 flex flex-row justify-between">
+			<View className="py-4 mb-2 flex flex-row justify-between">
 				<Typography size="3xl" fontWeight="normal">
 					{title}
 				</Typography>
@@ -109,7 +109,7 @@ export default function RankingList({ title, items, loading }: Props) {
 			</View>
 
 			{!subscription && (
-				<View className="w-full justify-center flex flex-row gap-4">
+				<View className="w-full justify-center flex flex-row gap-4 mb-8">
 					<UpgradeButton label="Unlock ranked list sorted by score" />
 				</View>
 			)}
@@ -132,7 +132,7 @@ export default function RankingList({ title, items, loading }: Props) {
 										style={{ width: "50%" }}
 										className="flex mb-24"
 									>
-										<ItemPreviewCard item={item} width={48} />
+										<ItemPreviewCard item={item} size="md" />
 									</View>
 								))}
 					</View>
@@ -153,6 +153,7 @@ export default function RankingList({ title, items, loading }: Props) {
 											<ItemPreviewCard
 												key={item.id}
 												item={item}
+												size="md"
 												showWarning={true}
 											/>
 										))}

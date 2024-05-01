@@ -61,20 +61,33 @@ export async function getSubscription(uid: string | null) {
 
 		const activePlan = subscription?.prices?.products?.name;
 
+		// console.log(
+		// 	"subscription?.prices?.products?.name",
+		// 	subscription?.prices?.products?.name,
+		// );
+
 		let planPlan = "Free";
 		if (!activePlan) {
 			planPlan = "Free";
 		} else if (
 			activePlan?.toLowerCase() === "pro (test)" ||
-			activePlan?.toLowerCase() === "pro (beta)"
+			activePlan?.toLowerCase() === "pro (beta)" ||
+			activePlan?.toLowerCase() === "oasis pro"
 		) {
 			planPlan = "Pro";
 		}
 
-		return {
+		const subscriptionDetails = {
 			...subscription,
 			plan: planPlan,
 		};
+
+		console.log(
+			"subscriptionDetails",
+			JSON.stringify(subscriptionDetails, null, 2),
+		);
+
+		return subscriptionDetails;
 	} catch (error) {
 		console.error("Error:", error);
 		return null;
@@ -137,4 +150,84 @@ export async function getUserFavorites(uid: string) {
 	);
 
 	return favorites;
+}
+
+export async function manageSubscriptionStatusChange(
+	uid: string,
+	rcVustomerInfo: any,
+) {
+	// console.log(
+	// 	"manageSubscriptionStatusChange: ",
+	// 	JSON.stringify(rcVustomerInfo, null, 2),
+	// );
+
+	try {
+		const provider = "revenue_cat";
+		const entitlements = rcVustomerInfo.entitlements;
+		const proEntitlement = entitlements?.all?.pro;
+		const proIsActive = proEntitlement?.isActive || false;
+		const proExpiresDate = proEntitlement?.expirationDate || null;
+		const proCreatedAt = proEntitlement?.originalPurchaseDate || null;
+		const proPriceId = proEntitlement?.productIdentifier || null;
+		const proWillRenew = proEntitlement?.willRenew || false;
+		// determine if active or cancelled based on proIsActive and expirationDate
+		const pastExpirationDate = proExpiresDate < new Date();
+		const status = !proIsActive && pastExpirationDate ? "canceled" : "active";
+		const subscriptionId = "sub_rc_" + proCreatedAt.toString() + proPriceId;
+
+		const subscriptionData = {
+			id: subscriptionId,
+			user_id: uid,
+			metadata: {
+				provider,
+				...rcVustomerInfo,
+			},
+			status,
+			price_id: proPriceId,
+			quantity: 1,
+			created: proCreatedAt,
+			current_period_end: proExpiresDate,
+			cancel_at_period_end: !proWillRenew,
+		};
+
+		// Check if the existing data matches the new data
+		const { data: existingSubscription, error: fetchError } = await supabase
+			.from("subscriptions")
+			.select("*")
+			.eq("id", subscriptionId)
+			.single();
+
+		// Compare existing data with new data
+		let isDataSame =
+			existingSubscription &&
+			Object.keys(subscriptionData).every((key) => {
+				return (
+					// @ts-ignore
+					JSON.stringify(subscriptionData[key]) ===
+					JSON.stringify(existingSubscription[key])
+				);
+			});
+
+		if (!existingSubscription) {
+			isDataSame = false;
+		}
+
+		if (!isDataSame) {
+			const { error } = await supabase
+				.from("subscriptions")
+				.upsert([subscriptionData]);
+
+			if (error) throw error;
+
+			console.log(
+				`Inserted/updated subscription [${subscriptionId}] for user [${uid}]`,
+			);
+		} else {
+			console.log(
+				`No changes detected for subscription [${subscriptionId}]. No update performed.`,
+			);
+		}
+	} catch (error) {
+		console.error("Error inserting/updating subscription:", error);
+	}
 }

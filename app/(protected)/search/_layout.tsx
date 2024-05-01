@@ -25,9 +25,12 @@ export default function SearchLayout() {
 					headerShown: false,
 				}}
 			/>
-			<Stack.Screen name="item" />
-			<Stack.Screen name="location" />
-			<Stack.Screen name="filter" />
+			<Stack.Screen name="item/[id]" />
+			<Stack.Screen name="location/[id]" />
+			<Stack.Screen name="filter/[id]" />
+			<Stack.Screen name="bottled-waters/index" />
+			<Stack.Screen name="tap-water/index" />
+			<Stack.Screen name="filters/index" />
 		</Stack>
 	);
 }

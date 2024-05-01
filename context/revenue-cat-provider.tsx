@@ -1,10 +1,18 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { manageSubscriptionStatusChange } from "@/actions/user";
+import {
+	createContext,
+	useCallback,
+	useContext,
+	useEffect,
+	useState,
+} from "react";
 import { Platform } from "react-native";
 import Purchases, {
 	CustomerInfo,
 	LOG_LEVEL,
 	PurchasesPackage,
 } from "react-native-purchases";
+import { useUserProvider } from "./user-provider";
 
 const APIKeys = {
 	apple: "appl_OIAHthcBxHjpVWGXmtLvBKRTtrR",
@@ -14,12 +22,10 @@ interface RevenueCatProps {
 	purchasePackage: (pack: PurchasesPackage) => Promise<void>;
 	restorePermissions: () => Promise<CustomerInfo>;
 	userSubscription: UserState;
-	package: PurchasesPackage[];
+	packages: PurchasesPackage[];
 }
 
 export interface UserState {
-	cookies: number;
-	items: string[];
 	pro: boolean;
 }
 
@@ -36,13 +42,12 @@ export const useRevenueCat = () => {
 };
 
 export const RevenueCatProvider = ({ children }: any) => {
+	const { subscription, uid, fetchSubscription } = useUserProvider();
 	const [userSubscription, setUserSubscription] = useState<UserState>({
-		cookies: 0,
-		items: [],
 		pro: false,
 	});
 	const [packages, setPackages] = useState<PurchasesPackage[]>([]);
-	const [isReady, setIsReady] = useState(false);
+	const [, setIsReady] = useState(false);
 
 	useEffect(() => {
 		const setup = async () => {
@@ -54,23 +59,72 @@ export const RevenueCatProvider = ({ children }: any) => {
 
 			Purchases.setLogLevel(LOG_LEVEL.DEBUG);
 
+			Purchases.addCustomerInfoUpdateListener(async (customerInfo) => {
+				updateCustomerInfo(customerInfo, uid || "");
+			});
+
 			await loadOfferings();
 		};
 
-		setup().catch(console.log);
-	}, []);
+		if (uid) {
+			setup().catch(console.log);
+		}
+	}, [uid]);
+
+	// if user purchased through web, set userSubscription to pro
+	useEffect(() => {
+		if (subscription) {
+			setUserSubscription({ pro: true });
+		}
+	}, [subscription]);
 
 	const loadOfferings = async () => {
 		const offerings = await Purchases.getOfferings();
-		console.log("offerings", offerings);
 		setPackages(offerings.current?.availablePackages || []);
 	};
 
-	console.log("packages", packages);
+	// console.log("packages", packages);
 
-	const purchasePackage = async (pack: PurchasesPackage) => {};
+	const purchasePackage = async (pack: PurchasesPackage) => {
+		try {
+			console.log("purchasePackage pack", pack);
+			await Purchases.purchasePackage(pack);
 
-	const updateCustomerInfo = async (customerInfo: CustomerInfo) => {};
+			if (pack.identifier === "pro") {
+				setUserSubscription({ ...userSubscription, pro: true });
+			}
+		} catch (error) {
+			console.log("purchasePackage error", error);
+			alert(error);
+		}
+	};
+
+	const updateCustomerInfo = useCallback(
+		async (customerInfo: CustomerInfo, uid: string) => {
+			// console.log(
+			// 	"updateCustomerInfo info",
+			// 	JSON.stringify(customerInfo, null, 2),
+			// );
+			// console.log("updateCustomerInfo uid", uid);
+
+			if (!customerInfo || !uid) {
+				console.error("No customer info or uid");
+				return;
+			}
+
+			// setUserSubscription({
+			// 	pro: customerInfo.entitlements.active.pro?.isActive || false,
+			// });
+
+			// console.log("calling manageSubscriptionStatusChange");
+
+			await manageSubscriptionStatusChange(uid, customerInfo);
+
+			// update user provider subscription
+			fetchSubscription(uid);
+		},
+		[uid],
+	);
 
 	const restorePermissions = async () => {
 		const customerInfo = await Purchases.restorePurchases();
@@ -81,7 +135,7 @@ export const RevenueCatProvider = ({ children }: any) => {
 		purchasePackage,
 		restorePermissions,
 		userSubscription: userSubscription,
-		package: packages,
+		packages: packages,
 	};
 
 	return (

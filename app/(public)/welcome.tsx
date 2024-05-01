@@ -16,7 +16,7 @@ export default function WelcomeScreen() {
 	return (
 		<ImageBackground source={backgroundImage} style={{ flex: 1 }}>
 			<SafeAreaView className="flex flex-1 p-4">
-				<View className="flex flex-1 mt-40 gap-y-4 items-center">
+				<View className="flex flex-1 mt-36 gap-y-4 items-center">
 					<H1 className="text-center">Welcome to your Oasis</H1>
 					<Muted className="text-center max-w-sm">
 						Search, research and find the the healthiest waters for you based on

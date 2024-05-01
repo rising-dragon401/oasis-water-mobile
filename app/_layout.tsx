@@ -4,6 +4,7 @@ import { Stack } from "expo-router";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import "../global.css";
 
+import { RevenueCatProvider } from "@/context/revenue-cat-provider";
 import { SupabaseProvider } from "@/context/supabase-provider";
 import UserProvider from "@/context/user-provider";
 import { theme } from "@/lib/constants";
@@ -21,29 +22,31 @@ export default function RootLayout() {
 	return (
 		<SupabaseProvider>
 			<UserProvider>
-				<SafeAreaProvider>
-					<Stack
-						screenOptions={{
-							headerShown: false,
-							contentStyle: {
-								backgroundColor:
-									colorScheme === "dark"
-										? theme.dark.background
-										: theme.light.background,
-							},
-						}}
-					>
-						<Stack.Screen name="(protected)" />
-						<Stack.Screen name="(public)" />
-						<Stack.Screen
-							name="subscribeModal"
-							options={{
-								presentation: "modal",
+				<RevenueCatProvider>
+					<SafeAreaProvider>
+						<Stack
+							screenOptions={{
+								headerShown: false,
+								contentStyle: {
+									backgroundColor:
+										colorScheme === "dark"
+											? theme.dark.background
+											: theme.light.background,
+								},
 							}}
-						/>
-					</Stack>
-				</SafeAreaProvider>
-				<PortalHost />
+						>
+							<Stack.Screen name="(protected)" />
+							<Stack.Screen name="(public)" />
+							<Stack.Screen
+								name="subscribeModal"
+								options={{
+									presentation: "modal",
+								}}
+							/>
+						</Stack>
+					</SafeAreaProvider>
+					<PortalHost />
+				</RevenueCatProvider>
 			</UserProvider>
 		</SupabaseProvider>
 	);

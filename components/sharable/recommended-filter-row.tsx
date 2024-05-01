@@ -43,7 +43,7 @@ export default function RecommendedFilterRow({
 								className="flex-shrink-0"
 								style={{ minWidth: "20%" }}
 							>
-								<ItemPreviewCard item={item} />
+								<ItemPreviewCard item={item} size="md" />
 							</View>
 						))}
 				</View>

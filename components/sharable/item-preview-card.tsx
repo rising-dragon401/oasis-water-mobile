@@ -11,10 +11,10 @@ import Typography from "./typography";
 type Props = {
 	item: any;
 	showWarning?: boolean;
-	width?: number;
+	size?: "sm" | "md" | "lg";
 };
 
-const ItemPreviewCard = ({ item, showWarning, width }: Props) => {
+const ItemPreviewCard = ({ item, showWarning, size }: Props) => {
 	const { subscription } = useUserProvider();
 
 	const renderScore = () => {
@@ -55,11 +55,15 @@ const ItemPreviewCard = ({ item, showWarning, width }: Props) => {
 		return basePath;
 	};
 
+	const width = size === "sm" ? 96 : size === "md" ? 192 : 288; // 24*4, 48*4, 72*4 pixels
+	const height = size === "sm" ? 96 : size === "md" ? 192 : 288; // 24*4, 48*4, 72*4 pixels
+
 	return (
 		// @ts-ignore
 		<Link href={determineLink()}>
 			<View
-				className={`flex flex-col items-center gap-2 w-${width || "36"} h-${width || "36"}`}
+				className="flex flex-col items-center gap-2"
+				style={{ width: width, height: height }}
 			>
 				<View className="relative rounded-md overflow-hidden h-full w-full">
 					<Image
@@ -84,7 +88,8 @@ const ItemPreviewCard = ({ item, showWarning, width }: Props) => {
 					)}
 				</View>
 				<View
-					className={`flex flex-row justify-between pt-1 md:gap-2 items-start w-${width || "36"}`}
+					className="flex flex-row justify-between pt-1 md:gap-2 items-start"
+					style={{ width: width }}
 				>
 					<View className="flex flex-col">
 						<Typography

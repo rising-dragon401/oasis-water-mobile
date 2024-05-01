@@ -48,14 +48,14 @@ export default function TabOneScreen() {
 				paddingVertical: 20,
 			}}
 		>
-			<View className="flex flex-col items-center justify-center p-4 mt-44">
+			<View className="flex flex-col h-full items-center justify-center p-4 mt-24">
 				<H1 className="text-center max-w-xs">Find your healthiest water</H1>
 
-				<Muted className="text-center mb-8 max-w-md">
+				<Muted className="text-center mb-8 max-w-md mt-2">
 					90% of water has microplastics, toxins and contaminants.
 				</Muted>
 
-				<View className="mt-2 mb-10">
+				<View className="mt-2 mb-10 w-[90%]">
 					<Search />
 				</View>
 

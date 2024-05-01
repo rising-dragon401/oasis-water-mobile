@@ -27,7 +27,8 @@ interface UserContextType {
 	userFavorites: any[] | null | undefined;
 	subscription: any | null | undefined;
 	refreshUserData: () => void;
-	fetchUserFavorites: (uid: string | null) => Promise<void>; // Updated this line
+	fetchUserFavorites: (uid: string | null) => Promise<void>;
+	fetchSubscription: (uid: string | null) => Promise<void>;
 	logout: () => void;
 }
 
@@ -95,7 +96,6 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 	const refreshUserData = useCallback(
 		async (uid?: string | null) => {
 			console.log("refreshUserData");
-
 			let userId = uid ?? null;
 
 			await Promise.all([
@@ -130,6 +130,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 			userFavorites,
 			refreshUserData,
 			fetchUserFavorites,
+			fetchSubscription,
 			logout,
 		}),
 		[
