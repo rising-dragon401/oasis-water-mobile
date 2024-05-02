@@ -1,8 +1,8 @@
+import { ContaminantFiltersDropdown } from "components/sharable/contaminant-filters-dropdown";
 import { View } from "react-native";
 
 import Typography from "../typography";
 import { ArticlesDropdown } from "./articles-dropdown";
-import { ContaminantFiltersDropdown } from "./contaminant-filters-dropdown";
 
 import {
 	Card,

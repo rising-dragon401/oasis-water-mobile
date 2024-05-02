@@ -39,24 +39,28 @@ export default function TabOneScreen() {
 	}
 
 	return (
-		<ScrollView
-			contentContainerStyle={{
-				paddingBottom: 80,
-				paddingVertical: 20,
-			}}
-		>
-			<View className="flex flex-col h-full items-center justify-center p-4 mt-24 ">
-				<H1 className="text-center max-w-xs">Find your healthiest water</H1>
+		<View className="flex flex-col h-full items-center justify-center p-4 mt-24 ">
+			<H1 className="text-center max-w-xs">Find your healthiest water</H1>
 
-				<Muted className="text-center mb-8 max-w-md mt-2">
-					90% of water has microplastics, toxins and contaminants.
-				</Muted>
+			<Muted className="text-center mb-8 max-w-md mt-2">
+				90% of water has microplastics, toxins and contaminants.
+			</Muted>
 
-				<View className="mt-2 mb-10 w-[90%] z-40">
-					<Search />
-				</View>
+			<View className="mt-2 mb-10 w-[90%] z-40">
+				<Search />
+			</View>
 
-				<View className="w-full mt-8">
+			<ScrollView
+				contentContainerStyle={{
+					paddingBottom: 120,
+					paddingVertical: 20,
+					paddingHorizontal: 10,
+					zIndex: 0,
+				}}
+				nestedScrollEnabled
+				showsVerticalScrollIndicator={false}
+			>
+				<View className="w-full mt-6">
 					<ItemRow title="Bottled Water" items={items} type="item" />
 				</View>
 
@@ -67,7 +71,7 @@ export default function TabOneScreen() {
 				<View className="w-full mt-10">
 					<ItemRow title="Filters" items={filters} type="filter" />
 				</View>
-			</View>
-		</ScrollView>
+			</ScrollView>
+		</View>
 	);
 }

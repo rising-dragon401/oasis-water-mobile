@@ -19,7 +19,7 @@ const APIKeys = {
 };
 
 interface RevenueCatProps {
-	purchasePackage: (pack: PurchasesPackage) => Promise<void>;
+	purchasePackage: (pack: PurchasesPackage) => Promise<boolean>;
 	restorePermissions: () => Promise<CustomerInfo>;
 	userSubscription: UserState;
 	packages: PurchasesPackage[];
@@ -93,9 +93,13 @@ export const RevenueCatProvider = ({ children }: any) => {
 			if (pack.identifier === "pro") {
 				setUserSubscription({ ...userSubscription, pro: true });
 			}
+
+			return true;
 		} catch (error) {
 			console.log("purchasePackage error", error);
 			alert(error);
+
+			return false;
 		}
 	};
 

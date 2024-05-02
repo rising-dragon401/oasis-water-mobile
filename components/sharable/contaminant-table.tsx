@@ -95,7 +95,7 @@ export default function ContaminantTable({
 
 	return (
 		<>
-			<Typography size="xl" fontWeight="normal" className="text-secondary">
+			<Typography size="xl" fontWeight="normal">
 				Contaminants filtered
 			</Typography>
 

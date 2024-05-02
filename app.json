@@ -3,7 +3,7 @@
 		"name": "Oasis",
 		"slug": "Oasis",
 		"scheme": "oasisapp",
-		"version": "1.0.0",
+		"version": "0.0.1",
 		"orientation": "portrait",
 		"icon": "./assets/icon.png",
 		"userInterfaceStyle": "automatic",
@@ -19,7 +19,8 @@
 				"usesNonExemptEncryption": false
 			},
 			"usesAppleSignIn": true,
-			"bundleIdentifier": "com.liveoasis.oasis"
+			"bundleIdentifier": "com.liveoasis.oasis",
+			"buildNumber": "4"
 		},
 		"android": {
 			"adaptiveIcon": {
@@ -30,7 +31,18 @@
 		"experiments": {
 			"typedRoutes": true
 		},
-		"plugins": ["expo-router", "expo-apple-authentication"],
+		"plugins": [
+			"expo-router",
+			"expo-apple-authentication",
+			[
+				"@sentry/react-native/expo",
+				{
+					"organization": "live-oasis",
+					"project": "oasis-expo"
+				}
+			],
+			["sentry-expo"]
+		],
 		"extra": {
 			"router": {
 				"origin": false

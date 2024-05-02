@@ -26,6 +26,13 @@ export default function TabTwoScreen() {
 			<View className="flex flex-col items-center p-4 gap-y-4 w-full">
 				<H1 className="text-center mt-20">Profile</H1>
 
+				<Button
+					label="Press me"
+					onPress={() => {
+						throw new Error("Hello, again, Sentry!");
+					}}
+				/>
+
 				<Typography
 					size="base"
 					fontWeight="normal"
@@ -33,38 +40,53 @@ export default function TabTwoScreen() {
 				>
 					Signed in as {user?.email}
 				</Typography>
-				<Typography size="base" fontWeight="normal" className="text-center">
-					Subscription: {subscription?.plan || "Free"}{" "}
-					{subscription?.plan === "Pro" && "💫"}
-				</Typography>
-
-				{activeSubscription && (
+				{activeSubscription ? (
 					<>
-						{provider === "revenue_cat" ? (
-							<View className="flex flex-col gap-4 text-center mt-8">
-								<Button
-									variant="outline"
-									label="Manage subscription"
-									onPress={handleManageSubscription}
-								/>
-								<Typography size="xs" fontWeight="normal">
-									(You can also manage your subscription in your phone
-									settings.)
-								</Typography>
-							</View>
-						) : (
+						<Typography size="base" fontWeight="normal" className="text-center">
+							Subscription: {subscription?.plan || "Free"}{" "}
+							{subscription?.plan === "Pro" && "💫"}
+						</Typography>
+
+						{subscription.cancel_at_period_end && (
 							<Typography
 								size="base"
 								fontWeight="normal"
 								className="text-center"
 							>
-								Manage your subscription online
+								Expires on{" "}
+								{new Date(subscription.current_period_end).toLocaleDateString()}
 							</Typography>
 						)}
-					</>
-				)}
 
-				{!subscription && <UpgradeButton />}
+						{activeSubscription && (
+							<>
+								{provider === "revenue_cat" ? (
+									<View className="flex flex-col gap-4 text-center mt-8">
+										<Button
+											variant="outline"
+											label="Manage subscription"
+											onPress={handleManageSubscription}
+										/>
+										<Typography size="xs" fontWeight="normal">
+											(You can also manage your subscription in your phone
+											settings.)
+										</Typography>
+									</View>
+								) : (
+									<Typography
+										size="base"
+										fontWeight="normal"
+										className="text-center"
+									>
+										Manage your subscription online
+									</Typography>
+								)}
+							</>
+						)}
+					</>
+				) : (
+					<UpgradeButton />
+				)}
 			</View>
 			<Button
 				className="w-full"

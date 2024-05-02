@@ -1,13 +1,11 @@
 import { useRouter } from "expo-router";
+import { useEffect } from "react";
 import { View } from "react-native";
 
 import { Button } from "@/components/ui/button";
 import { H1, Muted, P } from "@/components/ui/typography";
 import { useRevenueCat } from "@/context/revenue-cat-provider";
-
-const APIKeys = {
-	apple: "appl_OIAHthcBxHjpVWGXmtLvBKRTtrR",
-};
+import { useUserProvider } from "@/context/user-provider";
 
 const FEATURES = [
 	{
@@ -34,10 +32,17 @@ const FEATURES = [
 ];
 
 export default function SubscribeModal() {
+	const { subscription } = useUserProvider();
 	const router = useRouter();
 	const { packages, purchasePackage } = useRevenueCat();
 
-	const handleSubscribe = () => {
+	useEffect(() => {
+		if (subscription.active) {
+			router.back();
+		}
+	}, [subscription]);
+
+	const handleSubscribe = async () => {
 		const pack = packages[0];
 
 		if (!pack) {
@@ -45,7 +50,11 @@ export default function SubscribeModal() {
 			return;
 		}
 
-		purchasePackage!(pack);
+		const res = await purchasePackage!(pack);
+
+		if (res) {
+			router.back();
+		}
 	};
 
 	return (

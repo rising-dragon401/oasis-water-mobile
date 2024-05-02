@@ -18,6 +18,29 @@ eas build --profile development --platform ios
 npx expo start --dev-client
 ```
 
+Local preview
+
+```
+eas build -p ios --profile preview --local
+
+```
+
+Submitting
+
+```
+eas build --platform ios
+```
+
+```
+eas submit -p ios
+```
+
+Trouble shooting
+
+```
+npx expo-doctor
+```
+
 Then scan the QR code with the Expo Go app on your phone.
 
 # Expo Supabase Starter
@@ -55,3 +78,7 @@ https://github.com/FlemingVincent/expo-supabase-starter/assets/80268905/884ed027
 # mobile
 
 # mobile
+
+```
+
+```

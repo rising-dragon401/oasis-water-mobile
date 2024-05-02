@@ -58,7 +58,7 @@ export default function ResultsRow({ results }: Props) {
 				position: "absolute",
 				backgroundColor: "white",
 				width: "100%",
-				height: 240,
+				maxHeight: 240,
 				borderRadius: 8,
 				overflow: "scroll",
 				paddingTop: 8,
@@ -106,6 +106,8 @@ export default function ResultsRow({ results }: Props) {
 						</Link>
 					</View>
 				)}
+				nestedScrollEnabled
+				showsVerticalScrollIndicator={false}
 			/>
 		</ScrollView>
 	);

@@ -156,24 +156,33 @@ export async function manageSubscriptionStatusChange(
 	uid: string,
 	rcVustomerInfo: any,
 ) {
-	// console.log(
-	// 	"manageSubscriptionStatusChange: ",
-	// 	JSON.stringify(rcVustomerInfo, null, 2),
-	// );
+	console.log(
+		"manageSubscriptionStatusChange: ",
+		JSON.stringify(rcVustomerInfo, null, 2),
+	);
 
 	try {
 		const provider = "revenue_cat";
 		const entitlements = rcVustomerInfo.entitlements;
 		const proEntitlement = entitlements?.all?.pro;
-		const proIsActive = proEntitlement?.isActive || false;
+		const proIsActive = proEntitlement?.isActive === true || false;
 		const proExpiresDate = proEntitlement?.expirationDate || null;
 		const proCreatedAt = proEntitlement?.originalPurchaseDate || null;
 		const proPriceId = proEntitlement?.productIdentifier || null;
 		const proWillRenew = proEntitlement?.willRenew || false;
+
+		console.log("proWillRenew", proWillRenew);
 		// determine if active or cancelled based on proIsActive and expirationDate
 		const pastExpirationDate = proExpiresDate < new Date();
+		console.log("proIsActive", proIsActive);
 		const status = !proIsActive && pastExpirationDate ? "canceled" : "active";
-		const subscriptionId = "sub_rc_" + proCreatedAt.toString() + proPriceId;
+		// const status = !proIsActive ? "canceled" : "active";
+		const subscriptionId = "sub_rc_" + proCreatedAt?.toString() + proPriceId;
+
+		// check if required fields are present
+		if (!subscriptionId || !proCreatedAt || !proExpiresDate || !proPriceId) {
+			throw new Error("Missing required fields");
+		}
 
 		const subscriptionData = {
 			id: subscriptionId,

@@ -109,7 +109,7 @@ export default function Search({ indices }: { indices?: string[] }) {
 
 				<View
 					className="flex flex-row gap-3 mr-4 z-50"
-					style={{ position: "absolute", right: 16 }}
+					style={{ position: "absolute", right: 10 }}
 				>
 					{isLoading && <ActivityIndicator size="small" color="black" />}
 

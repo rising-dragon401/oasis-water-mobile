@@ -1,6 +1,9 @@
 import "expo-dev-client";
 
-import { Stack } from "expo-router";
+import * as Sentry from "@sentry/react-native";
+import { Stack, useNavigationContainerRef } from "expo-router";
+import React from "react";
+
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import "../global.css";
 
@@ -10,6 +13,7 @@ import UserProvider from "@/context/user-provider";
 import { theme } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
 import { PortalHost } from "components/primitives/portal";
+import { isRunningInExpoGo } from "expo";
 import { SWRConfig } from "swr";
 
 export {
@@ -17,8 +21,29 @@ export {
 	ErrorBoundary,
 } from "expo-router";
 
-export default function RootLayout() {
+const routingInstrumentation = new Sentry.ReactNavigationInstrumentation();
+
+Sentry.init({
+	dsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
+	debug: true, // If `true`, Sentry will try to print out useful debugging information if something goes wrong with sending the event. Set it to `false` in production
+	integrations: [
+		new Sentry.ReactNativeTracing({
+			routingInstrumentation,
+			enableNativeFramesTracking: !isRunningInExpoGo(),
+		}),
+	],
+});
+
+function RootLayout() {
 	const { colorScheme } = useColorScheme();
+
+	const ref = useNavigationContainerRef();
+
+	React.useEffect(() => {
+		if (ref) {
+			routingInstrumentation.registerNavigationContainer(ref);
+		}
+	}, [ref]);
 
 	return (
 		<SupabaseProvider>
@@ -54,3 +79,5 @@ export default function RootLayout() {
 		</SupabaseProvider>
 	);
 }
+
+export default Sentry.wrap(RootLayout);
