@@ -99,6 +99,8 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 	};
 
 	const signInWithApple = async () => {
+		console.log("signInWithApple");
+
 		try {
 			const credential = await AppleAuthentication.signInAsync({
 				requestedScopes: [
@@ -106,8 +108,11 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 					AppleAuthentication.AppleAuthenticationScope.EMAIL,
 				],
 			});
+
 			// Sign in via Supabase Auth.
 			if (credential.identityToken) {
+				console.log(" credential.identityToken: ", credential.identityToken);
+
 				const {
 					error,
 					data: { user },
@@ -115,7 +120,11 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 					provider: "apple",
 					token: credential.identityToken,
 				});
+
+				console.log("signInWithApple: ", error);
+
 				console.log(JSON.stringify({ error, user }, null, 2));
+
 				if (!error) {
 					// User is signed in.
 				}
@@ -123,6 +132,8 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 				throw new Error("No identityToken.");
 			}
 		} catch (e: any) {
+			console.log("signInWithApple: ", e);
+
 			if (e.code === "ERR_REQUEST_CANCELED") {
 				// handle that the user canceled the sign-in flow
 			} else {

@@ -75,6 +75,7 @@ export const getSevenRandomFilters = async () => {
 		.select()
 		.not("score", "is", null)
 		.not("is_indexed", "is", false)
+		.not("is_draft", "is", true)
 		.order("id", { ascending: false })
 		.limit(7);
 

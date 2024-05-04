@@ -24,8 +24,8 @@ export {
 const routingInstrumentation = new Sentry.ReactNavigationInstrumentation();
 
 Sentry.init({
-	dsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
-	debug: true, // If `true`, Sentry will try to print out useful debugging information if something goes wrong with sending the event. Set it to `false` in production
+	dsn: "https://7ebff0e9678f504c4a2fb71623d6ff85@o4507189223817216.ingest.us.sentry.io/4507189225062400",
+	debug: true,
 	integrations: [
 		new Sentry.ReactNativeTracing({
 			routingInstrumentation,

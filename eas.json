@@ -3,25 +3,32 @@
 		"version": ">= 0.38.3"
 	},
 	"build": {
+		"development-simulator": {
+			"developmentClient": true,
+			"distribution": "internal",
+			"ios": {
+				"simulator": true
+			}
+		},
 		"development": {
 			"developmentClient": true,
 			"distribution": "internal",
 			"autoIncrement": true,
 			"env": {
-				"SENTRY_AUTH_TOKEN": "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"
+				"SENTRY_AUTH_TOKEN": "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"
 			}
 		},
 		"preview": {
 			"distribution": "internal",
 			"autoIncrement": true,
 			"env": {
-				"SENTRY_AUTH_TOKEN": "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"
+				"SENTRY_AUTH_TOKEN": "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"
 			}
 		},
 		"production": {
 			"autoIncrement": true,
 			"env": {
-				"SENTRY_AUTH_TOKEN": "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"
+				"SENTRY_AUTH_TOKEN": "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"
 			}
 		}
 	},

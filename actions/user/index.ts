@@ -162,6 +162,13 @@ export async function manageSubscriptionStatusChange(
 	);
 
 	try {
+		// check for any active subscriptions
+		// if no active subscriptions, then return
+		const purchases = rcVustomerInfo?.allPurchasedProductIdentifiers;
+		if (!purchases || purchases.length === 0) {
+			return;
+		}
+
 		const provider = "revenue_cat";
 		const entitlements = rcVustomerInfo.entitlements;
 		const proEntitlement = entitlements?.all?.pro;
