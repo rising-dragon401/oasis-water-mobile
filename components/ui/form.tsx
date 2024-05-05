@@ -9,7 +9,6 @@ import {
 	useFormContext,
 } from "react-hook-form";
 import { View } from "react-native";
-import Animated, { FadeInDown, FadeOut } from "react-native-reanimated";
 
 import { Text } from "./text";
 
@@ -130,8 +129,8 @@ const FormDescription = React.forwardRef<
 FormDescription.displayName = "FormDescription";
 
 const FormMessage = React.forwardRef<
-	React.ElementRef<typeof Animated.Text>,
-	React.ComponentPropsWithoutRef<typeof Animated.Text>
+	React.ElementRef<typeof Text>,
+	React.ComponentPropsWithoutRef<typeof Text>
 >(({ className, children, ...props }, ref) => {
 	const { error, formMessageNativeID } = useFormField();
 	const body = error ? String(error?.message) : children;
@@ -141,16 +140,14 @@ const FormMessage = React.forwardRef<
 	}
 
 	return (
-		<Animated.Text
-			entering={FadeInDown}
-			exiting={FadeOut.duration(275)}
+		<Text
 			ref={ref}
 			nativeID={formMessageNativeID}
 			className={cn("text-sm font-medium text-destructive", className)}
 			{...props}
 		>
 			{body}
-		</Animated.Text>
+		</Text>
 	);
 });
 FormMessage.displayName = "FormMessage";

@@ -37,7 +37,7 @@ export default function SubscribeModal() {
 	const { packages, purchasePackage } = useRevenueCat();
 
 	useEffect(() => {
-		if (subscription.active) {
+		if (subscription?.active) {
 			router.back();
 		}
 	}, [subscription]);

@@ -19,7 +19,7 @@
       "supportsTablet": false,
       "usesAppleSignIn": true,
       "bundleIdentifier": "com.liveoasis.oasis",
-      "buildNumber": "13"
+      "buildNumber": "21"
     },
     "android": {
       "adaptiveIcon": {

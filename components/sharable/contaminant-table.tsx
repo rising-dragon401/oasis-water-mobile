@@ -4,15 +4,14 @@ import { View } from "react-native";
 import useSWR from "swr";
 
 import { getContaminants } from "@/actions/ingredients";
-import { ContaminantFiltersDropdown } from "./contaminant-filters-dropdown";
-import Typography from "./typography";
-
 import {
 	Accordion,
 	AccordionContent,
 	AccordionItem,
 	AccordionTrigger,
-} from "@/components/ui/accordion";
+} from "components/ui/accordion";
+import { ContaminantFiltersDropdown } from "./contaminant-filters-dropdown";
+import Typography from "./typography";
 
 import { IngredientCategories } from "@/lib/constants";
 

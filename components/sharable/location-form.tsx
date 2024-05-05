@@ -6,16 +6,16 @@ import { useNavigation } from "expo-router";
 import { useEffect, useState } from "react";
 import { ScrollView, View } from "react-native";
 
-import ContaminantCard from "./contamintant-card";
-import PaywallContent from "./paywall-content";
-import RecommendedFilterRow from "./recommended-filter-row";
-
 import {
 	Accordion,
 	AccordionContent,
 	AccordionItem,
 	AccordionTrigger,
 } from "components/ui/accordion";
+import ContaminantCard from "./contamintant-card";
+import PaywallContent from "./paywall-content";
+import RecommendedFilterRow from "./recommended-filter-row";
+
 import BlurredLineItem from "./blurred-line-item";
 import ItemImage from "./item-image";
 import Score from "./score";

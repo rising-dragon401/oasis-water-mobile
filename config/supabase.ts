@@ -15,8 +15,12 @@ const ExpoSecureStoreAdapter = {
 	},
 };
 
-const supabaseUrl = process.env.EXPO_PUBLIC_API_URL as string;
-const supabaseKey = process.env.EXPO_PUBLIC_API_KEY as string;
+const supabaseUrl =
+	(process.env.EXPO_PUBLIC_API_URL as string) ||
+	"https://connect.live-oasis.com";
+const supabaseKey =
+	(process.env.EXPO_PUBLIC_API_KEY as string) ||
+	"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlucnVxcnltcW9zYmZleWd5a2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTg3NjgyMzYsImV4cCI6MjAxNDM0NDIzNn0.CJmoqXKHvE4EcALhbienRCul9yIh1QAOGa1BuBrhHpo";
 
 export const supabase = createClient(supabaseUrl, supabaseKey, {
 	auth: {

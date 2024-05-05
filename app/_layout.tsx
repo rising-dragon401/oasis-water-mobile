@@ -16,11 +16,6 @@ import { PortalHost } from "components/primitives/portal";
 import { isRunningInExpoGo } from "expo";
 import { SWRConfig } from "swr";
 
-export {
-	// Catch any errors thrown by the Layout component.
-	ErrorBoundary,
-} from "expo-router";
-
 const routingInstrumentation = new Sentry.ReactNavigationInstrumentation();
 
 Sentry.init({

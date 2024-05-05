@@ -40,3 +40,17 @@ Trouble shooting
 ```
 npx expo-doctor
 ```
+
+```
+npx expo run:ios
+```
+
+```
+npx expo prebuild --platform ios
+```
+
+Reproduce Testflight crashing locally
+
+```
+npx expo start --no-dev --clear
+```

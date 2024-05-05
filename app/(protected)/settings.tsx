@@ -26,13 +26,6 @@ export default function TabTwoScreen() {
 			<View className="flex flex-col items-center p-4 gap-y-4 w-full">
 				<H1 className="text-center mt-20">Profile</H1>
 
-				<Button
-					label="Press me"
-					onPress={() => {
-						throw new Error("Hello, again, Sentry!");
-					}}
-				/>
-
 				<Typography
 					size="base"
 					fontWeight="normal"
