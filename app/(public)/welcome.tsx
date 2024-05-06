@@ -23,24 +23,36 @@ export default function WelcomeScreen() {
 						science.
 					</Muted>
 				</View>
-				<View className="flex flex-row gap-x-4">
+				<View className="flex flex-col gap-y-6">
+					<View className="flex flex-row gap-x-4">
+						<Button
+							className="flex-1"
+							size="default"
+							variant="default"
+							onPress={() => {
+								router.push("/sign-up");
+							}}
+							label="Sign Up"
+						/>
+						<Button
+							className="flex-1"
+							size="default"
+							variant="secondary"
+							onPress={() => {
+								router.push("/sign-in");
+							}}
+							label="Sign In"
+						/>
+					</View>
+
 					<Button
-						className="flex-1"
+						className=""
 						size="default"
-						variant="default"
+						variant="outline"
 						onPress={() => {
-							router.push("/sign-up");
+							router.push("/(protected)/search");
 						}}
-						label="Sign Up"
-					/>
-					<Button
-						className="flex-1"
-						size="default"
-						variant="secondary"
-						onPress={() => {
-							router.push("/sign-in");
-						}}
-						label="Sign In"
+						label="Or continue without an account"
 					/>
 				</View>
 			</SafeAreaView>

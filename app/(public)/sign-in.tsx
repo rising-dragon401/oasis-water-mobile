@@ -1,3 +1,4 @@
+import BackButton from "@/components/sharable/back-button";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
@@ -64,7 +65,10 @@ export default function SignIn() {
 	return (
 		<SafeAreaView className="flex-1 flex-col p-4">
 			<View className="flex-1">
-				<H1 className="self-start">Sign In</H1>
+				<View className="flex flex-col items-start justify-start">
+					<BackButton />
+					<H1 className="self-start">Sign In</H1>
+				</View>
 				<Muted className="self-start mb-5">to continue to your Oasis</Muted>
 				<Form {...form}>
 					<View className="gap-4">

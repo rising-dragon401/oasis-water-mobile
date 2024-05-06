@@ -108,12 +108,13 @@ const Button = React.forwardRef<
 							<ActivityIndicator size="small" />
 						</View>
 					)}
-					{label && (
-						<View className="flex flex-row gap-2 items-center justify-center">
-							{icon && iconPosition === "left" && (
-								<React.Fragment>{icon}</React.Fragment>
-							)}
 
+					<View className="flex flex-row gap-2 items-center justify-center">
+						{icon && iconPosition === "left" && (
+							<React.Fragment>{icon}</React.Fragment>
+						)}
+
+						{label && (
 							<Text
 								className={cn(
 									"flex items-center justify-center",
@@ -122,12 +123,12 @@ const Button = React.forwardRef<
 							>
 								{label}
 							</Text>
+						)}
 
-							{icon && iconPosition === "right" && (
-								<React.Fragment>{icon}</React.Fragment>
-							)}
-						</View>
-					)}
+						{icon && iconPosition === "right" && (
+							<React.Fragment>{icon}</React.Fragment>
+						)}
+					</View>
 				</Pressable>
 			</TextClassContext.Provider>
 		);

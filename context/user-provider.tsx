@@ -107,13 +107,12 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 	);
 
 	const logout = useCallback(async () => {
+		clearUserData();
 		await supabase.auth.signOut();
 		setSubscription(null);
-		clearUserData();
 	}, [supabase.auth]);
 
 	const clearUserData = () => {
-		console.log("clearUserData");
 		setUserData(null);
 		setUserId(null);
 		setUserFavorites(null);

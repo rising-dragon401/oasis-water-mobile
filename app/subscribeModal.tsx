@@ -33,7 +33,7 @@ const FEATURES = [
 ];
 
 export default function SubscribeModal() {
-	const { subscription } = useUserProvider();
+	const { subscription, user, userData } = useUserProvider();
 	const router = useRouter();
 	const { packages, purchasePackage } = useRevenueCat();
 
@@ -44,6 +44,11 @@ export default function SubscribeModal() {
 	}, [subscription]);
 
 	const handleSubscribe = async () => {
+		if (!user || !userData) {
+			router.push("/(public)/sign-in");
+			return;
+		}
+
 		const pack = packages[0];
 
 		if (!pack) {
@@ -60,7 +65,7 @@ export default function SubscribeModal() {
 
 	return (
 		<View className="flex flex-1 items-center justify-between bg-background p-4 gap-y-4 pt-20 pb-10">
-			<View></View>
+			<View />
 
 			<View className="w-full ">
 				<H1 className="text-center">Unlock your health</H1>
