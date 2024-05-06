@@ -110,6 +110,13 @@ export default function TabTwoScreen() {
 								onPress={handleRestorePurchases}
 							/>
 						</View>
+						<Link
+							className="w-full mt-8 text-red-500 text-center"
+							// @ts-ignore
+							href="/deleteAccountModal"
+						>
+							Delete account
+						</Link>
 					</View>
 				) : (
 					<View className="w-full justify-center items-center gap-y-2">

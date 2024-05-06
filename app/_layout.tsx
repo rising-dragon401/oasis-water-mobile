@@ -65,6 +65,12 @@ function RootLayout() {
 										presentation: "modal",
 									}}
 								/>
+								<Stack.Screen
+									name="deleteAccountModal"
+									options={{
+										presentation: "modal",
+									}}
+								/>
 							</Stack>
 						</SafeAreaProvider>
 						<PortalHost />

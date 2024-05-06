@@ -228,6 +228,8 @@ export async function manageSubscriptionStatusChange(
 			isDataSame = false;
 		}
 
+		// const hasStripeSubscription = existingSubscription.metadata?.provider !== "revenue_cat";
+
 		if (!isDataSame) {
 			const { error } = await supabase
 				.from("subscriptions")
