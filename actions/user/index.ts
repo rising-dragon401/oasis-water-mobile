@@ -247,3 +247,35 @@ export async function manageSubscriptionStatusChange(
 		console.error("Error inserting/updating subscription:", error);
 	}
 }
+
+export async function addFavorite(uid: string, type: any, itemId: number) {
+	const { data, error } = await supabase
+		.from("favorites")
+		.insert({ uid: uid, type: type, item_id: itemId })
+		.single();
+
+	if (error) {
+		throw new Error(error.message);
+	}
+
+	return data;
+}
+
+export async function removeFavorite(
+	uid: string,
+	type: string,
+	itemId: number,
+) {
+	const { data, error } = await supabase
+		.from("favorites")
+		.delete()
+		.eq("uid", uid)
+		.eq("type", type)
+		.eq("item_id", itemId);
+
+	if (error) {
+		throw new Error(error.message);
+	}
+
+	return data;
+}

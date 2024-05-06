@@ -1,4 +1,4 @@
-import { Octicons } from "@expo/vector-icons";
+import { Ionicons, Octicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import React from "react";
 
@@ -24,11 +24,14 @@ export default function ProtectedLayout() {
 						return <Octicons name="search" size={24} color={color} />;
 					} else if (route.name === "settings") {
 						return <Octicons name="person" size={24} color={color} />;
+					} else if (route.name === "oasis") {
+						return <Ionicons name="water-outline" size={24} color={color} />;
 					}
 				},
 			})}
 		>
 			<Tabs.Screen name="search" />
+			<Tabs.Screen name="oasis" />
 			<Tabs.Screen name="settings" />
 		</Tabs>
 	);

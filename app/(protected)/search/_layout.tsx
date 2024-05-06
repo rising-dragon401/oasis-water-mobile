@@ -1,6 +1,5 @@
 import { Stack } from "expo-router";
 
-import { theme } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function SearchLayout() {
@@ -11,12 +10,6 @@ export default function SearchLayout() {
 			screenOptions={{
 				headerShown: true,
 				headerBackTitle: "Search",
-				contentStyle: {
-					backgroundColor:
-						colorScheme === "dark"
-							? theme.dark.background
-							: theme.light.background,
-				},
 			}}
 		>
 			<Stack.Screen

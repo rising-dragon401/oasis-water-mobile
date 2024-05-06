@@ -70,7 +70,11 @@ export function LocationForm({ id }: Props) {
 				<View className="md:py-10 py-6 px-2">
 					<View className="flex flex-col items-center gap-6 w-full">
 						<View className="flex justify-center items-center h-80 w-80 p-4">
-							<ItemImage src={location.image} alt={location.name} />
+							<ItemImage
+								src={location.image}
+								alt={location.name}
+								thing={location}
+							/>
 						</View>
 
 						<View className="flex flex-row w-full justify-between">

@@ -46,7 +46,6 @@ export default function SubscribeModal() {
 	const handleSubscribe = async () => {
 		if (!user || !userData) {
 			router.back();
-
 			router.push("/(public)/sign-in");
 			return;
 		}

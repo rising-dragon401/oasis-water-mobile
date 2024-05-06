@@ -1,21 +1,27 @@
+import { Octicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import React from "react";
 import { Image, Text, View } from "react-native";
 
 import { determineLink } from "@/lib/utils";
-import { Octicons } from "@expo/vector-icons";
-import { useUserProvider } from "context/user-provider";
+import FavoriteButton from "./favorite-button";
 import Typography from "./typography";
 
-// import FavoriteButton from "../favorite-button";
+import { useUserProvider } from "context/user-provider";
 
 type Props = {
 	item: any;
 	showWarning?: boolean;
 	size?: "sm" | "md" | "lg";
+	showFavorite?: boolean;
 };
 
-const ItemPreviewCard = ({ item, showWarning, size }: Props) => {
+const ItemPreviewCard = ({
+	item,
+	showWarning,
+	size,
+	showFavorite = false,
+}: Props) => {
 	const { subscription } = useUserProvider();
 
 	const renderScore = () => {
@@ -42,15 +48,15 @@ const ItemPreviewCard = ({ item, showWarning, size }: Props) => {
 		);
 	};
 
-	const width = size === "sm" ? 96 : size === "md" ? 192 : 288; // 24*4, 48*4, 72*4 pixels
-	const height = size === "sm" ? 96 : size === "md" ? 192 : 288; // 24*4, 48*4, 72*4 pixels
+	const width = size === "sm" ? 96 : size === "md" ? 168 : 288;
+	const height = size === "sm" ? 96 : size === "md" ? 168 : 288;
 
 	return (
 		// @ts-ignore
 		<Link href={determineLink(item)}>
 			<View
 				className="flex flex-col items-center gap-2"
-				style={{ width: width, height: height }}
+				style={{ width, height }}
 			>
 				<View className="relative rounded-md overflow-hidden h-full w-full">
 					<Image
@@ -60,9 +66,13 @@ const ItemPreviewCard = ({ item, showWarning, size }: Props) => {
 							height: "100%",
 						}}
 					/>
-					{/* <View style={{ position: "absolute", top: 0, right: 0 }}>
-						<FavoriteButton item={item} />
-					</View> */}
+					{showFavorite && (
+						<View
+							style={{ position: "absolute", top: 8, right: 8, zIndex: 99 }}
+						>
+							<FavoriteButton item={item} />
+						</View>
+					)}
 					{item.score && (
 						<View style={{ position: "absolute", bottom: 8, right: 8 }}>
 							{renderScore()}

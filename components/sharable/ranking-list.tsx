@@ -130,7 +130,7 @@ export default function RankingList({ title, items, loading }: Props) {
 									<View
 										key={item.id}
 										style={{ width: "50%" }}
-										className="flex mb-24"
+										className="flex mb-10"
 									>
 										<ItemPreviewCard item={item} size="md" />
 									</View>

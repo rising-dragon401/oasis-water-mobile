@@ -9,11 +9,9 @@ import { Button } from "@/components/ui/button";
 import { H1, Muted } from "@/components/ui/typography";
 
 import { useRevenueCat } from "@/context/revenue-cat-provider";
-import { useSupabase } from "@/context/supabase-provider";
 
 export default function TabTwoScreen() {
-	const { signOut } = useSupabase();
-	const { user, userData, subscription } = useUserProvider();
+	const { user, userData, subscription, logout } = useUserProvider();
 	const { restorePurchases } = useRevenueCat();
 
 	const activeSubscription = subscription?.status === "active";
@@ -33,7 +31,7 @@ export default function TabTwoScreen() {
 		<View className="flex-1 items-center justify-between p-4 py-10">
 			<View className="flex flex-col items-center p-4 gap-y-4 w-full">
 				{userData ? (
-					<View>
+					<View className="w-full justify-center flex">
 						<H1 className="text-center mt-20">Profile</H1>
 
 						<Typography
@@ -95,21 +93,23 @@ export default function TabTwoScreen() {
 								)}
 							</>
 						) : (
-							<UpgradeButton />
+							<View className="mt-10">
+								<UpgradeButton />
+							</View>
 						)}
 						<Button
-							className="w-full"
+							className="w-full mt-4"
 							variant="secondary"
 							label="Sign Out"
-							onPress={() => {
-								signOut();
-							}}
+							onPress={logout}
 						/>
-						<Button
-							variant="ghost"
-							label="Restore purchases"
-							onPress={handleRestorePurchases}
-						/>
+						<View className="mt-10">
+							<Button
+								variant="ghost"
+								label="Restore purchases"
+								onPress={handleRestorePurchases}
+							/>
+						</View>
 					</View>
 				) : (
 					<View className="w-full justify-center items-center gap-y-2">

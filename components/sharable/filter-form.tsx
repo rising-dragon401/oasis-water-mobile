@@ -134,7 +134,7 @@ export function FilterForm({ id }: Props) {
 						{isLoading ? (
 							<ActivityIndicator />
 						) : (
-							<ItemImage src={filter.image} alt={filter.name} />
+							<ItemImage src={filter.image} alt={filter.name} thing={filter} />
 						)}
 					</View>
 

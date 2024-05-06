@@ -53,7 +53,7 @@ export default function TabOneScreen() {
 			<ScrollView
 				contentContainerStyle={{
 					paddingBottom: 120,
-					paddingVertical: 20,
+					paddingVertical: 0,
 					paddingHorizontal: 10,
 					zIndex: 0,
 				}}
