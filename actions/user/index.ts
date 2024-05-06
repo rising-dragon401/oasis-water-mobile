@@ -43,7 +43,6 @@ export async function getCurrentUserData(uid?: string) {
 }
 
 export async function getSubscription(uid: string | null) {
-	console.log("getSubscription uid", uid);
 	if (!uid) {
 		return null;
 	}
@@ -55,8 +54,6 @@ export async function getSubscription(uid: string | null) {
 			// .in("status", ["trialing", "active"])
 			.eq("user_id", uid)
 			.single();
-
-		console.log("subscription", subscription);
 
 		if (!subscription) {
 			return null;
@@ -159,10 +156,10 @@ export async function manageSubscriptionStatusChange(
 	uid: string,
 	rcVustomerInfo: any,
 ) {
-	console.log(
-		"manageSubscriptionStatusChange: ",
-		JSON.stringify(rcVustomerInfo, null, 2),
-	);
+	// console.log(
+	// 	"manageSubscriptionStatusChange: ",
+	// 	JSON.stringify(rcVustomerInfo, null, 2),
+	// );
 
 	try {
 		// check for any active subscriptions
