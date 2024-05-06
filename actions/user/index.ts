@@ -43,6 +43,7 @@ export async function getCurrentUserData(uid?: string) {
 }
 
 export async function getSubscription(uid: string | null) {
+	console.log("getSubscription uid", uid);
 	if (!uid) {
 		return null;
 	}
@@ -51,9 +52,11 @@ export async function getSubscription(uid: string | null) {
 		const { data: subscription } = await supabase
 			.from("subscriptions")
 			.select("*, prices(*, products(*))")
-			.in("status", ["trialing", "active"])
+			// .in("status", ["trialing", "active"])
 			.eq("user_id", uid)
 			.single();
+
+		console.log("subscription", subscription);
 
 		if (!subscription) {
 			return null;

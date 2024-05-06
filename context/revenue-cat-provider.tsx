@@ -20,7 +20,7 @@ const APIKeys = {
 
 interface RevenueCatProps {
 	purchasePackage: (pack: PurchasesPackage) => Promise<boolean>;
-	restorePermissions: () => Promise<CustomerInfo>;
+	restorePurchases: () => Promise<CustomerInfo>;
 	userSubscription: UserState;
 	packages: PurchasesPackage[];
 }
@@ -130,14 +130,14 @@ export const RevenueCatProvider = ({ children }: any) => {
 		[uid],
 	);
 
-	const restorePermissions = async () => {
+	const restorePurchases = async () => {
 		const customerInfo = await Purchases.restorePurchases();
 		return customerInfo;
 	};
 
 	const value = {
 		purchasePackage,
-		restorePermissions,
+		restorePurchases,
 		userSubscription: userSubscription,
 		packages: packages,
 	};

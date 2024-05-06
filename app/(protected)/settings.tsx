@@ -7,11 +7,13 @@ import UpgradeButton from "@/components/sharable/upgrade-button";
 import { Button } from "@/components/ui/button";
 import { H1 } from "@/components/ui/typography";
 
+import { useRevenueCat } from "@/context/revenue-cat-provider";
 import { useSupabase } from "@/context/supabase-provider";
 
 export default function TabTwoScreen() {
 	const { signOut } = useSupabase();
 	const { user, subscription } = useUserProvider();
+	const { restorePurchases } = useRevenueCat();
 
 	const activeSubscription = subscription?.status === "active";
 
@@ -20,6 +22,11 @@ export default function TabTwoScreen() {
 	};
 
 	const provider = subscription?.metadata?.provider || "stripe";
+
+	const handleRestorePurchases = async () => {
+		await restorePurchases();
+		alert("Any applicable purchases have been restored.");
+	};
 
 	return (
 		<View className="flex-1 items-center justify-between p-4 py-10">
@@ -80,6 +87,12 @@ export default function TabTwoScreen() {
 				) : (
 					<UpgradeButton />
 				)}
+
+				<Button
+					variant="ghost"
+					label="Restore purchases"
+					onPress={handleRestorePurchases}
+				/>
 			</View>
 			<Button
 				className="w-full"
