@@ -1,9 +1,10 @@
+import * as Linking from "expo-linking";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
 import { View } from "react-native";
 
 import { Button } from "@/components/ui/button";
-import { H1, Muted, P } from "@/components/ui/typography";
+import { H1, H3, P } from "@/components/ui/typography";
 import { useRevenueCat } from "@/context/revenue-cat-provider";
 import { useUserProvider } from "@/context/user-provider";
 
@@ -58,32 +59,53 @@ export default function SubscribeModal() {
 	};
 
 	return (
-		<View className="flex flex-1 items-center justify-center bg-background p-4 gap-y-4">
-			<H1 className="text-center">Unlock your health</H1>
-			<Muted className="text-center">$7.99 / month</Muted>
+		<View className="flex flex-1 items-center justify-between bg-background p-4 gap-y-4 pt-20 pb-10">
+			<View></View>
 
-			<View className="w-full gap-y-2">
-				{FEATURES.map((feature, index) => (
-					<P key={index} className="text-center">
-						{feature.label}
-					</P>
-				))}
+			<View className="w-full ">
+				<H1 className="text-center">Unlock your health</H1>
+				<H3 className="text-center">Oasis Pro</H3>
+				<View className="w-full gap-y-2 mt-14">
+					{FEATURES.map((feature, index) => (
+						<P key={index} className="text-center">
+							{feature.label}
+						</P>
+					))}
+				</View>
+
+				<View className="mt-8 w-full gap-y-6">
+					<Button
+						className="w-full"
+						variant="default"
+						label="Subscribe to unlock $7.99 / month"
+						onPress={handleSubscribe}
+					/>
+
+					<Button
+						className="w-full"
+						variant="secondary"
+						label="Not now"
+						onPress={() => {
+							router.back();
+						}}
+					/>
+				</View>
 			</View>
 
-			<View className="mt-8 w-full gap-y-6">
+			<View className="">
 				<Button
-					className="w-full"
-					variant="default"
-					label="Subscribe to unlock"
-					onPress={handleSubscribe}
+					label="Terms of Use"
+					variant="ghost"
+					onPress={() => {
+						Linking.openURL("https://www.live-oasis.com/terms");
+					}}
 				/>
 
 				<Button
-					className="w-full"
-					variant="secondary"
-					label="Not now"
+					label="Privacy Policy"
+					variant="ghost"
 					onPress={() => {
-						router.back();
+						Linking.openURL("https://www.live-oasis.com/privacy-policy");
 					}}
 				/>
 			</View>
