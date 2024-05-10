@@ -71,6 +71,12 @@ function RootLayout() {
 										presentation: "modal",
 									}}
 								/>
+								<Stack.Screen
+									name="chatModal"
+									options={{
+										presentation: "modal",
+									}}
+								/>
 							</Stack>
 						</SafeAreaProvider>
 						<PortalHost />
