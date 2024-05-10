@@ -7,6 +7,7 @@ import ItemPreviewCard from "../item-preview-card";
 
 import Score from "@/components/sharable/score";
 
+import { H3, P } from "@/components/ui/typography";
 import { Avatar, AvatarImage } from "components/ui/avatar";
 import Typography from "../typography";
 
@@ -71,7 +72,7 @@ export default function FavoritesList({
 						</Avatar>
 
 						<Typography size="2xl" fontWeight="normal">
-							{`${userData?.full_name || userData?.email || "User"}'s oasis`}
+							{`${userData?.full_name || userData?.email || "User"}'s Oasis`}
 						</Typography>
 					</View>
 
@@ -81,17 +82,27 @@ export default function FavoritesList({
 				</View>
 			)}
 
-			<FlatList
-				data={favorites}
-				renderItem={({ item }) => (
-					<View key={item.id} style={{ width: "48%" }} className="mb-24">
-						<ItemPreviewCard item={item} size="md" showFavorite />
-					</View>
-				)}
-				keyExtractor={(item) => item.id}
-				numColumns={2}
-				columnWrapperStyle={{ justifyContent: "space-between" }}
-			/>
+			{favorites && favorites.length > 0 ? (
+				<FlatList
+					data={favorites}
+					renderItem={({ item }) => (
+						<View key={item.id} style={{ width: "48%" }} className="mb-24">
+							<ItemPreviewCard item={item} size="md" showFavorite />
+						</View>
+					)}
+					keyExtractor={(item) => item.id}
+					numColumns={2}
+					columnWrapperStyle={{ justifyContent: "space-between" }}
+				/>
+			) : (
+				<View className="text-center">
+					<H3>No favorites found</H3>
+					<P>
+						Start adding the products you use to your Oasis for them to show up
+						here.
+					</P>
+				</View>
+			)}
 		</View>
 	);
 }

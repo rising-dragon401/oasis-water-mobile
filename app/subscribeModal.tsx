@@ -16,7 +16,7 @@ const FEATURES = [
 		label: "💧 Search bottled water, filters and tap water",
 	},
 	{
-		label: "🔬 Most up to date research",
+		label: "🌴 Add products to your Oasis",
 	},
 	// {
 	// 	label: "🤖 AI search",
@@ -24,6 +24,9 @@ const FEATURES = [
 	// {
 	// 	label: "🤝 Personalized recommendations",
 	// },
+	{
+		label: "🔬 Most up to date research",
+	},
 	{
 		label: "🧬 Supports Oasis to further our research",
 	},

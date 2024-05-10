@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import React, { useMemo } from "react";
-import { GestureResponderEvent, TouchableOpacity } from "react-native";
+import { Alert, GestureResponderEvent, TouchableOpacity } from "react-native";
 
 import { addFavorite, removeFavorite } from "@/actions/user";
 import { Octicons } from "@expo/vector-icons";
@@ -14,7 +14,7 @@ type Props = {
 };
 
 export default function FavoriteButton({ item, size = 18 }: Props) {
-	const { userFavorites, uid, userData, fetchUserFavorites } =
+	const { userFavorites, uid, userData, subscription, fetchUserFavorites } =
 		useUserProvider();
 	const router = useRouter();
 
@@ -28,32 +28,37 @@ export default function FavoriteButton({ item, size = 18 }: Props) {
 		[userFavorites, item],
 	);
 
-	const handleFavoriteClick = (e: GestureResponderEvent) => {
+	const handleFavoriteClick = async (e: GestureResponderEvent) => {
 		e.preventDefault();
 
-		// first check if user is logged in
 		if (!uid || !userData) {
-			alert("Please sign in to add to favorites");
+			alert(
+				"Please sign in and subscribe to add to this product to your Oasis.",
+			);
 			router.push("/(public)/sign-in");
 			return;
 		}
 
-		if (userFavorites && userFavorites.length === 0) {
-			addFavorite(uid, item.type, item.id);
+		if (!subscription) {
+			Alert.alert(
+				"Subscription Required",
+				"Please subscribe to add products to your Oasis",
+				[{ text: "OK", onPress: () => router.push("/subscribeModal") }],
+			);
 			return;
 		}
 
-		if (isItemInFavorites) {
-			// Remove item from favorites
-			removeFavorite(uid, item.type, item.id);
-		} else {
-			// Add item to favorites
-			console.log("add item to favorites");
-			addFavorite(uid, item.type, item.id);
+		try {
+			if (isItemInFavorites) {
+				await removeFavorite(uid, item.type, item.id);
+			} else {
+				await addFavorite(uid, item.type, item.id);
+			}
+			mutate("userFavorites");
+			fetchUserFavorites(uid);
+		} catch (error) {
+			console.error("Error updating favorites", error);
 		}
-
-		mutate("userFavorites");
-		fetchUserFavorites(uid);
 	};
 
 	return (

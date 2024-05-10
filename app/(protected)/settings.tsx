@@ -99,11 +99,11 @@ export default function TabTwoScreen() {
 						)}
 						<Button
 							className="w-full mt-4"
-							variant="secondary"
+							variant="outline"
 							label="Sign Out"
 							onPress={logout}
 						/>
-						<View className="mt-10">
+						<View className="mt-24">
 							<Button
 								variant="ghost"
 								label="Restore purchases"
@@ -111,7 +111,7 @@ export default function TabTwoScreen() {
 							/>
 						</View>
 						<Link
-							className="w-full mt-8 text-red-500 text-center"
+							className="w-full mt-2 text-red-500 text-center"
 							// @ts-ignore
 							href="/deleteAccountModal"
 						>
