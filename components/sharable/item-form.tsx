@@ -8,6 +8,7 @@ import { ScrollView, View } from "react-native";
 import { Octicons } from "@expo/vector-icons";
 
 import { Button } from "@/components/ui/button";
+import { H2, H4 } from "@/components/ui/typography";
 import { Link, useNavigation } from "expo-router";
 import BlurredLineItem from "./blurred-line-item";
 import ItemImage from "./item-image";
@@ -91,18 +92,11 @@ export function ItemForm({ id }: Props) {
 
 					<View className="flex flex-row gap-2 w-full">
 						<View className="flex flex-col w-2/3">
-							<Typography size="xl" fontWeight="normal">
-								{item.name}
-							</Typography>
+							<H2>{item.name}</H2>
+
 							{/* @ts-ignore */}
 							<Link href={`/search/company/${item.company?.name}`}>
-								<Typography
-									size="base"
-									fontWeight="normal"
-									className="text-secondary-foreground"
-								>
-									{item.company?.name}
-								</Typography>
+								<H4>{item.company?.name}</H4>
 							</Link>
 
 							<View>

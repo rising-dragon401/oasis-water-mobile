@@ -1,7 +1,7 @@
 import { Link } from "expo-router";
 import React from "react";
-
 import { ScrollView, View } from "react-native";
+
 import ItemPreviewCard from "./item-preview-card";
 import Typography from "./typography";
 
@@ -28,7 +28,7 @@ export default function ItemRow({ title, items, type }: Props) {
 	return (
 		<View className="flex flex-col gap-y-2">
 			<View className="flex flex-row items-center justify-between">
-				<Typography size="lg" fontWeight="bold" className="mb-4">
+				<Typography size="lg" fontWeight="bold">
 					{title}
 				</Typography>
 				{/* @ts-ignore */}

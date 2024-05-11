@@ -4,15 +4,24 @@ import { View } from "react-native";
 
 import { Button } from "@/components/ui/button";
 import { H1, Muted } from "@/components/ui/typography";
+import { theme } from "@/lib/constants";
 
 import FavoritesList from "@/components/sharable/favorites-list";
+import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function OasisScreen() {
 	const { uid, subscription, userFavorites } = useUserProvider();
 	const router = useRouter();
+	const { colorScheme } = useColorScheme();
+
+	const backgroundColor =
+		colorScheme === "dark" ? theme.dark.background : theme.light.background;
 
 	return (
-		<View className="flex-1 items-center justify-between p-4 pb-10 pt-20">
+		<View
+			className="flex-1 items-center justify-between p-4 pb-10 pt-20"
+			style={{ backgroundColor }}
+		>
 			<View className="flex flex-col items-center p-4 gap-y-4 w-full">
 				{subscription && userFavorites ? (
 					<FavoritesList userId={uid} />

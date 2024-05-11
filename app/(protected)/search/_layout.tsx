@@ -1,15 +1,30 @@
 import { Stack } from "expo-router";
 
+import { theme } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function SearchLayout() {
 	const { colorScheme } = useColorScheme();
+
+	const backgroundColor =
+		colorScheme === "dark" ? theme.dark.background : theme.light.background;
+	const textColor =
+		colorScheme === "dark" ? theme.dark.primary : theme.light.primary;
 
 	return (
 		<Stack
 			screenOptions={{
 				headerShown: true,
 				headerBackTitle: "Search",
+				contentStyle: {
+					backgroundColor,
+				},
+				headerStyle: {
+					backgroundColor,
+				},
+				headerTitleStyle: {
+					color: textColor,
+				},
 			}}
 		>
 			<Stack.Screen

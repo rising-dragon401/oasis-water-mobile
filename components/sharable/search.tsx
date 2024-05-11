@@ -1,13 +1,14 @@
 import { Octicons } from "@expo/vector-icons";
 import algoliasearch from "algoliasearch";
-import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 
 import ResultsRow from "./results-row";
 
 import { Input } from "@/components/ui/input";
+import { theme } from "@/lib/constants";
 import { useDebounce } from "@/lib/hooks/use-debounce";
+import { useColorScheme } from "@/lib/useColorScheme";
 
 const numResults = 5;
 
@@ -23,7 +24,7 @@ export default function Search({ indices }: { indices?: string[] }) {
 	const [value, setValue] = useState("");
 
 	const debouncedQuery = useDebounce(value, 500);
-	const router = useRouter();
+	const { colorScheme } = useColorScheme();
 
 	useEffect(() => {
 		setQueryCompleted(false);
@@ -97,6 +98,9 @@ export default function Search({ indices }: { indices?: string[] }) {
 		}
 	};
 
+	const iconColor =
+		colorScheme === "dark" ? theme.dark.primary : theme.light.primary;
+
 	return (
 		<>
 			<View className="flex flex-row gap-2 items-center relative">
@@ -120,11 +124,11 @@ export default function Search({ indices }: { indices?: string[] }) {
 							<TouchableOpacity
 							// onPress={() => handleSearch(value)}
 							>
-								<Octicons name="search" size={18} color="black" />
+								<Octicons name="search" size={18} color={iconColor} />
 							</TouchableOpacity>
 						) : (
 							<TouchableOpacity onPress={handleClear}>
-								<Octicons name="x-circle-fill" size={18} color="black" />
+								<Octicons name="x-circle-fill" size={18} color={iconColor} />
 							</TouchableOpacity>
 						)}
 					</View>

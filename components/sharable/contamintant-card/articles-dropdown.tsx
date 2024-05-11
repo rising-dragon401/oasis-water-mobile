@@ -23,9 +23,9 @@ export function ArticlesDropdown({ sources }: Props) {
 	return (
 		<DropdownMenu open={open} onOpenChange={setOpen}>
 			<DropdownMenuTrigger asChild>
-				<Button variant="outline" label="Articles" />
+				<Button variant="outline" label="Research" />
 			</DropdownMenuTrigger>
-			<DropdownMenuContent className="w-96" align="end">
+			<DropdownMenuContent className="w-96" align="start">
 				<DropdownMenuLabel>Articles</DropdownMenuLabel>
 				<DropdownMenuSeparator />
 				<DropdownMenuGroup>

@@ -6,13 +6,19 @@ import { View } from "react-native";
 import Typography from "@/components/sharable/typography";
 import UpgradeButton from "@/components/sharable/upgrade-button";
 import { Button } from "@/components/ui/button";
-import { H1, Muted } from "@/components/ui/typography";
+import { H1, Muted, P } from "@/components/ui/typography";
+import { theme } from "@/lib/constants";
+import { useColorScheme } from "@/lib/useColorScheme";
 
 import { useRevenueCat } from "@/context/revenue-cat-provider";
 
 export default function TabTwoScreen() {
 	const { user, userData, subscription, logout } = useUserProvider();
 	const { restorePurchases } = useRevenueCat();
+	const { colorScheme } = useColorScheme();
+
+	const backgroundColor =
+		colorScheme === "dark" ? theme.dark.background : theme.light.background;
 
 	const activeSubscription = subscription?.status === "active";
 
@@ -28,7 +34,10 @@ export default function TabTwoScreen() {
 	};
 
 	return (
-		<View className="flex-1 items-center justify-between p-4 py-10">
+		<View
+			className="flex-1 items-center justify-between p-4 py-10"
+			style={{ backgroundColor }}
+		>
 			<View className="flex flex-col items-center p-4 gap-y-4 w-full">
 				{userData ? (
 					<View className="w-full justify-center flex">
@@ -75,10 +84,6 @@ export default function TabTwoScreen() {
 													label="Manage subscription"
 													onPress={handleManageSubscription}
 												/>
-												<Typography size="xs" fontWeight="normal">
-													(You can also manage your subscription in your phone
-													settings.)
-												</Typography>
 											</View>
 										) : (
 											<Typography
@@ -103,7 +108,7 @@ export default function TabTwoScreen() {
 							label="Sign Out"
 							onPress={logout}
 						/>
-						<View className="mt-24">
+						<View className="mt-72">
 							<Button
 								variant="ghost"
 								label="Restore purchases"
@@ -124,7 +129,7 @@ export default function TabTwoScreen() {
 						<Muted>Not logged in</Muted>
 
 						<Link className="w-full mt-8 text-center" href="/(public)/sign-in">
-							Sign in
+							<P> Sign in</P>
 						</Link>
 					</View>
 				)}

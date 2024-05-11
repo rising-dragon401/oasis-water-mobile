@@ -18,6 +18,12 @@ export default function ProtectedLayout() {
 							? theme.dark.background
 							: theme.light.background,
 				},
+				headerStyle: {
+					backgroundColor:
+						colorScheme === "dark"
+							? theme.dark.background
+							: theme.light.background,
+				},
 				tabBarShowLabel: false,
 				tabBarIcon: ({ color }) => {
 					if (route.name === "search") {

@@ -15,6 +15,8 @@ import { Form, FormField, FormInput } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
 import { H1, Muted } from "@/components/ui/typography";
 import { useSupabase } from "@/context/supabase-provider";
+import { theme } from "@/lib/constants";
+import { useColorScheme } from "@/lib/useColorScheme";
 
 const formSchema = z.object({
 	email: z.string().email("Please enter a valid email address."),
@@ -27,6 +29,7 @@ const formSchema = z.object({
 export default function SignIn() {
 	const { signInWithPassword, signInWithGoogle } = useSupabase();
 	const router = useRouter();
+	const { colorScheme } = useColorScheme();
 
 	const [loading, setLoading] = useState(false);
 
@@ -61,6 +64,9 @@ export default function SignIn() {
 		await signInWithGoogle();
 		setLoading(false);
 	};
+
+	const iconColor =
+		colorScheme === "dark" ? theme.dark.primary : theme.light.primary;
 
 	return (
 		<SafeAreaView className="flex-1 flex-col p-4">
@@ -121,7 +127,7 @@ export default function SignIn() {
 					loading={loading}
 					onPress={() => onSignInWithGoogle()}
 					label="Sign In with Google"
-					icon={<FontAwesome6 name="google" size={12} color="black" />}
+					icon={<FontAwesome6 name="google" size={12} color={iconColor} />}
 					iconPosition="left"
 				/>
 				<AppleAuthButton />

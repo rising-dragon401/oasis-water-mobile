@@ -1,8 +1,8 @@
 import { useUserProvider } from "context/user-provider";
 import { useRouter } from "expo-router";
-import { Text, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 
-import Typography from "../typography";
+import { P } from "@/components/ui/typography";
 
 type BlurredLineItemProps = {
 	label: string;
@@ -27,17 +27,15 @@ export default function BlurredLineItem({
 	const showPaywall = !subscription;
 
 	return (
-		<View>
-			<Typography size="base" fontWeight="normal" className="text-primary my-0">
-				<Text className={labelClassName}>{label}: </Text>
+		<View className="flex flex-row items-center">
+			<P className={labelClassName}>{label}: </P>
 
-				<TouchableOpacity
-					onPress={showPaywall ? handleOpenPaywall : undefined}
-					className="min-w-14"
-				>
-					<Text>{value}</Text>
-				</TouchableOpacity>
-			</Typography>
+			<TouchableOpacity
+				onPress={showPaywall ? handleOpenPaywall : undefined}
+				className="min-w-14"
+			>
+				<P>{value}</P>
+			</TouchableOpacity>
 		</View>
 	);
 }

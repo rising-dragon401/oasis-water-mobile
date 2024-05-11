@@ -65,7 +65,7 @@ export default function FavoritesList({
 	return (
 		<View className="pb-8">
 			{!loading && (
-				<View className="py-4 gap-4 flex w-full flex-row justify-between">
+				<View className="py-4 gap-4 mb-4 flex w-full flex-row justify-between">
 					<View className="flex flex-col gap-2 mb-8">
 						<Avatar className="h-24 w-24" alt="oasis pfp">
 							<AvatarImage src={userData?.avatar_url || PROFILE_AVATAR} />
@@ -86,7 +86,7 @@ export default function FavoritesList({
 				<FlatList
 					data={favorites}
 					renderItem={({ item }) => (
-						<View key={item.id} style={{ width: "48%" }} className="mb-24">
+						<View key={item.id} style={{ width: "48%" }} className="mb-14">
 							<ItemPreviewCard item={item} size="md" showFavorite />
 						</View>
 					)}

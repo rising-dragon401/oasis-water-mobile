@@ -29,7 +29,7 @@ export default function ContaminantCard({ data }: Props) {
 					{data?.description}
 				</CardDescription>
 			</CardHeader>
-			<CardContent className="pl-0 max-w-96 px-4">
+			<CardContent className="pl-0 max-w-96 px-6">
 				<View className="w-full flex flex-row justify-between items-top">
 					{data.exceedingLimit !== undefined &&
 						data.exceedingLimit !== null &&
@@ -90,15 +90,15 @@ export default function ContaminantCard({ data }: Props) {
 				)}
 			</CardContent>
 			<CardFooter className="flex flex-row w-full justify-between px-4 pb-4">
-				<ContaminantFiltersDropdown
-					contaminantId={data?.id || ""}
-					align="start"
-				/>
 				{data?.sources ? (
 					<ArticlesDropdown sources={data?.sources || []} />
 				) : (
 					<View />
 				)}
+				<ContaminantFiltersDropdown
+					contaminantId={data?.id || ""}
+					align="start"
+				/>
 			</CardFooter>
 		</Card>
 	);

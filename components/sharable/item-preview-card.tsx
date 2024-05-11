@@ -3,6 +3,7 @@ import { Link } from "expo-router";
 import React from "react";
 import { Image, Text, View } from "react-native";
 
+import { P } from "@/components/ui/typography";
 import { determineLink } from "@/lib/utils";
 import FavoriteButton from "./favorite-button";
 import Typography from "./typography";
@@ -55,17 +56,20 @@ const ItemPreviewCard = ({
 		// @ts-ignore
 		<Link href={determineLink(item)}>
 			<View
-				className="flex flex-col items-center gap-2"
-				style={{ width, height }}
+				className="flex flex-col items-center gap-2 h-full"
+				// style={{ width, height }}
 			>
-				<View className="relative rounded-md overflow-hidden h-full w-full">
+				<View className="relative h-48 w-48 py-1">
 					<Image
 						source={{ uri: item.image || undefined }}
 						style={{
 							width: "100%",
 							height: "100%",
+							borderRadius: 10,
 						}}
+						resizeMode="cover"
 					/>
+
 					{showFavorite && (
 						<View
 							style={{ position: "absolute", top: 8, right: 8, zIndex: 99 }}
@@ -85,22 +89,11 @@ const ItemPreviewCard = ({
 					)}
 				</View>
 				<View
-					className="flex flex-row justify-between pt-1 md:gap-2 items-start"
-					style={{ width: width }}
+					className="flex flex-row justify-between h-full items-start"
+					style={{ width }}
 				>
 					<View className="flex flex-col">
-						<Typography
-							size="base"
-							fontWeight="bold"
-							className="!no-underline text-primary md:overflow-hidden flex-wrap max-w-56 max-h-24 md:whitespace-nowrap overflow-ellipsis"
-						>
-							{item.name}
-						</Typography>
-						{item.company_name && (
-							<Text style={{ color: "#666", fontSize: 10 }}>
-								{item.company_name}
-							</Text>
-						)}
+						<P>{item.name}</P>
 					</View>
 				</View>
 			</View>
