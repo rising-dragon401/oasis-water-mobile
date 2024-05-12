@@ -39,6 +39,7 @@ export default function SearchLayout() {
 			<Stack.Screen name="bottled-waters/index" />
 			<Stack.Screen name="tap-water/index" />
 			<Stack.Screen name="filters/index" />
+			<Stack.Screen name="oasis/[id]" />
 		</Stack>
 	);
 }

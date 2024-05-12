@@ -1,14 +1,13 @@
 import {
+	AntDesign,
 	Feather,
 	FontAwesome,
 	MaterialCommunityIcons,
 } from "@expo/vector-icons";
-
 import { Link } from "expo-router";
 import { FlatList, Image, ScrollView, View } from "react-native";
 
 import Typography from "@/components/sharable/typography";
-
 import { determineLink } from "@/lib/utils";
 
 type Props = {
@@ -19,17 +18,17 @@ export default function ResultsRow({ results }: Props) {
 	const getIcon = (result: any) => {
 		if (result.type === "tap_water") {
 			return (
-				<Feather name="droplet" size={16} color="text-secondary-foreground" />
+				<Feather name="droplet" size={18} color="text-secondary-foreground" />
 			);
 		} else if (result.type === "filter") {
 			return (
-				<Feather name="filter" size={16} color="text-secondary-foreground" />
+				<Feather name="filter" size={18} color="text-secondary-foreground" />
 			);
 		} else if (result.type === "ingredient") {
 			return (
 				<MaterialCommunityIcons
 					name="atom"
-					size={16}
+					size={18}
 					color="text-secondary-foreground"
 				/>
 			);
@@ -37,9 +36,13 @@ export default function ResultsRow({ results }: Props) {
 			return (
 				<FontAwesome
 					name="building-o"
-					size={16}
+					size={18}
 					color="text-secondary-foreground"
 				/>
+			);
+		} else if (result.type === "user") {
+			return (
+				<AntDesign name="user" size={18} color="text-secondary-foreground" />
 			);
 		} else {
 			return (
@@ -85,12 +88,12 @@ export default function ResultsRow({ results }: Props) {
 							// @ts-ignore
 							href={determineLink(result)}
 						>
-							<View className="flex flex-row gap-2 items-center justify-between w-full">
+							<View className="flex flex-row gap-2 items-center justify-between w-full px-1">
 								<View className="flex flex-row gap-2 items-center justify-center">
 									<Image
 										source={{ uri: result.image || "" }}
 										alt={result.name || ""}
-										style={{ width: 50, height: 50, borderRadius: 5 }}
+										style={{ width: 40, height: 40, borderRadius: 5 }}
 									/>
 									<Typography
 										size="base"

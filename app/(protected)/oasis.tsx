@@ -2,11 +2,10 @@ import { useUserProvider } from "context/user-provider";
 import { Link, useRouter } from "expo-router";
 import { View } from "react-native";
 
+import FavoritesList from "@/components/sharable/favorites-list";
 import { Button } from "@/components/ui/button";
 import { H1, Muted } from "@/components/ui/typography";
 import { theme } from "@/lib/constants";
-
-import FavoritesList from "@/components/sharable/favorites-list";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function OasisScreen() {

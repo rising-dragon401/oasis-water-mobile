@@ -80,6 +80,13 @@ export default function Search({ indices }: { indices?: string[] }) {
 						hitsPerPage: numResults || 3,
 					},
 				},
+				{
+					indexName: "users",
+					query,
+					params: {
+						hitsPerPage: numResults || 3,
+					},
+				},
 			];
 		}
 

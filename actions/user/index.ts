@@ -7,6 +7,8 @@ export async function getCurrentUserData(uid?: string) {
 		return null;
 	}
 
+	console.log("userId", userId);
+
 	const { data, error } = await supabase
 		.from("users")
 		.select("*")
@@ -150,6 +152,29 @@ export async function getUserFavorites(uid: string) {
 	);
 
 	return favorites;
+}
+
+export async function updateUserData(id: string, column: string, value: any) {
+	try {
+		if (!id) {
+			throw new Error("No user found");
+		}
+
+		const { error } = await supabase
+			.from("users")
+			.update({ [column]: value })
+			.eq("id", id)
+			.single();
+
+		if (error) {
+			throw new Error(error.message);
+		}
+
+		return true;
+	} catch (e) {
+		console.error("Error updating user data:", e);
+		return false;
+	}
 }
 
 export async function manageSubscriptionStatusChange(

@@ -1,17 +1,15 @@
-import { getCurrentUserData, getUserFavorites } from "@/actions/user";
+import { Octicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
-import { FlatList, View } from "react-native";
-import { default as useSWR } from "swr";
+import { FlatList, Share, TouchableOpacity, View } from "react-native";
 
-import ItemPreviewCard from "../item-preview-card";
-
+import { getCurrentUserData, getUserFavorites } from "@/actions/user";
 import Score from "@/components/sharable/score";
-
 import { H3, P } from "@/components/ui/typography";
 import { Avatar, AvatarImage } from "components/ui/avatar";
-import Typography from "../typography";
-
 import { PROFILE_AVATAR } from "lib/constants";
+import { default as useSWR } from "swr";
+import ItemPreviewCard from "../item-preview-card";
+import Typography from "../typography";
 
 export default function FavoritesList({
 	userId,
@@ -62,6 +60,36 @@ export default function FavoritesList({
 		setOasisScore(finalScore);
 	};
 
+	const shareProfile = async () => {
+		// deep linking now redirecting to mobile for some reason
+		// const url = `https://www.live-oasis.com/search/oasis/${userId}`;
+
+		const url =
+			"https://apps.apple.com/us/app/oasis-water-health-ratings/id6499478532";
+
+		try {
+			const result = await Share.share({
+				message: `Check out my water health score on Oasis. User name: ${userData?.full_name}.`,
+				url: url,
+			});
+
+			if (result.action === Share.sharedAction) {
+				if (result.activityType) {
+					// shared with activity type of result.activityType
+					console.log("Shared with activity type:", result.activityType);
+				} else {
+					// shared
+					console.log("Profile shared");
+				}
+			} else if (result.action === Share.dismissedAction) {
+				// dismissed
+				console.log("Share dismissed");
+			}
+		} catch (error) {
+			console.error("Error sharing profile:", error);
+		}
+	};
+
 	return (
 		<View className="pb-8">
 			{!loading && (
@@ -76,8 +104,11 @@ export default function FavoritesList({
 						</Typography>
 					</View>
 
-					<View className="max-h-24">
+					<View className="max-h-24 flex flex-row">
 						<Score score={oasisScore || 0} size="md" />
+						<TouchableOpacity onPress={() => shareProfile()}>
+							<Octicons name="share" size={24} color="muted" />
+						</TouchableOpacity>
 					</View>
 				</View>
 			)}
@@ -92,6 +123,7 @@ export default function FavoritesList({
 					)}
 					keyExtractor={(item) => item.id}
 					numColumns={2}
+					showsVerticalScrollIndicator={false}
 					columnWrapperStyle={{ justifyContent: "space-between" }}
 				/>
 			) : (

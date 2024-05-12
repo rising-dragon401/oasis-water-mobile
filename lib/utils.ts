@@ -12,6 +12,8 @@ export const determineLink = (item: any) => {
 		basePath = `/search/location/${item?.id}`;
 	} else if (item?.type === "filter") {
 		basePath = `/search/filter/${item?.id}`;
+	} else if (item?.type === "user") {
+		basePath = `/search/oasis/${item?.id}`;
 	} else {
 		basePath = `/search/item/${item?.id}`;
 	}

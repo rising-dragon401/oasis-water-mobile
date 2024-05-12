@@ -56,7 +56,7 @@ const ItemPreviewCard = ({
 		// @ts-ignore
 		<Link href={determineLink(item)}>
 			<View
-				className="flex flex-col items-center gap-2 h-full"
+				className="flex flex-col items-center gap-2"
 				// style={{ width, height }}
 			>
 				<View className="relative h-48 w-48 py-1">
@@ -89,7 +89,7 @@ const ItemPreviewCard = ({
 					)}
 				</View>
 				<View
-					className="flex flex-row justify-between h-full items-start"
+					className="flex flex-row justify-between items-start"
 					style={{ width }}
 				>
 					<View className="flex flex-col">
