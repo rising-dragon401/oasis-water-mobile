@@ -5,6 +5,7 @@ import { FlatList, Share, TouchableOpacity, View } from "react-native";
 import { getCurrentUserData, getUserFavorites } from "@/actions/user";
 import Score from "@/components/sharable/score";
 import { H3, P } from "@/components/ui/typography";
+import { useUserProvider } from "@/context/user-provider";
 import { Avatar, AvatarImage } from "components/ui/avatar";
 import { PROFILE_AVATAR } from "lib/constants";
 import { default as useSWR } from "swr";
@@ -16,9 +17,13 @@ export default function FavoritesList({
 }: {
 	userId: string | null | undefined;
 }) {
+	const { uid } = useUserProvider();
+
 	const [loading, setLoading] = useState(true);
 	const [userData, setUserData] = useState<any>(null);
 	const [oasisScore, setOasisScore] = useState<number | null>(null);
+
+	const isAuthUser = uid === userId;
 
 	const fetchUserFavorites = async () => {
 		const favorites = await getUserFavorites(userId || "");
@@ -106,9 +111,11 @@ export default function FavoritesList({
 
 					<View className="max-h-24 flex flex-row">
 						<Score score={oasisScore || 0} size="md" />
-						<TouchableOpacity onPress={() => shareProfile()}>
-							<Octicons name="share" size={24} color="muted" />
-						</TouchableOpacity>
+						{isAuthUser && (
+							<TouchableOpacity onPress={() => shareProfile()}>
+								<Octicons name="share" size={24} color="muted" />
+							</TouchableOpacity>
+						)}
 					</View>
 				</View>
 			)}
