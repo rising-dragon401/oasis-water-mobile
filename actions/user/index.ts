@@ -306,3 +306,40 @@ export async function removeFavorite(
 
 	return data;
 }
+
+export const incrementItemsViewed = async (uid: string | null | undefined) => {
+	if (!uid) {
+		return null;
+	}
+
+	// Fetch current user data to get the current items_viewed count
+	const { data: userData, error: userError } = await supabase
+		.from("users")
+		.select("*")
+		.eq("id", uid)
+		.single();
+
+	if (userError) {
+		console.error("Error fetching user data:", userError);
+		return null;
+	}
+
+	// Increment items_viewed count
+	// @ts-ignore
+	const currentItemsViewed = userData.metadata?.items_viewed || 0;
+	const updatedItemsViewed = currentItemsViewed + 1;
+
+	// Update user metadata with new items_viewed count
+	const { data, error } = await supabase
+		.from("users")
+		.update({ metadata: { items_viewed: updatedItemsViewed } })
+		.eq("id", uid)
+		.select();
+
+	if (error) {
+		console.error("Error incrementing items viewed:", error);
+		return null;
+	}
+
+	return data;
+};

@@ -107,6 +107,7 @@ export default function TabTwoScreen() {
 
 							<View className="flex flex-col gap-2 items-start mt-6">
 								<H3>Edit profile</H3>
+
 								<EditNameForm />
 
 								<OasisSwitch

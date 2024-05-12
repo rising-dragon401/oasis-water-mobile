@@ -1,3 +1,5 @@
+import { P } from "@/components/ui/typography";
+import { determineLink } from "@/lib/utils";
 import {
 	AntDesign,
 	Feather,
@@ -6,9 +8,6 @@ import {
 } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import { FlatList, Image, ScrollView, View } from "react-native";
-
-import Typography from "@/components/sharable/typography";
-import { determineLink } from "@/lib/utils";
 
 type Props = {
 	results: any[];
@@ -95,13 +94,7 @@ export default function ResultsRow({ results }: Props) {
 										alt={result.name || ""}
 										style={{ width: 40, height: 40, borderRadius: 5 }}
 									/>
-									<Typography
-										size="base"
-										fontWeight="normal"
-										className="max-w-64 overflow-hidden max-h-12"
-									>
-										{result.name}
-									</Typography>
+									<P className="max-w-64">{result.name}</P>
 								</View>
 
 								{getIcon(result)}

@@ -6,18 +6,19 @@ import { useNavigation } from "expo-router";
 import { useEffect, useState } from "react";
 import { ScrollView, View } from "react-native";
 
+import { incrementItemsViewed } from "@/actions/user";
+import { useUserProvider } from "@/context/user-provider";
 import {
 	Accordion,
 	AccordionContent,
 	AccordionItem,
 	AccordionTrigger,
 } from "components/ui/accordion";
+import BlurredLineItem from "./blurred-line-item";
 import ContaminantCard from "./contamintant-card";
+import ItemImage from "./item-image";
 import PaywallContent from "./paywall-content";
 import RecommendedFilterRow from "./recommended-filter-row";
-
-import BlurredLineItem from "./blurred-line-item";
-import ItemImage from "./item-image";
 import Score from "./score";
 import Sources from "./sources";
 import Typography from "./typography";
@@ -28,10 +29,15 @@ type Props = {
 
 export function LocationForm({ id }: Props) {
 	const navigation = useNavigation();
+	const { uid } = useUserProvider();
 
 	const [location, setLocation] = useState<any>({});
 	const [isLoading, setIsLoading] = useState(true);
 	const [openUtility, setOpenUtility] = useState<string>("0");
+
+	useEffect(() => {
+		incrementItemsViewed(uid);
+	}, [uid]);
 
 	const fetchLocation = async (id: string) => {
 		const location = await getLocationDetails(id);

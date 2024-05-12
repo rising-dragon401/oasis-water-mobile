@@ -8,6 +8,8 @@ import { getContaminants } from "actions/ingredients";
 import PaywallContent from "./paywall-content";
 
 import { getFilterDetails } from "@/actions/filters";
+import { incrementItemsViewed } from "@/actions/user";
+import { useUserProvider } from "@/context/user-provider";
 import { Button } from "../ui/button";
 import BlurredLineItem from "./blurred-line-item";
 import ContaminantTable from "./contaminant-table";
@@ -22,10 +24,15 @@ type Props = {
 
 export function FilterForm({ id }: Props) {
 	const navigation = useNavigation();
+	const { uid } = useUserProvider();
 
 	const [isLoading, setIsLoading] = useState(true);
 	const [filter, setFilter] = useState<any>({});
 	const [contaminants, setContaminants] = useState<any[]>([]);
+
+	useEffect(() => {
+		incrementItemsViewed(uid);
+	}, [uid]);
 
 	useEffect(() => {
 		fetchContaminants();

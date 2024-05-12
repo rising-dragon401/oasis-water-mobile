@@ -15,6 +15,8 @@ import ItemImage from "./item-image";
 import Score from "./score";
 import Typography from "./typography";
 
+import { incrementItemsViewed } from "@/actions/user";
+import { useUserProvider } from "@/context/user-provider";
 import ContaminantCard from "./contamintant-card";
 import IngredientsCard from "./ingredients-card";
 import MetaDataCard from "./metadata-card";
@@ -27,9 +29,14 @@ type Props = {
 
 export function ItemForm({ id }: Props) {
 	const navigation = useNavigation();
+	const { uid } = useUserProvider();
 
 	const [item, setItem] = useState<any>({});
 	const [, setIsLoading] = useState(true);
+
+	useEffect(() => {
+		incrementItemsViewed(uid);
+	}, [uid]);
 
 	const fetchItem = async (id: string) => {
 		const item = await getItemDetails(id);
