@@ -3,10 +3,9 @@ import { Link } from "expo-router";
 import React from "react";
 import { Image, Text, View } from "react-native";
 
-import { P } from "@/components/ui/typography";
+import { H4, Muted, P } from "@/components/ui/typography";
 import { determineLink } from "@/lib/utils";
 import FavoriteButton from "./favorite-button";
-import Typography from "./typography";
 
 import { useUserProvider } from "context/user-provider";
 
@@ -27,24 +26,17 @@ const ItemPreviewCard = ({
 
 	const renderScore = () => {
 		const score = item?.score || 0;
-		const color = "blue";
 
 		return (
 			<View className="flex flex-col gap-0 items-end">
 				{subscription ? (
-					<Typography
-						size="2xl"
-						fontWeight="normal"
-						className={`!no-underline ${color} text-right`}
-					>
-						{score}
-					</Typography>
+					<>
+						<H4>{score}</H4>
+					</>
 				) : (
-					<Octicons name="lock" size={16} color="muted" />
+					<Octicons name="lock" size={16} color="blue" />
 				)}
-				<Typography size="xs" fontWeight="normal">
-					/100
-				</Typography>
+				<Muted>/100</Muted>
 			</View>
 		);
 	};
@@ -77,24 +69,22 @@ const ItemPreviewCard = ({
 							<FavoriteButton item={item} />
 						</View>
 					)}
-					{item.score && (
-						<View style={{ position: "absolute", bottom: 8, right: 8 }}>
-							{renderScore()}
-						</View>
-					)}
-					{!item.score && showWarning && (
-						<View style={{ position: "absolute", bottom: 8, right: 8 }}>
-							<Text style={{ fontSize: 24, color: "red" }}>⚠️</Text>
-						</View>
-					)}
 				</View>
 				<View
 					className="flex flex-row justify-between items-start"
 					style={{ width }}
 				>
-					<View className="flex flex-col">
+					<View className="flex flex-col w-3/4">
 						<P>{item.name}</P>
 					</View>
+
+					{item.score && <View className="w-1/4">{renderScore()}</View>}
+
+					{!item.score && showWarning && (
+						<View className="w-1/4">
+							<Text style={{ fontSize: 24, color: "red" }}>⚠️</Text>
+						</View>
+					)}
 				</View>
 			</View>
 		</Link>

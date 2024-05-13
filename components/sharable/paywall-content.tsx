@@ -3,11 +3,12 @@ import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 
+import { theme } from "@/lib/constants";
+import { useColorScheme } from "@/lib/useColorScheme";
 import { Octicons } from "@expo/vector-icons";
 import { Button } from "components/ui/button";
 import { useUserProvider } from "context/user-provider";
 import Typography from "./typography";
-
 type PaywallContentProps = {
 	children: React.ReactNode;
 	className?: string;
@@ -26,6 +27,10 @@ const PaywallContent: React.FC<PaywallContentProps> = ({
 	items,
 }) => {
 	const router = useRouter();
+	const { colorScheme } = useColorScheme();
+
+	const iconColor =
+		colorScheme === "dark" ? theme.dark.secondary : theme.light.secondary;
 
 	// const pathname = usePathname();
 	const { subscription } = useUserProvider();
@@ -79,7 +84,7 @@ const PaywallContent: React.FC<PaywallContentProps> = ({
 						className="mt-4"
 						onPress={handleUpgradeClick}
 						iconPosition="right"
-						icon={<Octicons name="lock" size={16} color="white" />}
+						icon={<Octicons name="lock" size={16} color={iconColor} />}
 					/>
 				</View>
 			</TouchableOpacity>

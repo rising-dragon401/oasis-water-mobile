@@ -1,5 +1,6 @@
 "use client";
 
+import { H4, Muted, P } from "@/components/ui/typography";
 import { Octicons } from "@expo/vector-icons";
 import { useUserProvider } from "context/user-provider";
 import { useRouter } from "expo-router";
@@ -87,22 +88,10 @@ export default function Score({ score, size }: Props) {
 					/>
 				</Svg>
 				<View className="absolute flex-1 flex-col justify-center items-center">
-					<Typography
-						size="lg"
-						fontWeight="normal"
-						className="flex gap-2 text-primary mb-0"
-					>
-						Score:
-					</Typography>
+					<P>Score:</P>
 					<View className="flex-1 flex-row items-center gap-2">
 						<Octicons name="lock" size={16} color="blue" />
-						<Typography
-							size="2xl"
-							fontWeight="normal"
-							className="flex gap-2 text-primary mb-0"
-						>
-							/ 100
-						</Typography>
+						<Muted>/ 100</Muted>
 					</View>
 				</View>
 			</TouchableOpacity>
@@ -142,16 +131,8 @@ export default function Score({ score, size }: Props) {
 			</Svg>
 			<View className="absolute flex flex-col justify-center items-center">
 				<View className="flex-1 flex-row items-center gap-2">
-					<Typography size="2xl" fontWeight="normal" className="text-primary">
-						{score}
-					</Typography>
-					<Typography
-						size="2xl"
-						fontWeight="normal"
-						className="flex gap-2 text-primary mb-0"
-					>
-						/ 100
-					</Typography>
+					<H4>{score}</H4>
+					<P>/ 100</P>
 				</View>
 
 				{}

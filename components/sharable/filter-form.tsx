@@ -195,16 +195,7 @@ export function FilterForm({ id }: Props) {
 					</View>
 				</View>
 
-				<PaywallContent
-					className="mt-8"
-					label="Unlock all data and reports"
-					items={[
-						"Contaminants not filtered levels ☠️",
-						"Other filters for each toxin 🧪",
-						"Contaminants filtered levels 🧼",
-						"Lab reports and data 🔬",
-					]}
-				>
+				<View className="mt-8">
 					<View className="flex flex-col gap-6 mt-10">
 						<ContaminantTable
 							filteredContaminants={filter.contaminants_filtered}
@@ -212,10 +203,20 @@ export function FilterForm({ id }: Props) {
 						/>
 					</View>
 
-					{filter?.sources && filter?.sources?.length > 0 && (
-						<Sources data={filter.sources} />
-					)}
-				</PaywallContent>
+					<PaywallContent
+						label="Unlock all data and reports"
+						items={[
+							"Rating and scores 🌟",
+							"Research reports and data 🔬",
+							"Latest lab results 💧",
+							"Request new products 🌿",
+						]}
+					>
+						{filter?.sources && filter?.sources?.length > 0 && (
+							<Sources data={filter.sources} />
+						)}
+					</PaywallContent>
+				</View>
 			</View>
 		</ScrollView>
 	);

@@ -197,17 +197,7 @@ export function ItemForm({ id }: Props) {
 				)}
 
 				{item.is_indexed !== false && (
-					<PaywallContent
-						className="mt-6"
-						title="Full data & reports"
-						label="See what's in this water"
-						items={[
-							"Contaminants ☠️",
-							"Source and Treatment Process 💧",
-							"Other ingredients & minerals 🌿",
-							"Lab reports and data 🔬",
-						]}
-					>
+					<>
 						{sortedContaminants && sortedContaminants.length > 0 && (
 							<View className="flex flex-col gap-6 mt-6">
 								<Typography size="2xl" fontWeight="normal">
@@ -253,10 +243,22 @@ export function ItemForm({ id }: Props) {
 							)}
 						</>
 
-						{item && item?.sources?.length > 0 && (
-							<Sources data={item.sources} />
-						)}
-					</PaywallContent>
+						<PaywallContent
+							className="mt-6"
+							title="Full data & reports"
+							label="See the full picture"
+							items={[
+								"Rating and scores 🌟",
+								"Research reports and data 🔬",
+								"Latest lab results 💧",
+								"Request new products 🌿",
+							]}
+						>
+							{item && item?.sources?.length > 0 && (
+								<Sources data={item.sources} />
+							)}
+						</PaywallContent>
+					</>
 				)}
 			</View>
 		</ScrollView>
