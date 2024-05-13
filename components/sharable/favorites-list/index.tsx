@@ -74,7 +74,7 @@ export default function FavoritesList({
 
 		try {
 			const result = await Share.share({
-				message: `Check out my water health score on Oasis. User name: ${userData?.full_name}.`,
+				message: `Check out my water health score on Oasis and see what I drink.💧 Download and search for 👉 ${userData?.full_name}.`,
 				url: url,
 			});
 

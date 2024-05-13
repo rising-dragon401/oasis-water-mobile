@@ -117,14 +117,14 @@ export default function Search({ indices }: { indices?: string[] }) {
 					onChangeText={onChangeText}
 					aria-labelledbyledBy="inputLabel"
 					aria-errormessage="inputError"
-					className="!rounded-full w-full pl-4 z-40"
+					className="!rounded-full w-full pl-6 z-40"
 				/>
 
 				<View
 					className="flex flex-row gap-3 mr-4 z-50 items-center"
 					style={{ position: "absolute", right: 10 }}
 				>
-					{isLoading && <ActivityIndicator size="small" color="black" />}
+					{isLoading && <ActivityIndicator size="small" color={iconColor} />}
 
 					<View>
 						{!value ? (
