@@ -26,6 +26,18 @@ export const getLocations = async () => {
 	}
 };
 
+export const getRandomLocations = async () => {
+	const { data, error } = await supabase.rpc("get_random_locations");
+
+	if (error) {
+		console.error("error", error);
+
+		return [];
+	}
+
+	return data;
+};
+
 export const getFeaturedLocations = async () => {
 	const { data: featuredLocations, error } = await supabase
 		.from("tap_water_locations")

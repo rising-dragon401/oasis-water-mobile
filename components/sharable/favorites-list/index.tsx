@@ -4,13 +4,12 @@ import { FlatList, Share, TouchableOpacity, View } from "react-native";
 
 import { getCurrentUserData, getUserFavorites } from "@/actions/user";
 import Score from "@/components/sharable/score";
-import { H3, P } from "@/components/ui/typography";
+import { H3, H4, Muted, P } from "@/components/ui/typography";
 import { useUserProvider } from "@/context/user-provider";
 import { Avatar, AvatarImage } from "components/ui/avatar";
 import { PROFILE_AVATAR } from "lib/constants";
 import { default as useSWR } from "swr";
 import ItemPreviewCard from "../item-preview-card";
-import Typography from "../typography";
 
 export default function FavoritesList({
 	userId,
@@ -74,8 +73,8 @@ export default function FavoritesList({
 
 		try {
 			const result = await Share.share({
-				message: `Check out my water health score on Oasis and see what I drink.💧 Download and search for 👉 ${userData?.full_name}.`,
-				url: url,
+				message: `Check out my water health score on Oasis. Download and search for 👉 ${userData?.full_name}.`,
+				url,
 			});
 
 			if (result.action === Share.sharedAction) {
@@ -96,7 +95,7 @@ export default function FavoritesList({
 	};
 
 	return (
-		<View className="pb-8">
+		<View className="pb-8 px-2">
 			{!loading && (
 				<View className="py-4 gap-4 mb-4 flex w-full flex-row justify-between">
 					<View className="flex flex-col gap-2 mb-8">
@@ -104,18 +103,17 @@ export default function FavoritesList({
 							<AvatarImage src={userData?.avatar_url || PROFILE_AVATAR} />
 						</Avatar>
 
-						<Typography size="2xl" fontWeight="normal">
+						<H4>
 							{`${userData?.full_name || userData?.email || "User"}'s Oasis`}
-						</Typography>
+						</H4>
+						{userData?.bio && <Muted>{userData?.bio}</Muted>}
 					</View>
 
 					<View className="max-h-24 flex flex-row">
-						<Score score={oasisScore || 0} size="md" />
-						{isAuthUser && (
-							<TouchableOpacity onPress={() => shareProfile()}>
-								<Octicons name="share" size={24} color="muted" />
-							</TouchableOpacity>
-						)}
+						<Score score={oasisScore || 0} size="md" showScore />
+						<TouchableOpacity onPress={() => shareProfile()}>
+							<Octicons name="share" size={24} color="muted" />
+						</TouchableOpacity>
 					</View>
 				</View>
 			)}

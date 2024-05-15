@@ -3,7 +3,7 @@ import { Link } from "expo-router";
 import React from "react";
 import { Image, Text, View } from "react-native";
 
-import { H4, Muted, P } from "@/components/ui/typography";
+import { H4, Muted } from "@/components/ui/typography";
 import { determineLink } from "@/lib/utils";
 import FavoriteButton from "./favorite-button";
 
@@ -47,10 +47,7 @@ const ItemPreviewCard = ({
 	return (
 		// @ts-ignore
 		<Link href={determineLink(item)}>
-			<View
-				className="flex flex-col items-center gap-2"
-				// style={{ width, height }}
-			>
+			<View className="flex flex-col items-center gap-2">
 				<View className="relative h-48 w-48 py-1">
 					<Image
 						source={{ uri: item.image || undefined }}
@@ -70,18 +67,13 @@ const ItemPreviewCard = ({
 						</View>
 					)}
 				</View>
-				<View
-					className="flex flex-row justify-between items-start"
-					style={{ width }}
-				>
-					<View className="flex flex-col w-3/4">
-						<P>{item.name}</P>
-					</View>
+				<View className="flex-row w-48 justify-between items-start">
+					<Text className="flex flex-wrap w-2/3">{item.name}</Text>
 
-					{item.score && <View className="w-1/4">{renderScore()}</View>}
+					{item.score && <View className="w-1/3">{renderScore()}</View>}
 
 					{!item.score && showWarning && (
-						<View className="w-1/4">
+						<View className="w-2/3">
 							<Text style={{ fontSize: 24, color: "red" }}>⚠️</Text>
 						</View>
 					)}

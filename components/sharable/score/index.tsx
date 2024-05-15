@@ -11,9 +11,10 @@ import Typography from "../typography";
 type Props = {
 	score: number;
 	size?: "xs" | "sm" | "md" | "lg" | "xl";
+	showScore?: boolean;
 };
 
-export default function Score({ score, size }: Props) {
+export default function Score({ score, size, showScore = false }: Props) {
 	const router = useRouter();
 	const { subscription } = useUserProvider();
 
@@ -45,8 +46,6 @@ export default function Score({ score, size }: Props) {
 	// const color =
 	//   score >= 70 ? 'stroke-green-500' : score >= 40 ? 'stroke-yellow-500' : 'stroke-red-500'
 
-	const color = "stroke-blue-800";
-
 	const grade = () => {
 		if (score >= 90) {
 			return "Excellent";
@@ -66,7 +65,7 @@ export default function Score({ score, size }: Props) {
 	};
 
 	// Unindexed items have a score of 0
-	if (!subscription && score !== 0) {
+	if (!subscription && score !== 0 && !showScore) {
 		return (
 			<TouchableOpacity
 				onPress={handleOpenSubscribeModal}
@@ -135,12 +134,11 @@ export default function Score({ score, size }: Props) {
 					<P>/ 100</P>
 				</View>
 
-				{}
 				<Typography
 					size="base"
 					fontWeight="normal"
 					className="text-primary mt-1"
-					style={{ fontSize: fontSize }}
+					style={{ fontSize }}
 				>
 					{grade()}
 				</Typography>

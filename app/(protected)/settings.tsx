@@ -1,7 +1,7 @@
 import { useUserProvider } from "context/user-provider";
 import * as Linking from "expo-linking";
 import { Link } from "expo-router";
-import { View } from "react-native";
+import { ScrollView, View } from "react-native";
 
 import EditNameForm from "@/components/sharable/edit-name-form";
 import { OasisSwitch } from "@/components/sharable/oasis-switch";
@@ -35,9 +35,17 @@ export default function TabTwoScreen() {
 	};
 
 	return (
-		<View
-			className="flex-1 items-center justify-between p-4 py-6"
-			style={{ backgroundColor }}
+		<ScrollView
+			style={{
+				flex: 1,
+				padding: 16,
+				paddingTop: 24,
+				paddingBottom: 24,
+			}}
+			contentContainerStyle={{
+				alignItems: "center",
+				justifyContent: "space-between",
+			}}
 		>
 			<View className="flex flex-col items-center p-4 gap-y-4 w-full">
 				{userData ? (
@@ -80,7 +88,7 @@ export default function TabTwoScreen() {
 									{activeSubscription && (
 										<>
 											{provider === "revenue_cat" ? (
-												<View className="flex flex-col gap-4 text-center mt-8">
+												<View className="flex flex-col gap-4 text-center mt-2">
 													<Button
 														variant="outline"
 														label="Manage subscription"
@@ -105,20 +113,22 @@ export default function TabTwoScreen() {
 								</View>
 							)}
 
-							<View className="flex flex-col gap-2 items-start mt-6">
+							<View className="flex flex-col items-start mt-8">
 								<H3>Edit profile</H3>
 
 								<EditNameForm />
 
-								<OasisSwitch
-									userData={userData}
-									uid={uid}
-									subscription={subscription}
-								/>
+								<View className="mt-8">
+									<OasisSwitch
+										userData={userData}
+										uid={uid}
+										subscription={subscription}
+									/>
+								</View>
 							</View>
 						</View>
 
-						<View className="flex flex-col">
+						<View className="flex flex-col mt-10">
 							<Button
 								className="w-full mt-4"
 								variant="outline"
@@ -152,6 +162,6 @@ export default function TabTwoScreen() {
 					</View>
 				)}
 			</View>
-		</View>
+		</ScrollView>
 	);
 }

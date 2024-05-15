@@ -5,9 +5,9 @@ import Search from "@/components/sharable/search";
 import { H1, Muted } from "@/components/ui/typography";
 
 import ItemRow from "@/components/sharable/item-row";
-import { getSevenRandomFilters } from "actions/filters";
-import { getTenRandomItems } from "actions/items";
-import { getFeaturedLocations } from "actions/locations";
+import { getRandomFilters } from "actions/filters";
+import { getRandomItems } from "actions/items";
+import { getRandomLocations } from "actions/locations";
 
 export default function TabOneScreen() {
 	const [items, setItems] = useState<any[]>([]);
@@ -21,19 +21,19 @@ export default function TabOneScreen() {
 	}, []);
 
 	async function getBottledWater() {
-		const data = await getTenRandomItems();
+		const data = await getRandomItems();
 
 		setItems(data || []);
 	}
 
 	async function getTapWater() {
-		const data = await getFeaturedLocations();
+		const data = await getRandomLocations();
 
 		setTapWater(data || []);
 	}
 
 	async function getFilters() {
-		const data = await getSevenRandomFilters();
+		const data = await getRandomFilters();
 
 		setFilters(data || []);
 	}

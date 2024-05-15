@@ -100,20 +100,14 @@ export const getItemDetails = async (id: string) => {
 	}
 };
 
-export const getTenRandomItems = async () => {
-	const { data, error } = await supabase
-		.from("items")
-		.select()
-		.not("score", "is", null)
-		.order("id", { ascending: false })
-		.limit(6);
+export const getRandomItems = async () => {
+	const { data, error } = await supabase.rpc("get_random_items");
 
 	if (error) {
 		console.error("error", error);
+
 		return [];
 	}
 
-	const shuffledData = data.sort(() => 0.5 - Math.random()).slice(0, 10);
-
-	return shuffledData;
+	return data;
 };

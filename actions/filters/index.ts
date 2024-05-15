@@ -69,24 +69,16 @@ export const getRecommendedFilter = async (contaminants: any[]) => {
 	return highestScoringFilter;
 };
 
-export const getSevenRandomFilters = async () => {
-	const { data, error } = await supabase
-		.from("water_filters")
-		.select()
-		.not("score", "is", null)
-		.not("is_indexed", "is", false)
-		.not("is_draft", "is", true)
-		.order("id", { ascending: false })
-		.limit(7);
+export const getRandomFilters = async () => {
+	const { data, error } = await supabase.rpc("get_random_filters");
 
 	if (error) {
 		console.error("error", error);
+
 		return [];
 	}
 
-	const shuffledData = data.sort(() => 0.5 - Math.random()).slice(0, 10);
-
-	return shuffledData;
+	return data;
 };
 
 export const getFilterDetails = async (id: string) => {
