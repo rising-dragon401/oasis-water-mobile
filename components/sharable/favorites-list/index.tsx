@@ -10,6 +10,7 @@ import { Avatar, AvatarImage } from "components/ui/avatar";
 import { PROFILE_AVATAR } from "lib/constants";
 import { default as useSWR } from "swr";
 import ItemPreviewCard from "../item-preview-card";
+import Loader from "../loader";
 
 export default function FavoritesList({
 	userId,
@@ -20,7 +21,6 @@ export default function FavoritesList({
 
 	const [loading, setLoading] = useState(true);
 	const [userData, setUserData] = useState<any>(null);
-	const [oasisScore, setOasisScore] = useState<number | null>(null);
 
 	const isAuthUser = uid === userId;
 
@@ -30,13 +30,6 @@ export default function FavoritesList({
 	};
 
 	const { data: favorites } = useSWR("userFavorites", fetchUserFavorites);
-
-	// calculate oasis score
-	useEffect(() => {
-		if (favorites) {
-			calculateScore(favorites);
-		}
-	}, [favorites]);
 
 	// load user favorites
 	useEffect(() => {
@@ -49,19 +42,6 @@ export default function FavoritesList({
 		const userData = await getCurrentUserData(userId);
 		setUserData(userData);
 		setLoading(false);
-	};
-
-	const calculateScore = async (favorites: any[]) => {
-		let totalCount = 0;
-		let totalScore = 0;
-
-		await favorites.map((fav: any) => {
-			totalScore += fav.score || 0;
-			totalCount += 1;
-		});
-
-		const finalScore = Math.round(totalScore / totalCount);
-		setOasisScore(finalScore);
 	};
 
 	const shareProfile = async () => {
@@ -94,29 +74,31 @@ export default function FavoritesList({
 		}
 	};
 
+	if (loading) {
+		return <Loader />;
+	}
+
 	return (
-		<View className="pb-8 px-2">
-			{!loading && (
-				<View className="py-4 gap-4 mb-4 flex w-full flex-row justify-between">
-					<View className="flex flex-col gap-2 mb-8">
-						<Avatar className="h-24 w-24" alt="oasis pfp">
-							<AvatarImage src={userData?.avatar_url || PROFILE_AVATAR} />
-						</Avatar>
+		<View className="pb-8 px-4">
+			<View className="py-4 gap-4 mb-4 flex w-full flex-row justify-between">
+				<View className="flex flex-col gap-2 mb-8">
+					<Avatar className="h-36 w-36" alt="oasis pfp">
+						<AvatarImage src={userData?.avatar_url || PROFILE_AVATAR} />
+					</Avatar>
 
-						<H4>
-							{`${userData?.full_name || userData?.email || "User"}'s Oasis`}
-						</H4>
-						{userData?.bio && <Muted>{userData?.bio}</Muted>}
-					</View>
-
-					<View className="max-h-24 flex flex-row">
-						<Score score={oasisScore || 0} size="md" showScore />
-						<TouchableOpacity onPress={() => shareProfile()}>
-							<Octicons name="share" size={24} color="muted" />
-						</TouchableOpacity>
-					</View>
+					<H4>
+						{`${userData?.full_name || userData?.email || "User"}'s Oasis`}
+					</H4>
+					{userData?.bio && <Muted>{userData?.bio}</Muted>}
 				</View>
-			)}
+
+				<View className="max-h-24 flex flex-row">
+					<Score score={userData.score || 0} size="md" showScore />
+					<TouchableOpacity onPress={() => shareProfile()}>
+						<Octicons name="share" size={24} color="muted" />
+					</TouchableOpacity>
+				</View>
+			</View>
 
 			{favorites && favorites.length > 0 ? (
 				<FlatList

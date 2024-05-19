@@ -16,3 +16,19 @@ export const handleDeleteUser = async (uid: string) => {
 		return false;
 	}
 };
+
+export const getFeaturedUsers = async () => {
+	const { data, error } = await supabase
+		.from("users")
+		.select("*")
+		.eq("is_featured", true);
+
+	if (error) {
+		console.error("error", error);
+
+		return [];
+	}
+
+	const usersWithType = data.map((user) => ({ ...user, type: "user" }));
+	return usersWithType;
+};

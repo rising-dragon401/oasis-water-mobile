@@ -2,7 +2,11 @@ import { useRouter } from "expo-router";
 import React, { useMemo } from "react";
 import { Alert, GestureResponderEvent, TouchableOpacity } from "react-native";
 
-import { addFavorite, removeFavorite } from "@/actions/user";
+import {
+	addFavorite,
+	calculateUserScore,
+	removeFavorite,
+} from "@/actions/user";
 import { Octicons } from "@expo/vector-icons";
 
 import { useUserProvider } from "@/context/user-provider";
@@ -54,6 +58,8 @@ export default function FavoriteButton({ item, size = 18 }: Props) {
 			} else {
 				await addFavorite(uid, item.type, item.id);
 			}
+
+			calculateUserScore(uid);
 			mutate("userFavorites");
 			fetchUserFavorites(uid);
 		} catch (error) {

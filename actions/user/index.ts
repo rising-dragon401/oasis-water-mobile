@@ -307,6 +307,28 @@ export async function removeFavorite(
 	return data;
 }
 
+export const calculateUserScore = async (uid: string) => {
+	try {
+		const favs = await getUserFavorites(uid);
+
+		let score = 0;
+		let totalCount = 0;
+		let totalScore = 0;
+
+		// get average
+		await favs.map((fav: any) => {
+			totalScore += fav.score || 0;
+			totalCount += 1;
+		});
+
+		score = Math.round(totalScore / totalCount);
+
+		return updateUserData(uid, "score", score);
+	} catch {
+		return false;
+	}
+};
+
 export const incrementItemsViewed = async (uid: string | null | undefined) => {
 	if (!uid) {
 		return null;
@@ -342,4 +364,23 @@ export const incrementItemsViewed = async (uid: string | null | undefined) => {
 	}
 
 	return data;
+};
+
+export const getUsersWithOasis = async () => {
+	const { data, error } = await supabase
+		.from("users")
+		.select("*")
+		.eq("is_oasis_public", true);
+
+	if (error) {
+		console.error("Error fetching users with oasis:", error);
+		return null;
+	}
+
+	const filtered = data.filter((user) => user.score !== null);
+	const sorted = filtered.sort(
+		(a, b) => Number(b.is_featured) - Number(a.is_featured),
+	);
+
+	return sorted;
 };

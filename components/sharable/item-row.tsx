@@ -4,11 +4,12 @@ import { ScrollView, View } from "react-native";
 
 import ItemPreviewCard from "./item-preview-card";
 import Typography from "./typography";
+import UserPreviewCard from "./user-preview-card";
 
 type Props = {
 	title: string;
 	items: any[];
-	type: "location" | "filter" | "item";
+	type: "location" | "filter" | "item" | "user";
 };
 
 export default function ItemRow({ title, items, type }: Props) {
@@ -20,6 +21,8 @@ export default function ItemRow({ title, items, type }: Props) {
 				return `/search/filters`;
 			case "item":
 				return `/search/bottled-waters`;
+			case "user":
+				return `/search/users`;
 			default:
 				return `/search/bottled-waters`;
 		}
@@ -41,7 +44,11 @@ export default function ItemRow({ title, items, type }: Props) {
 			<ScrollView horizontal showsHorizontalScrollIndicator={false}>
 				{items.map((item, index) => (
 					<View key={item.id} className="mr-5">
-						<ItemPreviewCard item={item} size="md" />
+						{type === "user" ? (
+							<UserPreviewCard item={item} size="md" />
+						) : (
+							<ItemPreviewCard item={item} size="md" />
+						)}
 					</View>
 				))}
 			</ScrollView>

@@ -16,7 +16,7 @@ type Props = {
 	showFavorite?: boolean;
 };
 
-const ItemPreviewCard = ({
+const UserPreviewCard = ({
 	item,
 	showWarning,
 	size,
@@ -41,20 +41,17 @@ const ItemPreviewCard = ({
 		);
 	};
 
-	const width = size === "sm" ? 96 : size === "md" ? 168 : 288;
-	const height = size === "sm" ? 96 : size === "md" ? 168 : 288;
-
 	return (
 		// @ts-ignore
 		<Link href={determineLink(item)}>
 			<View className="flex flex-col items-center gap-2">
-				<View className="relative h-48 w-48 py-1">
+				<View className="relative h-40 w-40 py-1">
 					<Image
-						source={{ uri: item.image || undefined }}
+						source={{ uri: item.avatar_url || undefined }}
 						style={{
 							width: "100%",
 							height: "100%",
-							borderRadius: 10,
+							borderRadius: 99,
 						}}
 						resizeMode="cover"
 					/>
@@ -68,7 +65,7 @@ const ItemPreviewCard = ({
 					)}
 				</View>
 				<View className="flex-row w-48 justify-between items-start">
-					<Text className="flex flex-wrap w-2/3 max-h-16">{item.name}</Text>
+					<Text className="flex flex-wrap w-2/3">{item.full_name}</Text>
 
 					{item.score && <View className="w-1/3">{renderScore()}</View>}
 
@@ -83,4 +80,4 @@ const ItemPreviewCard = ({
 	);
 };
 
-export default ItemPreviewCard;
+export default UserPreviewCard;
