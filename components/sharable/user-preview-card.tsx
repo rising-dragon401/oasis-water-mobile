@@ -3,7 +3,7 @@ import { Link } from "expo-router";
 import React from "react";
 import { Image, Text, View } from "react-native";
 
-import { H4, Muted } from "@/components/ui/typography";
+import { H4, Muted, P } from "@/components/ui/typography";
 import { determineLink } from "@/lib/utils";
 import FavoriteButton from "./favorite-button";
 
@@ -65,7 +65,7 @@ const UserPreviewCard = ({
 					)}
 				</View>
 				<View className="flex-row w-48 justify-between items-start">
-					<Text className="flex flex-wrap w-2/3">{item.full_name}</Text>
+					<P className="flex flex-wrap w-2/3">{item.full_name}</P>
 
 					{item.score && <View className="w-1/3">{renderScore()}</View>}
 

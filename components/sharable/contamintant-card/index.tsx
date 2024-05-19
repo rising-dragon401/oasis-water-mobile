@@ -1,4 +1,3 @@
-import { ContaminantFiltersDropdown } from "components/sharable/contaminant-filters-dropdown";
 import { View } from "react-native";
 
 import Typography from "../typography";
@@ -95,10 +94,10 @@ export default function ContaminantCard({ data }: Props) {
 				) : (
 					<View />
 				)}
-				<ContaminantFiltersDropdown
+				{/* <ContaminantFiltersDropdown
 					contaminantId={data?.id || ""}
-					align="start"
-				/>
+					align="end"
+				/> */}
 			</CardFooter>
 		</Card>
 	);

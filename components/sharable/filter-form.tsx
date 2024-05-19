@@ -5,8 +5,6 @@ import { ActivityIndicator, ScrollView, View } from "react-native";
 
 import { getContaminants } from "actions/ingredients";
 
-import PaywallContent from "./paywall-content";
-
 import { getFilterDetails } from "@/actions/filters";
 import { incrementItemsViewed } from "@/actions/user";
 import { useUserProvider } from "@/context/user-provider";
@@ -203,7 +201,7 @@ export function FilterForm({ id }: Props) {
 						/>
 					</View>
 
-					<PaywallContent
+					{/* <PaywallContent
 						label="Unlock all data and reports"
 						items={[
 							"Rating and scores 🌟",
@@ -211,11 +209,11 @@ export function FilterForm({ id }: Props) {
 							"Latest lab results 💧",
 							"Request new products 🌿",
 						]}
-					>
-						{filter?.sources && filter?.sources?.length > 0 && (
-							<Sources data={filter.sources} />
-						)}
-					</PaywallContent>
+					> */}
+					{filter?.sources && filter?.sources?.length > 0 && (
+						<Sources data={filter.sources} />
+					)}
+					{/* </PaywallContent> */}
 				</View>
 			</View>
 		</ScrollView>

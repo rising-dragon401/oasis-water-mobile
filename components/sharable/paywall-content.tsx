@@ -30,7 +30,7 @@ const PaywallContent: React.FC<PaywallContentProps> = ({
 	const { colorScheme } = useColorScheme();
 
 	const iconColor =
-		colorScheme === "dark" ? theme.dark.secondary : theme.light.secondary;
+		colorScheme === "dark" ? theme.light.primary : theme.dark.primary;
 
 	// const pathname = usePathname();
 	const { subscription } = useUserProvider();
@@ -81,7 +81,6 @@ const PaywallContent: React.FC<PaywallContentProps> = ({
 					<Button
 						variant="default"
 						label="Upgrade now"
-						className="mt-4"
 						onPress={handleUpgradeClick}
 						iconPosition="right"
 						icon={<Octicons name="lock" size={16} color={iconColor} />}

@@ -20,7 +20,6 @@ import { useUserProvider } from "@/context/user-provider";
 import ContaminantCard from "./contamintant-card";
 import IngredientsCard from "./ingredients-card";
 import MetaDataCard from "./metadata-card";
-import PaywallContent from "./paywall-content";
 import Sources from "./sources";
 
 type Props = {
@@ -243,7 +242,7 @@ export function ItemForm({ id }: Props) {
 							)}
 						</>
 
-						<PaywallContent
+						{/* <PaywallContent
 							className="mt-6"
 							title="Full data & reports"
 							label="See the full picture"
@@ -253,11 +252,11 @@ export function ItemForm({ id }: Props) {
 								"Latest lab results 💧",
 								"Request new products 🌿",
 							]}
-						>
-							{item && item?.sources?.length > 0 && (
-								<Sources data={item.sources} />
-							)}
-						</PaywallContent>
+						> */}
+						{item && item?.sources?.length > 0 && (
+							<Sources data={item.sources} />
+						)}
+						{/* </PaywallContent> */}
 					</>
 				)}
 			</View>

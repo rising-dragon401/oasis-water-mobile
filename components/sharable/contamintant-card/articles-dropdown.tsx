@@ -26,7 +26,7 @@ export function ArticlesDropdown({ sources }: Props) {
 				<Button variant="outline" label="Research" />
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className="w-96" align="start">
-				<DropdownMenuLabel>Articles</DropdownMenuLabel>
+				<DropdownMenuLabel>Sources</DropdownMenuLabel>
 				<DropdownMenuSeparator />
 				<DropdownMenuGroup>
 					{sources.map((source: any) => (
