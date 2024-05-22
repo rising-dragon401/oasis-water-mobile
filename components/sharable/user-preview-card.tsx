@@ -5,9 +5,8 @@ import { Image, Text, View } from "react-native";
 
 import { H4, Muted, P } from "@/components/ui/typography";
 import { determineLink } from "@/lib/utils";
-import FavoriteButton from "./favorite-button";
-
 import { useUserProvider } from "context/user-provider";
+import FavoriteButton from "./favorite-button";
 
 type Props = {
 	item: any;

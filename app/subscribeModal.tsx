@@ -13,19 +13,20 @@ const FEATURES = [
 		label: "🔓 Unlock all ratings and data",
 	},
 	{
-		label: "💧 Search bottled water, filters and tap water",
+		label: "💧 Bottled water, filters and tap water",
 	},
 	{
-		label: "🌴 Add products to your Oasis",
+		label: "🤖 Oasis AI",
 	},
 	// {
 	// 	label: "🤖 AI search",
 	// },
-	// {
-	// 	label: "🤝 Personalized recommendations",
-	// },
+
 	{
 		label: "🔬 Most up to date research",
+	},
+	{
+		label: "📥 Request new tests",
 	},
 	{
 		label: "🧬 Supports Oasis to further our research",
@@ -86,7 +87,7 @@ export default function SubscribeModal() {
 					<Button
 						className="w-full"
 						variant="default"
-						label="Subscribe to unlock $7.99 / month"
+						label="Subscribe $7.99 / month"
 						onPress={handleSubscribe}
 					/>
 

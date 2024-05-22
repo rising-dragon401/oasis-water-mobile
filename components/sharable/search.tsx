@@ -1,5 +1,6 @@
-import { Octicons } from "@expo/vector-icons";
+import { Ionicons, Octicons } from "@expo/vector-icons";
 import algoliasearch from "algoliasearch";
+import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 
@@ -18,6 +19,8 @@ const searchClient = algoliasearch(
 );
 
 export default function Search({ indices }: { indices?: string[] }) {
+	const router = useRouter();
+
 	const [results, setResults] = useState<any[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
 	const [, setQueryCompleted] = useState(false);
@@ -126,11 +129,9 @@ export default function Search({ indices }: { indices?: string[] }) {
 				>
 					{isLoading && <ActivityIndicator size="small" color={iconColor} />}
 
-					<View>
+					<View className="flex flex-row gap-3">
 						{!value ? (
-							<TouchableOpacity
-							// onPress={() => handleSearch(value)}
-							>
+							<TouchableOpacity>
 								<Octicons name="search" size={18} color={iconColor} />
 							</TouchableOpacity>
 						) : (
@@ -138,6 +139,10 @@ export default function Search({ indices }: { indices?: string[] }) {
 								<Octicons name="x-circle-fill" size={18} color={iconColor} />
 							</TouchableOpacity>
 						)}
+
+						<TouchableOpacity onPress={() => router.push("/chatModal")}>
+							<Ionicons name="sparkles-outline" size={18} color={iconColor} />
+						</TouchableOpacity>
 					</View>
 
 					{/* <TouchableOpacity

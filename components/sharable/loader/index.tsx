@@ -3,11 +3,18 @@ import { ActivityIndicator } from "react-native";
 import { theme } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
 
-export default function Loader() {
+type Props = {
+	size?: "small" | "large";
+	defaultColor?: "dark" | "light";
+};
+
+export default function Loader({ size = "large", defaultColor }: Props) {
 	const { colorScheme } = useColorScheme();
 
-	const color =
-		colorScheme === "dark" ? theme.dark.background : theme.light.background;
+	const colorTheme = defaultColor || colorScheme;
 
-	return <ActivityIndicator size="large" color={color} />;
+	const color =
+		colorTheme === "dark" ? theme.dark.background : theme.light.background;
+
+	return <ActivityIndicator size={size} color={color} />;
 }

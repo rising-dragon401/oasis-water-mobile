@@ -68,13 +68,13 @@ const ItemPreviewCard = ({
 					)}
 				</View>
 				<View className="flex-row w-48 justify-between items-start">
-					<P className="flex flex-wrap w-2/3 max-h-16">{item.name}</P>
+					<P className="flex flex-wrap w-2/3 !h-14">{item.name}</P>
 
 					{item.score && <View className="w-1/3">{renderScore()}</View>}
 
 					{!item.score && showWarning && (
-						<View className="w-2/3">
-							<Text style={{ fontSize: 24, color: "red" }}>⚠️</Text>
+						<View className="w-full flex text-right justify-end">
+							<Text style={{ fontSize: 14 }}>⚠️</Text>
 						</View>
 					)}
 				</View>

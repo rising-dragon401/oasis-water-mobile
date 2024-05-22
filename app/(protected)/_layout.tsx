@@ -28,6 +28,14 @@ export default function ProtectedLayout() {
 				tabBarIcon: ({ color }) => {
 					if (route.name === "search") {
 						return <Octicons name="search" size={24} color={color} />;
+					} else if (route.name === "chat") {
+						return (
+							<Ionicons
+								name="chatbubble-ellipses-outline"
+								size={24}
+								color={color}
+							/>
+						);
 					} else if (route.name === "settings") {
 						return <Octicons name="person" size={24} color={color} />;
 					} else if (route.name === "oasis") {

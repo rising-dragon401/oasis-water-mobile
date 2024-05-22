@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
-import React, { useMemo } from "react";
-import { Alert, GestureResponderEvent, TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react";
+import { GestureResponderEvent, TouchableOpacity } from "react-native";
 
 import {
 	addFavorite,
@@ -18,19 +18,22 @@ type Props = {
 };
 
 export default function FavoriteButton({ item, size = 18 }: Props) {
-	const { userFavorites, uid, userData, subscription, fetchUserFavorites } =
+	const { userFavorites, uid, userData, fetchUserFavorites } =
 		useUserProvider();
 	const router = useRouter();
 
-	const isItemInFavorites = useMemo(
-		() =>
-			userFavorites &&
-			userFavorites.some(
+	const [loadingFavorite, setLoadingFavorite] = useState(false);
+	const [isItemInFavorites, setIsItemInFavorites] = useState(false);
+
+	useEffect(() => {
+		if (userFavorites) {
+			const found = userFavorites.some(
 				(favorite: any) =>
 					favorite && favorite.id === item.id && favorite.type === item.type,
-			),
-		[userFavorites, item],
-	);
+			);
+			setIsItemInFavorites(found);
+		}
+	}, [userFavorites, item]);
 
 	const handleFavoriteClick = async (e: GestureResponderEvent) => {
 		e.preventDefault();
@@ -43,19 +46,14 @@ export default function FavoriteButton({ item, size = 18 }: Props) {
 			return;
 		}
 
-		if (!subscription) {
-			Alert.alert(
-				"Subscription Required",
-				"Please subscribe to add products to your Oasis",
-				[{ text: "OK", onPress: () => router.push("/subscribeModal") }],
-			);
-			return;
-		}
+		setLoadingFavorite(true);
 
 		try {
 			if (isItemInFavorites) {
+				setIsItemInFavorites(false);
 				await removeFavorite(uid, item.type, item.id);
 			} else {
+				setIsItemInFavorites(true);
 				await addFavorite(uid, item.type, item.id);
 			}
 
@@ -65,14 +63,16 @@ export default function FavoriteButton({ item, size = 18 }: Props) {
 		} catch (error) {
 			console.error("Error updating favorites", error);
 		}
+
+		setLoadingFavorite(false);
 	};
 
 	return (
 		<TouchableOpacity onPress={handleFavoriteClick}>
 			{isItemInFavorites ? (
-				<Octicons name="check-circle" size={20} color="black" />
+				<Octicons name="check-circle" size={24} color="black" />
 			) : (
-				<Octicons name="plus-circle" size={20} color="black" />
+				<Octicons name="plus-circle" size={24} color="black" />
 			)}
 		</TouchableOpacity>
 	);
