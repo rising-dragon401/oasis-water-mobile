@@ -68,6 +68,10 @@ export default function SubscribeModal() {
 		}
 	};
 
+	const handleInviteFriends = () => {
+		router.push("/inviteModal");
+	};
+
 	return (
 		<View className="flex flex-1 items-center justify-between bg-background p-4 gap-y-4 pt-20 pb-10">
 			<View />
@@ -83,7 +87,7 @@ export default function SubscribeModal() {
 					))}
 				</View>
 
-				<View className="mt-8 w-full gap-y-6">
+				<View className="mt-8 w-full gap-y-4">
 					<Button
 						className="w-full"
 						variant="default"
@@ -91,14 +95,14 @@ export default function SubscribeModal() {
 						onPress={handleSubscribe}
 					/>
 
-					<Button
-						className="w-full"
-						variant="secondary"
-						label="Not now"
-						onPress={() => {
-							router.back();
-						}}
-					/>
+					{!userData?.has_redeemed_free_month && (
+						<Button
+							className="w-full bg-blue-500"
+							variant="default"
+							label="Invite 3 friends, get 1 month free 🤝"
+							onPress={handleInviteFriends}
+						/>
+					)}
 				</View>
 			</View>
 

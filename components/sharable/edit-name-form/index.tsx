@@ -55,8 +55,8 @@ export default function EditNameForm() {
 	};
 
 	return (
-		<View className="flex flex-col mt-2">
-			<View className="mx-auto flex w-full flex-col space-y-6 ">
+		<View className="flex flex-col mt-2 pb-10">
+			<View className="mx-auto flex w-full flex-col space-y-6">
 				<View className="">
 					<Label nativeID="password" className="text-sm">
 						Avatar

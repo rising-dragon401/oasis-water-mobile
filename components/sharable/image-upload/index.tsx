@@ -79,7 +79,7 @@ export function ImageUpload({
 			className="flex relative justify-center items-center border border-gray-300 border-dashed rounded-full w-24 h-24"
 		>
 			{file ? (
-				<Image source={{ uri: file }} className="rounded-full w-40 h-40" />
+				<Image source={{ uri: file }} className="rounded-full w-24 h-24" />
 			) : (
 				<P>Upload</P>
 			)}

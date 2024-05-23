@@ -1,6 +1,6 @@
 import { useUserProvider } from "context/user-provider";
 import * as Linking from "expo-linking";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { ScrollView, View } from "react-native";
 
 import EditNameForm from "@/components/sharable/edit-name-form";
@@ -8,18 +8,16 @@ import { OasisSwitch } from "@/components/sharable/oasis-switch";
 import Typography from "@/components/sharable/typography";
 import UpgradeButton from "@/components/sharable/upgrade-button";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import { H1, H3, Muted, P } from "@/components/ui/typography";
 import { useRevenueCat } from "@/context/revenue-cat-provider";
-import { theme } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function TabTwoScreen() {
 	const { uid, user, userData, subscription, logout } = useUserProvider();
 	const { restorePurchases } = useRevenueCat();
 	const { colorScheme } = useColorScheme();
-
-	const backgroundColor =
-		colorScheme === "dark" ? theme.dark.background : theme.light.background;
+	const router = useRouter();
 
 	const activeSubscription = subscription?.status === "active";
 
@@ -32,6 +30,14 @@ export default function TabTwoScreen() {
 	const handleRestorePurchases = async () => {
 		await restorePurchases();
 		alert("Any applicable purchases have been restored.");
+	};
+
+	const handleLoadInviteModal = () => {
+		router.push("/inviteModal");
+	};
+
+	const handleLoadRedeemModal = () => {
+		router.push("/redeemModal");
 	};
 
 	return (
@@ -47,7 +53,7 @@ export default function TabTwoScreen() {
 				justifyContent: "space-between",
 			}}
 		>
-			<View className="flex flex-col items-center p-4 gap-y-4 w-full">
+			<View className="flex flex-col items-center p-4 gap-y-4 w-full pb-14">
 				{userData ? (
 					<View className="w-full flex flex-col h-full justify-between">
 						<View className="">
@@ -108,12 +114,32 @@ export default function TabTwoScreen() {
 									)}
 								</>
 							) : (
-								<View className="mt-4">
+								<View className="mt-4 flex flex-col items-center gap-y-2">
 									<UpgradeButton />
+
+									{!userData?.has_redeemed_free_month && (
+										<>
+											<Separator />
+
+											<Button
+												className="w-full bg-blue-500"
+												variant="default"
+												label="Invite 3 friends, get 1 month free 🤝"
+												onPress={handleLoadInviteModal}
+											/>
+
+											<Button
+												className="w-full"
+												variant="outline"
+												label="Redeem invite code"
+												onPress={handleLoadRedeemModal}
+											/>
+										</>
+									)}
 								</View>
 							)}
 
-							<View className="flex flex-col items-start mt-8">
+							<View className="flex flex-col items-start mt-14">
 								<H3>Edit profile</H3>
 
 								<EditNameForm />

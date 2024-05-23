@@ -16,6 +16,8 @@ import Score from "./score";
 import Sources from "./sources";
 import Typography from "./typography";
 
+import { P } from "@/components/ui/typography";
+
 type Props = {
 	id: string;
 };
@@ -58,43 +60,101 @@ export function FilterForm({ id }: Props) {
 		return filter;
 	};
 
+	// get categories filtred (if any)
+	// get common water contaminants
 	const commonContaminants = useMemo(
-		() =>
-			contaminants?.filter(
-				(contaminant: any) => contaminant.is_common === true,
-			),
+		() => contaminants?.filter((contaminant) => contaminant.is_common === true),
 		[contaminants],
 	);
 
+	// get uncommon water contaminants
 	const uncommonContaminants = useMemo(
 		() => contaminants?.filter((contaminant) => contaminant.is_common !== true),
 		[contaminants],
 	);
 
+	// get categories filtred (if any)
+	const categoriesFiltered = useMemo(
+		() => filter.filtered_contaminant_categories ?? [],
+		[filter.filtered_contaminant_categories],
+	);
+
+	// get the category contamiannts that are filtered
+	const contaminantsFilteredFromCategory = useMemo(() => {
+		return categoriesFiltered.flatMap((category: any) => {
+			const percent = category.percentage;
+
+			const contaminantsInCategory =
+				contaminants?.filter(
+					(contaminant) => contaminant.category === category.category,
+				) || [];
+
+			const sliceIndex = Math.ceil(
+				contaminantsInCategory.length * (percent / 100),
+			);
+
+			const contaminantsInCategoryByPercent = contaminantsInCategory.slice(
+				0,
+				sliceIndex,
+			);
+
+			return contaminantsInCategoryByPercent.map((contaminant) => {
+				return {
+					id: contaminant.id,
+					name: contaminant.name,
+				};
+			});
+		});
+	}, [contaminants, categoriesFiltered]);
+
+	// combine normal filtered contaminants with category filtered contaminants
+	const combinedFilteredContaminants = useMemo(() => {
+		const flatContaminantsFromCategory =
+			contaminantsFilteredFromCategory.flat();
+		const uniqueContaminants = new Map();
+
+		// Add contaminants filtered directly
+		filter?.contaminants_filtered?.forEach((contaminant: any) => {
+			uniqueContaminants.set(contaminant.id, contaminant);
+		});
+
+		// Add contaminants filtered from categories
+		flatContaminantsFromCategory.forEach((contaminant: any) => {
+			if (!uniqueContaminants.has(contaminant.id)) {
+				uniqueContaminants.set(contaminant.id, contaminant);
+			}
+		});
+
+		return Array.from(uniqueContaminants.values());
+	}, [contaminantsFilteredFromCategory, filter.contaminants_filtered]);
+
+	// now get the common contaminants that are filtered
 	const commonContaminantsFiltered = useMemo(
 		() =>
 			contaminants?.filter(
 				(contaminant) =>
 					contaminant.is_common === true &&
-					filter.contaminants_filtered?.some(
+					combinedFilteredContaminants.some(
 						(filtered: any) => filtered.id === contaminant.id,
 					),
 			),
-		[contaminants, filter.contaminants_filtered],
+		[contaminants, combinedFilteredContaminants],
 	);
 
+	// and the uncommon contaminants that are filtered
 	const uncommonContaminantsFiltered = useMemo(
 		() =>
 			contaminants?.filter(
 				(contaminant) =>
 					contaminant.is_common !== true &&
-					filter.contaminants_filtered?.some(
+					combinedFilteredContaminants.some(
 						(filtered: any) => filtered.id === contaminant.id,
 					),
 			),
-		[contaminants, filter.contaminants_filtered],
+		[contaminants, combinedFilteredContaminants],
 	);
 
+	// along with the percentage of common and uncommon contaminants filtered
 	const percentCommonFiltered = useMemo(
 		() =>
 			Math.round(
@@ -113,12 +173,6 @@ export function FilterForm({ id }: Props) {
 					100,
 			),
 		[uncommonContaminantsFiltered, uncommonContaminants],
-	);
-
-	// get categories filtred (if any)
-	const categoriesFiltered = useMemo(
-		() => filter.filtered_contaminant_categories ?? [],
-		[filter.filtered_contaminant_categories],
 	);
 
 	if (filter.is_draft) {
@@ -191,9 +245,16 @@ export function FilterForm({ id }: Props) {
 							<Score score={filter.score} size="md" />
 						</View>
 					</View>
+
+					<View className="flex flex-col items-start">
+						<P>{filter.description}</P>
+						<P className="text-left mt-6">
+							Certifications: {filter.certifications || "None"}
+						</P>
+					</View>
 				</View>
 
-				<View className="mt-8">
+				<View>
 					<View className="flex flex-col gap-6 mt-10">
 						<ContaminantTable
 							filteredContaminants={filter.contaminants_filtered}

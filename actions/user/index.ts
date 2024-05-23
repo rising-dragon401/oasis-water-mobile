@@ -384,3 +384,163 @@ export const getUsersWithOasis = async () => {
 
 	return sorted;
 };
+
+export const getUserInviteCode = async (uid: string): Promise<any> => {
+	const { data, error } = await supabase
+		.from("invite_codes")
+		.select("id, redemptions")
+		.eq("uid", uid)
+		.single();
+
+	if (error || !data) {
+		console.error("Error fetching invite code:", error);
+		return null;
+	}
+
+	return data;
+};
+
+export const generateUserInviteCode = async (uid: string): Promise<any> => {
+	const inviteCode = (Math.random().toString(36) + "000000")
+		.substring(2, 8)
+		.toUpperCase();
+
+	console.log("inviteCode", inviteCode);
+
+	try {
+		// make sure the invite code doesn't already exist
+		const { data: existingInvite, error } = await supabase
+			.from("invite_codes")
+			.select("id")
+			.eq("id", inviteCode)
+			.single();
+
+		if (existingInvite) {
+			return generateUserInviteCode(uid);
+		}
+
+		const { data: createCode, error: inviteError } = await supabase
+			.from("invite_codes")
+			.insert([{ id: inviteCode, uid }]);
+
+		if (inviteError) {
+			console.error("Error creating invite code:", inviteError);
+			return null;
+		}
+
+		return inviteCode;
+	} catch (error) {
+		console.error("Error generating invite code:", error);
+		return null;
+	}
+};
+
+export const redeemInviteCode = async (uid: string, code: string) => {
+	try {
+		// first check if user has already redeemed a code
+		const { data: userData, error: redemptionError } = await supabase
+			.from("users")
+			.select("*")
+			.single();
+
+		if (userData?.redeemed_invite_code) {
+			console.error("User has already redeemed a code");
+			return null;
+		}
+
+		// if not, get user id of the creator of the code and add uid above to their redemptions array
+		const { data: inviteData, error: inviteError } = await supabase
+			.from("invite_codes")
+			.select("*")
+			.eq("id", code)
+			.single();
+
+		if (inviteError) {
+			console.error("Error fetching invite code:", inviteError);
+			return null;
+		}
+
+		if (!inviteData) {
+			console.error("Invite code not found");
+			return null;
+		}
+
+		if (inviteData.uid === uid) {
+			console.error("User cannot redeem their own code");
+			return null;
+		}
+
+		const currentArray = inviteData.redemptions || [];
+		// check if code is already redeemed
+		if (currentArray.includes(uid)) {
+			console.error("Code already redeemed");
+			return null;
+		}
+
+		currentArray.push(uid);
+
+		// add uid to the creator's redemptions array
+		const { data: redemptionData, error: redemptionError2 } = await supabase
+			.from("invite_codes")
+			.update({ redemptions: currentArray })
+			.eq("id", code);
+
+		if (redemptionError2) {
+			console.error("Error updating invite code:", redemptionError2);
+			return null;
+		}
+
+		// add the code to the user's redeemed_invite_code
+		const { data: userData2, error: redemptionError3 } = await supabase
+			.from("users")
+			.update({ redeemed_invite_code: code })
+			.eq("id", uid);
+
+		if (redemptionError3) {
+			console.error("Error updating user:", redemptionError3);
+			return null;
+		}
+
+		return true;
+	} catch (error) {
+		console.error("Error redeeming invite code:", error);
+		return null;
+	}
+};
+
+export const awardFreeMonth = async (uid: string) => {
+	// create row in subscriptions table
+	// get current date
+	const currentDate = new Date();
+	const nextMonth = new Date();
+	nextMonth.setMonth(nextMonth.getMonth() + 1);
+
+	const subscriptionData = {
+		id: "sub_free_" + currentDate.toString(),
+		user_id: uid,
+		metadata: {
+			provider: "invite_codes",
+		},
+		status: "active",
+		price_id: process.env.EXPO_PUBLIC_STRIPE_PRO_PRICE_ID,
+		quantity: 1,
+		created: currentDate,
+		current_period_end: nextMonth,
+		cancel_at_period_end: false,
+	};
+
+	try {
+		const { error } = await supabase
+			.from("subscriptions")
+			.upsert([subscriptionData]);
+
+		if (error) {
+			throw new Error(error.message);
+		}
+
+		return true;
+	} catch (error) {
+		console.error("Error awarding free month:", error);
+		return false;
+	}
+};

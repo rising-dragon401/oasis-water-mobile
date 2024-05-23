@@ -77,6 +77,18 @@ function RootLayout() {
 										presentation: "modal",
 									}}
 								/>
+								<Stack.Screen
+									name="inviteModal"
+									options={{
+										presentation: "modal",
+									}}
+								/>
+								<Stack.Screen
+									name="redeemModal"
+									options={{
+										presentation: "modal",
+									}}
+								/>
 							</Stack>
 						</SafeAreaProvider>
 						<PortalHost />
