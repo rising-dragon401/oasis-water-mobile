@@ -214,12 +214,11 @@ export default function ChatModal() {
 				content: reply,
 			});
 
-			console.log("updatedMessages: ", updatedMessages);
-
 			// add assistant message to state
 			setMessages(updatedMessages);
 		} catch (e) {
 			console.log("e: ", e);
+			Alert.alert("Error sending message", e.message);
 		}
 
 		setIsLoading(false);
