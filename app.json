@@ -19,7 +19,7 @@
       "supportsTablet": false,
       "usesAppleSignIn": true,
       "bundleIdentifier": "com.liveoasis.oasis",
-      "buildNumber": "6",
+      "buildNumber": "1",
       "associatedDomains": [
         "applinks:live-oasis.com"
       ]

@@ -370,7 +370,7 @@ export const getUsersWithOasis = async () => {
 	const { data, error } = await supabase
 		.from("users")
 		.select("*")
-		.eq("is_oasis_public", true);
+		.neq("is_oasis_public", false);
 
 	if (error) {
 		console.error("Error fetching users with oasis:", error);

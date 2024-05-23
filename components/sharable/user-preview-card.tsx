@@ -4,7 +4,6 @@ import React from "react";
 import { Image, Text, View } from "react-native";
 
 import { H4, Muted, P } from "@/components/ui/typography";
-import { determineLink } from "@/lib/utils";
 import { useUserProvider } from "context/user-provider";
 import FavoriteButton from "./favorite-button";
 
@@ -42,7 +41,7 @@ const UserPreviewCard = ({
 
 	return (
 		// @ts-ignore
-		<Link href={determineLink(item)}>
+		<Link href={`/search/oasis/${item.id}`}>
 			<View className="flex flex-col items-center gap-2">
 				<View className="relative h-40 w-40 py-1">
 					<Image

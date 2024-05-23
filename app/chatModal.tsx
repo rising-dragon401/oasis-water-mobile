@@ -20,8 +20,6 @@ import { H3, Muted } from "@/components/ui/typography";
 import { useUserProvider } from "@/context/user-provider";
 import useSessionStorage from "@/lib/hooks/session-storage";
 
-import "react-native-url-polyfill/auto";
-
 interface Message {
 	role: "user" | "assistant";
 	content: string;
@@ -63,18 +61,20 @@ export default function ChatModal() {
 
 	async function createNewAssistant() {
 		if (!uid) {
-			return null;
+			throw new Error("No user id found");
 		}
 
 		try {
 			const response = await fetch(
-				`${process.env.EXPO_PUBLIC_API_ENDPOINT}/create-new-assistant`,
+				`${process.env.EXPO_PUBLIC_API_ENDPOINT}/api/create-new-assistant`,
 				{
 					method: "POST",
 				},
 			);
 
 			const data = await response.json();
+
+			console.log("data: ", data);
 
 			if (response.ok) {
 				// add assistant to user
@@ -86,7 +86,7 @@ export default function ChatModal() {
 				throw new Error(data.message);
 			}
 		} catch (error) {
-			console.error("Error:", error);
+			console.error("createNewAssistant Error:", error);
 			return null;
 		}
 	}
@@ -168,8 +168,7 @@ export default function ChatModal() {
 			}
 
 			if (!assistant) {
-				console.log("no assistant id found");
-				return;
+				throw new Error("No assistant id found");
 			}
 
 			// Initiate threadId
@@ -180,8 +179,7 @@ export default function ChatModal() {
 			}
 
 			if (!thread) {
-				console.log("no thread id found");
-				return;
+				throw new Error("No thread id found");
 			}
 
 			// Create instance of AbortController to handle stream cancellation
