@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { H1, H3, Muted, P } from "@/components/ui/typography";
 import { useRevenueCat } from "@/context/revenue-cat-provider";
+import { theme } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function TabTwoScreen() {
@@ -40,20 +41,18 @@ export default function TabTwoScreen() {
 		router.push("/redeemModal");
 	};
 
+	const backgroundColor =
+		colorScheme === "dark" ? theme.dark.background : theme.light.background;
+
 	return (
 		<ScrollView
-			style={{
-				flex: 1,
-				padding: 16,
-				paddingTop: 24,
-				paddingBottom: 24,
-			}}
 			contentContainerStyle={{
 				alignItems: "center",
 				justifyContent: "space-between",
+				backgroundColor,
 			}}
 		>
-			<View className="flex flex-col items-center p-4 gap-y-4 w-full pb-14">
+			<View className="flex flex-col items-center  gap-y-4 w-full pb-14 px-8">
 				{userData ? (
 					<View className="w-full flex flex-col h-full justify-between">
 						<View className="">

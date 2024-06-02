@@ -1,5 +1,5 @@
 import { useUserProvider } from "context/user-provider";
-import { Link, useRouter } from "expo-router";
+import { Link } from "expo-router";
 import { View } from "react-native";
 
 import FavoritesList from "@/components/sharable/favorites-list";
@@ -8,8 +8,7 @@ import { theme } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function OasisScreen() {
-	const { uid, subscription, userFavorites } = useUserProvider();
-	const router = useRouter();
+	const { uid, userFavorites } = useUserProvider();
 	const { colorScheme } = useColorScheme();
 
 	const backgroundColor =

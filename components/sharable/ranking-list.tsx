@@ -1,6 +1,6 @@
-"use client";
-
+import { Octicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import ItemPreviewCard from "./item-preview-card";
 import Typography from "./typography";
@@ -13,10 +13,26 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useUserProvider } from "@/context/user-provider";
 
-import { Octicons } from "@expo/vector-icons";
-
-import { useEffect, useMemo, useState } from "react";
 import UpgradeButton from "./upgrade-button";
+
+const FILTERS: any[] = [
+	{
+		id: "all",
+		name: "All waters",
+	},
+	{
+		id: "bottled_water",
+		name: "Still and Sparkling",
+	},
+	{
+		id: "flavored_water",
+		name: "Flavored",
+	},
+	{
+		id: "large_gallons",
+		name: "Large gallons",
+	},
+];
 
 type Props = {
 	title: string;
@@ -28,14 +44,45 @@ export default function RankingList({ title, items, loading }: Props) {
 	const router = useRouter();
 	const { subscription } = useUserProvider();
 
+	const [filter, setFilter] = useState<any>("all");
 	const [sortMethod, setSortMethod] = useState("name");
 	const [isOpen, setIsOpen] = useState(false);
+	const [isOpenFilter, setIsOpenFilter] = useState(false);
+	const [allItems, setAllItems] = useState<any[]>([]);
+	const [resultItems, setResultItems] = useState<any[]>([]);
+	const [filteredItems, setFilteredItems] = useState<any[]>([]);
+
+	useEffect(() => {
+		if (items) {
+			setAllItems(items);
+		}
+	}, [items]);
 
 	useEffect(() => {
 		if (subscription) {
 			setSortMethod("score");
 		}
 	}, [subscription]);
+
+	useEffect(() => {
+		let filtered = allItems;
+		if (filter !== "all") {
+			if (filter === "large_gallons") {
+				filtered = allItems.filter(
+					(item) => item.tags && item.tags.includes("gallon"),
+				);
+			} else {
+				filtered = allItems.filter((item) => item.type === filter);
+			}
+		}
+		let sorted = filtered;
+		if (sortMethod === "score") {
+			sorted = filtered.sort((a, b) => (b.score || 0) - (a.score || 0));
+		} else if (sortMethod === "name") {
+			sorted = filtered.sort((a, b) => a.name.localeCompare(b.name));
+		}
+		setResultItems(sorted);
+	}, [filter, sortMethod, allItems]);
 
 	const sorted = useMemo(() => {
 		if (!items) return null;
@@ -60,6 +107,10 @@ export default function RankingList({ title, items, loading }: Props) {
 		}
 	};
 
+	const handleFilterByType = (type: any) => {
+		setFilter(type);
+	};
+
 	const itemsWithNoReports = sorted?.filter((item) => item.score === null);
 
 	return (
@@ -70,6 +121,36 @@ export default function RankingList({ title, items, loading }: Props) {
 				</Typography>
 
 				<View className="flex flex-row gap-4">
+					<DropdownMenu
+						open={isOpenFilter}
+						onOpenChange={setIsOpenFilter}
+						className="relative"
+					>
+						<DropdownMenuTrigger className="flex flex-row items-center gap-2">
+							<Typography size="base" fontWeight="normal">
+								Filter
+							</Typography>
+							<Octicons name="chevron-down" size={16} color="black" />
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end">
+							{FILTERS.map((filt) => (
+								<DropdownMenuItem
+									key={filt.id}
+									onPress={() => handleFilterByType(filt.id)}
+									className="hover:cursor-pointer flex flex-row justify-between w-48"
+								>
+									<Typography size="base" fontWeight="normal">
+										{filt.name}
+									</Typography>
+
+									{filt.id === filter && (
+										<Octicons name="check" size={16} color="black" />
+									)}
+								</DropdownMenuItem>
+							))}
+						</DropdownMenuContent>
+					</DropdownMenu>
+
 					<DropdownMenu
 						open={isOpen}
 						onOpenChange={setIsOpen}
@@ -122,8 +203,8 @@ export default function RankingList({ title, items, loading }: Props) {
 							flexWrap: "wrap",
 						}}
 					>
-						{sorted &&
-							sorted
+						{resultItems &&
+							resultItems
 								.filter((item) => item.score !== null)
 								.filter((item) => item?.is_draft !== true)
 								.map((item) => (
@@ -141,21 +222,27 @@ export default function RankingList({ title, items, loading }: Props) {
 						<>
 							<View className="pt-4 pb-8 flex flex-row justify-between mt-24">
 								<Typography size="3xl" fontWeight="normal">
-									⚠️ NO REPORTS LOCATED
+									⚠️ Untested items
 								</Typography>
 							</View>
 
-							<View className="grid md:grid-cols-3 grid-cols-2 w-full gap-6 pb-24">
+							<View
+								style={{
+									flexDirection: "row",
+									flexWrap: "wrap",
+								}}
+							>
 								{sorted &&
 									sorted
 										.filter((item) => item.score === null)
 										.map((item) => (
-											<ItemPreviewCard
+											<View
 												key={item.id}
-												item={item}
-												size="md"
-												showWarning={true}
-											/>
+												style={{ width: "50%" }}
+												className="flex mb-10"
+											>
+												<ItemPreviewCard item={item} size="md" />
+											</View>
 										))}
 							</View>
 						</>

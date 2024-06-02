@@ -3,6 +3,8 @@ import { Animated, View } from "react-native";
 import Markdown from "react-native-markdown-display";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { theme } from "@/lib/constants";
+import { useColorScheme } from "@/lib/useColorScheme";
 import { cn } from "@/lib/utils";
 
 const OasisAvatar =
@@ -25,6 +27,7 @@ export function ChatMessage({
 	...props
 }: ChatMessageProps) {
 	const fadeAnim = useRef(new Animated.Value(0)).current; // Initial opacity is 0
+	const { colorScheme } = useColorScheme();
 
 	useEffect(() => {
 		Animated.timing(fadeAnim, {
@@ -33,6 +36,10 @@ export function ChatMessage({
 			useNativeDriver: true,
 		}).start();
 	}, [fadeAnim]);
+
+	const textColor =
+		colorScheme === "dark" ? theme.dark.primary : theme.light.primary;
+
 	return (
 		<Animated.View
 			style={{ opacity: fadeAnim }}
@@ -51,10 +58,20 @@ export function ChatMessage({
 				</Avatar>
 			)}
 			<View
-				className={`!max-w-[80vw] space-y-2 overflow-hidden rounded-xl px-4 ${message.role === "user" ? "bg-border py-1" : "flex justify-start w-full"}
-      `}
+				className={`
+					!max-w-[80vw] space-y-2 overflow-hidden rounded-xl px-4
+					${message.role === "user" ? "bg-border py-1" : "flex justify-start w-full"}
+      			`}
 			>
-				<Markdown>{message.content}</Markdown>
+				<Markdown
+					style={{
+						text: {
+							color: textColor,
+						},
+					}}
+				>
+					{message.content}
+				</Markdown>
 			</View>
 		</Animated.View>
 	);
