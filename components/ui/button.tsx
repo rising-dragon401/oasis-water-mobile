@@ -21,7 +21,7 @@ const buttonVariants = cva(
 				link: "web:underline-offset-4 web:hover:underline web:focus:underline ",
 			},
 			size: {
-				default: "h-10 px-4 py-2 native:h-12 native:px-5 native:py-3",
+				default: "h-12 px-4 py-2 native:h-14 native:px-5 native:py-3",
 				sm: "h-9 rounded-md px-3",
 				lg: "h-11 rounded-md px-8 native:h-14",
 				icon: "h-10 w-10",
@@ -35,16 +35,16 @@ const buttonVariants = cva(
 );
 
 const buttonTextVariants = cva(
-	"web:whitespace-nowrap text-sm native:text-base font-medium text-foreground web:transition-colors",
+	"web:whitespace-nowrap text-base native:text-base  text-foreground web:transition-colors",
 	{
 		variants: {
 			variant: {
-				default: "text-secondary",
+				default: "text-secondary !font-bold",
 				destructive: "text-secondary",
 				outline: "group-active:text-accent-foreground",
 				secondary:
 					"text-secondary-foreground group-active:text-secondary-foreground",
-				ghost: "group-active:text-accent-foreground",
+				ghost: "group-active:text-accent-foreground font-normal",
 				link: "text-primary group-active:underline",
 			},
 			size: {
@@ -103,12 +103,6 @@ const Button = React.forwardRef<
 					role="button"
 					{...props}
 				>
-					{loading && (
-						<View className="absolute">
-							<ActivityIndicator size="small" />
-						</View>
-					)}
-
 					<View className="flex flex-row gap-2 items-center justify-center">
 						{icon && iconPosition === "left" && (
 							<React.Fragment>{icon}</React.Fragment>
@@ -128,6 +122,8 @@ const Button = React.forwardRef<
 						{icon && iconPosition === "right" && (
 							<React.Fragment>{icon}</React.Fragment>
 						)}
+
+						{loading && <ActivityIndicator size="small" />}
 					</View>
 				</Pressable>
 			</TextClassContext.Provider>

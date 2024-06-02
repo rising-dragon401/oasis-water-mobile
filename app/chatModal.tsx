@@ -44,6 +44,7 @@ export default function ChatModal() {
 	const [query, setQuery] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const [abortController, setAbortController] = useState<AbortController>();
+	const [starterPrompts, setStarterPrompts] = useState<string[]>([]);
 	const [assistantId, setAssistantId] = useSessionStorage("assistantId", "");
 	const [threadId, setThreadId] = useSessionStorage("threadId", "");
 	const [messages, setMessages] = useSessionStorage<Message[]>("messages", []);
@@ -58,6 +59,20 @@ export default function ChatModal() {
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [userData]);
+
+	useEffect(() => {
+		if (!messages || messages.length === 0) {
+			generateRandomPrompts();
+		}
+	}, [messages]);
+
+	const generateRandomPrompts = () => {
+		const randomPrompts = STARTER_PROMPTS.sort(() => 0.5 - Math.random()).slice(
+			0,
+			3,
+		);
+		setStarterPrompts(randomPrompts);
+	};
 
 	async function createNewAssistant() {
 		if (!uid) {
@@ -216,7 +231,7 @@ export default function ChatModal() {
 
 			// add assistant message to state
 			setMessages(updatedMessages);
-		} catch (e) {
+		} catch (e: any) {
 			console.log("e: ", e);
 			Alert.alert("Error sending message", e.message);
 		}
@@ -271,24 +286,22 @@ export default function ChatModal() {
 								<Logo />
 							</View>
 
-							{STARTER_PROMPTS.sort(() => 0.5 - Math.random())
-								.slice(0, 3)
-								.map((prompt) => (
-									<Button
-										key={prompt}
-										variant="outline"
-										label={prompt}
-										onPress={() => {
-											handleSendMessage(prompt);
-										}}
-										className="mb-2"
-									/>
-								))}
+							{starterPrompts.map((prompt) => (
+								<Button
+									key={prompt}
+									variant="outline"
+									label={prompt}
+									onPress={() => {
+										handleSendMessage(prompt);
+									}}
+									className="mb-2"
+								/>
+							))}
 						</View>
 					)}
 				</ScrollView>
 				<View className="flex flex-col items-center justify-center px-6 pb-4">
-					<View className="w-full relative flex items-center">
+					<View className="w-full relative items-center">
 						<Input
 							placeholder="Ask Oasis"
 							value={query}
@@ -299,12 +312,12 @@ export default function ChatModal() {
 						/>
 						<TouchableOpacity
 							onPress={() => handleSendMessage(query)}
-							className="absolute right-9 inset-y-0 my-aut top-6"
+							className="absolute right-4 top-1/2 transform -translate-y-1/2"
 						>
 							<Ionicons name="send" size={24} color="black" />
 						</TouchableOpacity>
 					</View>
-					<Muted>Oasis AI may provide innacurate / incomplete answers.</Muted>
+					<Muted>Oasis AI may provide inaccurate and incomplete answers.</Muted>
 				</View>
 			</View>
 		</KeyboardAvoidingView>

@@ -1,4 +1,3 @@
-import BackButton from "@/components/sharable/back-button";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
@@ -10,6 +9,7 @@ import * as z from "zod";
 
 import { SafeAreaView } from "@/components/safe-area-view";
 import { AppleAuthButton } from "@/components/sharable/apple-auth-button";
+import BackButton from "@/components/sharable/back-button";
 import { Button } from "@/components/ui/button";
 import { Form, FormField, FormInput } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";

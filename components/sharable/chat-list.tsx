@@ -15,8 +15,6 @@ export default function ChatList({
 	isLoading,
 	userAvatar,
 }: ChatListProps) {
-	const lastMessage = messages[messages.length - 1];
-
 	return (
 		<View className="relative mx-auto max-w-2xl md:px-4">
 			{messages.map((message, index) => (

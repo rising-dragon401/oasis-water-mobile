@@ -1,10 +1,10 @@
 import * as Linking from "expo-linking";
 import { useRouter } from "expo-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { View } from "react-native";
 
 import { Button } from "@/components/ui/button";
-import { H1, H3, P } from "@/components/ui/typography";
+import { H1, H3, Muted, P } from "@/components/ui/typography";
 import { useRevenueCat } from "@/context/revenue-cat-provider";
 import { useUserProvider } from "@/context/user-provider";
 
@@ -41,6 +41,8 @@ export default function SubscribeModal() {
 	const router = useRouter();
 	const { packages, purchasePackage } = useRevenueCat();
 
+	const [loading, setLoading] = useState(false);
+
 	useEffect(() => {
 		if (subscription?.active) {
 			router.back();
@@ -48,24 +50,32 @@ export default function SubscribeModal() {
 	}, [subscription]);
 
 	const handleSubscribe = async () => {
-		if (!user || !userData) {
-			router.back();
-			router.push("/(public)/sign-in");
-			return;
+		setLoading(true);
+
+		try {
+			if (!user || !userData) {
+				router.back();
+				router.push("/(public)/sign-in");
+				throw new Error("User not found");
+			}
+
+			const pack = packages[1];
+
+			if (!pack) {
+				console.log("No package found");
+				return;
+			}
+
+			const res = await purchasePackage!(pack);
+
+			if (res) {
+				router.back();
+			}
+		} catch (e) {
+			console.log(e);
 		}
 
-		const pack = packages[0];
-
-		if (!pack) {
-			console.log("No package found");
-			return;
-		}
-
-		const res = await purchasePackage!(pack);
-
-		if (res) {
-			router.back();
-		}
+		setLoading(false);
 	};
 
 	const handleInviteFriends = () => {
@@ -76,10 +86,13 @@ export default function SubscribeModal() {
 		<View className="flex flex-1 items-center justify-between bg-background p-4 gap-y-4 pt-20 pb-10">
 			<View />
 
-			<View className="w-full ">
-				<H1 className="text-center">Unlock your health</H1>
-				<H3 className="text-center">Oasis Pro</H3>
-				<View className="w-full gap-y-2 mt-14">
+			<View className="w-full items-center flex flex-col">
+				<H1 className="text-center">Unlock what's actually healthy for you</H1>
+				<H3 className="text-center my-4">Oasis Pro</H3>
+				<Muted>Free access for 3 days, then</Muted>
+				<Muted className="mb-4">$47 per year, ($4 /month)</Muted>
+
+				<View className="w-full gap-y-2 bg-secondary py-6 max-w-sm rounded-lg">
 					{FEATURES.map((feature, index) => (
 						<P key={index} className="text-center">
 							{feature.label}
@@ -91,7 +104,8 @@ export default function SubscribeModal() {
 					<Button
 						className="w-full"
 						variant="default"
-						label="Subscribe $7.99 / month"
+						label="Start your 3 day free trial"
+						loading={loading}
 						onPress={handleSubscribe}
 					/>
 
@@ -109,6 +123,7 @@ export default function SubscribeModal() {
 			<View className="">
 				<Button
 					label="Terms of Use"
+					size="sm"
 					variant="ghost"
 					onPress={() => {
 						Linking.openURL("https://www.live-oasis.com/terms");
@@ -117,6 +132,7 @@ export default function SubscribeModal() {
 
 				<Button
 					label="Privacy Policy"
+					size="sm"
 					variant="ghost"
 					onPress={() => {
 						Linking.openURL("https://www.live-oasis.com/privacy-policy");

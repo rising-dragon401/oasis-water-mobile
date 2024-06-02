@@ -79,7 +79,7 @@ export default function FavoritesList({
 	}
 
 	return (
-		<View className="pb-8 px-4">
+		<View className="pb-8 px-8">
 			<View className="py-4 gap-4 mb-4 flex w-full flex-row justify-between">
 				<View className="flex flex-col gap-2 mb-8">
 					<Avatar className="h-24 w-24" alt="oasis pfp">
@@ -104,7 +104,7 @@ export default function FavoritesList({
 				<FlatList
 					data={favorites}
 					renderItem={({ item }) => (
-						<View key={item.id} style={{ width: "48%" }} className="mb-14">
+						<View key={item.id} style={{ width: "48%" }} className="mb-8">
 							<ItemPreviewCard item={item} size="md" showFavorite />
 						</View>
 					)}

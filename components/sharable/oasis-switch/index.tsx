@@ -60,7 +60,7 @@ export function OasisSwitch({ userData, uid, subscription }: Props) {
 
 	return (
 		<View className="flex flex-col items-center gap-2">
-			<Label nativeID="oasis-public">Oasis public</Label>
+			<Label nativeID="oasis-public">Oasis page public</Label>
 			<TouchableOpacity
 				onPress={!subscription ? handleUpgradeClick : undefined}
 			>
