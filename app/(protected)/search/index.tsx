@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { ScrollView, View } from "react-native";
+import { View } from "react-native";
 
 import Search from "@/components/sharable/search";
 import { H1, Muted } from "@/components/ui/typography";
 
-import ItemRow from "@/components/sharable/item-row";
+import RankingList from "@/components/sharable/ranking-list";
 import { getFeaturedUsers } from "actions/admin";
 import { getRandomFilters } from "actions/filters";
 import { getRandomItems } from "actions/items";
@@ -51,15 +51,17 @@ export default function TabOneScreen() {
 		<View className="flex flex-col h-full items-center justify-center p-4 mt-24">
 			<H1 className="text-center max-w-xs">Find your healthiest water</H1>
 
-			<Muted className="text-center mb-8 max-w-md mt-2">
+			<Muted className="text-center mb-4 max-w-md mt-2">
 				90% of water has microplastics, toxins and contaminants.
 			</Muted>
 
-			<View className="mb-10 w-[90%] z-40">
+			<View className="mb-4 w-[90%] z-40">
 				<Search />
 			</View>
 
-			<ScrollView
+			<RankingList />
+
+			{/* <ScrollView
 				contentContainerStyle={{
 					paddingBottom: 120,
 					paddingVertical: 0,
@@ -84,7 +86,7 @@ export default function TabOneScreen() {
 				<View className="w-full mt-10">
 					<ItemRow title="People" items={people} type="user" />
 				</View>
-			</ScrollView>
+			</ScrollView> */}
 		</View>
 	);
 }

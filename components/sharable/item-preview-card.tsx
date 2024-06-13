@@ -41,9 +41,6 @@ const ItemPreviewCard = ({
 		);
 	};
 
-	const width = size === "sm" ? 96 : size === "md" ? 168 : 288;
-	const height = size === "sm" ? 96 : size === "md" ? 168 : 288;
-
 	return (
 		// @ts-ignore
 		<Link href={determineLink(item)}>

@@ -1,7 +1,30 @@
 import { supabase } from "@/config/supabase";
 
-export const getItems = async () => {
-	const { data: items, error } = await supabase.from("items").select();
+export const getItems = async ({
+	limit,
+	sortMethod,
+}: { limit?: number; sortMethod?: "name" | "score" } = {}) => {
+	let items;
+	let orderBy = sortMethod || "name";
+
+	console.log("orderBy: ", orderBy);
+
+	if (limit) {
+		const { data } = await supabase
+			.from("items")
+			.select()
+			.order(orderBy, { ascending: true })
+			.limit(limit);
+
+		items = data;
+	} else {
+		const { data } = await supabase
+			.from("items")
+			.select()
+			.order(orderBy, { ascending: true });
+
+		items = data;
+	}
 
 	if (!items) {
 		return [];
@@ -110,4 +133,52 @@ export const getRandomItems = async () => {
 	}
 
 	return data;
+};
+
+export const getFlavoredWater = async ({
+	limit,
+	sortMethod,
+}: { limit?: number; sortMethod?: "name" | "score" } = {}) => {
+	let orderBy = sortMethod || "name";
+
+	const { data: items, error } = await supabase
+		.from("items")
+		.select()
+		.eq("type", "flavored_water")
+		.order(orderBy, { ascending: true });
+
+	return items || [];
+};
+
+export const getWaterGallons = async ({
+	limit,
+	sortMethod,
+}: { limit?: number; sortMethod?: "name" | "score" } = {}) => {
+	let orderBy = sortMethod || "name";
+
+	const { data: items, error } = await supabase
+		.from("items")
+		.select()
+		.ilike("name", "%gallon%")
+		.order(orderBy, { ascending: true });
+
+	if (!items) {
+		return [];
+	}
+
+	const itemsWithCompany = await Promise.all(
+		items.map(async (item) => {
+			const { data: company, error: companyError } = await supabase
+				.from("companies")
+				.select("name")
+				.eq("id", item.company);
+
+			return {
+				...item,
+				company_name: company ? company[0].name : null,
+			};
+		}),
+	);
+
+	return itemsWithCompany;
 };

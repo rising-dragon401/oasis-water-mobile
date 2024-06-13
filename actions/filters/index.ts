@@ -1,9 +1,28 @@
 import { supabase } from "@/config/supabase";
 
-export const getFilters = async () => {
-	const { data: filters, error } = await supabase
-		.from("water_filters")
-		.select();
+export const getFilters = async ({
+	limit,
+	sortMethod,
+}: { limit?: number; sortMethod?: "name" | "score" } = {}) => {
+	let filters;
+	let orderBy = sortMethod || "name";
+
+	if (limit) {
+		const { data } = await supabase
+			.from("water_filters")
+			.select()
+			.order(orderBy)
+			.limit(limit);
+
+		filters = data;
+	} else {
+		const { data } = await supabase
+			.from("water_filters")
+			.select()
+			.order(orderBy);
+
+		filters = data;
+	}
 
 	if (!filters) {
 		return [];

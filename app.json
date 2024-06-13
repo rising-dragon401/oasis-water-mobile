@@ -3,7 +3,7 @@
     "name": "Oasis",
     "slug": "Oasis",
     "scheme": "oasisapp",
-    "version": "0.0.7",
+    "version": "0.0.8",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -19,7 +19,7 @@
       "supportsTablet": false,
       "usesAppleSignIn": true,
       "bundleIdentifier": "com.liveoasis.oasis",
-      "buildNumber": "1",
+      "buildNumber": "0",
       "associatedDomains": [
         "applinks:live-oasis.com"
       ]
@@ -28,7 +28,9 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.liveoasis.oasis",
+      "versionCode": 4
     },
     "experiments": {
       "typedRoutes": true

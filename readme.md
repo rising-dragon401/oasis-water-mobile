@@ -15,6 +15,12 @@ eas build --profile development --platform ios
 ```
 
 ```
+eas build --profile development --platform android
+```
+
+Then run this to preview the app
+
+```
 npx expo start --dev-client
 ```
 
