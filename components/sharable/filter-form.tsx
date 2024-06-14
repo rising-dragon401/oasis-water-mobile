@@ -236,7 +236,7 @@ export function FilterForm({ id }: Props) {
 										Linking.openURL(filter.affiliate_url);
 									}}
 									className="w-40"
-									label="Buy Now"
+									label="Learn more"
 								/>
 							)}
 						</View>

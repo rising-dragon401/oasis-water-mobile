@@ -57,6 +57,7 @@ export default function Search({ indices }: { indices?: string[] }) {
 				indexName: index,
 				query,
 				params: {
+					restrictSearchableAttributes: ["name"],
 					hitsPerPage: numResults || 5,
 				},
 			}));
@@ -66,6 +67,7 @@ export default function Search({ indices }: { indices?: string[] }) {
 					indexName: "items",
 					query,
 					params: {
+						restrictSearchableAttributes: ["name"],
 						hitsPerPage: numResults || 15,
 					},
 				},
@@ -73,6 +75,7 @@ export default function Search({ indices }: { indices?: string[] }) {
 					indexName: "tap_water_locations",
 					query,
 					params: {
+						restrictSearchableAttributes: ["name"],
 						hitsPerPage: numResults || 5,
 					},
 				},
@@ -80,6 +83,7 @@ export default function Search({ indices }: { indices?: string[] }) {
 					indexName: "water_filters",
 					query,
 					params: {
+						restrictSearchableAttributes: ["name"],
 						hitsPerPage: numResults || 3,
 					},
 				},
@@ -87,6 +91,7 @@ export default function Search({ indices }: { indices?: string[] }) {
 					indexName: "users",
 					query,
 					params: {
+						restrictSearchableAttributes: ["name"],
 						hitsPerPage: numResults || 3,
 					},
 				},
@@ -95,9 +100,7 @@ export default function Search({ indices }: { indices?: string[] }) {
 
 		try {
 			const response = await searchClient.multipleQueries(queries);
-			console.log("algolia results: ", response.results);
 			const hits = response.results.map((result: any) => result.hits);
-			console.log("algolia hits: ", hits);
 			setResults(hits.flat());
 		} catch (error) {
 			console.error("Failed to fetch from Algolia", error);

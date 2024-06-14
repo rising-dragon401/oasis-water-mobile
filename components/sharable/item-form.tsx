@@ -149,7 +149,7 @@ export function ItemForm({ id }: Props) {
 													onPress={() => {
 														Linking.openURL(item.affiliate_url);
 													}}
-													label="Buy Now"
+													label="Learn more"
 													icon={
 														<Octicons
 															name="arrow-right"

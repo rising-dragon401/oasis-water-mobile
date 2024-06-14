@@ -53,7 +53,7 @@ export async function getSubscription(uid: string | null) {
 		const { data: subscription } = await supabase
 			.from("subscriptions")
 			.select("*, prices(*, products(*))")
-			// .in("status", ["trialing", "active"])
+			.in("status", ["trialing", "active"])
 			.eq("user_id", uid)
 			.single();
 

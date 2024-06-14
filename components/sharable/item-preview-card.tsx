@@ -1,13 +1,15 @@
 import { Octicons } from "@expo/vector-icons";
+import { useUserProvider } from "context/user-provider";
+import { Image } from "expo-image";
 import { Link } from "expo-router";
 import React from "react";
-import { Image, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
 import { H4, Muted, P } from "@/components/ui/typography";
 import { determineLink } from "@/lib/utils";
 import FavoriteButton from "./favorite-button";
 
-import { useUserProvider } from "context/user-provider";
+const blurhash = "LTR{+2of~oj[%LfQM|fP%2fQM|j[";
 
 type Props = {
 	item: any;
@@ -45,7 +47,7 @@ const ItemPreviewCard = ({
 		// @ts-ignore
 		<Link href={determineLink(item)}>
 			<View className="flex flex-col items-center gap-2">
-				<View className="relative h-48 w-48 py-1">
+				<View className="relative h-48 w-48">
 					<Image
 						source={{ uri: item.image || undefined }}
 						style={{
@@ -53,6 +55,7 @@ const ItemPreviewCard = ({
 							height: "100%",
 							borderRadius: 10,
 						}}
+						placeholder={{ blurhash }}
 						resizeMode="cover"
 					/>
 
@@ -65,7 +68,7 @@ const ItemPreviewCard = ({
 					)}
 				</View>
 				<View className="flex-row w-48 justify-between items-start">
-					<P className="flex flex-wrap w-2/3 !h-14">{item.name}</P>
+					<P className="flex flex-wrap w-2/3 !max-h-14">{item.name}</P>
 
 					{item.score && <View className="w-1/3">{renderScore()}</View>}
 

@@ -49,9 +49,7 @@ export default function ResultsRow({ results }: Props) {
 			style={{
 				position: "absolute",
 				backgroundColor:
-					colorScheme === "dark"
-						? theme.dark.background
-						: theme.light.background,
+					colorScheme === "dark" ? theme.dark.card : theme.light.card,
 				width: "100%",
 				maxHeight: 240,
 				borderRadius: 8,

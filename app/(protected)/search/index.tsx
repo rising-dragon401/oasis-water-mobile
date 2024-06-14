@@ -48,7 +48,7 @@ export default function TabOneScreen() {
 	}
 
 	return (
-		<View className="flex flex-col h-full items-center justify-center p-4 mt-24">
+		<View className="flex flex-col h-full items-center justify-center p-4 mt-36">
 			<H1 className="text-center max-w-xs">Find your healthiest water</H1>
 
 			<Muted className="text-center mb-4 max-w-md mt-2">
