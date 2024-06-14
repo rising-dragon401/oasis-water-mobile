@@ -167,7 +167,7 @@ export function ItemForm({ id }: Props) {
 						</View>
 
 						<View className="flex w-1/3 flex-col-reverse justify-end items-end">
-							<Score score={item.is_indexed ? item.score : 0} size="md" />
+							<Score score={item.score} size="md" />
 						</View>
 					</View>
 				</View>
@@ -179,7 +179,7 @@ export function ItemForm({ id }: Props) {
 							fontWeight="normal"
 							className="text-primary"
 						>
-							⚠️ NO REPORTS LOCATED – PROCEED WITH CAUTION.
+							⚠️ No lab reports
 						</Typography>
 						<View className="flex flex-col gap-6 mt-6">
 							<Typography
@@ -187,78 +187,59 @@ export function ItemForm({ id }: Props) {
 								fontWeight="normal"
 								className="text-primary"
 							>
-								This item has not been tested or rated yet. This usally means
-								the company has not publicized or refuses to share their lab
-								reports so we cannot recommend or provide a score for this item.
+								This item doesn't have complete lab reports. Proceed with
+								caution as there may be unexpected contaminants inside. Score is
+								subject to change
 							</Typography>
 						</View>
 					</View>
 				)}
 
-				{item.is_indexed !== false && (
+				<>
+					{sortedContaminants && sortedContaminants.length > 0 && (
+						<View className="flex flex-col gap-6 mt-6">
+							<Typography size="2xl" fontWeight="normal">
+								Contaminants ☠️
+							</Typography>
+							<View className="grid md:grid-cols-2 grid-cols-1 gap-6">
+								{sortedContaminants.map((contaminant: any, index: number) => (
+									<ContaminantCard
+										key={contaminant.id || index}
+										data={contaminant}
+									/>
+								))}
+							</View>
+						</View>
+					)}
+
+					<View className="grid md:grid-cols-2 md:grid-rows-1 grid-rows-2 gap-4 mt-6 w-full">
+						<MetaDataCard title="Source" description={item.metadata?.source} />
+						<MetaDataCard
+							title="Treatment Process"
+							description={
+								Array.isArray(item.filtration_methods) &&
+								item.filtration_methods.length > 0
+									? item.filtration_methods.join(", ") +
+										". " +
+										item.metadata?.treatment_process
+									: item.metadata?.treatment_process
+							}
+						/>
+					</View>
+
 					<>
-						{sortedContaminants && sortedContaminants.length > 0 && (
-							<View className="flex flex-col gap-6 mt-6">
+						{item?.ingredients?.length > 0 && (
+							<View className="flex flex-col gap-6 my-10">
 								<Typography size="2xl" fontWeight="normal">
-									Contaminants ☠️
+									Other Ingredients
 								</Typography>
-								<View className="grid md:grid-cols-2 grid-cols-1 gap-6">
-									{sortedContaminants.map((contaminant: any, index: number) => (
-										<ContaminantCard
-											key={contaminant.id || index}
-											data={contaminant}
-										/>
-									))}
-								</View>
+								<IngredientsCard ingredients={item.ingredients} />
 							</View>
 						)}
-
-						<View className="grid md:grid-cols-2 md:grid-rows-1 grid-rows-2 gap-4 mt-6 w-full">
-							<MetaDataCard
-								title="Source"
-								description={item.metadata?.source}
-							/>
-							<MetaDataCard
-								title="Treatment Process"
-								description={
-									Array.isArray(item.filtration_methods) &&
-									item.filtration_methods.length > 0
-										? item.filtration_methods.join(", ") +
-											". " +
-											item.metadata?.treatment_process
-										: item.metadata?.treatment_process
-								}
-							/>
-						</View>
-
-						<>
-							{item?.ingredients?.length > 0 && (
-								<View className="flex flex-col gap-6 my-10">
-									<Typography size="2xl" fontWeight="normal">
-										Other Ingredients
-									</Typography>
-									<IngredientsCard ingredients={item.ingredients} />
-								</View>
-							)}
-						</>
-
-						{/* <PaywallContent
-							className="mt-6"
-							title="Full data & reports"
-							label="See the full picture"
-							items={[
-								"Rating and scores 🌟",
-								"Research reports and data 🔬",
-								"Latest lab results 💧",
-								"Request new products 🌿",
-							]}
-						> */}
-						{item && item?.sources?.length > 0 && (
-							<Sources data={item.sources} />
-						)}
-						{/* </PaywallContent> */}
 					</>
-				)}
+
+					{item && item?.sources?.length > 0 && <Sources data={item.sources} />}
+				</>
 			</View>
 		</ScrollView>
 	);

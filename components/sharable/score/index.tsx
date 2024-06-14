@@ -1,7 +1,5 @@
-"use client";
-
-import { H4, Muted, P } from "@/components/ui/typography";
-import { Octicons } from "@expo/vector-icons";
+import { Muted, P } from "@/components/ui/typography";
+import { Feather, Octicons } from "@expo/vector-icons";
 import { useUserProvider } from "context/user-provider";
 import { useRouter } from "expo-router";
 import { TouchableOpacity, View } from "react-native";
@@ -43,9 +41,6 @@ export default function Score({ score, size, showScore = false }: Props) {
 					: size === "sm"
 						? 12
 						: 10;
-	// const color =
-	//   score >= 70 ? 'stroke-green-500' : score >= 40 ? 'stroke-yellow-500' : 'stroke-red-500'
-
 	const grade = () => {
 		if (score >= 90) {
 			return "Excellent";
@@ -65,7 +60,7 @@ export default function Score({ score, size, showScore = false }: Props) {
 	};
 
 	// Unindexed items have a score of 0
-	if (!subscription && score !== 0 && !showScore) {
+	if (!subscription && !showScore) {
 		return (
 			<TouchableOpacity
 				onPress={handleOpenSubscribeModal}
@@ -129,10 +124,14 @@ export default function Score({ score, size, showScore = false }: Props) {
 				/>
 			</Svg>
 			<View className="absolute flex flex-col justify-center items-center">
-				<View className="flex-1 flex-row items-center gap-2">
-					<H4>{score}</H4>
-					<P>/ 100</P>
-				</View>
+				{score ? (
+					<P>{score} / 100</P>
+				) : (
+					<View className="flex flex-row gap-1">
+						<Feather name="alert-triangle" size={24} color="red" />
+						<P>/ 100</P>
+					</View>
+				)}
 
 				<Typography
 					size="base"
