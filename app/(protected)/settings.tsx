@@ -20,8 +20,6 @@ export default function TabTwoScreen() {
 	const { colorScheme } = useColorScheme();
 	const router = useRouter();
 
-	const activeSubscription = subscription?.status === "active";
-
 	const handleManageSubscription = () => {
 		Linking.openURL(subscription.metadata?.managementURL || "");
 	};
@@ -66,14 +64,14 @@ export default function TabTwoScreen() {
 								Signed in as {user?.email}
 							</Typography>
 
-							{activeSubscription ? (
+							{subscription ? (
 								<>
 									<Typography
 										size="base"
 										fontWeight="normal"
 										className="text-center"
 									>
-										Subscription: {subscription?.plan || "Free"}{" "}
+										Subscription: Pro
 										{subscription?.plan === "Pro" && "💫"}
 									</Typography>
 
@@ -90,26 +88,22 @@ export default function TabTwoScreen() {
 										</Typography>
 									)}
 
-									{activeSubscription && (
-										<>
-											{provider === "revenue_cat" ? (
-												<View className="flex flex-col gap-4 text-center mt-2">
-													<Button
-														variant="outline"
-														label="Manage subscription"
-														onPress={handleManageSubscription}
-													/>
-												</View>
-											) : (
-												<Typography
-													size="base"
-													fontWeight="normal"
-													className="text-center"
-												>
-													Manage your subscription online
-												</Typography>
-											)}
-										</>
+									{provider === "revenue_cat" ? (
+										<View className="flex flex-col gap-4 text-center mt-2">
+											<Button
+												variant="outline"
+												label="Manage subscription"
+												onPress={handleManageSubscription}
+											/>
+										</View>
+									) : (
+										<Typography
+											size="base"
+											fontWeight="normal"
+											className="text-center"
+										>
+											Manage your subscription online
+										</Typography>
 									)}
 								</>
 							) : (
@@ -182,7 +176,7 @@ export default function TabTwoScreen() {
 						<Muted>Not logged in</Muted>
 
 						<Link className="w-full mt-8 text-center" href="/(public)/sign-in">
-							<P> Sign in</P>
+							<P>Sign in</P>
 						</Link>
 					</View>
 				)}

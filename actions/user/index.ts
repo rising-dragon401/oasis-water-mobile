@@ -45,32 +45,34 @@ export async function getCurrentUserData(uid?: string) {
 }
 
 export async function getSubscription(uid: string | null) {
+	console.log("getSubscription", uid);
 	if (!uid) {
 		return null;
 	}
 
 	try {
+		// fetch all subscriptions
 		const { data: subscription } = await supabase
 			.from("subscriptions")
 			.select("*, prices(*, products(*))")
 			.in("status", ["trialing", "active"])
-			.eq("user_id", uid)
-			.single();
+			.eq("user_id", uid);
 
 		if (!subscription) {
 			return null;
 		}
 
-		const activePlan = subscription?.prices?.products?.name;
+		console.log("subscription[0]: ", JSON.stringify(subscription[0], null, 2));
 
-		// console.log(
-		// 	"subscription?.prices?.products?.name",
-		// 	subscription?.prices?.products?.name,
-		// );
+		// use most recent subscription
+		const activePlan = subscription[0]?.prices?.products?.name;
+
+		console.log("activePlan", activePlan);
 
 		let planPlan = "Free";
 		if (!activePlan) {
 			planPlan = "Free";
+			return false;
 		} else if (
 			activePlan?.toLowerCase() === "pro (test)" ||
 			activePlan?.toLowerCase() === "pro (beta)" ||
@@ -89,6 +91,7 @@ export async function getSubscription(uid: string | null) {
 		// 	JSON.stringify(subscriptionDetails, null, 2),
 		// );
 
+		// only return subscription details if user is subscribed
 		return subscriptionDetails;
 	} catch (error) {
 		console.error("Error:", error);
@@ -181,10 +184,13 @@ export async function manageSubscriptionStatusChange(
 	uid: string,
 	rcVustomerInfo: any,
 ) {
-	console.log(
-		"manageSubscriptionStatusChange: ",
-		JSON.stringify(rcVustomerInfo, null, 2),
-	);
+	// console.log(
+	// 	"manageSubscriptionStatusChange: ",
+	// 	JSON.stringify(rcVustomerInfo, null, 2),
+	// );
+
+	// TODO - remove before launch
+	return;
 
 	try {
 		// check for any active subscriptions

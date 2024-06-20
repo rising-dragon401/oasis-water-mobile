@@ -2,7 +2,7 @@ import { Label } from "components/ui/label";
 import { Switch } from "components/ui/switch";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { TouchableOpacity, View } from "react-native";
+import { View } from "react-native";
 
 import { addUserToAlgolia, deleteUserFromAlgolia } from "@/actions/algolia";
 import { updateUserData } from "@/actions/user";
@@ -44,11 +44,6 @@ export function OasisSwitch({ userData, uid, subscription }: Props) {
 		}
 	};
 
-	const handleUpgradeClick = (e: any) => {
-		e.stopPropagation();
-		router.push("/subscribeModal");
-	};
-
 	const switchElement = (
 		<Switch
 			checked={checked}
@@ -59,13 +54,9 @@ export function OasisSwitch({ userData, uid, subscription }: Props) {
 	);
 
 	return (
-		<View className="flex flex-col items-center gap-2">
-			<Label nativeID="oasis-public">Oasis page public</Label>
-			<TouchableOpacity
-				onPress={!subscription ? handleUpgradeClick : undefined}
-			>
-				{switchElement}
-			</TouchableOpacity>
+		<View className="flex flex-col items-left gap-2">
+			<Label nativeID="oasis-public">Public profile</Label>
+			{switchElement}
 		</View>
 	);
 }
