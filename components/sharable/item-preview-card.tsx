@@ -6,6 +6,7 @@ import React from "react";
 import { Text, View } from "react-native";
 
 import { H4, Muted, P } from "@/components/ui/typography";
+import { useColorScheme } from "@/lib/useColorScheme";
 import { determineLink } from "@/lib/utils";
 import FavoriteButton from "./favorite-button";
 
@@ -25,6 +26,7 @@ const ItemPreviewCard = ({
 	showFavorite = false,
 }: Props) => {
 	const { subscription } = useUserProvider();
+	const { borderColor } = useColorScheme();
 
 	const renderScore = () => {
 		const score = item?.score || 0;
@@ -46,7 +48,10 @@ const ItemPreviewCard = ({
 	return (
 		// @ts-ignore
 		<Link href={determineLink(item)}>
-			<View className="flex flex-col items-center gap-2 border border-gray-200 dark:border-gray-800 rounded-md">
+			<View
+				className="flex flex-col items-center gap-2 border rounded-md"
+				style={{ borderColor }}
+			>
 				<View className="relative h-48 w-48">
 					<Image
 						source={{ uri: item.image || undefined }}

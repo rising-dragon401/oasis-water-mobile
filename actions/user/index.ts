@@ -184,13 +184,13 @@ export async function manageSubscriptionStatusChange(
 	uid: string,
 	rcVustomerInfo: any,
 ) {
-	// console.log(
-	// 	"manageSubscriptionStatusChange: ",
-	// 	JSON.stringify(rcVustomerInfo, null, 2),
-	// );
+	console.log(
+		"manageSubscriptionStatusChange: ",
+		JSON.stringify(rcVustomerInfo, null, 2),
+	);
 
 	// TODO - remove before launch
-	return;
+	// return;
 
 	try {
 		// check for any active subscriptions

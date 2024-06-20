@@ -308,23 +308,22 @@ export default function RankingList({ title, items }: Props) {
 					</View>
 				</View>
 
-				<TabsContent value={tabValue} className="w-full px-4 mt-2">
-					<View style={{ minHeight: 600 }}>
+				<TabsContent value={tabValue} className="w-full px-4">
+					<View style={{ minHeight: 600 }} className="mt-2">
 						<FlatList
 							data={filteredItems}
 							renderItem={({ item }) => (
-								<View key={item.id} style={{ width: "48%" }} className="mb-8">
+								<View key={item.id} style={{ width: "48%" }} className="mb-4">
 									<ItemPreviewCard item={item} size="md" />
 								</View>
 							)}
 							keyExtractor={(item) => item.id}
 							numColumns={2}
 							showsVerticalScrollIndicator={false}
-							style={{ minHeight: 300, maxHeight: 600 }}
+							style={{ minHeight: 300, maxHeight: 600, paddingTop: 10 }}
 							columnWrapperStyle={{ justifyContent: "space-between" }}
 							onEndReached={() => setPage((prevPage) => prevPage + 1)}
 							onEndReachedThreshold={0.1}
-							// ListFooterComponent={() => loading[tabValue] && <Loader />}
 						/>
 
 						{loading[tabValue] && <Loader />}

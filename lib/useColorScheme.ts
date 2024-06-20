@@ -8,11 +8,15 @@ export function useColorScheme() {
 	const iconColor =
 		colorScheme === "dark" ? theme.dark.primary : theme.light.primary;
 
+	const borderColor =
+		colorScheme === "dark" ? theme.dark.border : theme.light.border;
+
 	return {
 		colorScheme: colorScheme ?? "dark",
 		isDarkColorScheme: colorScheme === "dark",
 		setColorScheme,
 		toggleColorScheme,
 		iconColor,
+		borderColor,
 	};
 }
