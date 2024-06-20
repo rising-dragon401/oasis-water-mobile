@@ -28,7 +28,7 @@ interface UserContextType {
 	subscription: any | null | undefined;
 	refreshUserData: () => void;
 	fetchUserFavorites: (uid: string | null) => Promise<void>;
-	fetchSubscription: (uid: string | null) => Promise<void>;
+	fetchSubscription: (uid: string | null) => Promise<any | null>;
 	logout: () => void;
 }
 

@@ -182,3 +182,18 @@ export const getWaterGallons = async ({
 
 	return itemsWithCompany;
 };
+
+export const getMineralPackets = async ({
+	limit,
+	sortMethod,
+}: { limit?: number; sortMethod?: "name" | "score" } = {}) => {
+	let orderBy = sortMethod || "name";
+
+	const { data: items, error } = await supabase
+		.from("items")
+		.select()
+		.eq("type", "mineral_packets")
+		.order(orderBy, { ascending: true });
+
+	return items || [];
+};

@@ -114,33 +114,40 @@ export function ItemForm({ id }: Props) {
 											labelClassName="text-red-500"
 										/>
 
-										<BlurredLineItem
-											label="Toxins above guidelines"
-											value={contaminantsAboveLimit.length}
-											labelClassName="text-red-500"
-										/>
+										{item.type === "bottled_water" && (
+											<>
+												<BlurredLineItem
+													label="Toxins above guidelines"
+													value={contaminantsAboveLimit.length}
+													labelClassName="text-red-500"
+												/>
 
-										<BlurredLineItem
-											label="Microplastics"
-											value={nanoPlasticsValue}
-										/>
+												<BlurredLineItem
+													label="Microplastics"
+													value={nanoPlasticsValue}
+												/>
 
-										<BlurredLineItem label="Fluoride" value={fluorideValue} />
+												<BlurredLineItem
+													label="Fluoride"
+													value={fluorideValue}
+												/>
 
-										<BlurredLineItem
-											label="pH"
-											value={item.metadata?.ph_level}
-										/>
+												<BlurredLineItem
+													label="pH"
+													value={item.metadata?.ph_level}
+												/>
 
-										<BlurredLineItem
-											label="TDS"
-											value={item.metadata?.tds ?? "Unknown"}
-										/>
+												<BlurredLineItem
+													label="TDS"
+													value={item.metadata?.tds ?? "Unknown"}
+												/>
 
-										<BlurredLineItem
-											label="PFAS"
-											value={item.metadata?.pfas || "Unknown"}
-										/>
+												<BlurredLineItem
+													label="PFAS"
+													value={item.metadata?.pfas || "Unknown"}
+												/>
+											</>
+										)}
 
 										<View className="flex flex-col md:w-40 w-full md:mt-6 mt-2 gap-2">
 											{item.affiliate_url && (
@@ -187,9 +194,8 @@ export function ItemForm({ id }: Props) {
 								fontWeight="normal"
 								className="text-primary"
 							>
-								This item doesn't have complete lab reports. Proceed with
-								caution as there may be unexpected contaminants inside. Score is
-								subject to change
+								This item has not been tested. Proceed with caution as there may
+								be unexpected contaminants inside. Score is subject to change
 							</Typography>
 						</View>
 					</View>
@@ -212,20 +218,25 @@ export function ItemForm({ id }: Props) {
 						</View>
 					)}
 
-					<View className="grid md:grid-cols-2 md:grid-rows-1 grid-rows-2 gap-4 mt-6 w-full">
-						<MetaDataCard title="Source" description={item.metadata?.source} />
-						<MetaDataCard
-							title="Treatment Process"
-							description={
-								Array.isArray(item.filtration_methods) &&
-								item.filtration_methods.length > 0
-									? item.filtration_methods.join(", ") +
-										". " +
-										item.metadata?.treatment_process
-									: item.metadata?.treatment_process
-							}
-						/>
-					</View>
+					{item.type === "bottled_water" && (
+						<View className="grid md:grid-cols-2 md:grid-rows-1 grid-rows-2 gap-4 mt-6 w-full">
+							<MetaDataCard
+								title="Source"
+								description={item.metadata?.source}
+							/>
+							<MetaDataCard
+								title="Treatment Process"
+								description={
+									Array.isArray(item.filtration_methods) &&
+									item.filtration_methods.length > 0
+										? item.filtration_methods.join(", ") +
+											". " +
+											item.metadata?.treatment_process
+										: item.metadata?.treatment_process
+								}
+							/>
+						</View>
+					)}
 
 					<>
 						{item?.ingredients?.length > 0 && (

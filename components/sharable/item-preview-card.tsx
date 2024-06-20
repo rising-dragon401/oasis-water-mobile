@@ -46,14 +46,15 @@ const ItemPreviewCard = ({
 	return (
 		// @ts-ignore
 		<Link href={determineLink(item)}>
-			<View className="flex flex-col items-center gap-2">
+			<View className="flex flex-col items-center gap-2 border border-gray-200 rounded-md">
 				<View className="relative h-48 w-48">
 					<Image
 						source={{ uri: item.image || undefined }}
 						style={{
 							width: "100%",
 							height: "100%",
-							borderRadius: 10,
+							borderTopLeftRadius: 10,
+							borderTopRightRadius: 10,
 						}}
 						placeholder={{ blurhash }}
 						resizeMode="cover"
@@ -67,7 +68,7 @@ const ItemPreviewCard = ({
 						</View>
 					)}
 				</View>
-				<View className="flex-row w-48 justify-between items-start">
+				<View className="flex-row w-48 justify-between items-start px-1 pb-1">
 					<P className="flex flex-wrap w-2/3 !max-h-14">{item.name}</P>
 
 					{item.score && <View className="w-1/3">{renderScore()}</View>}

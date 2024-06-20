@@ -1,15 +1,15 @@
+import { FontAwesome } from "@expo/vector-icons";
 import Feather from "@expo/vector-icons/Feather";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { FlatList, ScrollView, View } from "react-native";
+import { FlatList, ScrollView, TouchableOpacity, View } from "react-native";
 
 import ItemPreviewCard from "./item-preview-card";
 
 import { getFilters } from "@/actions/filters";
-import { getFlavoredWater, getItems, getWaterGallons } from "@/actions/items";
+import { getItems, getMineralPackets } from "@/actions/items";
 import { getLocations } from "@/actions/locations";
 import {
 	DropdownMenu,
@@ -19,22 +19,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useUserProvider } from "@/context/user-provider";
-import { Button } from "../ui/button";
 import { Muted, P } from "../ui/typography";
 import Loader from "./loader";
 
-type TabKeys =
-	| "bottled_water"
-	| "tap_water"
-	| "filter"
-	| "flavored_water"
-	| "water_gallons";
+type TabKeys = "bottled_water" | "tap_water" | "filter" | "mineral_packets";
 
 type CategoryType = {
 	id: TabKeys;
 	title: string;
 	href?: string;
 	logo: React.ReactElement;
+	tags?: string[];
 };
 
 const CATEGORIES: CategoryType[] = [
@@ -49,6 +44,7 @@ const CATEGORIES: CategoryType[] = [
 				color="black"
 			/>
 		),
+		tags: ["still", "sparkling", "flavored", "gallon"],
 	},
 	{
 		id: "filter",
@@ -56,31 +52,19 @@ const CATEGORIES: CategoryType[] = [
 		logo: (
 			<MaterialCommunityIcons name="filter-outline" size={18} color="black" />
 		),
-	},
-	{
-		id: "flavored_water",
-		title: "Flavored water",
-		logo: (
-			<MaterialCommunityIcons
-				name="bottle-soda-outline"
-				size={14}
-				color="black"
-			/>
-		),
-	},
-	{
-		id: "water_gallons",
-		title: "5 Gallons",
-		logo: <Feather name="droplet" size={18} color="black" />,
+		tags: ["tap", "shower", "bath"],
 	},
 	{
 		id: "tap_water",
 		title: "Tap water",
-		logo: <MaterialIcons name="waves" size={18} color="black" />,
+		logo: <Feather name="droplet" size={18} color="black" />,
+	},
+	{
+		id: "mineral_packets",
+		title: "Mineral packets",
+		logo: <FontAwesome name="diamond" size={24} color="black" />,
 	},
 ];
-
-type SortMethod = "name" | "score";
 
 type Props = {
 	title?: string;
@@ -93,174 +77,113 @@ export default function RankingList({ title, items }: Props) {
 
 	const [loading, setLoading] = useState({
 		bottled_water: true,
-		tap_water: true,
 		filter: true,
-		flavored_water: true,
-		water_gallons: true,
+		tap_water: true,
+		mineral_packets: true,
 	});
-	const [filterMenuOpen, setFilterMenuOpen] = useState(false);
 	const [tabValue, setTabValue] = useState<TabKeys>("bottled_water");
-	const [sortMethod, setSortMethod] = useState("name");
 	const [allItems, setAllItems] = useState<any[]>([]);
 	const [filteredItems, setFilteredItems] = useState<any[]>([]);
 	const [bottledWater, setBottledWater] = useState<any[]>([]);
-	const [waterGallons, setWaterGallons] = useState<any[]>([]);
+	const [mineralPackets, setMineralPackets] = useState<any[]>([]);
 	const [tapWater, setTapWater] = useState<any[]>([]);
 	const [filters, setFilters] = useState<any[]>([]);
-	const [flavoredWater, setFlavoredWater] = useState<any[]>([]);
+	const [sortMethod, setSortMethod] = useState("name");
 	const [completeInit, setCompleteInit] = useState(false);
 	const [page, setPage] = useState(1);
+	const [tags, setTags] = useState<string[]>([]);
+	const [selectedTags, setSelectedTags] = useState<string[]>([]);
+	const [filterMenuOpen, setFilterMenuOpen] = useState(false);
+	const [tagsMenuOpen, setTagsMenuOpen] = useState(false);
 
-	// load initial 20 items on page load
+	const fetchData = async (
+		fetchFunction: () => Promise<any>,
+		setData: (data: any) => void,
+		setLoading: (loading: boolean) => void,
+	) => {
+		try {
+			const data = await fetchFunction();
+			setData(data);
+		} finally {
+			setLoading(false);
+		}
+	};
+
 	useEffect(() => {
-		const fetch = async () => {
-			let sort: SortMethod = "name";
-
-			const items = await getItems({ limit: 18, sortMethod: sort });
+		const initialFetch = async () => {
+			const items = await getItems({ limit: 999, sortMethod: "name" });
 			setBottledWater(items);
-			setFilteredItems(items);
-			setLoading((prev) => ({ ...prev, bottled_water: false }));
+			setAllItems(items);
 
-			const fetchLocations = async () => {
-				const locations = await getLocations({ limit: 18, sortMethod: sort });
-				if (locations) {
-					setTapWater(locations);
-					setLoading((prev) => ({ ...prev, tap_water: false }));
-				}
-			};
+			await fetchData(
+				() => getLocations({ limit: 999, sortMethod: "name" }),
+				setTapWater,
+				(loading) => setLoading((prev) => ({ ...prev, tap_water: loading })),
+			);
 
-			const fetchFilters = async () => {
-				const filters = await getFilters({ limit: 18, sortMethod: sort });
-				if (filters) {
-					setFilters(filters);
-					setLoading((prev) => ({ ...prev, filter: false }));
-				}
-			};
+			await fetchData(
+				() => getFilters({ limit: 999, sortMethod: "name" }),
+				setFilters,
+				(loading) => setLoading((prev) => ({ ...prev, filter: loading })),
+			);
 
-			const fetchFlavoredWater = async () => {
-				const flavoredWater = await getFlavoredWater({
-					limit: 18,
-					sortMethod: sort,
-				});
-				if (flavoredWater) {
-					setFlavoredWater(flavoredWater);
-					setLoading((prev) => ({ ...prev, flavored_water: false }));
-				}
-			};
-
-			const fetchWaterGallons = async () => {
-				const waterGallons = await getWaterGallons({
-					limit: 18,
-					sortMethod: sort,
-				});
-				if (waterGallons) {
-					setWaterGallons(waterGallons);
-					setLoading((prev) => ({ ...prev, water_gallons: false }));
-				}
-			};
-
-			fetchLocations();
-			fetchFilters();
-			fetchFlavoredWater();
-			fetchWaterGallons();
+			await fetchData(
+				() => getMineralPackets({ limit: 999, sortMethod: "name" }),
+				setMineralPackets,
+				(loading) =>
+					setLoading((prev) => ({ ...prev, mineral_packets: loading })),
+			);
 
 			setCompleteInit(true);
 		};
 
-		fetch();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		initialFetch();
 	}, []);
 
-	// load all items
 	useEffect(() => {
-		if (completeInit) {
-			let sort: SortMethod = "name";
-			if (subscription && uid) {
-				sort = "score";
-			}
-
-			getItems({ sortMethod: sort }).then((items) => {
-				setBottledWater(items);
-				if (tabValue === "bottled_water") {
-					setAllItems(items);
-				}
-			});
-
-			getLocations({ sortMethod: sort }).then((locations: any) => {
-				setTapWater(locations);
-				if (tabValue === "tap_water") {
-					setAllItems(locations);
-				}
-			});
-
-			getFilters({ sortMethod: sort }).then((filters) => {
-				setFilters(filters);
-				if (tabValue === "filter") {
-					setAllItems(filters);
-				}
-			});
-
-			getFlavoredWater({ sortMethod: sort }).then((flavoredWater) => {
-				setFlavoredWater(flavoredWater);
-				if (tabValue === "flavored_water") {
-					setAllItems(flavoredWater);
-				}
-			});
-
-			getWaterGallons({ sortMethod: sort }).then((waterGallons) => {
-				setWaterGallons(waterGallons);
-				if (tabValue === "water_gallons") {
-					setAllItems(waterGallons);
-				}
-			});
-		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [completeInit]);
-
-	// manage tab switching.
-	useEffect(() => {
-		if (tabValue) {
-			manageTab(tabValue);
-		}
+		if (tabValue) manageTab(tabValue);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [tabValue]);
 
 	useEffect(() => {
 		if (!allItems) return;
 
-		let sorted = allItems;
+		let sortedItems = [...allItems];
 		if (sortMethod === "score") {
-			sorted = sorted?.sort((a, b) => (b.score || 0) - (a.score || 0));
-		} else if (sortMethod === "name") {
-			sorted = sorted?.sort((a, b) => a.name.localeCompare(b.name));
+			sortedItems.sort((a, b) => (b.score || 0) - (a.score || 0));
+		} else {
+			sortedItems.sort((a, b) => a.name.localeCompare(b.name));
 		}
 
-		if (sorted && sorted?.length > 5) {
-			setFilteredItems(sorted);
+		if (selectedTags.length > 0) {
+			sortedItems = sortedItems.filter((item) =>
+				selectedTags.every((tag) => item.tags.includes(tag)),
+			);
 		}
-	}, [sortMethod, allItems]);
 
-	// manage sort based on subscription
+		setFilteredItems(sortedItems);
+	}, [sortMethod, allItems, selectedTags]);
+
 	useEffect(() => {
-		if (!subscription || !uid) {
-			setSortMethod("name");
-		} else if (subscription && uid) {
-			setSortMethod("score");
-		}
+		setSortMethod(subscription && uid ? "score" : "name");
 	}, [subscription, uid]);
 
 	const manageTab = (tabValue: TabKeys) => {
+		setSelectedTags([]);
+
 		if (tabValue === "bottled_water") {
 			setAllItems(bottledWater);
 		} else if (tabValue === "tap_water") {
 			setAllItems(tapWater);
 		} else if (tabValue === "filter") {
 			setAllItems(filters);
-		} else if (tabValue === "flavored_water") {
-			setAllItems(flavoredWater);
-		} else if (tabValue === "water_gallons") {
-			setAllItems(waterGallons);
+		} else if (tabValue === "mineral_packets") {
+			setAllItems(mineralPackets);
 		}
+
+		setTags(
+			CATEGORIES.find((category) => category.id === tabValue)?.tags || [],
+		);
 	};
 
 	const handleClickSortByScore = () => {
@@ -270,11 +193,6 @@ export default function RankingList({ title, items }: Props) {
 			router.push("/subscribeModal");
 		}
 	};
-
-	useEffect(() => {
-		// console.log("");
-	}, [filteredItems]);
-
 	return (
 		<View className="pb-14 w-full">
 			<Tabs
@@ -284,7 +202,7 @@ export default function RankingList({ title, items }: Props) {
 					setTabValue(value as TabKeys);
 				}}
 			>
-				<View className="py-2 flex flex-row justify-between mb-2">
+				<View className="flex flex-row justify-between">
 					<ScrollView horizontal showsHorizontalScrollIndicator={false}>
 						<TabsList className="flex flex-row gap-2 bg-transparent">
 							{CATEGORIES.map((category) => (
@@ -305,19 +223,60 @@ export default function RankingList({ title, items }: Props) {
 						</TabsList>
 					</ScrollView>
 
-					<View className="flex flex-row items-center gap-8">
+					<View className="flex flex-row items-center gap-6 w-24 px-2">
+						{tags.length > 0 ? (
+							<DropdownMenu
+								open={tagsMenuOpen}
+								onOpenChange={(value) => setTagsMenuOpen(value)}
+							>
+								<DropdownMenuTrigger asChild>
+									<TouchableOpacity>
+										<FontAwesome6 name="sliders" size={16} color="black" />
+									</TouchableOpacity>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent align="end">
+									<Muted className="p-1">Tags</Muted>
+									{tags.map((tag) => (
+										<DropdownMenuItem
+											onPress={() => {
+												setSelectedTags((prevTags) =>
+													prevTags.includes(tag)
+														? prevTags.filter((t) => t !== tag)
+														: [tag],
+												);
+											}}
+											className="hover:cursor-pointer flex justify-between"
+											key={tag}
+										>
+											<P className="flex justify-between">{tag}</P>
+											<P className="flex justify-between">
+												{selectedTags.includes(tag) && (
+													<Feather name="check" size={16} color="black" />
+												)}
+											</P>
+										</DropdownMenuItem>
+									))}
+								</DropdownMenuContent>
+							</DropdownMenu>
+						) : (
+							<View className="w-4" />
+						)}
+
 						<DropdownMenu
 							open={filterMenuOpen}
 							onOpenChange={(value) => setFilterMenuOpen(value)}
 						>
 							<DropdownMenuTrigger asChild>
-								<Button
-									className="bg-transparent"
-									icon={<FontAwesome6 name="sliders" size={16} color="black" />}
-								/>
+								<TouchableOpacity>
+									<FontAwesome6
+										name="arrow-down-short-wide"
+										size={16}
+										color="black"
+									/>
+								</TouchableOpacity>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align="end">
-								<Muted>Sort by</Muted>
+								<Muted className="p-1">Sort by</Muted>
 								<DropdownMenuItem
 									onPress={handleClickSortByScore}
 									className="hover:cursor-pointer"
@@ -335,7 +294,7 @@ export default function RankingList({ title, items }: Props) {
 									onPress={() => {
 										setSortMethod("name");
 									}}
-									className="hover:cursor-pointer flex justify-between"
+									className="hover:cursor-pointer flex justify-between w-full"
 								>
 									<P>Name</P>
 									{sortMethod === "name" && (
@@ -347,27 +306,27 @@ export default function RankingList({ title, items }: Props) {
 					</View>
 				</View>
 
-				<TabsContent value={tabValue} className="w-full px-4">
-					<FlatList
-						data={filteredItems}
-						renderItem={({ item }) => (
-							<View key={item.id} style={{ width: "48%" }} className="mb-8">
-								<ItemPreviewCard item={item} size="md" />
-							</View>
-						)}
-						keyExtractor={(item) => item.id}
-						numColumns={2}
-						showsVerticalScrollIndicator={false}
-						style={{ minHeight: 300, maxHeight: 600 }}
-						columnWrapperStyle={{ justifyContent: "space-between" }}
-						onEndReached={() => setPage((prevPage) => prevPage + 1)}
-						onEndReachedThreshold={0.1}
-						// ListFooterComponent={() => loading[tabValue] && <Loader />}
-					/>
+				<TabsContent value={tabValue} className="w-full px-4 mt-2">
+					<View style={{ minHeight: 600 }}>
+						<FlatList
+							data={filteredItems}
+							renderItem={({ item }) => (
+								<View key={item.id} style={{ width: "48%" }} className="mb-8">
+									<ItemPreviewCard item={item} size="md" />
+								</View>
+							)}
+							keyExtractor={(item) => item.id}
+							numColumns={2}
+							showsVerticalScrollIndicator={false}
+							style={{ minHeight: 300, maxHeight: 600 }}
+							columnWrapperStyle={{ justifyContent: "space-between" }}
+							onEndReached={() => setPage((prevPage) => prevPage + 1)}
+							onEndReachedThreshold={0.1}
+							// ListFooterComponent={() => loading[tabValue] && <Loader />}
+						/>
 
-					{loading[tabValue] && <Loader />}
-
-					{/* <View ref={lastItemRef} /> */}
+						{loading[tabValue] && <Loader />}
+					</View>
 				</TabsContent>
 			</Tabs>
 		</View>
