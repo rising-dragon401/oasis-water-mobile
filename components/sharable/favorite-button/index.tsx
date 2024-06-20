@@ -10,6 +10,7 @@ import {
 import { Octicons } from "@expo/vector-icons";
 
 import { useUserProvider } from "@/context/user-provider";
+import { useColorScheme } from "@/lib/useColorScheme";
 import { mutate } from "swr";
 
 type Props = {
@@ -21,6 +22,7 @@ export default function FavoriteButton({ item, size = 18 }: Props) {
 	const { userFavorites, uid, userData, fetchUserFavorites } =
 		useUserProvider();
 	const router = useRouter();
+	const { iconColor } = useColorScheme();
 
 	const [loadingFavorite, setLoadingFavorite] = useState(false);
 	const [isItemInFavorites, setIsItemInFavorites] = useState(false);
@@ -70,9 +72,9 @@ export default function FavoriteButton({ item, size = 18 }: Props) {
 	return (
 		<TouchableOpacity onPress={handleFavoriteClick}>
 			{isItemInFavorites ? (
-				<Octicons name="check-circle" size={24} color="black" />
+				<Octicons name="check-circle" size={24} color={iconColor} />
 			) : (
-				<Octicons name="plus-circle" size={24} color="black" />
+				<Octicons name="plus-circle" size={24} color={iconColor} />
 			)}
 		</TouchableOpacity>
 	);

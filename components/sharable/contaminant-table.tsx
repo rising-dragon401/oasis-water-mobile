@@ -4,6 +4,7 @@ import { View } from "react-native";
 import useSWR from "swr";
 
 import { getContaminants } from "@/actions/ingredients";
+import { useColorScheme } from "@/lib/useColorScheme";
 import {
 	Accordion,
 	AccordionContent,
@@ -24,6 +25,8 @@ export default function ContaminantTable({
 	filteredContaminants,
 	categories,
 }: Props) {
+	const { iconColor } = useColorScheme();
+
 	const { data: allContaminants } = useSWR(
 		"water-contaminants",
 		getContaminants,
@@ -132,9 +135,9 @@ export default function ContaminantTable({
 										</View>
 										<View className="w-14">
 											{contaminant.isFiltered ? (
-												<Octicons name="check" size={12} color="black" />
+												<Octicons name="check" size={12} color={iconColor} />
 											) : (
-												<Octicons name="x" size={12} color="black" />
+												<Octicons name="x" size={12} color={iconColor} />
 											)}
 										</View>
 										<ContaminantFiltersDropdown

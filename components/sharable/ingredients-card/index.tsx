@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import { View } from "react-native";
 
 import { P } from "@/components/ui/typography";
+import { useColorScheme } from "@/lib/useColorScheme";
 import Typography from "../typography";
 
 type Props = {
@@ -10,6 +11,8 @@ type Props = {
 };
 
 export default function IngredientsCard({ ingredients }: Props) {
+	const { iconColor } = useColorScheme();
+
 	const nonContaminantIngredients = useMemo(
 		() =>
 			ingredients
@@ -44,14 +47,14 @@ export default function IngredientsCard({ ingredients }: Props) {
 					<View className="px-4 py-2 flex md:flex-row flex-col justify-between">
 						<View className="flex flex-col w-full md:w-1/2 pr-2">
 							<View className="flex flex-row items-center gap-1">
-								<Feather name="thumbs-up" size={18} color="black" />
+								<Feather name="thumbs-up" size={18} color={iconColor} />
 								<P>Benefits:</P>
 							</View>
 							<P>{ingredient.benefits}</P>
 						</View>
 						<View className="flex flex-col w-full md:w-1/2 md:pl-4 md:mt-0 mt-2">
 							<View className="flex flex-row items-center gap-1">
-								<Feather name="thumbs-up" size={18} color="black" />
+								<Feather name="thumbs-up" size={18} color={iconColor} />
 								<P>Harms:</P>
 							</View>
 							<P>{ingredient.risks}</P>

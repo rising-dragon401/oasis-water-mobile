@@ -1,3 +1,4 @@
+import { useColorScheme } from "@/lib/useColorScheme";
 import { Octicons } from "@expo/vector-icons";
 import * as AccordionPrimitive from "components/primitives/accordion";
 import { TextClassContext } from "components/ui/text";
@@ -65,6 +66,8 @@ const AccordionTrigger = React.forwardRef<
 >(({ className, children, ...props }, ref) => {
 	const { isExpanded } = AccordionPrimitive.useItemContext();
 
+	const { iconColor } = useColorScheme();
+
 	const progress = useDerivedValue(() =>
 		isExpanded
 			? withTiming(1, { duration: 250 })
@@ -87,7 +90,7 @@ const AccordionTrigger = React.forwardRef<
 					>
 						<>{children}</>
 						<Animated.View style={chevronStyle}>
-							<Octicons name="chevron-down" size={1} color="black" />
+							<Octicons name="chevron-down" size={1} color={iconColor} />
 						</Animated.View>
 					</Trigger>
 				</AccordionPrimitive.Trigger>

@@ -46,15 +46,15 @@ const ItemPreviewCard = ({
 	return (
 		// @ts-ignore
 		<Link href={determineLink(item)}>
-			<View className="flex flex-col items-center gap-2 border border-gray-200 rounded-md">
+			<View className="flex flex-col items-center gap-2 border border-gray-200 dark:border-gray-800 rounded-md">
 				<View className="relative h-48 w-48">
 					<Image
 						source={{ uri: item.image || undefined }}
 						style={{
 							width: "100%",
 							height: "100%",
-							borderTopLeftRadius: 10,
-							borderTopRightRadius: 10,
+							borderTopLeftRadius: 4,
+							borderTopRightRadius: 4,
 						}}
 						placeholder={{ blurhash }}
 						resizeMode="cover"

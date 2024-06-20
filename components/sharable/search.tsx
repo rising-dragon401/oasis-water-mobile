@@ -147,13 +147,6 @@ export default function Search({ indices }: { indices?: string[] }) {
 							<Ionicons name="sparkles-outline" size={18} color={iconColor} />
 						</TouchableOpacity>
 					</View>
-
-					{/* <TouchableOpacity
-						// @ts-ignore
-						onPress={() => router.push("/chatModal")}
-					>
-						<Ionicons name="sparkles-outline" size={20} color="black" />
-					</TouchableOpacity> */}
 				</View>
 			</View>
 			{results.length > 0 && <ResultsRow results={results} />}

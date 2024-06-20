@@ -8,6 +8,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useColorScheme } from "@/lib/useColorScheme";
 import { Octicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import { useState } from "react";
@@ -18,6 +19,8 @@ type Props = {
 };
 
 export function ArticlesDropdown({ sources }: Props) {
+	const { iconColor } = useColorScheme();
+
 	const [open, setOpen] = useState(false);
 
 	return (
@@ -43,7 +46,7 @@ export function ArticlesDropdown({ sources }: Props) {
 								<Typography size="base" fontWeight="normal">
 									{source.label}
 								</Typography>
-								<Octicons name="arrow-right" size={24} color="black" />
+								<Octicons name="arrow-right" size={24} color={iconColor} />
 							</Link>
 						</DropdownMenuItem>
 					))}

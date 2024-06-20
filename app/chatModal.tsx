@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { H3, Muted } from "@/components/ui/typography";
 import { useUserProvider } from "@/context/user-provider";
 import useSessionStorage from "@/lib/hooks/session-storage";
+import { useColorScheme } from "@/lib/useColorScheme";
 
 interface Message {
 	role: "user" | "assistant";
@@ -40,6 +41,7 @@ export default function ChatModal() {
 	const { subscription, uid } = useUserProvider();
 	const router = useRouter();
 	const { userData } = useUserProvider();
+	const { iconColor } = useColorScheme();
 
 	const [query, setQuery] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
@@ -314,7 +316,7 @@ export default function ChatModal() {
 							onPress={() => handleSendMessage(query)}
 							className="absolute right-4 top-1/2 transform -translate-y-1/2"
 						>
-							<Ionicons name="send" size={24} color="black" />
+							<Ionicons name="send" size={24} color={iconColor} />
 						</TouchableOpacity>
 					</View>
 					<Muted>Oasis AI may provide inaccurate and incomplete answers.</Muted>

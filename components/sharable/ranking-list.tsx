@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useUserProvider } from "@/context/user-provider";
+import { useColorScheme } from "@/lib/useColorScheme";
 import { Muted, P } from "../ui/typography";
 import Loader from "./loader";
 
@@ -74,6 +75,7 @@ type Props = {
 export default function RankingList({ title, items }: Props) {
 	const { subscription, uid } = useUserProvider();
 	const router = useRouter();
+	const { iconColor } = useColorScheme();
 
 	const [loading, setLoading] = useState({
 		bottled_water: true,
@@ -231,7 +233,7 @@ export default function RankingList({ title, items }: Props) {
 							>
 								<DropdownMenuTrigger asChild>
 									<TouchableOpacity>
-										<FontAwesome6 name="sliders" size={16} color="black" />
+										<FontAwesome6 name="sliders" size={16} color={iconColor} />
 									</TouchableOpacity>
 								</DropdownMenuTrigger>
 								<DropdownMenuContent align="end">
@@ -251,7 +253,7 @@ export default function RankingList({ title, items }: Props) {
 											<P className="flex justify-between">{tag}</P>
 											<P className="flex justify-between">
 												{selectedTags.includes(tag) && (
-													<Feather name="check" size={16} color="black" />
+													<Feather name="check" size={16} color={iconColor} />
 												)}
 											</P>
 										</DropdownMenuItem>
@@ -271,7 +273,7 @@ export default function RankingList({ title, items }: Props) {
 									<FontAwesome6
 										name="arrow-down-short-wide"
 										size={16}
-										color="black"
+										color={iconColor}
 									/>
 								</TouchableOpacity>
 							</DropdownMenuTrigger>
@@ -282,11 +284,11 @@ export default function RankingList({ title, items }: Props) {
 									className="hover:cursor-pointer"
 								>
 									{!subscription && (
-										<Feather name="lock" size={16} color="black" />
+										<Feather name="lock" size={16} color={iconColor} />
 									)}
 									<P>Score</P>
 									{sortMethod === "score" && (
-										<Feather name="check" size={16} color="black" />
+										<Feather name="check" size={16} color={iconColor} />
 									)}
 								</DropdownMenuItem>
 
@@ -298,7 +300,7 @@ export default function RankingList({ title, items }: Props) {
 								>
 									<P>Name</P>
 									{sortMethod === "name" && (
-										<Feather name="check" size={16} color="black" />
+										<Feather name="check" size={16} color={iconColor} />
 									)}
 								</DropdownMenuItem>
 							</DropdownMenuContent>
