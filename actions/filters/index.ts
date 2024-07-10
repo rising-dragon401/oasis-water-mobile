@@ -132,6 +132,7 @@ export const getFilterDetails = async (id: string) => {
 				return data ? data[0] : null;
 			}),
 		);
+
 		contaminantData = contaminantData.filter(
 			(contaminant) => contaminant !== null,
 		); // Filter out null values

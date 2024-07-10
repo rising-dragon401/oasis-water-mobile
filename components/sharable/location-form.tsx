@@ -17,6 +17,7 @@ import {
 import BlurredLineItem from "./blurred-line-item";
 import ContaminantCard from "./contamintant-card";
 import ItemImage from "./item-image";
+import PaywallContent from "./paywall-content";
 import RecommendedFilterRow from "./recommended-filter-row";
 import Score from "./score";
 import Sources from "./sources";
@@ -134,19 +135,19 @@ export function LocationForm({ id }: Props) {
 											</View>
 										</AccordionTrigger>
 										<AccordionContent>
-											{/* <PaywallContent
+											<PaywallContent
 												className="mt-8"
-												label="View contaminants"
-											> */}
-											<View className="grid md:grid-cols-2 grid-cols-1 gap-6 w-full">
-												{utility.contaminants.map((contaminant: any) => (
-													<ContaminantCard
-														key={contaminant.id}
-														data={contaminant}
-													/>
-												))}
-											</View>
-											{/* </PaywallContent> */}
+												label="View contaminants in this tap water"
+											>
+												<View className="grid md:grid-cols-2 grid-cols-1 gap-6 w-full">
+													{utility.contaminants.map((contaminant: any) => (
+														<ContaminantCard
+															key={contaminant.id}
+															data={contaminant}
+														/>
+													))}
+												</View>
+											</PaywallContent>
 										</AccordionContent>
 									</AccordionItem>
 								))}

@@ -3,33 +3,32 @@ import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { ScrollView, View } from "react-native";
 
+import Logo from "@/components/sharable/logo";
 import { Button } from "@/components/ui/button";
-import { H1, H3, Muted, P } from "@/components/ui/typography";
+import { H2, Muted, P } from "@/components/ui/typography";
 import { useRevenueCat } from "@/context/revenue-cat-provider";
 import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 const FEATURES = [
 	{
-		label: "🔓 Unlock all ratings and data",
+		label: "🔓 Unlock all scores and ratings",
 	},
 	{
-		label: "💧 Bottled water, filters and tap water",
+		label: "🤖 Personal AI nutritionist",
 	},
 	{
-		label: "🤖 Oasis AI",
+		label: "🔬 Latest scientific research",
 	},
-	{
-		label: "🔬 Most up to date research",
-	},
-	{
-		label: "📥 Request new tests",
-	},
-	{
-		label: "🧬 Supports Oasis to further our research",
-	},
+	// {
+	// 	label: "📥 Request new tests",
+	// },
+
 	{
 		label: "🌐 Private community",
+	},
+	{
+		label: "🧬 Supports new lab testings",
 	},
 ];
 
@@ -86,10 +85,13 @@ export default function SubscribeModal() {
 				<View />
 
 				<View className="w-full items-center flex flex-col">
-					<H1 className="text-center">
+					{/* <H1 className="text-center">
 						Unlock what's actually healthy for you
-					</H1>
-					<H3 className="text-center my-4">Oasis Pro</H3>
+					</H1> */}
+
+					<Logo />
+					<H2 className="text-center mt-2">Oasis Pro</H2>
+
 					<Muted>Free access for 3 days, then</Muted>
 					<Muted className="mb-4">$47 per year, ($4 /month)</Muted>
 
@@ -127,7 +129,7 @@ export default function SubscribeModal() {
 						size="sm"
 						variant="ghost"
 						onPress={() => {
-							Linking.openURL("https://www.live-oasis.com/terms");
+							Linking.openURL("https://www.oasiswater.app/terms");
 						}}
 					/>
 
@@ -136,7 +138,16 @@ export default function SubscribeModal() {
 						size="sm"
 						variant="ghost"
 						onPress={() => {
-							Linking.openURL("https://www.live-oasis.com/privacy-policy");
+							Linking.openURL("https://www.oasiswater.app/privacy-policy");
+						}}
+					/>
+
+					<Button
+						label="Refund Policy"
+						size="sm"
+						variant="ghost"
+						onPress={() => {
+							Linking.openURL("https://www.oasiswater.app/refund-policy");
 						}}
 					/>
 				</View>

@@ -9,6 +9,7 @@ export default function Sources({ data }: any) {
 			<Typography size="2xl" fontWeight="normal">
 				Sources
 			</Typography>
+
 			<View className="grid md:grid-cols-2 grid-cols-1 gap-6">
 				{data?.map((source: any) => (
 					<View key={source.url} className="flex flex-col gap-2">

@@ -8,10 +8,11 @@ import { ScrollView, View } from "react-native";
 import { Octicons } from "@expo/vector-icons";
 
 import { Button } from "@/components/ui/button";
-import { H2, H4 } from "@/components/ui/typography";
+import { H2, Muted } from "@/components/ui/typography";
 import { Link, useNavigation } from "expo-router";
 import BlurredLineItem from "./blurred-line-item";
 import ItemImage from "./item-image";
+import PaywallContent from "./paywall-content";
 import Score from "./score";
 import Typography from "./typography";
 
@@ -100,16 +101,16 @@ export function ItemForm({ id }: Props) {
 
 					<View className="flex flex-row gap-2 w-full">
 						<View className="flex flex-col w-2/3">
-							<H2>{item.name}</H2>
+							<H2 className="pb-1">{item.name}</H2>
 
 							{/* @ts-ignore */}
 							<Link href={`/search/company/${item.company?.name}`}>
-								<H4>{item.company?.name}</H4>
+								<Muted>{item.company?.name}</Muted>
 							</Link>
 
-							<View>
+							<View className="mt-2">
 								{item.is_indexed !== false ? (
-									<View className="flex flex-col">
+									<View className="flex flex-col w-56 justify-between gap-y-2">
 										<BlurredLineItem
 											label="Contaminants found"
 											value={contaminants.length}
@@ -127,26 +128,31 @@ export function ItemForm({ id }: Props) {
 												<BlurredLineItem
 													label="Microplastics"
 													value={nanoPlasticsValue}
+													isPaywalled
 												/>
 
 												<BlurredLineItem
 													label="Fluoride"
 													value={fluorideValue}
+													isPaywalled
 												/>
 
 												<BlurredLineItem
 													label="pH"
 													value={item.metadata?.ph_level}
+													isPaywalled
 												/>
 
 												<BlurredLineItem
 													label="TDS"
 													value={item.metadata?.tds ?? "Unknown"}
+													isPaywalled
 												/>
 
 												<BlurredLineItem
 													label="PFAS"
 													value={item.metadata?.pfas || "Unknown"}
+													isPaywalled
 												/>
 											</>
 										)}
@@ -209,14 +215,24 @@ export function ItemForm({ id }: Props) {
 							<Typography size="2xl" fontWeight="normal">
 								Contaminants ☠️
 							</Typography>
-							<View className="grid md:grid-cols-2 grid-cols-1 gap-6">
-								{sortedContaminants.map((contaminant: any, index: number) => (
-									<ContaminantCard
-										key={contaminant.id || index}
-										data={contaminant}
-									/>
-								))}
-							</View>
+							<PaywallContent
+								label="See what contaminants this filter removes"
+								items={[
+									"Rating and scores 🌟",
+									"Research reports and data 🔬",
+									"Latest lab results 💧",
+									"Request new products 🌿",
+								]}
+							>
+								<View className="grid md:grid-cols-2 grid-cols-1 gap-6">
+									{sortedContaminants.map((contaminant: any, index: number) => (
+										<ContaminantCard
+											key={contaminant.id || index}
+											data={contaminant}
+										/>
+									))}
+								</View>
+							</PaywallContent>
 						</View>
 					)}
 
@@ -246,7 +262,9 @@ export function ItemForm({ id }: Props) {
 								<Typography size="2xl" fontWeight="normal">
 									Other Ingredients
 								</Typography>
-								<IngredientsCard ingredients={item.ingredients} />
+								<PaywallContent label="View all minerals and ingredients">
+									<IngredientsCard ingredients={item.ingredients} />
+								</PaywallContent>
 							</View>
 						)}
 					</>

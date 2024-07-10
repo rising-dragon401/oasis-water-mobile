@@ -6,7 +6,10 @@ import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { FlatList, ScrollView, TouchableOpacity, View } from "react-native";
 
+import { useColorScheme } from "@/lib/useColorScheme";
+import { Muted, P } from "../ui/typography";
 import ItemPreviewCard from "./item-preview-card";
+import Loader from "./loader";
 
 import { getFilters } from "@/actions/filters";
 import { getItems, getMineralPackets } from "@/actions/items";
@@ -19,9 +22,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useUserProvider } from "@/context/user-provider";
-import { useColorScheme } from "@/lib/useColorScheme";
-import { Muted, P } from "../ui/typography";
-import Loader from "./loader";
 
 type TabKeys = "bottled_water" | "tap_water" | "filter" | "mineral_packets";
 
@@ -53,7 +53,7 @@ const CATEGORIES: CategoryType[] = [
 		logo: (
 			<MaterialCommunityIcons name="filter-outline" size={18} color="black" />
 		),
-		tags: ["tap", "shower", "bath"],
+		tags: ["tap", "shower", "bottle", "sink"],
 	},
 	{
 		id: "tap_water",
@@ -98,45 +98,60 @@ export default function RankingList({ title, items }: Props) {
 	const [filterMenuOpen, setFilterMenuOpen] = useState(false);
 	const [tagsMenuOpen, setTagsMenuOpen] = useState(false);
 
-	const fetchData = async (
-		fetchFunction: () => Promise<any>,
-		setData: (data: any) => void,
-		setLoading: (loading: boolean) => void,
-	) => {
-		try {
-			const data = await fetchFunction();
-			setData(data);
-		} finally {
-			setLoading(false);
-		}
-	};
+	// const fetchData = async (
+	// 	fetchFunction: () => Promise<any>,
+	// 	setData: (data: any) => void,
+	// 	setLoading: (loading: boolean) => void,
+	// ) => {
+	// 	try {
+	// 		const data = await fetchFunction();
+	// 		setData(data);
+	// 	} finally {
+	// 		setLoading(false);
+	// 	}
+	// };
 
 	useEffect(() => {
 		const initialFetch = async () => {
-			const items = await getItems({ limit: 999, sortMethod: "name" });
-			setBottledWater(items);
-			setAllItems(items);
-
-			await fetchData(
-				() => getLocations({ limit: 999, sortMethod: "name" }),
-				setTapWater,
-				(loading) => setLoading((prev) => ({ ...prev, tap_water: loading })),
+			const itemsPromise = getItems({ limit: 999, sortMethod: "name" }).then(
+				(items) => {
+					setBottledWater(items);
+					setLoading((prev) => ({ ...prev, bottled_water: false }));
+					setAllItems(items);
+					setCompleteInit(true);
+				},
 			);
 
-			await fetchData(
-				() => getFilters({ limit: 999, sortMethod: "name" }),
-				setFilters,
-				(loading) => setLoading((prev) => ({ ...prev, filter: loading })),
-			);
+			const filtersPromise = getFilters({
+				limit: 999,
+				sortMethod: "name",
+			}).then((filters) => {
+				setFilters(filters);
+				setLoading((prev) => ({ ...prev, filter: false }));
+			});
 
-			await fetchData(
-				() => getMineralPackets({ limit: 999, sortMethod: "name" }),
-				setMineralPackets,
-				(loading) =>
-					setLoading((prev) => ({ ...prev, mineral_packets: loading })),
-			);
+			const locationsPromise = getLocations({
+				limit: 999,
+				sortMethod: "name",
+			}).then((locations: any) => {
+				setTapWater(locations);
+				setLoading((prev) => ({ ...prev, tap_water: false }));
+			});
 
-			setCompleteInit(true);
+			const mineralPacketsPromise = getMineralPackets({
+				limit: 999,
+				sortMethod: "name",
+			}).then((mineralPackets) => {
+				setMineralPackets(mineralPackets);
+				setLoading((prev) => ({ ...prev, mineral_packets: false }));
+			});
+
+			await Promise.all([
+				itemsPromise,
+				filtersPromise,
+				locationsPromise,
+				mineralPacketsPromise,
+			]);
 		};
 
 		initialFetch();
@@ -159,7 +174,7 @@ export default function RankingList({ title, items }: Props) {
 
 		if (selectedTags.length > 0) {
 			sortedItems = sortedItems.filter((item) =>
-				selectedTags.every((tag) => item.tags.includes(tag)),
+				selectedTags.every((tag) => item?.tags?.includes(tag)),
 			);
 		}
 
@@ -195,6 +210,22 @@ export default function RankingList({ title, items }: Props) {
 			router.push("/subscribeModal");
 		}
 	};
+
+	// const UnlockTopButton = () => {
+	// 	if (!subscription) {
+	// 		return (
+	// 			<Button
+	// 				variant="outline"
+	// 				className="flex flex-row gap-1"
+	// 				onClick={handleClickSortByScore}
+	// 			>
+	// 				Unlock top rated
+	// 				<TrendingUp className="w-4 h-4" />
+	// 			</Button>
+	// 		);
+	// 	}
+	// };
+
 	return (
 		<View className="pb-14 w-full">
 			<Tabs
@@ -277,7 +308,7 @@ export default function RankingList({ title, items }: Props) {
 									/>
 								</TouchableOpacity>
 							</DropdownMenuTrigger>
-							<DropdownMenuContent align="end">
+							<DropdownMenuContent align="end" className="w-40">
 								<Muted className="p-1">Sort by</Muted>
 								<DropdownMenuItem
 									onPress={handleClickSortByScore}
@@ -310,23 +341,27 @@ export default function RankingList({ title, items }: Props) {
 
 				<TabsContent value={tabValue} className="w-full px-4">
 					<View style={{ minHeight: 600 }} className="mt-2">
-						<FlatList
-							data={filteredItems}
-							renderItem={({ item }) => (
-								<View key={item.id} style={{ width: "48%" }} className="mb-4">
-									<ItemPreviewCard item={item} size="md" />
-								</View>
-							)}
-							keyExtractor={(item) => item.id}
-							numColumns={2}
-							showsVerticalScrollIndicator={false}
-							style={{ minHeight: 300, maxHeight: 600, paddingTop: 10 }}
-							columnWrapperStyle={{ justifyContent: "space-between" }}
-							onEndReached={() => setPage((prevPage) => prevPage + 1)}
-							onEndReachedThreshold={0.1}
-						/>
-
-						{loading[tabValue] && <Loader />}
+						{loading[tabValue] || !filteredItems ? (
+							<View className="flex flex-row justify-center items-center h-40 w-full">
+								<Loader />
+							</View>
+						) : (
+							<FlatList
+								data={filteredItems}
+								renderItem={({ item }) => (
+									<View key={item.id} style={{ width: "48%" }} className="mb-4">
+										<ItemPreviewCard item={item} size="md" />
+									</View>
+								)}
+								keyExtractor={(item) => item.id}
+								numColumns={2}
+								showsVerticalScrollIndicator={false}
+								style={{ minHeight: 300, maxHeight: 600, paddingTop: 10 }}
+								columnWrapperStyle={{ justifyContent: "space-between" }}
+								onEndReached={() => setPage((prevPage) => prevPage + 1)}
+								onEndReachedThreshold={0.1}
+							/>
+						)}
 					</View>
 				</TabsContent>
 			</Tabs>

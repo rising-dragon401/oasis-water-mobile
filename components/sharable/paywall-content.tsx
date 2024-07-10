@@ -58,7 +58,11 @@ const PaywallContent: React.FC<PaywallContentProps> = ({
 			<TouchableOpacity onPress={handleUpgradeClick}>
 				<View className="flex hover:cursor-pointer w-[90vw] bg-secondary p-4 py-6 rounded-md gap-x-4 items-center gap-y-4">
 					{label && (
-						<Typography size="2xl" fontWeight="normal" className="mb-2">
+						<Typography
+							size="2xl"
+							fontWeight="normal"
+							className="mb-2 text-center"
+						>
 							{label}
 						</Typography>
 					)}

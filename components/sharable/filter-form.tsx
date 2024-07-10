@@ -6,7 +6,6 @@ import { ActivityIndicator, ScrollView, View } from "react-native";
 import { getContaminants } from "actions/ingredients";
 
 import { getFilterDetails } from "@/actions/filters";
-import { incrementItemsViewed } from "@/actions/user";
 import { useUserProvider } from "@/context/user-provider";
 import { Button } from "../ui/button";
 import BlurredLineItem from "./blurred-line-item";
@@ -29,10 +28,6 @@ export function FilterForm({ id }: Props) {
 	const [isLoading, setIsLoading] = useState(true);
 	const [filter, setFilter] = useState<any>({});
 	const [contaminants, setContaminants] = useState<any[]>([]);
-
-	useEffect(() => {
-		incrementItemsViewed(uid);
-	}, [uid]);
 
 	useEffect(() => {
 		fetchContaminants();
@@ -115,13 +110,13 @@ export function FilterForm({ id }: Props) {
 
 		// Add contaminants filtered directly
 		filter?.contaminants_filtered?.forEach((contaminant: any) => {
-			uniqueContaminants.set(contaminant.id, contaminant);
+			uniqueContaminants?.set(contaminant?.id, contaminant);
 		});
 
 		// Add contaminants filtered from categories
 		flatContaminantsFromCategory.forEach((contaminant: any) => {
-			if (!uniqueContaminants.has(contaminant.id)) {
-				uniqueContaminants.set(contaminant.id, contaminant);
+			if (!uniqueContaminants.has(contaminant?.id)) {
+				uniqueContaminants.set(contaminant?.id, contaminant);
 			}
 		});
 
@@ -135,7 +130,7 @@ export function FilterForm({ id }: Props) {
 				(contaminant) =>
 					contaminant.is_common === true &&
 					combinedFilteredContaminants.some(
-						(filtered: any) => filtered.id === contaminant.id,
+						(filtered: any) => filtered?.id === contaminant?.id,
 					),
 			),
 		[contaminants, combinedFilteredContaminants],
@@ -148,7 +143,7 @@ export function FilterForm({ id }: Props) {
 				(contaminant) =>
 					contaminant.is_common !== true &&
 					combinedFilteredContaminants.some(
-						(filtered: any) => filtered.id === contaminant.id,
+						(filtered: any) => filtered?.id === contaminant?.id,
 					),
 			),
 		[contaminants, combinedFilteredContaminants],
@@ -212,22 +207,33 @@ export function FilterForm({ id }: Props) {
 							</Typography>
 							{/* </Link> */}
 
-							<BlurredLineItem
-								label="Common contaminants filtered"
-								value={
-									`${commonContaminantsFiltered?.length.toString()} (${percentCommonFiltered}%)` ||
-									"0"
-								}
-								labelClassName="text-red-500"
-							/>
-							<BlurredLineItem
-								label="Uncommon contaminants filtered"
-								value={
-									`${uncommonContaminantsFiltered?.length.toString()} (${percentUncommonFiltered}%)` ||
-									"0"
-								}
-								labelClassName="text-red-500"
-							/>
+							<View className="flex flex-col gap-2 w-72">
+								<BlurredLineItem
+									label="Common contaminants filtered"
+									value={
+										`${commonContaminantsFiltered?.length.toString()} (${percentCommonFiltered}%)` ||
+										"0"
+									}
+									labelClassName="text-red-500"
+									flexDirection="col"
+									isPaywalled
+								/>
+
+								<BlurredLineItem
+									label="Uncommon contaminants filtered"
+									value={
+										`${uncommonContaminantsFiltered?.length.toString()} (${percentUncommonFiltered}%)` ||
+										"0"
+									}
+									labelClassName="text-red-500"
+									flexDirection="col"
+									isPaywalled
+								/>
+
+								<P className="text-left mt-2">
+									Certifications: {filter.certifications || "None"}
+								</P>
+							</View>
 
 							{filter.affiliate_url && (
 								<Button
@@ -235,7 +241,7 @@ export function FilterForm({ id }: Props) {
 									onPress={() => {
 										Linking.openURL(filter.affiliate_url);
 									}}
-									className="w-40"
+									className="w-40 mt-2"
 									label="Learn more"
 								/>
 							)}
@@ -248,9 +254,6 @@ export function FilterForm({ id }: Props) {
 
 					<View className="flex flex-col items-start">
 						<P>{filter.description}</P>
-						<P className="text-left mt-6">
-							Certifications: {filter.certifications || "None"}
-						</P>
 					</View>
 				</View>
 
@@ -262,19 +265,9 @@ export function FilterForm({ id }: Props) {
 						/>
 					</View>
 
-					{/* <PaywallContent
-						label="Unlock all data and reports"
-						items={[
-							"Rating and scores 🌟",
-							"Research reports and data 🔬",
-							"Latest lab results 💧",
-							"Request new products 🌿",
-						]}
-					> */}
 					{filter?.sources && filter?.sources?.length > 0 && (
 						<Sources data={filter.sources} />
 					)}
-					{/* </PaywallContent> */}
 				</View>
 			</View>
 		</ScrollView>

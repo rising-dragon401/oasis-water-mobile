@@ -1,4 +1,3 @@
-import { Octicons } from "@expo/vector-icons";
 import { useMemo } from "react";
 import { View } from "react-native";
 import useSWR from "swr";
@@ -11,7 +10,7 @@ import {
 	AccordionItem,
 	AccordionTrigger,
 } from "components/ui/accordion";
-import { ContaminantFiltersDropdown } from "./contaminant-filters-dropdown";
+import PaywallContent from "./paywall-content";
 import Typography from "./typography";
 
 import { IngredientCategories } from "@/lib/constants";
@@ -69,7 +68,7 @@ export default function ContaminantTable({
 							name: contaminant.name,
 							is_common: contaminant.is_common,
 							isFiltered: filteredContaminants?.some(
-								(fc) => fc.id === contaminant.id,
+								(fc) => fc?.id === contaminant?.id,
 							),
 						};
 					},
@@ -101,56 +100,67 @@ export default function ContaminantTable({
 				Contaminants filtered
 			</Typography>
 
-			{contaminantsByCategory.map((item) => (
-				<Accordion
-					key={item.category}
-					type="single"
-					collapsible
-					className="w-[90vw]"
-				>
-					<AccordionItem value="item-1">
-						<AccordionTrigger>
-							<View className="flex w-full flex-row gap-6 justify-between items-center">
-								<Typography size="lg" fontWeight="normal">
-									{item.category}
-								</Typography>
-								<Typography size="base" fontWeight="normal">
-									{item.percentageFiltered}%
-								</Typography>
-							</View>
-						</AccordionTrigger>
-						<AccordionContent>
-							<View className="flex flex-col gap-y-4">
-								{item.contaminants?.map((contaminant: any) => (
-									<View
-										// @ts-ignore
-										// href={determineLink(contaminant)}
-										className="flex flex-row gap-6 justify-between items-center"
-										key={contaminant.name}
-									>
-										<View className="w-96" key={contaminant.name}>
-											<Typography size="base" fontWeight="normal">
-												{contaminant.name} {contaminant?.is_common ? "(c)" : ""}
-											</Typography>
-										</View>
-										<View className="w-14">
+			<PaywallContent
+				label="See what contaminants this filter removes"
+				items={[
+					"Rating and scores 🌟",
+					"Research reports and data 🔬",
+					"Latest lab results 💧",
+					"Request new products 🌿",
+				]}
+			>
+				{contaminantsByCategory.map((item) => (
+					<Accordion
+						key={item.category}
+						type="single"
+						collapsible
+						className="w-[90vw]"
+					>
+						<AccordionItem value="item-1">
+							<AccordionTrigger>
+								<View className="flex w-full flex-row gap-6 justify-between items-center">
+									<Typography size="lg" fontWeight="normal">
+										{item.category}
+									</Typography>
+									<Typography size="base" fontWeight="normal">
+										{item.percentageFiltered}%
+									</Typography>
+								</View>
+							</AccordionTrigger>
+							<AccordionContent>
+								<View className="flex flex-col gap-y-4">
+									{item.contaminants?.map((contaminant: any) => (
+										<View
+											// @ts-ignore
+											// href={determineLink(contaminant)}
+											className="flex flex-row gap-6 justify-between items-center"
+											key={contaminant.name}
+										>
+											<View className="w-96" key={contaminant.name}>
+												<Typography size="base" fontWeight="normal">
+													{contaminant.name}{" "}
+													{contaminant?.is_common ? "(c)" : ""}
+												</Typography>
+											</View>
+											{/* <View className="w-14">
 											{contaminant.isFiltered ? (
 												<Octicons name="check" size={12} color={iconColor} />
 											) : (
 												<Octicons name="x" size={12} color={iconColor} />
 											)}
-										</View>
-										<ContaminantFiltersDropdown
+										</View> */}
+											{/* <ContaminantFiltersDropdown
 											contaminantId={contaminant?.id}
 											align="end"
-										/>
-									</View>
-								))}
-							</View>
-						</AccordionContent>
-					</AccordionItem>
-				</Accordion>
-			))}
+										/> */}
+										</View>
+									))}
+								</View>
+							</AccordionContent>
+						</AccordionItem>
+					</Accordion>
+				))}
+			</PaywallContent>
 		</>
 	);
 }
