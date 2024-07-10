@@ -246,7 +246,9 @@ export default function RankingList({ title, items }: Props) {
 										loading[category.id] && category.id !== "bottled_water"
 									}
 									className={`flex flex-row justify-center items-center gap-1 bg-transparent shadow-none rounded-lg px-3 ${
-										tabValue === category.id ? "bg-secondary text-white" : ""
+										tabValue === category.id
+											? "bg-secondary text-white border"
+											: ""
 									}`}
 									style={{ flex: 1 }}
 								>
