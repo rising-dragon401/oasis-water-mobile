@@ -3,14 +3,20 @@ import { View } from "react-native";
 
 import Search from "@/components/sharable/search";
 import { H1, Muted } from "@/components/ui/typography";
+import { useUserProvider } from "@/context/user-provider";
 
 import RankingList from "@/components/sharable/ranking-list";
 import { getFeaturedUsers } from "actions/admin";
 import { getRandomFilters } from "actions/filters";
 import { getRandomItems } from "actions/items";
 import { getRandomLocations } from "actions/locations";
+import { usePathname, useRouter } from "expo-router";
 
 export default function TabOneScreen() {
+	const { userData, subscription, uid } = useUserProvider();
+	const router = useRouter();
+	const pathname = usePathname();
+
 	const [items, setItems] = useState<any[]>([]);
 	const [tapWater, setTapWater] = useState<any[]>([]);
 	const [filters, setFilters] = useState<any[]>([]);
@@ -22,6 +28,18 @@ export default function TabOneScreen() {
 		getFilters();
 		getPeople();
 	}, []);
+
+	useEffect(() => {
+		if (
+			userData &&
+			uid &&
+			subscription &&
+			!userData?.has_reviewed_app &&
+			pathname !== "/reviewModal"
+		) {
+			router.push("/reviewModal");
+		}
+	}, [userData, subscription, uid]);
 
 	async function getBottledWater() {
 		const data = await getRandomItems();

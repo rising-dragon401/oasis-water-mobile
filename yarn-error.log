@@ -1,8 +1,8 @@
 Arguments: 
-  /Users/cormachayden/.nvm/versions/node/v18.17.1/bin/node /usr/local/bin/yarn add @types/react-native-polyfill-globals -D
+  /Users/cormachayden/.nvm/versions/node/v18.17.1/bin/node /usr/local/bin/yarnpkg add expo-in-app-review
 
 PATH: 
-  /Users/cormachayden/anaconda3/bin:/Users/cormachayden/.nvm/versions/node/v18.17.1/bin:/Users/cormachayden/.yarn/bin:/Users/cormachayden/.config/yarn/global/node_modules/.bin:/opt/homebrew/opt/libpq/bin:/opt/homebrew/opt/libpq/bin:/Library/Frameworks/Python.framework/Versions/2.7/bin:/Library/Frameworks/Python.framework/Versions/3.9/bin:/Library/Frameworks/Python.framework/Versions/3.10/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/Library/Apple/usr/bin:/usr/local/go/bin:/Users/cormachayden/Library/Android/sdk/platform-tools:/opt/homebrew/opt/libpq/bin:/Users/cormachayden/Downloads/google-cloud-sdk/bin:/Library/Frameworks/Python.framework/Versions/2.7/bin:/Library/Frameworks/Python.framework/Versions/3.9/bin:/Library/Frameworks/Python.framework/Versions/3.10/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/Users/cormachayden/.cargo/bin:/Applications/Visual:/Applications/Visual Studio Code.app/Contents/Resources/app/bin:/Users/cormachayden/Library/Android/sdk/emulator:/Users/cormachayden/Library/Android/sdk/platform-tools:/Users/cormachayden/.foundry/bin
+  /Users/cormachayden/Desktop/apps/oasis/mobile/node_modules/.bin:/Users/cormachayden/Desktop/apps/oasis/mobile/node_modules/.bin:/Users/cormachayden/Desktop/apps/oasis/node_modules/.bin:/Users/cormachayden/Desktop/apps/node_modules/.bin:/Users/cormachayden/Desktop/node_modules/.bin:/Users/cormachayden/node_modules/.bin:/Users/node_modules/.bin:/node_modules/.bin:/Users/cormachayden/.nvm/versions/node/v18.17.1/lib/node_modules/npm/node_modules/@npmcli/run-script/lib/node-gyp-bin:/Users/cormachayden/anaconda3/bin:/Users/cormachayden/.nvm/versions/node/v18.17.1/bin:/Users/cormachayden/.yarn/bin:/Users/cormachayden/.config/yarn/global/node_modules/.bin:/opt/homebrew/opt/libpq/bin:/opt/homebrew/opt/libpq/bin:/Library/Frameworks/Python.framework/Versions/2.7/bin:/Library/Frameworks/Python.framework/Versions/3.9/bin:/Library/Frameworks/Python.framework/Versions/3.10/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/Library/Apple/usr/bin:/usr/local/go/bin:/Users/cormachayden/Library/Android/sdk/platform-tools:/opt/homebrew/opt/libpq/bin:/Users/cormachayden/Downloads/google-cloud-sdk/bin:/Library/Frameworks/Python.framework/Versions/2.7/bin:/Library/Frameworks/Python.framework/Versions/3.9/bin:/Library/Frameworks/Python.framework/Versions/3.10/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/Users/cormachayden/.cargo/bin:/Applications/Visual:/Applications/Visual Studio Code.app/Contents/Resources/app/bin:/Users/cormachayden/Library/Android/sdk/emulator:/Users/cormachayden/Library/Android/sdk/platform-tools:/Users/cormachayden/.foundry/bin
 
 Yarn version: 
   1.22.15
@@ -14,7 +14,7 @@ Platform:
   darwin arm64
 
 Trace: 
-  Error: https://registry.npmjs.org/@types%2freact-native-polyfill-globals: Not found
+  Error: https://registry.npmjs.org/expo-in-app-review: Not found
       at params.callback [as _callback] (/usr/local/lib/node_modules/yarn/lib/cli.js:66140:18)
       at self.callback (/usr/local/lib/node_modules/yarn/lib/cli.js:140885:22)
       at Request.emit (node:events:514:28)
@@ -52,6 +52,7 @@ npm manifest:
       "expo-blur": "~12.9.2",
       "expo-constants": "~15.4.5",
       "expo-dev-client": "~3.3.11",
+      "expo-image": "~1.10.6",
       "expo-image-picker": "~14.7.1",
       "expo-linking": "~6.2.2",
       "expo-router": "~3.4.10",
@@ -66,7 +67,6 @@ npm manifest:
       "react-dom": "18.2.0",
       "react-hook-form": "^7.45.0",
       "react-native": "0.73.6",
-      "react-native-fetch-api": "^3.0.0",
       "react-native-markdown-display": "^7.0.2",
       "react-native-polyfill-globals": "^3.1.0",
       "react-native-purchases": "^7.27.0",
@@ -74,7 +74,7 @@ npm manifest:
       "react-native-safe-area-context": "4.8.2",
       "react-native-screens": "~3.29.0",
       "react-native-svg": "14.1.0",
-      "react-native-url-polyfill": "^1.3.0",
+      "react-native-url-polyfill": "^2.0.0",
       "react-native-web": "~0.19.6",
       "swr": "^2.2.5",
       "tailwind-merge": "^2.2.1",
@@ -5323,6 +5323,13 @@ Lockfile:
     dependencies:
       expo-image-loader "~4.6.0"
   
+  expo-image@~1.10.6:
+    version "1.10.6"
+    resolved "https://registry.yarnpkg.com/expo-image/-/expo-image-1.10.6.tgz#b0e54d31d97742505296c076a5f18d094ba9a8cc"
+    integrity sha512-vcnAIym1eU8vQgV1re1E7rVQZStJimBa4aPDhjFfzMzbddAF7heJuagyewiUkTzbZUwYzPaZAie6VJPyWx9Ueg==
+    dependencies:
+      "@react-native/assets-registry" "~0.73.1"
+  
   expo-json-utils@~0.12.0:
     version "0.12.3"
     resolved "https://registry.yarnpkg.com/expo-json-utils/-/expo-json-utils-0.12.3.tgz#cabb704a344d6d75f225cf4032c64479e442a2a9"
@@ -7883,11 +7890,6 @@ Lockfile:
       os-homedir "^1.0.0"
       os-tmpdir "^1.0.0"
   
-  p-defer@^3.0.0:
-    version "3.0.0"
-    resolved "https://registry.yarnpkg.com/p-defer/-/p-defer-3.0.0.tgz#d1dceb4ee9b2b604b1d94ffec83760175d4e6f83"
-    integrity sha512-ugZxsxmtTln604yeYd29EGrNhazN2lywetzpKhfmQjW/VJmhpDmWbiX+h0zL8V91R0UXkhb3KtPmyq9PZw3aYw==
-  
   p-finally@^1.0.0:
     version "1.0.0"
     resolved "https://registry.yarnpkg.com/p-finally/-/p-finally-1.0.0.tgz#3fbcfb15b899a44123b34b6dcc18b724336a2cae"
@@ -8375,13 +8377,6 @@ Lockfile:
       babel-plugin-tester "^11.0.4"
       lightningcss "1.22.0"
   
-  react-native-fetch-api@^3.0.0:
-    version "3.0.0"
-    resolved "https://registry.yarnpkg.com/react-native-fetch-api/-/react-native-fetch-api-3.0.0.tgz#81e1bb6562c292521bc4eca52fe1097f4c1ebab5"
-    integrity sha512-g2rtqPjdroaboDKTsJCTlcmtw54E25OjyaunUP0anOZn4Fuo2IKs8BVfe02zVggA/UysbmfSnRJIqtNkAgggNA==
-    dependencies:
-      p-defer "^3.0.0"
-  
   react-native-fit-image@^1.5.5:
     version "1.5.5"
     resolved "https://registry.yarnpkg.com/react-native-fit-image/-/react-native-fit-image-1.5.5.tgz#c660d1ad74b9dcaa1cba27a0d9c23837e000226c"
@@ -8451,10 +8446,10 @@ Lockfile:
       css-select "^5.1.0"
       css-tree "^1.1.3"
   
-  react-native-url-polyfill@^1.3.0:
-    version "1.3.0"
-    resolved "https://registry.yarnpkg.com/react-native-url-polyfill/-/react-native-url-polyfill-1.3.0.tgz#c1763de0f2a8c22cc3e959b654c8790622b6ef6a"
-    integrity sha512-w9JfSkvpqqlix9UjDvJjm1EjSt652zVQ6iwCIj1cVVkwXf4jQhQgTNXY6EVTwuAmUjg6BC6k9RHCBynoLFo3IQ==
+  react-native-url-polyfill@^2.0.0:
+    version "2.0.0"
+    resolved "https://registry.yarnpkg.com/react-native-url-polyfill/-/react-native-url-polyfill-2.0.0.tgz#db714520a2985cff1d50ab2e66279b9f91ffd589"
+    integrity sha512-My330Do7/DvKnEvwQc0WdcBnFPploYKp9CYlefDXzIdEaA+PAhDYllkvGeEroEzvc4Kzzj2O4yVdz8v6fjRvhA==
     dependencies:
       whatwg-url-without-unicode "8.0.0-3"
   

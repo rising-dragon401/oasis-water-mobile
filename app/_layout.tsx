@@ -89,6 +89,12 @@ function RootLayout() {
 										presentation: "modal",
 									}}
 								/>
+								<Stack.Screen
+									name="reviewModal"
+									options={{
+										presentation: "modal",
+									}}
+								/>
 							</Stack>
 						</SafeAreaProvider>
 						<PortalHost />

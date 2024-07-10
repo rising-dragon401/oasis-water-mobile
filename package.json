@@ -29,6 +29,7 @@
     "expo-router": "~3.4.10",
     "expo-secure-store": "~12.8.1",
     "expo-status-bar": "~1.11.1",
+    "expo-store-review": "~6.8.3",
     "expo-updates": "~0.24.12",
     "expo-web-browser": "^12.8.2",
     "lucide-react-native": "^0.368.0",
