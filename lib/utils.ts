@@ -10,7 +10,11 @@ export const determineLink = (item: any) => {
 
 	if (item?.type === "tap_water") {
 		basePath = `/search/location/${item?.id}`;
-	} else if (item?.type === "filter") {
+	} else if (
+		item?.type === "filter" ||
+		item?.type === "shower_filter" ||
+		item?.type === "bottle_filter"
+	) {
 		basePath = `/search/filter/${item?.id}`;
 	} else if (item?.type === "user") {
 		basePath = `/search/oasis/${item?.id}`;

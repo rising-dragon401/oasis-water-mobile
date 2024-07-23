@@ -29,17 +29,20 @@ export const getFilters = async ({
 	}
 
 	const filtersWithCompany = await Promise.all(
-		filters.map(async (filter) => {
-			const { data: company, error: companyError } = await supabase
-				.from("companies")
-				.select("name")
-				.eq("id", filter.company);
+		filters
+			.filter((filter) => !filter.is_draft)
+			.map(async (filter) => {
+				const { data: company, error: companyError } = await supabase
+					.from("companies")
+					.select("name")
+					.eq("id", filter.company);
 
-			return {
-				...filter,
-				company_name: company ? company[0].name : null,
-			};
-		}),
+				return {
+					...filter,
+					company_name: company ? company[0].name : null,
+					score: filter.is_indexed === false ? null : filter.score,
+				};
+			}),
 	);
 
 	return filtersWithCompany;

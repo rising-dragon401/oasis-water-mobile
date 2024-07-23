@@ -1,4 +1,3 @@
-import { FontAwesome } from "@expo/vector-icons";
 import Feather from "@expo/vector-icons/Feather";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
@@ -12,7 +11,7 @@ import ItemPreviewCard from "./item-preview-card";
 import Loader from "./loader";
 
 import { getFilters } from "@/actions/filters";
-import { getItems, getMineralPackets } from "@/actions/items";
+import { getItems } from "@/actions/items";
 import { getLocations } from "@/actions/locations";
 import {
 	DropdownMenu,
@@ -60,11 +59,6 @@ const CATEGORIES: CategoryType[] = [
 		title: "Tap water",
 		logo: <Feather name="droplet" size={18} color="black" />,
 	},
-	{
-		id: "mineral_packets",
-		title: "Mineral packets",
-		logo: <FontAwesome name="diamond" size={24} color="black" />,
-	},
 ];
 
 type Props = {
@@ -87,7 +81,6 @@ export default function RankingList({ title, items }: Props) {
 	const [allItems, setAllItems] = useState<any[]>([]);
 	const [filteredItems, setFilteredItems] = useState<any[]>([]);
 	const [bottledWater, setBottledWater] = useState<any[]>([]);
-	const [mineralPackets, setMineralPackets] = useState<any[]>([]);
 	const [tapWater, setTapWater] = useState<any[]>([]);
 	const [filters, setFilters] = useState<any[]>([]);
 	const [sortMethod, setSortMethod] = useState("name");
@@ -97,19 +90,6 @@ export default function RankingList({ title, items }: Props) {
 	const [selectedTags, setSelectedTags] = useState<string[]>([]);
 	const [filterMenuOpen, setFilterMenuOpen] = useState(false);
 	const [tagsMenuOpen, setTagsMenuOpen] = useState(false);
-
-	// const fetchData = async (
-	// 	fetchFunction: () => Promise<any>,
-	// 	setData: (data: any) => void,
-	// 	setLoading: (loading: boolean) => void,
-	// ) => {
-	// 	try {
-	// 		const data = await fetchFunction();
-	// 		setData(data);
-	// 	} finally {
-	// 		setLoading(false);
-	// 	}
-	// };
 
 	useEffect(() => {
 		const initialFetch = async () => {
@@ -138,20 +118,7 @@ export default function RankingList({ title, items }: Props) {
 				setLoading((prev) => ({ ...prev, tap_water: false }));
 			});
 
-			const mineralPacketsPromise = getMineralPackets({
-				limit: 999,
-				sortMethod: "name",
-			}).then((mineralPackets) => {
-				setMineralPackets(mineralPackets);
-				setLoading((prev) => ({ ...prev, mineral_packets: false }));
-			});
-
-			await Promise.all([
-				itemsPromise,
-				filtersPromise,
-				locationsPromise,
-				mineralPacketsPromise,
-			]);
+			await Promise.all([itemsPromise, filtersPromise, locationsPromise]);
 		};
 
 		initialFetch();
@@ -194,8 +161,6 @@ export default function RankingList({ title, items }: Props) {
 			setAllItems(tapWater);
 		} else if (tabValue === "filter") {
 			setAllItems(filters);
-		} else if (tabValue === "mineral_packets") {
-			setAllItems(mineralPackets);
 		}
 
 		setTags(
@@ -342,7 +307,7 @@ export default function RankingList({ title, items }: Props) {
 				</View>
 
 				<TabsContent value={tabValue} className="w-full px-4">
-					<View style={{ minHeight: 600 }} className="mt-2">
+					<View style={{ minHeight: 600 }} className="mt-2 pb-10">
 						{loading[tabValue] || !filteredItems ? (
 							<View className="flex flex-row justify-center items-center h-40 w-full">
 								<Loader />
@@ -358,7 +323,9 @@ export default function RankingList({ title, items }: Props) {
 								keyExtractor={(item) => item.id}
 								numColumns={2}
 								showsVerticalScrollIndicator={false}
-								style={{ minHeight: 300, maxHeight: 600, paddingTop: 10 }}
+								contentContainerStyle={{
+									paddingBottom: 240,
+								}}
 								columnWrapperStyle={{ justifyContent: "space-between" }}
 								onEndReached={() => setPage((prevPage) => prevPage + 1)}
 								onEndReachedThreshold={0.1}

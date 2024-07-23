@@ -88,7 +88,7 @@ export default function FavoritesList({
 				</View>
 
 				<View className="max-h-24 flex flex-row">
-					<Score score={userData.score || 0} size="md" showScore />
+					<Score score={userData?.score || 0} size="md" showScore />
 					<TouchableOpacity onPress={() => shareProfile()}>
 						<Octicons name="share" size={24} color="muted" />
 					</TouchableOpacity>
@@ -110,11 +110,8 @@ export default function FavoritesList({
 				/>
 			) : (
 				<View className="text-center">
-					<H3>No favorites found</H3>
-					<P>
-						Start adding the products you use to your Oasis for them to show up
-						here.
-					</P>
+					<H3>No products found</H3>
+					<P>Start adding the products you use to see them here.</P>
 				</View>
 			)}
 		</View>

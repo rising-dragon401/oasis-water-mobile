@@ -27,9 +27,9 @@ export default function OasisScreen() {
 						<>
 							<View className="w-full justify-center items-center gap-y-2">
 								<View className="flex flex-col items-center p-4 gap-y-4 w-full">
-									<H1 className="text-center mt-20">Your Oasis</H1>
+									<H1 className="text-center mt-20">My products</H1>
 									<Muted className="text-center ">
-										You haven't added anything to your Oasis yet
+										You haven't added anything yet
 									</Muted>
 								</View>
 
@@ -46,9 +46,9 @@ export default function OasisScreen() {
 			) : (
 				<View className="w-full justify-center items-center gap-y-2">
 					<View className="flex flex-col items-center p-4 gap-y-4 w-full">
-						<H1 className="text-center mt-20">Your Oasis</H1>
+						<H1 className="text-center mt-20">My products</H1>
 						<Muted className="text-center ">
-							Sign in to add products to your Oasis
+							Sign in to add products and see your water score
 						</Muted>
 					</View>
 

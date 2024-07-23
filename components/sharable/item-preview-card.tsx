@@ -1,4 +1,3 @@
-import { Octicons } from "@expo/vector-icons";
 import { useUserProvider } from "context/user-provider";
 import { Image } from "expo-image";
 import { Link } from "expo-router";
@@ -8,6 +7,7 @@ import { Text, View } from "react-native";
 import { H4, Muted, P } from "@/components/ui/typography";
 import { useColorScheme } from "@/lib/useColorScheme";
 import { determineLink } from "@/lib/utils";
+import { Octicons } from "@expo/vector-icons";
 import FavoriteButton from "./favorite-button";
 
 const blurhash = "LTR{+2of~oj[%LfQM|fP%2fQM|j[";
@@ -27,23 +27,6 @@ const ItemPreviewCard = ({
 }: Props) => {
 	const { subscription } = useUserProvider();
 	const { borderColor } = useColorScheme();
-
-	const renderScore = () => {
-		const score = item?.score || 0;
-
-		return (
-			<View className="flex flex-col gap-0 items-end">
-				{subscription ? (
-					<>
-						<H4>{score}</H4>
-					</>
-				) : (
-					<Octicons name="lock" size={16} color="blue" />
-				)}
-				<Muted>/100</Muted>
-			</View>
-		);
-	};
 
 	return (
 		// @ts-ignore
@@ -76,12 +59,21 @@ const ItemPreviewCard = ({
 				<View className="flex-row w-48 justify-between items-start px-1 pb-1">
 					<P className="flex flex-wrap w-2/3 !max-h-14">{item.name}</P>
 
-					{item.score && <View className="w-1/3">{renderScore()}</View>}
-
-					{!item.score && showWarning && (
-						<View className="w-full flex text-right justify-end">
-							<Text style={{ fontSize: 14 }}>⚠️</Text>
-						</View>
+					{subscription ? (
+						<>
+							{item.is_indexed && item.score ? (
+								<View className="flex flex-col gap-0 items-end justify-end">
+									<H4>{item.score}</H4>
+									<Muted>/100</Muted>
+								</View>
+							) : (
+								<View className="w-full flex text-right justify-end">
+									<Text style={{ fontSize: 14 }}>⚠️</Text>
+								</View>
+							)}
+						</>
+					) : (
+						<Octicons name="lock" size={16} color="blue" />
 					)}
 				</View>
 			</View>
