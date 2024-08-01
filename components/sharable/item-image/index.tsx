@@ -1,5 +1,6 @@
 import FavoriteButton from "components/sharable/favorite-button";
-import { Image, View } from "react-native";
+import { Image } from "expo-image";
+import { View } from "react-native";
 
 type ItemImageProps = {
 	src: string;
@@ -8,15 +9,14 @@ type ItemImageProps = {
 };
 
 export default function ItemImage({ src, alt, thing }: ItemImageProps) {
+	console.log("src", src);
+
 	return (
 		<View style={{ position: "relative", width: "100%", height: "100%" }}>
 			<Image
-				source={{ uri: src }}
+				source={src}
 				accessibilityLabel={alt}
 				style={{ width: "100%", height: "100%", borderRadius: 8 }}
-				onError={(e) =>
-					console.log("Image loading error:", e.nativeEvent.error)
-				}
 			/>
 			<View style={{ position: "absolute", top: 10, right: 10, zIndex: 99 }}>
 				<FavoriteButton item={thing} />

@@ -3,49 +3,40 @@ import { supabase } from "@/config/supabase";
 export const getFilters = async ({
 	limit,
 	sortMethod,
-}: { limit?: number; sortMethod?: "name" | "score" } = {}) => {
+	type = "filter",
+}: {
+	limit?: number;
+	sortMethod?: "name" | "score";
+	type?: "filter" | "shower_filter" | "bottle_filter";
+} = {}) => {
 	let filters;
 	let orderBy = sortMethod || "name";
 
-	if (limit) {
-		const { data } = await supabase
-			.from("water_filters")
-			.select()
-			.order(orderBy)
-			.limit(limit);
+	let query = supabase.from("water_filters").select().order(orderBy);
 
-		filters = data;
-	} else {
-		const { data } = await supabase
-			.from("water_filters")
-			.select()
-			.order(orderBy);
-
-		filters = data;
+	if (type) {
+		query = query.eq("type", type);
 	}
+
+	if (limit) {
+		query = query.limit(limit);
+	}
+
+	const { data } = await query;
+
+	filters = data;
 
 	if (!filters) {
 		return [];
 	}
 
-	const filtersWithCompany = await Promise.all(
-		filters
-			.filter((filter) => !filter.is_draft)
-			.map(async (filter) => {
-				const { data: company, error: companyError } = await supabase
-					.from("companies")
-					.select("name")
-					.eq("id", filter.company);
+	filters = filters.sort((a, b) => {
+		if (a.is_indexed === false) return 1;
+		if (b.is_indexed === false) return -1;
+		return 0;
+	});
 
-				return {
-					...filter,
-					company_name: company ? company[0].name : null,
-					score: filter.is_indexed === false ? null : filter.score,
-				};
-			}),
-	);
-
-	return filtersWithCompany;
+	return filters;
 };
 
 export const getFiltersByContaminant = async (contaminantId: number) => {

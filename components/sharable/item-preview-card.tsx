@@ -57,7 +57,7 @@ const ItemPreviewCard = ({
 					)}
 				</View>
 				<View className="flex-row w-48 justify-between items-start px-1 pb-1">
-					<P className="flex flex-wrap w-2/3 !max-h-14">{item.name}</P>
+					<P className="flex flex-wrap w-2/3 h-14">{item.name}</P>
 
 					{subscription ? (
 						<>

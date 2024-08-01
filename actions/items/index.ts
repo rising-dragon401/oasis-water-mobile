@@ -3,48 +3,36 @@ import { supabase } from "@/config/supabase";
 export const getItems = async ({
 	limit,
 	sortMethod,
-}: { limit?: number; sortMethod?: "name" | "score" } = {}) => {
-	let items;
+	type,
+}: { limit?: number; sortMethod?: "name" | "score"; type?: any } = {}) => {
 	let orderBy = sortMethod || "name";
 
-	console.log("orderBy: ", orderBy);
+	let query = supabase
+		.from("items")
+		.select()
+		.order(orderBy, { ascending: true });
 
-	if (limit) {
-		const { data } = await supabase
-			.from("items")
-			.select()
-			.order(orderBy, { ascending: true })
-			.limit(limit);
-
-		items = data;
-	} else {
-		const { data } = await supabase
-			.from("items")
-			.select()
-			.order(orderBy, { ascending: true });
-
-		items = data;
+	if (type) {
+		query = query.eq("type", type);
 	}
 
-	if (!items) {
-		return [];
+	if (limit !== undefined) {
+		query = query.limit(limit);
 	}
 
-	const itemsWithCompany = await Promise.all(
-		items.map(async (item) => {
-			const { data: company, error: companyError } = await supabase
-				.from("companies")
-				.select("name")
-				.eq("id", item.company);
+	const { data } = await query;
 
-			return {
-				...item,
-				company_name: company ? company[0].name : null,
-			};
-		}),
-	);
+	let items = data || [];
 
-	return itemsWithCompany;
+	items = items.filter((item: any) => !item.is_private);
+
+	items = items.sort((a: any, b: any) => {
+		if (a.is_indexed === false) return 1;
+		if (b.is_indexed === false) return -1;
+		return 0;
+	});
+
+	return items;
 };
 
 export const getItemDetails = async (id: string) => {

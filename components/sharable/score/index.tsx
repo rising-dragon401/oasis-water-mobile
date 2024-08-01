@@ -50,6 +50,9 @@ export default function Score({ score, size, showScore = false }: Props) {
 			return "Alright";
 		} else if (score >= 35) {
 			return "Poor";
+			// @ts-ignore
+		} else if (score === "?") {
+			return "Unknown";
 		} else {
 			return "Bad";
 		}

@@ -1,16 +1,17 @@
+import { Image } from "expo-image";
+import { Link, usePathname, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { View } from "react-native";
+import { ScrollView, View } from "react-native";
 
 import Search from "@/components/sharable/search";
-import { H1, Muted } from "@/components/ui/typography";
+import { H2, Large, Muted } from "@/components/ui/typography";
 import { useUserProvider } from "@/context/user-provider";
+import { CATEGORIES } from "@/lib/constants/categories";
 
-import RankingList from "@/components/sharable/ranking-list";
 import { getFeaturedUsers } from "actions/admin";
 import { getRandomFilters } from "actions/filters";
 import { getRandomItems } from "actions/items";
 import { getRandomLocations } from "actions/locations";
-import { usePathname, useRouter } from "expo-router";
 
 export default function TabOneScreen() {
 	const { userData, subscription, uid } = useUserProvider();
@@ -66,45 +67,59 @@ export default function TabOneScreen() {
 	}
 
 	return (
-		<View className="flex flex-col h-full items-center justify-center p-4 mt-36">
-			<H1 className="text-center max-w-xs">Find your healthiest water</H1>
+		<View className="flex flex-col h-full items-center mt-36 p-4">
+			<H2 className="text-center max-w-xs">What are you drinking?</H2>
 
-			<Muted className="text-center mb-4 max-w-md mt-2">
-				90% of water has microplastics, toxins and contaminants.
+			<Muted className="text-center mb-4 max-w-md ">
+				Find the best water brands based on science
 			</Muted>
 
-			<View className="mb-4 w-[90%] z-40">
+			<View className="mb-8 w-[90%] z-40">
 				<Search />
 			</View>
 
-			<RankingList />
-
-			{/* <ScrollView
+			<ScrollView
 				contentContainerStyle={{
-					paddingBottom: 120,
-					paddingVertical: 0,
-					paddingHorizontal: 10,
-					zIndex: 0,
+					width: "100%",
+					flexDirection: "row",
+					flexWrap: "wrap",
+					justifyContent: "space-between",
+					gap: 8,
+					paddingHorizontal: 8,
+					rowGap: 16,
 				}}
-				nestedScrollEnabled
-				showsVerticalScrollIndicator={false}
+				className="overflow-y-scroll"
 			>
-				<View className="w-full mt-6">
-					<ItemRow title="Bottled Water" items={items} type="item" />
-				</View>
-
-				<View className="w-full mt-10">
-					<ItemRow title="Tap Water" items={tapWater} type="location" />
-				</View>
-
-				<View className="w-full mt-10">
-					<ItemRow title="Filters" items={filters} type="filter" />
-				</View>
-
-				<View className="w-full mt-10">
-					<ItemRow title="People" items={people} type="user" />
-				</View>
-			</ScrollView> */}
+				{CATEGORIES.map((category) => (
+					<Link
+						key={category.id}
+						href={`/search/top-rated/${category.id}`}
+						style={
+							{
+								// flexBasis: "100%",
+								// borderRadius: 12,
+							}
+						}
+						className="bg-card border-input border h-48 rounded-lg"
+					>
+						<View className="flex flex-col items-center justify-center w-[42vw] gap-2 pt-4">
+							<Image
+								source={{ uri: category.image }}
+								alt={category.title}
+								style={{
+									width: "80%",
+									height: "70%",
+									resizeMode: "contain",
+								}}
+								className="mb-2 w-54 h-48 "
+							/>
+							<Large className="text-center text-md mt-4">
+								{category.title}
+							</Large>
+						</View>
+					</Link>
+				))}
+			</ScrollView>
 		</View>
 	);
 }

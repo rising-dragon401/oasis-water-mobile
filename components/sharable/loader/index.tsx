@@ -16,7 +16,5 @@ export default function Loader({ size = "large", defaultColor }: Props) {
 	const color =
 		colorTheme === "dark" ? theme.dark.background : theme.light.background;
 
-	console.log("color: ", color);
-
 	return <ActivityIndicator size={size} color={color} />;
 }

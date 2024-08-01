@@ -64,7 +64,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [session, activeSession]);
 
-	// subscription  listener
+	// subscription listener
 	useEffect(() => {
 		supabase
 			.channel("subscriptions")
@@ -106,7 +106,6 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
 	const fetchSubscription = async (uid: string | null) => {
 		const data = await getSubscription(uid);
-		console.log("fetchSubscription", data);
 		setSubscription(data);
 		return data;
 	};

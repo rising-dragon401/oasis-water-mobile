@@ -90,7 +90,7 @@ export default function SubscribeModal() {
 					</H1> */}
 
 					<Logo />
-					<H2 className="text-center mt-2">Oasis Pro</H2>
+					<H2 className="text-center mt-2">Oasis Member</H2>
 
 					<Muted>Free access for 3 days, then</Muted>
 					<Muted className="mb-4">$47 per year, ($4 /month)</Muted>
@@ -123,7 +123,7 @@ export default function SubscribeModal() {
 					</View>
 				</View>
 
-				<View className="mt-14">
+				<View className="mt-14 px-8">
 					<Button
 						label="Terms of Use"
 						size="sm"

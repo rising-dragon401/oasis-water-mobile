@@ -3,7 +3,7 @@
     "name": "Oasis",
     "slug": "Oasis",
     "scheme": "oasisapp",
-    "version": "0.0.9",
+    "version": "0.1.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -19,7 +19,7 @@
       "supportsTablet": false,
       "usesAppleSignIn": true,
       "bundleIdentifier": "com.liveoasis.oasis",
-      "buildNumber": "2",
+      "buildNumber": "1",
       "associatedDomains": [
         "applinks:oasiswater.app"
       ]
@@ -30,13 +30,23 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.liveoasis.oasis",
-      "versionCode": 4
+      "versionCode": 0,
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "experiments": {
       "typedRoutes": true
     },
     "plugins": [
       "expo-router",
+      "expo-dev-launcher",
+      [
+        "expo-dev-launcher",
+        {
+          "launchMode": "most-recent"
+        }
+      ],
       "expo-apple-authentication",
       [
         "@sentry/react-native/expo",
@@ -66,6 +76,7 @@
     },
     "updates": {
       "url": "https://u.expo.dev/ba3ea707-c8f6-4baf-becd-c2dedfa41b76"
-    }
+    },
+    "owner": "oasis-water"
   }
 }

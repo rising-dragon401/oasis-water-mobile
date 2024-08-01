@@ -72,9 +72,9 @@ export default function FavoriteButton({ item, size = 18 }: Props) {
 	return (
 		<TouchableOpacity onPress={handleFavoriteClick}>
 			{isItemInFavorites ? (
-				<Octicons name="check-circle" size={24} color={iconColor} />
+				<Octicons name="heart-fill" size={24} color={iconColor} />
 			) : (
-				<Octicons name="plus-circle" size={24} color={iconColor} />
+				<Octicons name="heart" size={24} color={iconColor} />
 			)}
 		</TouchableOpacity>
 	);

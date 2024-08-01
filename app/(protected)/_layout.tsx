@@ -39,7 +39,7 @@ export default function ProtectedLayout() {
 					} else if (route.name === "settings") {
 						return <Octicons name="person" size={24} color={color} />;
 					} else if (route.name === "oasis") {
-						return <Ionicons name="water-outline" size={24} color={color} />;
+						return <Ionicons name="heart-outline" size={24} color={color} />;
 					}
 				},
 			})}

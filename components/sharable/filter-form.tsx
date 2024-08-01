@@ -8,7 +8,6 @@ import { getContaminants } from "actions/ingredients";
 import { getFilterDetails } from "@/actions/filters";
 import { useUserProvider } from "@/context/user-provider";
 import { Button } from "../ui/button";
-import BlurredLineItem from "./blurred-line-item";
 import ContaminantTable from "./contaminant-table";
 import ItemImage from "./item-image";
 import Score from "./score";
@@ -198,42 +197,14 @@ export function FilterForm({ id }: Props) {
 								{filter.name}
 							</Typography>
 							{/* <Link href={`/search/company/${filter.company?.name}`}> */}
-							<Typography
-								size="base"
-								fontWeight="normal"
-								className="text-secondary-foreground"
-							>
+							<P>
 								{filter.brand} - {filter.company}
-							</Typography>
+							</P>
+
+							<P className="text-left">
+								Certifications: {filter.certifications || "None"}
+							</P>
 							{/* </Link> */}
-
-							<View className="flex flex-col gap-2 w-72">
-								<BlurredLineItem
-									label="Common contaminants filtered"
-									value={
-										`${commonContaminantsFiltered?.length.toString()} (${percentCommonFiltered}%)` ||
-										"0"
-									}
-									labelClassName="text-red-500"
-									flexDirection="col"
-									isPaywalled
-								/>
-
-								<BlurredLineItem
-									label="Uncommon contaminants filtered"
-									value={
-										`${uncommonContaminantsFiltered?.length.toString()} (${percentUncommonFiltered}%)` ||
-										"0"
-									}
-									labelClassName="text-red-500"
-									flexDirection="col"
-									isPaywalled
-								/>
-
-								<P className="text-left mt-2">
-									Certifications: {filter.certifications || "None"}
-								</P>
-							</View>
 
 							{filter.affiliate_url && (
 								<Button

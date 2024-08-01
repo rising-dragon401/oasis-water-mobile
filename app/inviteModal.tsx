@@ -82,7 +82,7 @@ export default function InviteModal() {
 		if (res) {
 			Alert.alert(
 				"Free month achieved!",
-				"You now have one month access to Oasis Pro. You may need to reload the app.",
+				"You now have one month access to Oasis Members. You may need to reload the app.",
 			);
 
 			await refreshUserData();
