@@ -10,7 +10,7 @@ export default function TopRatedItems() {
 
 	return (
 		<View
-			className="flex-1 items-center justify-between p-4 pb-10 "
+			className="flex-1 items-center justify-between p-4 "
 			style={{ backgroundColor }}
 		>
 			<View className="md:px-0 px-2 ">

@@ -42,9 +42,30 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 		//   }
 		// }
 		const data = await fetchFunction();
-		// localStorage.setItem(key, JSON.stringify(data));
+
+		// Sort the data if the user has a subscription
+		if (subscription && uid) {
+			console.log("sorting");
+
+			const items = data;
+			const indexedItems = data.filter(
+				(item: any) => item.is_indexed !== false,
+			);
+			const nonIndexedItems = data.filter(
+				(item: any) => item.is_indexed === false,
+			);
+
+			console.log("indexedItems:", indexedItems);
+			indexedItems.sort((a: any, b: any) => b.score - a.score);
+			nonIndexedItems.sort((a: any, b: any) => b.score - a.score);
+			items.sort((a: any, b: any) => b.score - a.score);
+
+			setAllItems(items);
+		} else {
+			setAllItems(data);
+		}
+
 		setLoading(false);
-		setAllItems(data);
 	};
 
 	useEffect(() => {
@@ -71,6 +92,15 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 				);
 				navigation.setOptions({
 					title: "Shower filters",
+				});
+				break;
+
+			case "energy_drink":
+				fetchAndSetData("energy_drink", () =>
+					getItems({ limit: 25, sortMethod: "name", type: "energy_drink" }),
+				);
+				navigation.setOptions({
+					title: "Energy drinks",
 				});
 				break;
 			case "flavored_water":
@@ -100,25 +130,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 			default:
 				break;
 		}
-	}, [categoryId]);
-
-	// handle sorting by score
-	useEffect(() => {
-		if (subscription && uid) {
-			setAllItems((prevItems) => {
-				const indexedItems = prevItems.filter(
-					(item) => item.is_indexed !== false,
-				);
-				const nonIndexedItems = prevItems.filter(
-					(item) => item.is_indexed === false,
-				);
-
-				indexedItems.sort((a, b) => b.score - a.score);
-
-				return [...indexedItems, ...nonIndexedItems];
-			});
-		}
-	}, [subscription, uid, loading]);
+	}, [categoryId, subscription, uid]);
 
 	const UnlockTopButton = () => {
 		return (
@@ -136,10 +148,13 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 	};
 
 	return (
-		<View className="pb-14 md:mt-4 mt-0 w-screen px-8">
+		<View className="md:mt-4 mt-0 w-screen px-8">
 			{!subscription && <View className="pb-4">{UnlockTopButton()}</View>}
 
-			<ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
+			<ScrollView
+				contentContainerStyle={{ paddingBottom: 20 }}
+				showsVerticalScrollIndicator={false}
+			>
 				<View className="flex flex-row w-full">
 					<View className="flex-1 pr-1 gap-y-4">
 						{allItems &&

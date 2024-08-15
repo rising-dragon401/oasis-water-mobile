@@ -95,19 +95,19 @@ export default function FavoritesList({
 				</View>
 			</View>
 
-			{favorites && favorites.length > 0 ? (
+			{favorites && favorites?.length > 0 ? (
 				<FlatList
 					data={favorites}
 					renderItem={({ item, index }) => (
 						<View
-							key={item.id}
+							key={item?.id}
 							style={{ width: "48%" }}
 							className={`mb-8 ${index < 2 ? "mt-2" : ""}`}
 						>
 							<ItemPreviewCard item={item} size="md" showFavorite />
 						</View>
 					)}
-					keyExtractor={(item) => item.id}
+					keyExtractor={(item) => item?.id}
 					numColumns={2}
 					showsVerticalScrollIndicator={false}
 					columnWrapperStyle={{ justifyContent: "space-between" }}

@@ -67,7 +67,7 @@ export default function TabOneScreen() {
 	}
 
 	return (
-		<View className="flex flex-col h-full items-center mt-36 p-4">
+		<View className="flex flex-col h-full items-center my-6 p-4">
 			<H2 className="text-center max-w-xs">What are you drinking?</H2>
 
 			<Muted className="text-center mb-4 max-w-md ">
@@ -86,39 +86,37 @@ export default function TabOneScreen() {
 					justifyContent: "space-between",
 					gap: 8,
 					paddingHorizontal: 8,
+					paddingBottom: 24, // Add padding to the bottom
 					rowGap: 16,
 				}}
 				className="overflow-y-scroll"
+				showsVerticalScrollIndicator={false} // Hide scrollbar for cleaner look
 			>
-				{CATEGORIES.map((category) => (
-					<Link
-						key={category.id}
-						href={`/search/top-rated/${category.id}`}
-						style={
-							{
-								// flexBasis: "100%",
-								// borderRadius: 12,
-							}
-						}
-						className="bg-card border-input border h-48 rounded-lg"
-					>
-						<View className="flex flex-col items-center justify-center w-[42vw] gap-2 pt-4">
-							<Image
-								source={{ uri: category.image }}
-								alt={category.title}
-								style={{
-									width: "80%",
-									height: "70%",
-									resizeMode: "contain",
-								}}
-								className="mb-2 w-54 h-48 "
-							/>
-							<Large className="text-center text-md mt-4">
-								{category.title}
-							</Large>
-						</View>
-					</Link>
-				))}
+				{CATEGORIES.sort((a, b) => (b.is_new ? 1 : 0) - (a.is_new ? 1 : 0)).map(
+					(category) => (
+						<Link
+							key={category.id}
+							href={`/search/top-rated/${category.id}`}
+							className="bg-card border-input border h-48 rounded-lg mb-4" // Add margin-bottom
+						>
+							<View className="flex flex-col items-center justify-center w-[42vw] gap-2 pt-4">
+								<Image
+									source={{ uri: category.image }}
+									alt={category.title}
+									style={{
+										width: "80%",
+										height: "70%",
+										resizeMode: "contain",
+									}}
+									className="mb-2 w-54 h-48 "
+								/>
+								<Large className="text-center text-md mt-4">
+									{category.title}
+								</Large>
+							</View>
+						</Link>
+					),
+				)}
 			</ScrollView>
 		</View>
 	);

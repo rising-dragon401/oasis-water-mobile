@@ -1,16 +1,13 @@
-import "expo-dev-client";
-
 import * as Sentry from "@sentry/react-native";
+import "expo-dev-client";
 import { Stack, useNavigationContainerRef } from "expo-router";
 import React from "react";
-
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import "../global.css";
 
 import { RevenueCatProvider } from "@/context/revenue-cat-provider";
 import { SupabaseProvider } from "@/context/supabase-provider";
 import UserProvider from "@/context/user-provider";
-import { theme } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
 import { PortalHost } from "components/primitives/portal";
 import { isRunningInExpoGo } from "expo";
@@ -30,7 +27,7 @@ Sentry.init({
 });
 
 function RootLayout() {
-	const { colorScheme } = useColorScheme();
+	const { colorScheme, backgroundColor } = useColorScheme();
 
 	const ref = useNavigationContainerRef();
 
@@ -50,10 +47,7 @@ function RootLayout() {
 								screenOptions={{
 									headerShown: false,
 									contentStyle: {
-										backgroundColor:
-											colorScheme === "dark"
-												? theme.dark.background
-												: theme.light.background,
+										backgroundColor,
 									},
 								}}
 							>

@@ -114,6 +114,7 @@ export async function getUserFavorites(uid: string) {
 	// go through each favorite and get the data for the favorite. If type is 'bottled_water' search items table. If type is 'tap_water_locations'. If type is 'filter' search water_filters table.
 	const favorites = await Promise.all(
 		data.map(async (favorite) => {
+			let result;
 			if (favorite.type === "bottled_water") {
 				const { data, error } = await supabase
 					.from("items")
@@ -125,7 +126,7 @@ export async function getUserFavorites(uid: string) {
 					throw new Error(error.message);
 				}
 
-				return data;
+				result = data;
 			} else if (favorite.type === "tap_water") {
 				const { data, error } = await supabase
 					.from("tap_water_locations")
@@ -137,7 +138,7 @@ export async function getUserFavorites(uid: string) {
 					throw new Error(error.message);
 				}
 
-				return data;
+				result = data;
 			} else if (favorite.type === "filter") {
 				const { data, error } = await supabase
 					.from("water_filters")
@@ -149,12 +150,18 @@ export async function getUserFavorites(uid: string) {
 					throw new Error(error.message);
 				}
 
-				return data;
+				result = data;
+			}
+
+			// Only return the result if it has an id and image
+			if (result && result.id && result.image) {
+				return result;
 			}
 		}),
 	);
 
-	return favorites;
+	// Filter out any undefined results (where id or image were null)
+	return favorites.filter(Boolean);
 }
 
 export async function updateUserData(id: string, column: string, value: any) {

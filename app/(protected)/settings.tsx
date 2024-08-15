@@ -42,14 +42,15 @@ export default function TabTwoScreen() {
 		<ScrollView
 			contentContainerStyle={{
 				display: "flex",
-				alignItems: "center",
-				justifyContent: "space-between",
+				// alignItems: "center",
+				// justifyContent: "space-between",
 				backgroundColor,
+				height: "100%",
 				paddingBottom: 64,
 			}}
 			className="overflow-y-scroll"
 		>
-			<H1 className="text-center mt-28">Acount</H1>
+			<H1 className="text-center mt-24">Acount</H1>
 
 			{userData ? (
 				<View className="w-full flex flex-col h-full justify-between pb-14 px-8">
@@ -169,10 +170,13 @@ export default function TabTwoScreen() {
 					</View>
 				</View>
 			) : (
-				<View className="w-full justify-center items-center gap-y-2 h-full px-8">
-					<Muted>Not logged in</Muted>
+				<View
+					className="w-full justify-center items-center gap-y-2 px-8 mt-2"
+					style={{ backgroundColor }}
+				>
+					<Muted>Looks like you're not logged in</Muted>
 
-					<Link className="w-full mt-8 text-center" href="/(public)/sign-in">
+					<Link className="w-full text-center mt-4" href="/(public)/sign-in">
 						<P>Sign in</P>
 					</Link>
 				</View>

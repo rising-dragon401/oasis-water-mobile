@@ -61,7 +61,7 @@ const ItemPreviewCard = ({
 
 					{subscription ? (
 						<>
-							{item.is_indexed && item.score ? (
+							{item.score ? (
 								<View className="flex flex-col gap-0 items-end justify-end">
 									<H4>{item.score}</H4>
 									<Muted>/100</Muted>

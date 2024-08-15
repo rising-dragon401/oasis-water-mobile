@@ -5,7 +5,8 @@ export type TabKeys =
 	| "tap_water"
 	| "filter"
 	| "shower_filter"
-	| "bottle_filter";
+	| "bottle_filter"
+	| "energy_drink";
 
 type CategoryType = {
 	id: TabKeys;
@@ -13,6 +14,7 @@ type CategoryType = {
 	href?: string;
 	image: string;
 	tags?: string[];
+	is_new?: boolean;
 };
 
 export const CATEGORIES: CategoryType[] = [
@@ -54,5 +56,12 @@ export const CATEGORIES: CategoryType[] = [
 		title: "Bottle filters",
 		image:
 			"https://connect.live-oasis.com/storage/v1/object/public/website/images/categories/bottle%20filter%20category%20coverpng.png",
+	},
+	{
+		id: "energy_drink",
+		title: "Energy drinks",
+		image:
+			"https://connect.live-oasis.com/storage/v1/object/public/website/images/categories/energy%20drink%20cover.png?t=2024-08-12T21%3A43%3A47.242Z",
+		is_new: true,
 	},
 ];

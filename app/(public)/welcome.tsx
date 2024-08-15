@@ -19,8 +19,7 @@ export default function WelcomeScreen() {
 				<View className="flex flex-1 mt-24 gap-y-4 items-center">
 					<H1 className="text-center">Welcome to your Oasis</H1>
 					<Muted className="text-center max-w-sm">
-						Search, research and find the the healthiest waters for you based on
-						science.
+						Find the best water brands based on science
 					</Muted>
 				</View>
 				<View className="flex flex-col gap-y-6">

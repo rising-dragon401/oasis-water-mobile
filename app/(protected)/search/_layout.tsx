@@ -1,7 +1,13 @@
+import OasisLogo from "@/assets/oasis-word.png";
+import { Image } from "expo-image";
 import { Stack } from "expo-router";
 
 import { theme } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
+
+function CustomHeader() {
+	return <Image source={OasisLogo} style={{ width: 85, height: 24 }} />;
+}
 
 export default function SearchLayout() {
 	const { colorScheme } = useColorScheme();
@@ -30,7 +36,12 @@ export default function SearchLayout() {
 			<Stack.Screen
 				name="index"
 				options={{
-					headerShown: false,
+					headerTitle: () => <CustomHeader />,
+					headerTitleAlign: "center",
+					headerShadowVisible: false,
+					headerStyle: {
+						backgroundColor: theme.light.background,
+					},
 				}}
 			/>
 			<Stack.Screen name="item/[id]" />
