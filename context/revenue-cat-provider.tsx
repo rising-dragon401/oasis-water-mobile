@@ -16,6 +16,7 @@ import { useUserProvider } from "./user-provider";
 
 const APIKeys = {
 	apple: "appl_OIAHthcBxHjpVWGXmtLvBKRTtrR",
+	google: "goog_FvkMjztDreNxCXHMlzQqreSiQxs",
 };
 
 interface RevenueCatProps {
@@ -53,6 +54,8 @@ export const RevenueCatProvider = ({ children }: any) => {
 		const setup = async () => {
 			if (Platform.OS === "ios") {
 				await Purchases.configure({ apiKey: APIKeys.apple });
+			} else {
+				await Purchases.configure({ apiKey: APIKeys.google });
 			}
 
 			setIsReady(true);

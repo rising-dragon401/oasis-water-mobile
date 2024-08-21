@@ -148,7 +148,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 	};
 
 	return (
-		<View className="md:mt-4 mt-0 w-screen px-8">
+		<View className="md:mt-4 mt-0 w-screen px-4">
 			{!subscription && <View className="pb-4">{UnlockTopButton()}</View>}
 
 			<ScrollView
@@ -156,7 +156,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 				showsVerticalScrollIndicator={false}
 			>
 				<View className="flex flex-row w-full">
-					<View className="flex-1 pr-1 gap-y-4">
+					<View className="flex-1 pr-1 gap-4">
 						{allItems &&
 							allItems
 								.filter((item) => !item.is_draft)

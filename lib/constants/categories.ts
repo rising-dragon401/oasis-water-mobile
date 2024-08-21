@@ -13,6 +13,7 @@ type CategoryType = {
 	title: string;
 	href?: string;
 	image: string;
+	icon?: string;
 	tags?: string[];
 	is_new?: boolean;
 };

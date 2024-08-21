@@ -16,9 +16,9 @@ export default function NotFound() {
 				variant="default"
 				size="default"
 				onPress={() => {
-					router.back();
+					router.push("/(public)/welcome");
 				}}
-				label="Go back"
+				label="Go home"
 			/>
 		</View>
 	);

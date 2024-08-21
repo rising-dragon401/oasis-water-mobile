@@ -68,9 +68,11 @@ export default function TabOneScreen() {
 
 	return (
 		<View className="flex flex-col h-full items-center my-6 p-4">
-			<H2 className="text-center max-w-xs">What are you drinking?</H2>
+			<H2 className="text-center max-w-xs border-none">
+				What are you drinking?
+			</H2>
 
-			<Muted className="text-center mb-4 max-w-md ">
+			<Muted className="text-center mb-4 max-w-md">
 				Find the best water brands based on science
 			</Muted>
 
@@ -97,19 +99,22 @@ export default function TabOneScreen() {
 						<Link
 							key={category.id}
 							href={`/search/top-rated/${category.id}`}
-							className="bg-card border-input border h-48 rounded-lg mb-4" // Add margin-bottom
+							className="bg-card border-input border h-44 rounded-lg mb-4" // Add margin-bottom
 						>
 							<View className="flex flex-col items-center justify-center w-[42vw] gap-2 pt-4">
-								<Image
-									source={{ uri: category.image }}
-									alt={category.title}
-									style={{
-										width: "80%",
-										height: "70%",
-										resizeMode: "contain",
-									}}
-									className="mb-2 w-54 h-48 "
-								/>
+								<View className="relative w-36 h-28">
+									<Image
+										source={{ uri: category.image }}
+										alt={category.title}
+										style={{
+											width: "100%",
+											height: "100%",
+											borderTopLeftRadius: 4,
+											borderTopRightRadius: 4,
+										}}
+									/>
+								</View>
+
 								<Large className="text-center text-md mt-4">
 									{category.title}
 								</Large>

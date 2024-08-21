@@ -41,6 +41,22 @@ eas build --platform ios
 eas submit -p ios
 ```
 
+Android development build
+
+```
+eas build --platform android --profile development
+```
+
+```
+npx expo start
+```
+
+Creating android build
+
+```
+eas build --platform android
+```
+
 Trouble shooting
 
 ```

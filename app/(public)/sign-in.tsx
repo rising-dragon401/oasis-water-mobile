@@ -4,7 +4,14 @@ import { useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { ActivityIndicator, View } from "react-native";
+import {
+	ActivityIndicator,
+	Alert,
+	KeyboardAvoidingView,
+	Platform,
+	ScrollView,
+	View,
+} from "react-native";
 import * as z from "zod";
 
 import { SafeAreaView } from "@/components/safe-area-view";
@@ -56,6 +63,12 @@ export default function SignIn() {
 			form.reset();
 		} catch (error: Error | any) {
 			console.log(error.message);
+			Alert.alert(
+				"Sign In Error",
+				error.message,
+				[{ text: "OK", onPress: () => console.log("OK Pressed") }],
+				{ cancelable: false },
+			);
 		}
 	}
 
@@ -70,78 +83,87 @@ export default function SignIn() {
 
 	return (
 		<SafeAreaView className="flex-1 flex-col p-4">
-			<View className="flex-1">
-				<View className="flex flex-col items-start justify-start">
-					<BackButton />
-					<H1 className="self-start">Sign In</H1>
-				</View>
-				<Muted className="self-start mb-5">to continue to your Oasis</Muted>
-				<Form {...form}>
-					<View className="gap-4">
-						<FormField
-							control={form.control}
-							name="email"
-							render={({ field }) => (
-								<FormInput
-									label="Email"
-									placeholder="Email"
-									autoCapitalize="none"
-									autoComplete="email"
-									autoCorrect={false}
-									keyboardType="email-address"
-									{...field}
+			<KeyboardAvoidingView
+				behavior={Platform.OS === "ios" ? "padding" : "height"}
+				className="flex-1"
+			>
+				<ScrollView contentContainerClassName="flex-grow p-4">
+					<View className="flex-1">
+						<View className="flex flex-col items-start justify-start">
+							<BackButton />
+							<H1 className="self-start">Sign In</H1>
+						</View>
+						<Muted className="self-start mb-5">to continue to your Oasis</Muted>
+						<Form {...form}>
+							<View className="gap-4">
+								<FormField
+									control={form.control}
+									name="email"
+									render={({ field }) => (
+										<FormInput
+											label="Email"
+											placeholder="Email"
+											autoCapitalize="none"
+											autoComplete="email"
+											autoCorrect={false}
+											keyboardType="email-address"
+											{...field}
+										/>
+									)}
 								/>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name="password"
-							render={({ field }) => (
-								<FormInput
-									label="Password"
-									placeholder="Password"
-									autoCapitalize="none"
-									autoCorrect={false}
-									secureTextEntry
-									{...field}
+								<FormField
+									control={form.control}
+									name="password"
+									render={({ field }) => (
+										<FormInput
+											label="Password"
+											placeholder="Password"
+											autoCapitalize="none"
+											autoCorrect={false}
+											secureTextEntry
+											{...field}
+										/>
+									)}
 								/>
-							)}
-						/>
+							</View>
+						</Form>
 					</View>
-				</Form>
-			</View>
 
-			<View className="gap-y-4 ">
-				<Button
-					size="default"
-					variant="default"
-					onPress={form.handleSubmit(onSubmit)}
-					label="Sign In"
-				>
-					{form.formState.isSubmitting && <ActivityIndicator size="small" />}
-				</Button>
+					<View className="gap-y-4 mt-2">
+						<Button
+							size="default"
+							variant="default"
+							onPress={form.handleSubmit(onSubmit)}
+							label="Sign In"
+						>
+							{form.formState.isSubmitting && (
+								<ActivityIndicator size="small" />
+							)}
+						</Button>
 
-				<Separator orientation="horizontal" />
-				<Button
-					variant="outline"
-					loading={loading}
-					onPress={() => onSignInWithGoogle()}
-					label="Sign In with Google"
-					icon={<FontAwesome6 name="google" size={12} color={iconColor} />}
-					iconPosition="left"
-				/>
-				<AppleAuthButton />
+						<Separator orientation="horizontal" />
+						<Button
+							variant="outline"
+							loading={loading}
+							onPress={() => onSignInWithGoogle()}
+							label="Sign In with Google"
+							icon={<FontAwesome6 name="google" size={12} color={iconColor} />}
+							iconPosition="left"
+						/>
+						<AppleAuthButton />
 
-				<Muted
-					className="text-center"
-					onPress={() => {
-						router.replace("/sign-up");
-					}}
-				>
-					Don't have an account?{" "}
-					<Muted className="text-foreground">Sign up</Muted>
-				</Muted>
-			</View>
+						<Muted
+							className="text-center"
+							onPress={() => {
+								router.replace("/sign-up");
+							}}
+						>
+							Don't have an account?{" "}
+							<Muted className="text-foreground">Sign up</Muted>
+						</Muted>
+					</View>
+				</ScrollView>
+			</KeyboardAvoidingView>
 		</SafeAreaView>
 	);
 }

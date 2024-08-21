@@ -60,7 +60,7 @@ export default function SubscribeModal() {
 
 			if (!pack) {
 				console.log("No package found");
-				return;
+				throw new Error("No package found");
 			}
 
 			const res = await purchasePackage!(pack);

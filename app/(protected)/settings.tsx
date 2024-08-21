@@ -45,15 +45,15 @@ export default function TabTwoScreen() {
 				// alignItems: "center",
 				// justifyContent: "space-between",
 				backgroundColor,
-				height: "100%",
+				// height: "100%",
 				paddingBottom: 64,
 			}}
 			className="overflow-y-scroll"
 		>
-			<H1 className="text-center mt-24">Acount</H1>
-
 			{userData ? (
 				<View className="w-full flex flex-col h-full justify-between pb-14 px-8">
+					<H1 className="text-center mt-24">Acount</H1>
+
 					<View>
 						<Typography
 							size="base"
@@ -171,9 +171,10 @@ export default function TabTwoScreen() {
 				</View>
 			) : (
 				<View
-					className="w-full justify-center items-center gap-y-2 px-8 mt-2"
+					className="w-full min-h-screen justify-start items-center gap-y-2 px-8 mt-2"
 					style={{ backgroundColor }}
 				>
+					<H1 className="text-center mt-24">Acount</H1>
 					<Muted>Looks like you're not logged in</Muted>
 
 					<Link className="w-full text-center mt-4" href="/(public)/sign-in">
