@@ -90,12 +90,12 @@ export default function SubscribeModal() {
 					</H1> */}
 
 					<Logo />
-					<H2 className="text-center mt-2">Oasis Member</H2>
+					<H2 className="text-center pt-4">Oasis Member</H2>
 
 					<Muted>Free access for 3 days, then</Muted>
 					<Muted className="mb-4">$47 per year, ($4 /month)</Muted>
 
-					<View className="w-full gap-y-3 bg-background py-4 max-w-sm rounded-lg">
+					<View className="w-full gap-y-3 bg-card py-4 max-w-sm rounded-lg">
 						{FEATURES.map((feature, index) => (
 							<P key={index} className="text-center">
 								{feature.label}

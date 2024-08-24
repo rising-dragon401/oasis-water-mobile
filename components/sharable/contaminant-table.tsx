@@ -3,6 +3,7 @@ import { View } from "react-native";
 import useSWR from "swr";
 
 import { getContaminants } from "@/actions/ingredients";
+import { P } from "@/components/ui/typography";
 import { useColorScheme } from "@/lib/useColorScheme";
 import {
 	Accordion,
@@ -96,7 +97,7 @@ export default function ContaminantTable({
 
 	return (
 		<>
-			<Typography size="xl" fontWeight="normal">
+			<Typography size="xl" fontWeight="bold">
 				Contaminants filtered
 			</Typography>
 
@@ -128,34 +129,14 @@ export default function ContaminantTable({
 								</View>
 							</AccordionTrigger>
 							<AccordionContent>
-								<View className="flex flex-col gap-y-4">
-									{item.contaminants?.map((contaminant: any) => (
-										<View
-											// @ts-ignore
-											// href={determineLink(contaminant)}
-											className="flex flex-row gap-6 justify-between items-center"
-											key={contaminant.name}
-										>
-											<View className="w-96" key={contaminant.name}>
-												<Typography size="base" fontWeight="normal">
-													{contaminant.name}{" "}
-													{contaminant?.is_common ? "(c)" : ""}
-												</Typography>
-											</View>
-											{/* <View className="w-14">
-											{contaminant.isFiltered ? (
-												<Octicons name="check" size={12} color={iconColor} />
-											) : (
-												<Octicons name="x" size={12} color={iconColor} />
-											)}
-										</View> */}
-											{/* <ContaminantFiltersDropdown
-											contaminantId={contaminant?.id}
-											align="end"
-										/> */}
-										</View>
-									))}
-								</View>
+								<P>
+									{item.contaminants
+										?.map(
+											(contaminant: any, index: number) =>
+												`${contaminant.name}${contaminant?.is_common ? " (c)" : ""}${index < item.contaminants.length - 1 ? ", " : ""}`,
+										)
+										.join("")}
+								</P>
 							</AccordionContent>
 						</AccordionItem>
 					</Accordion>

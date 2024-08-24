@@ -3,7 +3,7 @@ import { Link } from "expo-router";
 import { View } from "react-native";
 
 import FavoritesList from "@/components/sharable/favorites-list";
-import { H1, Muted } from "@/components/ui/typography";
+import { H1, Muted, P } from "@/components/ui/typography";
 import { theme } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
 
@@ -53,7 +53,7 @@ export default function OasisScreen() {
 					</View>
 
 					<Link className="w-full mt-2 text-center" href="/(public)/sign-in">
-						Sign in
+						<P>Sign in</P>
 					</Link>
 				</View>
 			)}

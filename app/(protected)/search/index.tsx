@@ -1,10 +1,10 @@
 import { Image } from "expo-image";
 import { Link, usePathname, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { ScrollView, View } from "react-native";
+import { FlatList, View } from "react-native";
 
 import Search from "@/components/sharable/search";
-import { H2, Large, Muted } from "@/components/ui/typography";
+import { H2, Muted, P } from "@/components/ui/typography";
 import { useUserProvider } from "@/context/user-provider";
 import { CATEGORIES } from "@/lib/constants/categories";
 
@@ -68,61 +68,55 @@ export default function TabOneScreen() {
 
 	return (
 		<View className="flex flex-col h-full items-center my-6 p-4">
-			<H2 className="text-center max-w-xs border-none">
-				What are you drinking?
-			</H2>
+			<H2 className="text-center max-w-xs border-none">Search healthy water</H2>
 
 			<Muted className="text-center mb-4 max-w-md">
-				Find the best water brands based on science
+				Discover the best water products based on science.
 			</Muted>
 
 			<View className="mb-8 w-[90%] z-40">
 				<Search />
 			</View>
 
-			<ScrollView
+			<FlatList
+				data={CATEGORIES.sort(
+					(a, b) => (b.is_new ? 1 : 0) - (a.is_new ? 1 : 0),
+				)}
+				numColumns={2}
 				contentContainerStyle={{
 					width: "100%",
-					flexDirection: "row",
-					flexWrap: "wrap",
-					justifyContent: "space-between",
-					gap: 8,
 					paddingHorizontal: 8,
-					paddingBottom: 24, // Add padding to the bottom
-					rowGap: 16,
+					paddingBottom: 24,
+				}}
+				columnWrapperStyle={{
+					justifyContent: "space-between",
 				}}
 				className="overflow-y-scroll"
-				showsVerticalScrollIndicator={false} // Hide scrollbar for cleaner look
-			>
-				{CATEGORIES.sort((a, b) => (b.is_new ? 1 : 0) - (a.is_new ? 1 : 0)).map(
-					(category) => (
+				showsVerticalScrollIndicator={false}
+				renderItem={({ item: category }) => (
+					<View className="mb-10 w-[48%] h-[120px] rounded-xl bg-card">
 						<Link
 							key={category.id}
 							href={`/search/top-rated/${category.id}`}
-							className="bg-card border-input border h-44 rounded-lg mb-4" // Add margin-bottom
+							className=""
 						>
-							<View className="flex flex-col items-center justify-center w-[42vw] gap-2 pt-4">
-								<View className="relative w-36 h-28">
-									<Image
-										source={{ uri: category.image }}
-										alt={category.title}
-										style={{
-											width: "100%",
-											height: "100%",
-											borderTopLeftRadius: 4,
-											borderTopRightRadius: 4,
-										}}
-									/>
-								</View>
-
-								<Large className="text-center text-md mt-4">
-									{category.title}
-								</Large>
+							<View className="relative w-full aspect-[4.5/3] flex items-center justify-center rounded-xl">
+								<Image
+									source={{ uri: category.image }}
+									alt={category.title}
+									style={{
+										width: "70%",
+										height: "80%",
+										borderRadius: 4,
+									}}
+								/>
 							</View>
 						</Link>
-					),
+						<P className="text-left text-lg font-medium">{category.title}</P>
+					</View>
 				)}
-			</ScrollView>
+				keyExtractor={(item) => item.id}
+			/>
 		</View>
 	);
 }

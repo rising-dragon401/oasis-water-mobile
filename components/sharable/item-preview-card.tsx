@@ -1,3 +1,4 @@
+import { useColorScheme } from "@/lib/useColorScheme";
 import { useUserProvider } from "context/user-provider";
 import { Image } from "expo-image";
 import { Link } from "expo-router";
@@ -5,7 +6,6 @@ import React from "react";
 import { Text, View } from "react-native";
 
 import { H4, Muted, P } from "@/components/ui/typography";
-import { useColorScheme } from "@/lib/useColorScheme";
 import { determineLink } from "@/lib/utils";
 import { Octicons } from "@expo/vector-icons";
 import FavoriteButton from "./favorite-button";
@@ -26,26 +26,21 @@ const ItemPreviewCard = ({
 	showFavorite = false,
 }: Props) => {
 	const { subscription } = useUserProvider();
-	const { borderColor } = useColorScheme();
+	const { textColor } = useColorScheme();
 
 	return (
 		// @ts-ignore
 		<Link href={determineLink(item)}>
-			<View
-				className="flex flex-col items-center gap-2 border rounded-md"
-				style={{ borderColor }}
-			>
-				<View className="relative h-48 w-48">
+			<View className="flex flex-col items-center gap-2 rounded-md">
+				<View className="relative h-48 w-48 bg-input">
 					<Image
 						source={{ uri: item.image || undefined }}
 						style={{
 							width: "100%",
 							height: "100%",
-							borderTopLeftRadius: 4,
-							borderTopRightRadius: 4,
+							borderRadius: 8,
 						}}
 						placeholder={{ blurhash }}
-						resizeMode="cover"
 					/>
 
 					{showFavorite && (
@@ -73,7 +68,7 @@ const ItemPreviewCard = ({
 							)}
 						</>
 					) : (
-						<Octicons name="lock" size={16} color="blue" />
+						<Octicons name="lock" size={16} color={textColor} />
 					)}
 				</View>
 			</View>

@@ -12,6 +12,7 @@ type BlurredLineItemProps = {
 	labelClassName?: string;
 	flexDirection?: "row" | "col";
 	isPaywalled?: boolean;
+	score?: "good" | "bad" | "neutral";
 };
 
 export default function BlurredLineItem({
@@ -20,10 +21,11 @@ export default function BlurredLineItem({
 	labelClassName,
 	flexDirection = "row",
 	isPaywalled = false,
+	score,
 }: BlurredLineItemProps) {
 	const router = useRouter();
 	const { subscription } = useUserProvider();
-	const { iconColor } = useColorScheme();
+	const { textColor } = useColorScheme();
 
 	const handleOpenPaywall = () => {
 		if (!subscription) {
@@ -33,24 +35,30 @@ export default function BlurredLineItem({
 
 	const showPaywall = !subscription && isPaywalled;
 
-	const alignItems = flexDirection === "row" ? "items-center" : "items-left";
+	const colorMark =
+		score === "good"
+			? "bg-green-200"
+			: score === "bad"
+				? "bg-red-200"
+				: "bg-gray-200";
 
 	return (
-		<View
-			className={`flex flex-${flexDirection} ${alignItems} justify-between`}
-		>
-			<P className={labelClassName}>{label}: </P>
+		<View className="flex flex-row justify-between w-full">
+			<P className="flex-wrap max-w-30">{label}</P>
+			<View className="flex flex-row gap-2 items-center min-w-18">
+				{showPaywall ? (
+					<TouchableOpacity
+						onPress={handleOpenPaywall}
+						className="cursor-pointer"
+					>
+						<Feather name="lock" size={16} color={textColor} />
+					</TouchableOpacity>
+				) : (
+					<P className="min-w-14 text-right">{value}</P>
+				)}
 
-			{!showPaywall && <P>{value}</P>}
-
-			{showPaywall && (
-				<TouchableOpacity
-					onPress={showPaywall ? handleOpenPaywall : undefined}
-					className=""
-				>
-					<Feather name="lock" size={18} color={iconColor} />
-				</TouchableOpacity>
-			)}
+				<View className={`min-w-8 h-4 rounded-full ${colorMark}`} />
+			</View>
 		</View>
 	);
 }

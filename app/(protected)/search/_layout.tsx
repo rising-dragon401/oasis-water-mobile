@@ -2,7 +2,6 @@ import OasisLogo from "@/assets/oasis-word.png";
 import { Image } from "expo-image";
 import { Stack } from "expo-router";
 
-import { theme } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 function CustomHeader() {
@@ -10,12 +9,7 @@ function CustomHeader() {
 }
 
 export default function SearchLayout() {
-	const { colorScheme } = useColorScheme();
-
-	const backgroundColor =
-		colorScheme === "dark" ? theme.dark.background : theme.light.background;
-	const textColor =
-		colorScheme === "dark" ? theme.dark.primary : theme.light.primary;
+	const { backgroundColor, textColor } = useColorScheme();
 
 	return (
 		<Stack
@@ -40,7 +34,7 @@ export default function SearchLayout() {
 					headerTitleAlign: "center",
 					headerShadowVisible: false,
 					headerStyle: {
-						backgroundColor: theme.light.background,
+						backgroundColor,
 					},
 				}}
 			/>

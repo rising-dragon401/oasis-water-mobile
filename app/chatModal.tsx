@@ -41,7 +41,7 @@ export default function ChatModal() {
 	const { subscription, uid } = useUserProvider();
 	const router = useRouter();
 	const { userData } = useUserProvider();
-	const { iconColor } = useColorScheme();
+	const { iconColor, backgroundColor } = useColorScheme();
 
 	const [query, setQuery] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
@@ -252,7 +252,7 @@ export default function ChatModal() {
 			behavior={Platform.OS === "ios" ? "padding" : "height"}
 			keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
 		>
-			<View className="flex flex-1 flex-col bg-background pt-5 py-4">
+			<View className="flex flex-1 flex-col pt-5 py-4">
 				<View className="flex flex-row items-center justify-center relative">
 					<View />
 					<H3 className="text-center mb-4">Chat with Oasis</H3>

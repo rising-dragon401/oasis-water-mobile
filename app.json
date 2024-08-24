@@ -3,7 +3,7 @@
     "name": "Oasis",
     "slug": "Oasis",
     "scheme": "oasisapp",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -19,7 +19,7 @@
       "supportsTablet": false,
       "usesAppleSignIn": true,
       "bundleIdentifier": "com.liveoasis.oasis",
-      "buildNumber": "1",
+      "buildNumber": "3",
       "associatedDomains": [
         "applinks:oasiswater.app"
       ]

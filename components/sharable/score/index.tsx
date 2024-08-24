@@ -1,4 +1,5 @@
 import { Muted, P } from "@/components/ui/typography";
+import { useColorScheme } from "@/lib/useColorScheme";
 import { Feather, Octicons } from "@expo/vector-icons";
 import { useUserProvider } from "context/user-provider";
 import { useRouter } from "expo-router";
@@ -15,6 +16,7 @@ type Props = {
 export default function Score({ score, size, showScore = false }: Props) {
 	const router = useRouter();
 	const { subscription } = useUserProvider();
+	const { textColor } = useColorScheme();
 
 	const radius =
 		size === "xl"
@@ -22,10 +24,11 @@ export default function Score({ score, size, showScore = false }: Props) {
 			: size === "lg"
 				? 70
 				: size === "md"
-					? 60
+					? 50
 					: size === "sm"
 						? 50
 						: 40;
+
 	const strokeWidth = 6;
 	const svgSize = 2 * (radius + strokeWidth); // Adjust SVG size to accommodate stroke
 	const circumference = 2 * Math.PI * radius;
@@ -37,10 +40,11 @@ export default function Score({ score, size, showScore = false }: Props) {
 			: size === "lg"
 				? 16
 				: size === "md"
-					? 14
+					? 10
 					: size === "sm"
 						? 12
 						: 10;
+
 	const grade = () => {
 		if (score >= 90) {
 			return "Excellent";
@@ -87,7 +91,7 @@ export default function Score({ score, size, showScore = false }: Props) {
 				<View className="absolute flex-1 flex-col justify-center items-center">
 					<P>Score:</P>
 					<View className="flex-1 flex-row items-center gap-2">
-						<Octicons name="lock" size={16} color="blue" />
+						<Octicons name="lock" size={16} color={textColor} />
 						<Muted>/ 100</Muted>
 					</View>
 				</View>
@@ -106,7 +110,7 @@ export default function Score({ score, size, showScore = false }: Props) {
 		>
 			<Svg width={svgSize} height={svgSize}>
 				<Circle
-					stroke="blue"
+					stroke={textColor}
 					strokeWidth={strokeWidth}
 					fill="transparent"
 					r={radius}
@@ -115,7 +119,7 @@ export default function Score({ score, size, showScore = false }: Props) {
 					strokeOpacity={0.3}
 				/>
 				<Circle
-					stroke="blue"
+					stroke={textColor}
 					strokeWidth={strokeWidth}
 					strokeDasharray={`${circumference} ${circumference}`}
 					strokeDashoffset={offset}
@@ -137,9 +141,9 @@ export default function Score({ score, size, showScore = false }: Props) {
 				)}
 
 				<Typography
-					size="base"
+					size="xs"
 					fontWeight="normal"
-					className="text-primary mt-1"
+					className="text-primary"
 					style={{ fontSize }}
 				>
 					{grade()}

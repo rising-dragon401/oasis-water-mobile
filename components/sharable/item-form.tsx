@@ -87,6 +87,31 @@ export function ItemForm({ id }: Props) {
 				? "Some"
 				: "No";
 
+	const harmfulIngredients = item.ingredients?.filter(
+		(ingredient: any) => ingredient.severity_score > 0,
+	);
+
+	const waterSource = (() => {
+		switch (item.water_source) {
+			case "municipal_supply":
+				return "Tap water";
+			case "mountain_spring":
+				return "Mountain Spring";
+			case "aquifer":
+				return "Aquifer";
+			case "iceberg":
+				return "Iceberg";
+			case "spring":
+				return "Spring";
+			case "well":
+				return "Well";
+			case "rain":
+				return "Rain";
+			default:
+				return "Unknown";
+		}
+	})();
+
 	return (
 		<ScrollView
 			contentContainerStyle={{
@@ -94,7 +119,7 @@ export function ItemForm({ id }: Props) {
 			}}
 		>
 			<View className="w-full items-center justify-center px-8">
-				<View className="flex flex-col gap-6 justify-center items-center w-full">
+				<View className="flex flex-col gap-2 justify-center items-center w-full">
 					<View className="flex justify-center items-center h-80 w-80 p-4">
 						<ItemImage src={item.image} alt={item.name} thing={item} />
 					</View>
@@ -107,83 +132,123 @@ export function ItemForm({ id }: Props) {
 							<Link href={`/search/company/${item.company?.name}`}>
 								<Muted>{item.company?.name}</Muted>
 							</Link>
-
-							<View className="mt-2">
-								{item.is_indexed !== false ? (
-									<View className="flex flex-col w-56 justify-between gap-y-2">
-										<BlurredLineItem
-											label="Contaminants found"
-											value={contaminants.length}
-											labelClassName="text-red-500"
-										/>
-
-										{item.type === "bottled_water" && (
-											<>
-												<BlurredLineItem
-													label="Toxins above guidelines"
-													value={contaminantsAboveLimit.length}
-													labelClassName="text-red-500"
-												/>
-
-												<BlurredLineItem
-													label="Microplastics"
-													value={nanoPlasticsValue}
-													isPaywalled
-												/>
-
-												<BlurredLineItem
-													label="Fluoride"
-													value={fluorideValue}
-													isPaywalled
-												/>
-
-												<BlurredLineItem
-													label="pH"
-													value={item.metadata?.ph_level}
-													isPaywalled
-												/>
-
-												<BlurredLineItem
-													label="TDS"
-													value={item.metadata?.tds ?? "Unknown"}
-													isPaywalled
-												/>
-
-												<BlurredLineItem
-													label="PFAS"
-													value={item.metadata?.pfas || "Unknown"}
-													isPaywalled
-												/>
-											</>
-										)}
-
-										<View className="flex flex-col md:w-40 w-full md:mt-6 mt-2 gap-2">
-											{item.affiliate_url && (
-												<Button
-													variant={item.score > 70 ? "outline" : "outline"}
-													onPress={() => {
-														Linking.openURL(item.affiliate_url);
-													}}
-													label="Learn more"
-													icon={
-														<Octicons
-															name="arrow-right"
-															size={12}
-															color={iconColor}
-														/>
-													}
-													iconPosition="right"
-												/>
-											)}
-										</View>
-									</View>
-								) : null}
-							</View>
 						</View>
 
-						<View className="flex w-1/3 flex-col-reverse justify-end items-end">
+						<View className="flex w-1/3 flex-col-reverse justify-end items-end -mt-2">
 							<Score score={item.score} size="md" />
 						</View>
+					</View>
+
+					<View className="flex flex-col gap-10 gap-y-1 w-full mt-2 ">
+						{item.is_indexed && (
+							<View className="flex flex-col gap-y-1 w-full">
+								<BlurredLineItem
+									label="Contaminants"
+									value={contaminants.length}
+									isPaywalled={false}
+									score={contaminants.length > 0 ? "bad" : "good"}
+								/>
+
+								<BlurredLineItem
+									label="Above guidelines"
+									value={contaminantsAboveLimit.length}
+									isPaywalled={false}
+									score={contaminantsAboveLimit.length > 0 ? "bad" : "good"}
+								/>
+
+								<BlurredLineItem
+									label="pH"
+									value={
+										item.metadata?.ph_level === 0 ||
+										item.metadata?.ph_level == null
+											? "Unknown"
+											: item.metadata.ph_level
+									}
+									isPaywalled={false}
+									score={
+										parseFloat(item.metadata?.ph_level) > 7 ? "good" : "neutral"
+									}
+								/>
+
+								<BlurredLineItem
+									label="TDS"
+									value={item.metadata?.tds || "N/A"}
+									isPaywalled={false}
+									score="neutral"
+								/>
+
+								<BlurredLineItem
+									label="PFAS"
+									value={item.metadata?.pfas || "N/A"}
+									isPaywalled={false}
+									score={item.metadata?.pfas === "Yes" ? "bad" : "good"}
+								/>
+
+								<BlurredLineItem
+									label="Fluoride"
+									value={fluorideValue}
+									isPaywalled={false}
+									score={parseFloat(fluorideValue) > 0 ? "bad" : "good"}
+								/>
+							</View>
+						)}
+
+						<View className="flex flex-col gap-y-1 w-full">
+							<BlurredLineItem
+								label="Harmful ingredients"
+								value={harmfulIngredients?.length}
+								isPaywalled={false}
+								score={harmfulIngredients?.length > 0 ? "bad" : "good"}
+							/>
+
+							<BlurredLineItem
+								label="Microplastics"
+								value={nanoPlasticsValue}
+								isPaywalled={false}
+								score={nanoPlasticsValue === "Yes" ? "bad" : "good"}
+							/>
+
+							<BlurredLineItem
+								label="Packaging"
+								value={
+									item?.packaging
+										? item.packaging.charAt(0).toUpperCase() +
+											item.packaging.slice(1)
+										: "Unknown"
+								}
+								isPaywalled={false}
+								score={item.packaging === "glass" ? "good" : "bad"}
+							/>
+
+							<BlurredLineItem
+								label="Source"
+								value={waterSource ? waterSource : "Unknown"}
+								isPaywalled={false}
+								score={
+									item.water_source === "spring" ||
+									item.water_source === "aquifer" ||
+									item.water_source === "mountain_spring"
+										? "good"
+										: "bad"
+								}
+							/>
+						</View>
+					</View>
+
+					<View className="flex flex-col md:w-40 w-full md:mt-6 mt-2 gap-2">
+						{item.affiliate_url && (
+							<Button
+								variant={item.score > 70 ? "outline" : "outline"}
+								onPress={() => {
+									Linking.openURL(item.affiliate_url);
+								}}
+								label="Learn more"
+								icon={
+									<Octicons name="arrow-right" size={12} color={iconColor} />
+								}
+								iconPosition="right"
+							/>
+						)}
 					</View>
 				</View>
 

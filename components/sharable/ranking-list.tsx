@@ -1,11 +1,13 @@
 import { getFilters } from "@/actions/filters";
 import { getItems } from "@/actions/items";
-import { Button } from "@/components/ui/button";
 import { Octicons } from "@expo/vector-icons";
 import { useNavigation, useRouter } from "expo-router";
-import { ScrollView, View } from "react-native";
+import { FlatList, View } from "react-native";
 
+import { Button } from "@/components/ui/button";
+import { H2, Muted } from "@/components/ui/typography";
 import { useUserProvider } from "@/context/user-provider";
+import { useColorScheme } from "@/lib/useColorScheme";
 
 import { useEffect, useState } from "react";
 import ItemPreviewCard from "./item-preview-card";
@@ -15,9 +17,11 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 	const { subscription, uid } = useUserProvider();
 	const router = useRouter();
 	const navigation = useNavigation();
+	const { backgroundColor } = useColorScheme();
 
 	const [loading, setLoading] = useState(true);
 	const [allItems, setAllItems] = useState<any[]>([]);
+	const [title, setTitle] = useState<string>("");
 
 	const fetchAndSetData = async (
 		key: string,
@@ -55,7 +59,6 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 				(item: any) => item.is_indexed === false,
 			);
 
-			console.log("indexedItems:", indexedItems);
 			indexedItems.sort((a: any, b: any) => b.score - a.score);
 			nonIndexedItems.sort((a: any, b: any) => b.score - a.score);
 			items.sort((a: any, b: any) => b.score - a.score);
@@ -77,6 +80,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 				navigation.setOptions({
 					title: "Bottled water",
 				});
+				setTitle("Bottled water");
 				break;
 			case "filter":
 				fetchAndSetData("filter", () =>
@@ -85,6 +89,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 				navigation.setOptions({
 					title: "Filters",
 				});
+				setTitle("Filters");
 				break;
 			case "shower_filter":
 				fetchAndSetData("shower_filter", () =>
@@ -93,6 +98,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 				navigation.setOptions({
 					title: "Shower filters",
 				});
+				setTitle("Shower filters");
 				break;
 
 			case "energy_drink":
@@ -102,6 +108,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 				navigation.setOptions({
 					title: "Energy drinks",
 				});
+				setTitle("Energy drinks");
 				break;
 			case "flavored_water":
 				fetchAndSetData("flavored_water", () =>
@@ -110,6 +117,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 				navigation.setOptions({
 					title: "Flavored water",
 				});
+				setTitle("Flavored water");
 				break;
 			case "gallons":
 				fetchAndSetData("gallons", () =>
@@ -118,6 +126,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 				navigation.setOptions({
 					title: "Water gallons",
 				});
+				setTitle("Water gallons");
 				break;
 			case "bottle_filter":
 				fetchAndSetData("bottle_filter", () =>
@@ -126,60 +135,68 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 				navigation.setOptions({
 					title: "Bottle filters",
 				});
+				setTitle("Bottle filters");
 				break;
 			default:
 				break;
 		}
 	}, [categoryId, subscription, uid]);
 
-	const UnlockTopButton = () => {
-		return (
-			<Button
-				className="w-full"
-				variant="default"
-				label="Unlock top rated"
-				icon={<Octicons name="lock" size={16} color="white" />}
-				iconPosition="left"
-				onPress={() => {
-					router.push("/subscribeModal");
-				}}
-			/>
-		);
-	};
+	const renderItem = ({ item }: { item: any }) => (
+		<ItemPreviewCard key={item.id} item={item} />
+	);
+
+	const renderLoader = () => (
+		<>
+			{Array(10)
+				.fill(0)
+				.map((_, index) => (
+					<Loader key={`loader-${index}`} />
+				))}
+		</>
+	);
 
 	return (
 		<View className="md:mt-4 mt-0 w-screen px-4">
-			{!subscription && <View className="pb-4">{UnlockTopButton()}</View>}
-
-			<ScrollView
-				contentContainerStyle={{ paddingBottom: 20 }}
-				showsVerticalScrollIndicator={false}
-			>
-				<View className="flex flex-row w-full">
-					<View className="flex-1 pr-1 gap-4">
-						{allItems &&
-							allItems
-								.filter((item) => !item.is_draft)
-								.filter((_, index) => index % 2 === 0)
-								.map((item) => <ItemPreviewCard key={item.id} item={item} />)}
-						{(loading || !allItems) &&
-							Array(5)
-								.fill(0)
-								.map((_, index) => <Loader key={`loader-left-${index}`} />)}
-					</View>
-					<View className="flex-1 pl-1 gap-y-4">
-						{allItems &&
-							allItems
-								.filter((item) => !item.is_draft)
-								.filter((_, index) => index % 2 !== 0)
-								.map((item) => <ItemPreviewCard key={item.id} item={item} />)}
-						{(loading || !allItems) &&
-							Array(5)
-								.fill(0)
-								.map((_, index) => <Loader key={`loader-right-${index}`} />)}
-					</View>
+			{!subscription ? (
+				<View className="pb-4 px-4">
+					<H2>All {title.charAt(0).toLowerCase() + title.slice(1)}</H2>
+					<Muted>
+						Want to know the best{" "}
+						{title.charAt(0).toLowerCase() + title.slice(1)} based on science?
+					</Muted>
+					<Button
+						className="w-56 mt-2"
+						variant="default"
+						label="Show me the ratings"
+						icon={<Octicons name="lock" size={16} color={backgroundColor} />}
+						iconPosition="left"
+						onPress={() => {
+							router.push("/subscribeModal");
+						}}
+					/>
 				</View>
-			</ScrollView>
+			) : (
+				<View className="pb-4">
+					<H2>Top {title.charAt(0).toLowerCase() + title.slice(1)}</H2>
+					<Muted>
+						Best {title.charAt(0).toLowerCase() + title.slice(1)} based on
+						science and lab reports sorted by score{" "}
+					</Muted>
+				</View>
+			)}
+
+			<FlatList
+				data={allItems?.filter((item) => !item.is_draft) || []}
+				renderItem={renderItem}
+				keyExtractor={(item) => item.id}
+				numColumns={2}
+				columnWrapperStyle={{ justifyContent: "space-around", gap: 8 }}
+				contentContainerStyle={{ paddingTop: 0, paddingBottom: 20, gap: 16 }}
+				showsVerticalScrollIndicator={false}
+				ListEmptyComponent={loading ? renderLoader() : null}
+				ListHeaderComponent={<View style={{ height: 1 }} />}
+			/>
 		</View>
 	);
 }

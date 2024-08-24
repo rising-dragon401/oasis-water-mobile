@@ -154,7 +154,7 @@ export default function SignUp() {
 							</View>
 						</Form>
 					</View>
-					<View className="gap-y-4">
+					<View className="gap-y-4 mt-2">
 						<Button
 							size="default"
 							variant="default"
@@ -164,7 +164,7 @@ export default function SignUp() {
 						/>
 						<Separator orientation="horizontal" />
 						<Button
-							variant="outline"
+							variant="secondary"
 							loading={loading}
 							onPress={() => onSignInWithGoogle()}
 							label="Sign Up with Google"

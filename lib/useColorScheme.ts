@@ -14,6 +14,9 @@ export function useColorScheme() {
 	const backgroundColor =
 		colorScheme === "dark" ? theme.dark.background : theme.light.background;
 
+	const textColor =
+		colorScheme === "dark" ? theme.dark.primary : theme.light.primary;
+
 	return {
 		colorScheme: colorScheme ?? "dark",
 		isDarkColorScheme: colorScheme === "dark",
@@ -22,5 +25,6 @@ export function useColorScheme() {
 		iconColor,
 		borderColor,
 		backgroundColor,
+		textColor,
 	};
 }

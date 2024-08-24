@@ -27,7 +27,7 @@ Sentry.init({
 });
 
 function RootLayout() {
-	const { colorScheme, backgroundColor } = useColorScheme();
+	const { backgroundColor } = useColorScheme();
 
 	const ref = useNavigationContainerRef();
 

@@ -1,18 +1,19 @@
-import * as Linking from "expo-linking";
 import { useNavigation } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, ScrollView, View } from "react-native";
 
-import { getContaminants } from "actions/ingredients";
-
 import { getFilterDetails } from "@/actions/filters";
-import { useUserProvider } from "@/context/user-provider";
+import { IngredientCategories } from "@/lib/constants";
+import { getContaminants } from "actions/ingredients";
+import * as Linking from "expo-linking";
 import { Button } from "../ui/button";
 import ContaminantTable from "./contaminant-table";
 import ItemImage from "./item-image";
 import Score from "./score";
+import ShowerFilterMetadata from "./shower-filter-metadata";
 import Sources from "./sources";
 import Typography from "./typography";
+import WaterFilterMetadata from "./water-filter-metadata";
 
 import { P } from "@/components/ui/typography";
 
@@ -20,9 +21,15 @@ type Props = {
 	id: string;
 };
 
+interface ContaminantsByCategory {
+	[key: string]: {
+		percentageFiltered: number;
+		contaminants: any[];
+	};
+}
+
 export function FilterForm({ id }: Props) {
 	const navigation = useNavigation();
-	const { uid } = useUserProvider();
 
 	const [isLoading, setIsLoading] = useState(true);
 	const [filter, setFilter] = useState<any>({});
@@ -55,118 +62,81 @@ export function FilterForm({ id }: Props) {
 	};
 
 	// get categories filtred (if any)
-	// get common water contaminants
-	const commonContaminants = useMemo(
-		() => contaminants?.filter((contaminant) => contaminant.is_common === true),
-		[contaminants],
-	);
-
-	// get uncommon water contaminants
-	const uncommonContaminants = useMemo(
-		() => contaminants?.filter((contaminant) => contaminant.is_common !== true),
-		[contaminants],
-	);
-
-	// get categories filtred (if any)
 	const categoriesFiltered = useMemo(
 		() => filter.filtered_contaminant_categories ?? [],
 		[filter.filtered_contaminant_categories],
 	);
 
-	// get the category contamiannts that are filtered
-	const contaminantsFilteredFromCategory = useMemo(() => {
-		return categoriesFiltered.flatMap((category: any) => {
-			const percent = category.percentage;
+	const filteredContaminants = filter.contaminants_filtered;
+	const categories = filter.filtered_contaminant_categories;
 
-			const contaminantsInCategory =
-				contaminants?.filter(
-					(contaminant) => contaminant.category === category.category,
-				) || [];
+	// Some filters only list the categories
+	const categoryNames = categories?.map((item: any) => item.category);
 
-			const sliceIndex = Math.ceil(
-				contaminantsInCategory.length * (percent / 100),
+	const contaminantsByCategory = useMemo(() => {
+		return IngredientCategories.reduce((acc, category) => {
+			const contaminantsInCategory = contaminants?.filter(
+				(contaminant) => contaminant.category === category,
 			);
 
-			const contaminantsInCategoryByPercent = contaminantsInCategory.slice(
-				0,
-				sliceIndex,
-			);
+			let filteredInCategory = [];
+			let percentageFiltered = 0;
 
-			return contaminantsInCategoryByPercent.map((contaminant) => {
-				return {
-					id: contaminant.id,
-					name: contaminant.name,
-				};
-			});
-		});
-	}, [contaminants, categoriesFiltered]);
+			// Check for case where filter simply lists category and % filtered
+			if (categories && categoryNames?.includes(category)) {
+				filteredInCategory = (contaminantsInCategory ?? []).map(
+					(contaminant) => {
+						return {
+							id: contaminant.id,
+							name: contaminant.name,
+							is_common: contaminant.is_common,
+							// isFiltered: filteredContaminants.some((fc) => fc.id === contaminant.id) || 'unknown',
+						};
+					},
+				);
+				percentageFiltered = categories.find(
+					(item: any) => item.category === category,
+				)?.percentage;
+			} else {
+				filteredInCategory = (contaminantsInCategory ?? []).map(
+					(contaminant) => {
+						return {
+							id: contaminant.id,
+							name: contaminant.name,
+							is_common: contaminant.is_common,
+							isFiltered: filteredContaminants?.some(
+								(fc: any) => fc.id === contaminant.id,
+							),
+						};
+					},
+				);
 
-	// combine normal filtered contaminants with category filtered contaminants
-	const combinedFilteredContaminants = useMemo(() => {
-		const flatContaminantsFromCategory =
-			contaminantsFilteredFromCategory.flat();
-		const uniqueContaminants = new Map();
+				const totalFiltered =
+					filteredInCategory?.filter((contaminant) => contaminant.isFiltered)
+						.length ?? 0;
+				const totalInCategory = contaminantsInCategory?.length;
 
-		// Add contaminants filtered directly
-		filter?.contaminants_filtered?.forEach((contaminant: any) => {
-			uniqueContaminants?.set(contaminant?.id, contaminant);
-		});
-
-		// Add contaminants filtered from categories
-		flatContaminantsFromCategory.forEach((contaminant: any) => {
-			if (!uniqueContaminants.has(contaminant?.id)) {
-				uniqueContaminants.set(contaminant?.id, contaminant);
+				percentageFiltered = Math.round(
+					totalInCategory ? (totalFiltered / totalInCategory) * 100 : 0,
+				);
 			}
-		});
 
-		return Array.from(uniqueContaminants.values());
-	}, [contaminantsFilteredFromCategory, filter.contaminants_filtered]);
+			acc[category] = {
+				percentageFiltered,
+				contaminants: filteredInCategory,
+			};
 
-	// now get the common contaminants that are filtered
-	const commonContaminantsFiltered = useMemo(
-		() =>
-			contaminants?.filter(
-				(contaminant) =>
-					contaminant.is_common === true &&
-					combinedFilteredContaminants.some(
-						(filtered: any) => filtered?.id === contaminant?.id,
-					),
-			),
-		[contaminants, combinedFilteredContaminants],
-	);
+			return acc;
+		}, {} as ContaminantsByCategory);
 
-	// and the uncommon contaminants that are filtered
-	const uncommonContaminantsFiltered = useMemo(
-		() =>
-			contaminants?.filter(
-				(contaminant) =>
-					contaminant.is_common !== true &&
-					combinedFilteredContaminants.some(
-						(filtered: any) => filtered?.id === contaminant?.id,
-					),
-			),
-		[contaminants, combinedFilteredContaminants],
-	);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [contaminants, filteredContaminants]);
 
-	// along with the percentage of common and uncommon contaminants filtered
-	const percentCommonFiltered = useMemo(
-		() =>
-			Math.round(
-				((commonContaminantsFiltered?.length ?? 0) /
-					(commonContaminants?.length ?? 1)) *
-					100,
-			),
-		[commonContaminantsFiltered, commonContaminants],
-	);
-
-	const percentUncommonFiltered = useMemo(
-		() =>
-			Math.round(
-				((uncommonContaminantsFiltered?.length ?? 0) /
-					(uncommonContaminants?.length ?? 1)) *
-					100,
-			),
-		[uncommonContaminantsFiltered, uncommonContaminants],
+	const contaminantCategories = Object.fromEntries(
+		filter?.filtered_contaminant_categories?.map((category: any) => [
+			category.category,
+			category.percentage,
+		]) ?? [],
 	);
 
 	if (filter.is_draft) {
@@ -182,7 +152,7 @@ export function FilterForm({ id }: Props) {
 			}}
 		>
 			<View className="w-full items-center justify-center px-8">
-				<View className="flex flex-col gap-6 justify-center items-center w-full">
+				<View className="flex flex-col gap-2 justify-center items-center w-full">
 					<View className="flex justify-center items-center h-80 w-80 p-4">
 						{isLoading ? (
 							<ActivityIndicator />
@@ -191,7 +161,7 @@ export function FilterForm({ id }: Props) {
 						)}
 					</View>
 
-					<View className="flex flex-row justify-between gap-2">
+					<View className="flex flex-row justify-between gap-2 w-full">
 						<View className="flex flex-col gap-2 w-2/3">
 							<Typography size="3xl" fontWeight="normal">
 								{filter.name}
@@ -200,19 +170,19 @@ export function FilterForm({ id }: Props) {
 							<P>
 								{filter.brand} - {filter.company}
 							</P>
-
-							<P className="text-left">
-								Certifications: {filter.certifications || "None"}
-							</P>
 							{/* </Link> */}
+
+							{/* <P className="text-left">
+								Certifications: {filter.certifications || "None"}
+							</P> */}
 
 							{filter.affiliate_url && (
 								<Button
-									variant={filter.score > 70 ? "default" : "outline"}
+									variant={filter.score > 70 ? "default" : "secondary"}
 									onPress={() => {
 										Linking.openURL(filter.affiliate_url);
 									}}
-									className="w-40 mt-2"
+									className="w-56 !h-10 !py-0"
 									label="Learn more"
 								/>
 							)}
@@ -223,13 +193,28 @@ export function FilterForm({ id }: Props) {
 						</View>
 					</View>
 
+					<View>
+						{filter.type === "shower_filter" && (
+							<ShowerFilterMetadata
+								filteredContaminants={filteredContaminants}
+								contaminantsByCategory={contaminantsByCategory}
+							/>
+						)}
+
+						{(filter.type === "filter" || filter.type === "bottle_filter") && (
+							<WaterFilterMetadata
+								contaminantCategories={contaminantCategories}
+							/>
+						)}
+					</View>
+
 					<View className="flex flex-col items-start">
 						<P>{filter.description}</P>
 					</View>
 				</View>
 
 				<View>
-					<View className="flex flex-col gap-6 mt-10">
+					<View className="flex flex-col mt-6">
 						<ContaminantTable
 							filteredContaminants={filter.contaminants_filtered}
 							categories={categoriesFiltered}

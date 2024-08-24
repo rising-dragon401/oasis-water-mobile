@@ -2,44 +2,35 @@ import { Ionicons, Octicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import React from "react";
 
-import { theme } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function ProtectedLayout() {
-	const { colorScheme } = useColorScheme();
+	const { backgroundColor, textColor } = useColorScheme();
 
 	return (
 		<Tabs
 			screenOptions={({ route }) => ({
 				headerShown: false,
 				tabBarStyle: {
-					backgroundColor:
-						colorScheme === "dark"
-							? theme.dark.background
-							: theme.light.background,
+					backgroundColor,
 				},
 				headerStyle: {
-					backgroundColor:
-						colorScheme === "dark"
-							? theme.dark.background
-							: theme.light.background,
+					backgroundColor,
 				},
 				tabBarShowLabel: false,
-				tabBarIcon: ({ color }) => {
+				tabBarLabelStyle: {
+					color: textColor,
+				},
+				tabBarIcon: ({ focused, color }) => {
+					const iconColor = focused ? textColor : "rgba(128, 128, 128, 0.5)"; // Faded color for inactive tabs
 					if (route.name === "search") {
-						return <Octicons name="search" size={24} color={color} />;
-					} else if (route.name === "chat") {
-						return (
-							<Ionicons
-								name="chatbubble-ellipses-outline"
-								size={24}
-								color={color}
-							/>
-						);
+						return <Octicons name="search" size={24} color={iconColor} />;
 					} else if (route.name === "settings") {
-						return <Octicons name="person" size={24} color={color} />;
+						return <Octicons name="person" size={24} color={iconColor} />;
 					} else if (route.name === "oasis") {
-						return <Ionicons name="heart-outline" size={24} color={color} />;
+						return (
+							<Ionicons name="heart-outline" size={24} color={iconColor} />
+						);
 					}
 				},
 			})}
