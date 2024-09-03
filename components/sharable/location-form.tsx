@@ -83,22 +83,22 @@ export function LocationForm({ id }: Props) {
 							/>
 						</View>
 
-						<View className="flex flex-row w-full justify-between">
+						<View className="flex flex-row w-full justify-between gap-6">
 							<View className="flex flex-col w-2/3">
 								<Typography size="3xl" fontWeight="normal" className="w-2/3">
 									{location.name} Tap Water
 								</Typography>
 
 								<BlurredLineItem
-									label="Contaminants found"
+									label="Contaminants"
 									value={contaminants.length}
-									labelClassName="text-red-500"
+									score={contaminants.length > 2 ? "bad" : "good"}
 								/>
 
 								<BlurredLineItem
-									label="Toxins above health guidelines"
+									label="Above guidelines"
 									value={contaminantsAboveLimit.length}
-									labelClassName="text-red-500"
+									score={contaminantsAboveLimit.length > 1 ? "bad" : "good"}
 								/>
 							</View>
 

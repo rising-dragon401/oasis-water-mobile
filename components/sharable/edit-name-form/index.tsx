@@ -56,11 +56,8 @@ export default function EditNameForm() {
 
 	return (
 		<View className="flex flex-col mt-2 pb-10">
-			<View className="mx-auto flex w-full flex-col space-y-6">
+			<View className="mx-auto flex w-full flex-col gap-2">
 				<View className="">
-					<Label nativeID="password" className="text-sm">
-						Avatar
-					</Label>
 					<ImageUpload
 						itemId={uid}
 						label="Avatar"
@@ -101,7 +98,7 @@ export default function EditNameForm() {
 					variant="outline"
 					loading={loading}
 					onPress={handleChangeName}
-					className="w-24 mt-2"
+					className="w-36 mt-2"
 					label="Update"
 				/>
 			</View>

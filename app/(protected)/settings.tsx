@@ -136,7 +136,7 @@ export default function TabTwoScreen() {
 
 							<EditNameForm />
 
-							<View className="mt-8">
+							<View className="mt-4">
 								<OasisSwitch
 									userData={userData}
 									uid={uid}

@@ -137,6 +137,15 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 				});
 				setTitle("Bottle filters");
 				break;
+			case "coconut_water":
+				fetchAndSetData("coconut_water", () =>
+					getItems({ limit: 25, sortMethod: "name", type: "coconut_water" }),
+				);
+				navigation.setOptions({
+					title: "Coconut waters",
+				});
+				setTitle("Coconut waters");
+				break;
 			default:
 				break;
 		}
@@ -157,7 +166,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 	);
 
 	return (
-		<View className="md:mt-4 mt-0 w-screen px-4">
+		<View className="flex-1 md:mt-4 mt-0 w-screen px-4">
 			{!subscription ? (
 				<View className="pb-4 px-4">
 					<H2>All {title.charAt(0).toLowerCase() + title.slice(1)}</H2>
@@ -185,14 +194,13 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 					</Muted>
 				</View>
 			)}
-
 			<FlatList
 				data={allItems?.filter((item) => !item.is_draft) || []}
 				renderItem={renderItem}
 				keyExtractor={(item) => item.id}
 				numColumns={2}
 				columnWrapperStyle={{ justifyContent: "space-around", gap: 8 }}
-				contentContainerStyle={{ paddingTop: 0, paddingBottom: 20, gap: 16 }}
+				contentContainerStyle={{ paddingTop: 0, paddingBottom: 0, gap: 16 }}
 				showsVerticalScrollIndicator={false}
 				ListEmptyComponent={loading ? renderLoader() : null}
 				ListHeaderComponent={<View style={{ height: 1 }} />}

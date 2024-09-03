@@ -1,4 +1,4 @@
-import { Ionicons, Octicons } from "@expo/vector-icons";
+import { Octicons } from "@expo/vector-icons";
 import algoliasearch from "algoliasearch";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -142,10 +142,10 @@ export default function Search({ indices }: { indices?: string[] }) {
 								<Octicons name="x-circle-fill" size={18} color={iconColor} />
 							</TouchableOpacity>
 						)}
-
+						{/* 
 						<TouchableOpacity onPress={() => router.push("/chatModal")}>
 							<Ionicons name="sparkles-outline" size={18} color={iconColor} />
-						</TouchableOpacity>
+						</TouchableOpacity> */}
 					</View>
 				</View>
 			</View>

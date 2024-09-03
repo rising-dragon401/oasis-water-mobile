@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { FlatList, View } from "react-native";
 
 import Search from "@/components/sharable/search";
-import { H2, Muted, P } from "@/components/ui/typography";
+import { H2, H4, Muted, P } from "@/components/ui/typography";
 import { useUserProvider } from "@/context/user-provider";
 import { CATEGORIES } from "@/lib/constants/categories";
 
@@ -68,55 +68,60 @@ export default function TabOneScreen() {
 
 	return (
 		<View className="flex flex-col h-full items-center my-6 p-4">
-			<H2 className="text-center max-w-xs border-none">Search healthy water</H2>
+			<H2 className="text-center max-w-xs border-none pb-0">
+				Search healthy water
+			</H2>
 
 			<Muted className="text-center mb-4 max-w-md">
 				Discover the best water products based on science.
 			</Muted>
 
-			<View className="mb-8 w-[90%] z-40">
+			<View className="mb-10 w-[90%] z-40">
 				<Search />
 			</View>
 
-			<FlatList
-				data={CATEGORIES.sort(
-					(a, b) => (b.is_new ? 1 : 0) - (a.is_new ? 1 : 0),
-				)}
-				numColumns={2}
-				contentContainerStyle={{
-					width: "100%",
-					paddingHorizontal: 8,
-					paddingBottom: 24,
-				}}
-				columnWrapperStyle={{
-					justifyContent: "space-between",
-				}}
-				className="overflow-y-scroll"
-				showsVerticalScrollIndicator={false}
-				renderItem={({ item: category }) => (
-					<View className="mb-10 w-[48%] h-[120px] rounded-xl bg-card">
-						<Link
-							key={category.id}
-							href={`/search/top-rated/${category.id}`}
-							className=""
-						>
-							<View className="relative w-full aspect-[4.5/3] flex items-center justify-center rounded-xl">
-								<Image
-									source={{ uri: category.image }}
-									alt={category.title}
-									style={{
-										width: "70%",
-										height: "80%",
-										borderRadius: 4,
-									}}
-								/>
-							</View>
-						</Link>
-						<P className="text-left text-lg font-medium">{category.title}</P>
-					</View>
-				)}
-				keyExtractor={(item) => item.id}
-			/>
+			<View className="flex-1">
+				<H4 className="text-left mb-2">Product categories</H4>
+				<FlatList
+					data={CATEGORIES.sort(
+						(a, b) => (b.is_new ? 1 : 0) - (a.is_new ? 1 : 0),
+					)}
+					numColumns={2}
+					contentContainerStyle={{
+						width: "100%",
+						paddingHorizontal: 8,
+						paddingBottom: 20,
+					}}
+					columnWrapperStyle={{
+						justifyContent: "space-between",
+					}}
+					className="overflow-y-scroll"
+					showsVerticalScrollIndicator={false}
+					renderItem={({ item: category }) => (
+						<View className="mb-12 w-[48%] h-[180px] py-2 rounded-xl">
+							<Link
+								key={category.id}
+								href={`/search/top-rated/${category.id}`}
+								className=""
+							>
+								<View className="relative w-full aspect-square flex items-center justify-center rounded-xl bg-card">
+									<Image
+										source={{ uri: category.image }}
+										alt={category.title}
+										style={{
+											width: "70%",
+											height: "80%",
+											borderRadius: 4,
+										}}
+									/>
+								</View>
+							</Link>
+							<P className="text-left text-lg font-medium">{category.title}</P>
+						</View>
+					)}
+					keyExtractor={(item) => item.id}
+				/>
+			</View>
 		</View>
 	);
 }

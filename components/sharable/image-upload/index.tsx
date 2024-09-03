@@ -55,11 +55,9 @@ export function ImageUpload({
 				if (file) {
 					const res = await uploadImage(
 						base64Data,
-						`website/users/${itemId}`,
+						`users/${itemId}`,
 						fileName,
 					);
-
-					console.log("res: ", res);
 
 					if (res && setFile) {
 						setFile(res.publicUrl);
@@ -81,7 +79,7 @@ export function ImageUpload({
 			{file ? (
 				<Image source={{ uri: file }} className="rounded-full w-24 h-24" />
 			) : (
-				<P>Upload</P>
+				<P>{label}</P>
 			)}
 		</TouchableOpacity>
 	);

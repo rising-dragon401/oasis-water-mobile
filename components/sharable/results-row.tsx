@@ -1,5 +1,6 @@
 import { P } from "@/components/ui/typography";
 import { theme } from "@/lib/constants";
+import { placeHolderImageBlurHash } from "@/lib/constants/images";
 import { useColorScheme } from "@/lib/useColorScheme";
 import { determineLink } from "@/lib/utils";
 import {
@@ -8,8 +9,9 @@ import {
 	FontAwesome,
 	MaterialCommunityIcons,
 } from "@expo/vector-icons";
+import { Image } from "expo-image";
 import { Link } from "expo-router";
-import { FlatList, Image, ScrollView, View } from "react-native";
+import { FlatList, KeyboardAvoidingView, Platform, View } from "react-native";
 
 type Props = {
 	results: any[];
@@ -45,57 +47,61 @@ export default function ResultsRow({ results }: Props) {
 	};
 
 	return (
-		<ScrollView
+		<KeyboardAvoidingView
+			behavior={Platform.OS === "ios" ? "padding" : "height"}
 			style={{
 				position: "absolute",
-				backgroundColor:
-					colorScheme === "dark" ? theme.dark.card : theme.light.card,
 				width: "100%",
 				maxHeight: 240,
-				borderRadius: 8,
-				overflow: "scroll",
-				paddingTop: 8,
-				zIndex: 100,
-				elevation: 100,
 				marginTop: 46,
-				shadowColor: "#000",
-				shadowOffset: {
-					width: 0,
-					height: 2,
-				},
-				shadowOpacity: 0.25,
-				shadowRadius: 3.84,
-				borderWidth: 1,
-				borderColor,
+				zIndex: 100,
 			}}
 		>
-			<FlatList
-				data={results}
-				keyExtractor={(item) => item.id.toString()}
-				renderItem={({ item: result }) => (
-					<View className="p-2">
-						<Link
-							// @ts-ignore
-							href={determineLink(result)}
-						>
-							<View className="flex flex-row gap-2 items-center justify-between w-full px-1 pr-4">
-								<View className="flex flex-row gap-2 items-center justify-center">
-									<Image
-										source={{ uri: result.image || "" }}
-										alt={result.name || ""}
-										style={{ width: 28, height: 28, borderRadius: 5 }}
-									/>
-									<P className="max-w-64 font-bold ml-2">{result.name}</P>
-								</View>
+			<View
+				style={{
+					backgroundColor:
+						colorScheme === "dark" ? theme.dark.card : theme.light.card,
+					borderRadius: 8,
+					overflow: "hidden",
+					borderWidth: 1,
+					borderColor,
+					shadowColor: "#000",
+					shadowOffset: { width: 0, height: 2 },
+					shadowOpacity: 0.25,
+					shadowRadius: 3.84,
+					elevation: 5,
+				}}
+			>
+				<FlatList
+					data={results}
+					keyExtractor={(item) => item.id.toString()}
+					renderItem={({ item: result }) => (
+						<View className="p-2">
+							<Link
+								// @ts-ignore
+								href={determineLink(result)}
+							>
+								<View className="flex flex-row gap-2 items-center justify-between w-full py-1">
+									<View className="flex flex-row gap-4 items-center justify-center pl-2">
+										<Image
+											source={{ uri: result.image || "" }}
+											alt={result.name || ""}
+											style={{ width: 32, height: 32, borderRadius: 5 }}
+											placeholder={{ blurhash: placeHolderImageBlurHash }}
+										/>
+										<P className="max-w-72 font-medium">{result.name}</P>
+									</View>
 
-								{getIcon(result)}
-							</View>
-						</Link>
-					</View>
-				)}
-				nestedScrollEnabled
-				showsVerticalScrollIndicator={false}
-			/>
-		</ScrollView>
+									{/* {getIcon(result)} */}
+								</View>
+							</Link>
+						</View>
+					)}
+					nestedScrollEnabled
+					showsVerticalScrollIndicator={false}
+					keyboardShouldPersistTaps="handled"
+				/>
+			</View>
+		</KeyboardAvoidingView>
 	);
 }

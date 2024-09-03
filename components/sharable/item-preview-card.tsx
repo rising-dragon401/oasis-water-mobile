@@ -6,11 +6,10 @@ import React from "react";
 import { Text, View } from "react-native";
 
 import { H4, Muted, P } from "@/components/ui/typography";
+import { placeHolderImageBlurHash } from "@/lib/constants/images";
 import { determineLink } from "@/lib/utils";
 import { Octicons } from "@expo/vector-icons";
 import FavoriteButton from "./favorite-button";
-
-const blurhash = "LTR{+2of~oj[%LfQM|fP%2fQM|j[";
 
 type Props = {
 	item: any;
@@ -40,7 +39,7 @@ const ItemPreviewCard = ({
 							height: "100%",
 							borderRadius: 8,
 						}}
-						placeholder={{ blurhash }}
+						placeholder={{ blurhash: placeHolderImageBlurHash }}
 					/>
 
 					{showFavorite && (
