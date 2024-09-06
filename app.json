@@ -61,7 +61,8 @@
         {
           "photosPermission": "The app accesses your photos to upload your profile picture."
         }
-      ]
+      ],
+      "expo-localization"
     ],
     "extra": {
       "router": {

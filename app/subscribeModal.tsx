@@ -1,5 +1,5 @@
 import * as Linking from "expo-linking";
-import { useRouter } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { ScrollView, View } from "react-native";
 
@@ -14,9 +14,9 @@ const FEATURES = [
 	{
 		label: "🔓 Unlock all scores and ratings",
 	},
-	{
-		label: "🤖 Personal AI nutritionist",
-	},
+	// {
+	// 	label: "🤖 Personal AI nutritionist",
+	// },
 	{
 		label: "🔬 Latest scientific research",
 	},
@@ -111,7 +111,6 @@ export default function SubscribeModal() {
 							loading={loading}
 							onPress={handleSubscribe}
 						/>
-
 						{!userData?.has_redeemed_free_month && (
 							<Button
 								className="w-full bg-transparent"
@@ -120,6 +119,9 @@ export default function SubscribeModal() {
 								onPress={handleInviteFriends}
 							/>
 						)}
+						<Link className="w-full text-center mt-4" href="/(public)/sign-in">
+							<P>Already a member? Sign in</P>
+						</Link>
 					</View>
 				</View>
 

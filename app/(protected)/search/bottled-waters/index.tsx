@@ -36,7 +36,7 @@ export default function Page() {
 				paddingHorizontal: 20,
 			}}
 		>
-			<RankingList title="Bottled waters" items={items} loading={loading} />
+			<RankingList categoryId="bottled_water" />
 		</ScrollView>
 	);
 }

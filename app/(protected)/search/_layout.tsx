@@ -41,6 +41,7 @@ export default function SearchLayout() {
 			<Stack.Screen name="item/[id]" />
 			<Stack.Screen name="location/[id]" />
 			<Stack.Screen name="filter/[id]" />
+			<Stack.Screen name="article/[id]" />
 			<Stack.Screen name="bottled-waters/index" />
 			<Stack.Screen name="tap-water/index" />
 			<Stack.Screen name="filters/index" />

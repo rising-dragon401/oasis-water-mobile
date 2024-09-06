@@ -37,7 +37,7 @@ export default function Page() {
 				paddingHorizontal: 20,
 			}}
 		>
-			<RankingList title="Tap Water" items={locations} />
+			<RankingList categoryId="tap_water" />
 		</ScrollView>
 	);
 }
