@@ -27,6 +27,14 @@ export default function ProtectedLayout() {
 						return <Octicons name="search" size={24} color={iconColor} />;
 					} else if (route.name === "settings") {
 						return <Octicons name="person" size={24} color={iconColor} />;
+					} else if (route.name === "research") {
+						return (
+							<Ionicons name="flask-outline" size={24} color={iconColor} />
+						);
+					} else if (route.name === "top-rated") {
+						return (
+							<Ionicons name="trophy-outline" size={24} color={iconColor} />
+						);
 					} else if (route.name === "oasis") {
 						return (
 							<Ionicons name="heart-outline" size={24} color={iconColor} />
@@ -36,6 +44,8 @@ export default function ProtectedLayout() {
 			})}
 		>
 			<Tabs.Screen name="search" />
+			<Tabs.Screen name="top-rated" />
+			<Tabs.Screen name="research" />
 			<Tabs.Screen name="oasis" />
 			<Tabs.Screen name="settings" />
 		</Tabs>

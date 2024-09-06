@@ -9,7 +9,7 @@ import Typography from "@/components/sharable/typography";
 import UpgradeButton from "@/components/sharable/upgrade-button";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { H1, H3, Muted, P } from "@/components/ui/typography";
+import { H1, Large, Muted, P } from "@/components/ui/typography";
 import { useRevenueCat } from "@/context/revenue-cat-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
 
@@ -52,34 +52,22 @@ export default function TabTwoScreen() {
 		>
 			{userData ? (
 				<View className="w-full flex flex-col h-full justify-between pb-14 px-8">
-					<H1 className="text-center mt-24">Acount</H1>
+					<H1 className="mt-24">Acount</H1>
 
 					<View>
-						<Typography
-							size="base"
-							fontWeight="normal"
-							className="text-center mt-4"
-						>
+						<Typography size="base" fontWeight="normal" className="mt-2">
 							Signed in as {user?.email}
 						</Typography>
 
 						{subscription ? (
 							<>
-								<Typography
-									size="base"
-									fontWeight="normal"
-									className="text-center"
-								>
+								<Typography size="base" fontWeight="normal">
 									Subscription: Pro
 									{subscription?.plan === "Pro" && "💫"}
 								</Typography>
 
 								{subscription.cancel_at_period_end && (
-									<Typography
-										size="base"
-										fontWeight="normal"
-										className="text-center"
-									>
+									<Typography size="base" fontWeight="normal">
 										Expires on{" "}
 										{new Date(
 											subscription.current_period_end,
@@ -96,11 +84,7 @@ export default function TabTwoScreen() {
 										/>
 									</View>
 								) : (
-									<Typography
-										size="base"
-										fontWeight="normal"
-										className="text-center"
-									>
+									<Typography size="base" fontWeight="normal">
 										Manage your subscription online
 									</Typography>
 								)}
@@ -131,8 +115,8 @@ export default function TabTwoScreen() {
 							</View>
 						)}
 
-						<View className="flex flex-col items-start mt-14">
-							<H3>Edit profile</H3>
+						<View className="flex flex-col items-start mt-8">
+							<Large>Edit profile</Large>
 
 							<EditNameForm />
 
@@ -171,13 +155,13 @@ export default function TabTwoScreen() {
 				</View>
 			) : (
 				<View
-					className="w-full min-h-screen justify-start items-center gap-y-2 px-8 mt-2"
+					className="w-full min-h-screen justify-start gap-y-2 px-8 mt-2"
 					style={{ backgroundColor }}
 				>
-					<H1 className="text-center mt-24">Acount</H1>
+					<H1 className="mt-24">Acount</H1>
 					<Muted>Looks like you're not logged in</Muted>
 
-					<Link className="w-full text-center mt-4" href="/(public)/sign-in">
+					<Link className="w-full  mt-4" href="/(public)/sign-in">
 						<P>Sign in</P>
 					</Link>
 				</View>

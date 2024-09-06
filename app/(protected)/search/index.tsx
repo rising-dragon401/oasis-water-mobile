@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { FlatList, View } from "react-native";
 
 import Search from "@/components/sharable/search";
-import { H2, H4, Muted, P } from "@/components/ui/typography";
+import { H2, H4, Muted, P, Small } from "@/components/ui/typography";
 import { useUserProvider } from "@/context/user-provider";
 import { CATEGORIES } from "@/lib/constants/categories";
 import { getEntry } from "actions/blogs";
@@ -80,7 +80,12 @@ export default function TabOneScreen() {
 			</View>
 
 			<View className="flex-1 flex-col -mb-12">
-				<H4 className="text-left mb-4">Product categories</H4>
+				<View className="flex flex-row justify-between w-full items-center">
+					<H4 className="text-left mb-4">Product categories</H4>
+					<Link href="/(protected)/top-rated">
+						<Small className="text-secondary italic">explore</Small>
+					</Link>
+				</View>
 				<FlatList
 					data={CATEGORIES.sort(
 						(a, b) => (b.is_new ? 1 : 0) - (a.is_new ? 1 : 0),
@@ -118,7 +123,12 @@ export default function TabOneScreen() {
 			</View>
 
 			<View className="flex-1 w-full justify-start">
-				<H4 className="text-left mb-4">Research</H4>
+				<View className="flex flex-row justify-between w-full items-center">
+					<H4 className="text-left mb-4">Research</H4>
+					<Link href="/(protected)/research">
+						<Small className="text-secondary italic">view all</Small>
+					</Link>
+				</View>
 				<FlatList
 					data={blogs}
 					horizontal={true}

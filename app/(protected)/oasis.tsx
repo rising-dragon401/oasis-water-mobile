@@ -16,7 +16,7 @@ export default function OasisScreen() {
 
 	return (
 		<View
-			className="flex-1 items-center justify-between px-4 pb-10 pt-20"
+			className="flex-1 justify-between px-4 pb-10 pt-20"
 			style={{ backgroundColor }}
 		>
 			{uid ? (
@@ -25,7 +25,7 @@ export default function OasisScreen() {
 						<FavoritesList userId={uid} />
 					) : (
 						<>
-							<View className="w-full justify-center items-center gap-y-2">
+							<View className="w-full justify-center gap-y-2">
 								<View className="flex flex-col items-center p-4 gap-y-4 w-full">
 									<H1 className="text-center mt-20">My products</H1>
 									<Muted className="text-center ">
@@ -44,15 +44,15 @@ export default function OasisScreen() {
 					)}
 				</View>
 			) : (
-				<View className="w-full justify-center items-center gap-y-2">
-					<View className="flex flex-col items-center p-4 gap-y-4 w-full">
-						<H1 className="text-center">My products</H1>
-						<Muted className="text-center ">
+				<View className="w-full gap-y-2">
+					<View className="flex flex-colp-4 gap-y-4 w-full">
+						<H1 className="\">My products</H1>
+						<Muted className="">
 							Sign in to add products and see your water score
 						</Muted>
 					</View>
 
-					<Link className="w-full mt-2 text-center" href="/(public)/sign-in">
+					<Link className="w-full mt-2" href="/(public)/sign-in">
 						<P>Sign in</P>
 					</Link>
 				</View>

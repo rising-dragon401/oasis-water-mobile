@@ -1,5 +1,6 @@
 import { Label } from "components/ui/label";
 import { Switch } from "components/ui/switch";
+import { Muted } from "components/ui/typography";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { View } from "react-native";
@@ -56,6 +57,7 @@ export function OasisSwitch({ userData, uid, subscription }: Props) {
 	return (
 		<View className="flex flex-col items-left gap-2">
 			<Label nativeID="oasis-public">Public profile</Label>
+			<Muted>Show your favorite products to the public</Muted>
 			{switchElement}
 		</View>
 	);
