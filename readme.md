@@ -31,7 +31,7 @@ eas build -p ios --profile preview --local
 
 ```
 
-Submitting
+Submitting to iOS
 
 ```
 eas build --platform ios
@@ -55,6 +55,10 @@ Creating android build
 
 ```
 eas build --platform android
+```
+
+```
+eas submit -p android
 ```
 
 Trouble shooting
