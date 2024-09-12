@@ -101,11 +101,11 @@ export function FilterForm({ id }: Props) {
 				filteredInCategory = (contaminantsInCategory ?? []).map(
 					(contaminant) => {
 						return {
-							id: contaminant.id,
-							name: contaminant.name,
-							is_common: contaminant.is_common,
+							id: contaminant?.id,
+							name: contaminant?.name,
+							is_common: contaminant?.is_common,
 							isFiltered: filteredContaminants?.some(
-								(fc: any) => fc.id === contaminant.id,
+								(fc: any) => fc?.id === contaminant?.id,
 							),
 						};
 					},
