@@ -84,7 +84,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 				break;
 			case "filter":
 				fetchAndSetData("filter", () =>
-					getFilters({ limit: 50, sortMethod: "name", type: "filter" }),
+					getFilters({ limit: 250, sortMethod: "name", type: "filter" }),
 				);
 				navigation.setOptions({
 					title: "Filters",
@@ -93,7 +93,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 				break;
 			case "shower_filter":
 				fetchAndSetData("shower_filter", () =>
-					getFilters({ limit: 25, sortMethod: "name", type: "shower_filter" }),
+					getFilters({ limit: 100, sortMethod: "name", type: "shower_filter" }),
 				);
 				navigation.setOptions({
 					title: "Shower filters",
@@ -103,7 +103,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 
 			case "energy_drink":
 				fetchAndSetData("energy_drink", () =>
-					getItems({ limit: 25, sortMethod: "name", type: "energy_drink" }),
+					getItems({ limit: 100, sortMethod: "name", type: "energy_drink" }),
 				);
 				navigation.setOptions({
 					title: "Energy drinks",
@@ -112,7 +112,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 				break;
 			case "flavored_water":
 				fetchAndSetData("flavored_water", () =>
-					getItems({ limit: 25, sortMethod: "name", type: "flavored_water" }),
+					getItems({ limit: 100, sortMethod: "name", type: "flavored_water" }),
 				);
 				navigation.setOptions({
 					title: "Flavored water",
@@ -121,7 +121,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 				break;
 			case "gallons":
 				fetchAndSetData("gallons", () =>
-					getItems({ limit: 25, sortMethod: "name", type: "water_gallon" }),
+					getItems({ limit: 100, sortMethod: "name", type: "water_gallon" }),
 				);
 				navigation.setOptions({
 					title: "Water gallons",
@@ -130,7 +130,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 				break;
 			case "bottle_filter":
 				fetchAndSetData("bottle_filter", () =>
-					getFilters({ limit: 25, sortMethod: "name", type: "bottle_filter" }),
+					getFilters({ limit: 100, sortMethod: "name", type: "bottle_filter" }),
 				);
 				navigation.setOptions({
 					title: "Bottle filters",
@@ -139,7 +139,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 				break;
 			case "coconut_water":
 				fetchAndSetData("coconut_water", () =>
-					getItems({ limit: 25, sortMethod: "name", type: "coconut_water" }),
+					getItems({ limit: 100, sortMethod: "name", type: "coconut_water" }),
 				);
 				navigation.setOptions({
 					title: "Coconut waters",

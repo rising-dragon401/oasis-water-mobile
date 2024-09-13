@@ -3,11 +3,11 @@ import { supabase } from "@/config/supabase";
 export const getFilters = async ({
 	limit,
 	sortMethod,
-	type = "filter",
+	type,
 }: {
 	limit?: number;
 	sortMethod?: "name" | "score";
-	type?: "filter" | "shower_filter" | "bottle_filter";
+	type?: "filter" | "shower_filter" | "bottle_filter" | null;
 } = {}) => {
 	let filters;
 	let orderBy = sortMethod || "name";
@@ -18,9 +18,13 @@ export const getFilters = async ({
 		query = query.eq("type", type);
 	}
 
+	console.log("type: ", type);
+
 	if (limit) {
 		query = query.limit(limit);
 	}
+
+	console.log("limit: ", limit);
 
 	const { data } = await query;
 

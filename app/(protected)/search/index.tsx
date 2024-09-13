@@ -13,6 +13,7 @@ import { useColorScheme } from "@/lib/useColorScheme";
 import { getFeaturedUsers } from "actions/admin";
 import { getEntry } from "actions/blogs";
 import axios from "axios";
+
 export default function TabOneScreen() {
 	const { userData, subscription, uid } = useUserProvider();
 	const router = useRouter();
@@ -21,6 +22,7 @@ export default function TabOneScreen() {
 
 	const [people, setPeople] = useState<any[]>([]);
 	const [blogs, setBlogs] = useState<any[]>([]);
+	const [loadingPeople, setLoadingPeople] = useState(false);
 
 	useEffect(() => {
 		getPeople();
@@ -62,9 +64,11 @@ export default function TabOneScreen() {
 	}
 
 	async function getPeople() {
+		setLoadingPeople(true);
 		const data = await getFeaturedUsers();
 
 		setPeople(data || []);
+		setLoadingPeople(false);
 	}
 
 	return (
@@ -248,42 +252,63 @@ export default function TabOneScreen() {
 						/>
 					</Link> */}
 				</View>
-				<FlatList
-					data={people}
-					horizontal
-					showsHorizontalScrollIndicator={false}
-					contentContainerStyle={{
-						paddingTop: 8,
-					}}
-					className="overflow-x-scroll"
-					renderItem={({ item: user }) => (
-						<Link
-							key={user.id}
-							href={`/search/oasis/${user.id}`}
-							className="mr-4"
-						>
-							<View className="flex-row items-center bg-card rounded-full p-3 pr-5">
-								<View className="w-14 h-14 rounded-full overflow-hidden mr-4">
-									<Image
-										source={{ uri: user.avatar_url }}
-										alt={user.full_name}
-										style={{
-											width: "100%",
-											height: "100%",
-										}}
-									/>
-								</View>
-								<View>
-									<P className="text-base font-medium">{user.full_name}</P>
-									<P className="text-sm text-secondary">
-										{user.favorites.length} products
-									</P>
-								</View>
+				{loadingPeople ? (
+					<FlatList
+						data={[1, 2, 3]} // Placeholder items
+						horizontal
+						renderItem={() => (
+							<View className="mr-4">
+								<Skeleton
+									width={180}
+									height={60}
+									style={{ borderRadius: 30 }}
+								/>
 							</View>
-						</Link>
-					)}
-					keyExtractor={(item) => item.id}
-				/>
+						)}
+						keyExtractor={(item) => item.toString()}
+					/>
+				) : (
+					<FlatList
+						data={people}
+						horizontal
+						showsHorizontalScrollIndicator={false}
+						contentContainerStyle={{
+							paddingTop: 8,
+						}}
+						className="overflow-x-scroll"
+						renderItem={({ item: user }) => (
+							<Link
+								key={user.id}
+								href={`/search/oasis/${user.id}`}
+								className="mr-4"
+							>
+								<View className="flex-row items-center bg-card rounded-full p-3 pr-5">
+									<View className="w-[40px] h-[40px] rounded-full overflow-hidden mr-4">
+										<Image
+											source={{
+												uri:
+													user.avatar_url ||
+													"https://example.com/default-avatar.png",
+											}}
+											alt={user.full_name}
+											style={{
+												width: "100%",
+												height: "100%",
+											}}
+										/>
+									</View>
+									<View>
+										<P className="text-base font-medium">{user.full_name}</P>
+										<P className="text-sm text-secondary">
+											{user.favorites.length} products
+										</P>
+									</View>
+								</View>
+							</Link>
+						)}
+						keyExtractor={(item) => item.id}
+					/>
+				)}
 			</View>
 		</ScrollView>
 	);

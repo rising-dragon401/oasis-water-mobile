@@ -30,7 +30,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.liveoasis.oasis",
-      "versionCode": 17,
+      "versionCode": 22,
       "permissions": [
         "android.permission.RECORD_AUDIO"
       ]
