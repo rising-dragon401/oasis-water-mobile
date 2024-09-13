@@ -6,6 +6,7 @@ export const theme = {
 		popover: "hsl(39 57% 96)",
 		primary: "hsl(20 7% 18%)",
 		secondary: "hsl(40 13% 64%)",
+		"muted-foreground": "hsl(0 0% 45%)",
 		muted: "hsl(30 6% 93%)",
 		accent: "hsl(229 59% 38%)",
 		destructive: "hsl(0 84.2% 60.2%)",

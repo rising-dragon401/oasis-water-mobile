@@ -35,13 +35,6 @@ export const CATEGORIES: CategoryType[] = [
 		tags: ["sink", "counter", "pitcher"],
 	},
 	{
-		id: "flavored_water",
-		title: "Flavored drinks",
-		image:
-			"https://connect.live-oasis.com/storage/v1/object/public/website/images/categories/sparkling_water_cover.png",
-		tags: ["still", "sparkling"],
-	},
-	{
 		id: "gallons",
 		title: "Water gallons",
 		image:
@@ -60,6 +53,13 @@ export const CATEGORIES: CategoryType[] = [
 			"https://connect.live-oasis.com/storage/v1/object/public/website/images/categories/water_bottle_filter.png",
 	},
 	{
+		id: "flavored_water",
+		title: "Flavored drinks",
+		image:
+			"https://connect.live-oasis.com/storage/v1/object/public/website/images/categories/sparkling_water_cover.png",
+		tags: ["still", "sparkling"],
+	},
+	{
 		id: "energy_drink",
 		title: "Energy drinks",
 		image:
@@ -70,6 +70,6 @@ export const CATEGORIES: CategoryType[] = [
 		title: "Coconut water",
 		image:
 			"https://connect.live-oasis.com/storage/v1/object/public/website/images/categories/coconut%20water%20category%20cover.png",
-		is_new: true,
+		is_new: false,
 	},
 ];

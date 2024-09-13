@@ -1,21 +1,23 @@
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image } from "expo-image";
 import { Link, usePathname, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { FlatList, View } from "react-native";
+import { FlatList, ScrollView, View } from "react-native";
 
 import Search from "@/components/sharable/search";
-import { H2, H4, Muted, P, Small } from "@/components/ui/typography";
+import Skeleton from "@/components/sharable/skeleton";
+import { H2, H4, Muted, P } from "@/components/ui/typography";
 import { useUserProvider } from "@/context/user-provider";
 import { CATEGORIES } from "@/lib/constants/categories";
+import { useColorScheme } from "@/lib/useColorScheme";
+import { getFeaturedUsers } from "actions/admin";
 import { getEntry } from "actions/blogs";
 import axios from "axios";
-
-import { getFeaturedUsers } from "actions/admin";
-
 export default function TabOneScreen() {
 	const { userData, subscription, uid } = useUserProvider();
 	const router = useRouter();
 	const pathname = usePathname();
+	const { textSecondaryColor, mutedColor } = useColorScheme();
 
 	const [people, setPeople] = useState<any[]>([]);
 	const [blogs, setBlogs] = useState<any[]>([]);
@@ -66,7 +68,15 @@ export default function TabOneScreen() {
 	}
 
 	return (
-		<View className="flex flex-col h-full items-center my-6 p-4">
+		<ScrollView
+			contentContainerStyle={{
+				flexGrow: 1,
+				alignItems: "center",
+				paddingBottom: 60,
+			}}
+			showsVerticalScrollIndicator={false}
+			className="flex flex-col my-4 p-4"
+		>
 			<H2 className="text-center max-w-xs border-none pb-0">
 				Search healthy water
 			</H2>
@@ -79,11 +89,15 @@ export default function TabOneScreen() {
 				<Search />
 			</View>
 
-			<View className="flex-1 flex-col -mb-12">
+			<View className="flex-1 flex-col w-ful">
 				<View className="flex flex-row justify-between w-full items-center">
-					<H4 className="text-left mb-4">Product categories</H4>
+					<H4 className="text-left">Product categories</H4>
 					<Link href="/(protected)/top-rated">
-						<Small className="text-secondary italic">explore</Small>
+						<Ionicons
+							name="arrow-forward"
+							size={16}
+							color={textSecondaryColor}
+						/>
 					</Link>
 				</View>
 				<FlatList
@@ -93,82 +107,176 @@ export default function TabOneScreen() {
 					horizontal={true}
 					showsHorizontalScrollIndicator={false}
 					contentContainerStyle={{
-						paddingHorizontal: 8,
+						paddingTop: 8,
 					}}
 					className="overflow-x-scroll"
 					renderItem={({ item: category }) => (
-						<View className="mr-4 w-[180px] h-[160px] py-2 rounded-xl">
+						<View className="mr-3 w-[140px] py-1 rounded-xl">
 							<Link
 								key={category.id}
 								href={`/search/top-rated/${category.id}`}
-								className=""
+								className="flex flex-col"
 							>
-								<View className="relative w-full aspect-square flex items-center justify-center rounded-xl bg-card">
+								<View className="relative w-[140px] h-[140px] flex items-center justify-center rounded-xl bg-card">
 									<Image
 										source={{ uri: category.image }}
 										alt={category.title}
 										style={{
 											width: "70%",
-											height: "80%",
+											height: "70%",
 											borderRadius: 4,
 										}}
 									/>
 								</View>
 							</Link>
-							<P className="text-left text-lg font-medium">{category.title}</P>
+							<View className="justify-center">
+								<P className="text-left text-md font-medium">
+									{category.title}
+								</P>
+							</View>
 						</View>
 					)}
 					keyExtractor={(item) => item.id}
 				/>
 			</View>
 
-			<View className="flex-1 w-full justify-start">
+			<View className="flex-1 w-full justify-start mt-12">
 				<View className="flex flex-row justify-between w-full items-center">
-					<H4 className="text-left mb-4">Research</H4>
+					<H4 className="text-left">Scientific research</H4>
 					<Link href="/(protected)/research">
-						<Small className="text-secondary italic">view all</Small>
+						<Ionicons
+							name="arrow-forward"
+							size={16}
+							color={textSecondaryColor}
+						/>
 					</Link>
 				</View>
+
+				{blogs.length === 0 ? (
+					<FlatList
+						data={[1, 2, 3]}
+						horizontal={true}
+						showsHorizontalScrollIndicator={false}
+						contentContainerStyle={{
+							paddingTop: 8,
+							paddingHorizontal: 0,
+						}}
+						className="overflow-x-scroll"
+						renderItem={() => (
+							<Skeleton
+								width={180}
+								height={120}
+								style={{
+									borderRadius: 8,
+									marginRight: 16,
+								}}
+							/>
+						)}
+						keyExtractor={(item) => item.toString()}
+					/>
+				) : (
+					<FlatList
+						data={blogs}
+						horizontal={true}
+						showsHorizontalScrollIndicator={false}
+						contentContainerStyle={{
+							paddingTop: 8,
+							paddingHorizontal: 0,
+						}}
+						className="overflow-x-scroll"
+						renderItem={({ item }) => (
+							<Link
+								href={`/search/article/${item.id}`}
+								className="flex flex-col mr-4"
+							>
+								<View style={{ width: 180 }}>
+									<View
+										style={{
+											width: 180,
+											height: 120,
+											borderRadius: 8,
+											overflow: "hidden",
+											position: "relative",
+										}}
+									>
+										<Image
+											source={{ uri: item.cover }}
+											alt={item.attributes.title}
+											style={{
+												width: "100%",
+												height: "100%",
+												borderRadius: 8,
+											}}
+										/>
+										<View
+											style={{
+												position: "absolute",
+												top: 0,
+												left: 0,
+												right: 0,
+												bottom: 0,
+												backgroundColor: "rgba(0,0,0,0.3)",
+												padding: 8,
+												justifyContent: "flex-end",
+											}}
+										>
+											<P
+												className="text-left text-white font-bold text-sm"
+												numberOfLines={3}
+												ellipsizeMode="tail"
+											>
+												{item.attributes.title}
+											</P>
+										</View>
+									</View>
+								</View>
+							</Link>
+						)}
+						keyExtractor={(item) => item.id}
+					/>
+				)}
+			</View>
+
+			<View className="flex-1 w-full justify-start mt-12">
+				<View className="flex flex-row justify-between w-full items-center">
+					<H4 className="text-left">Featured users</H4>
+					{/* <Link href="/(protected)/search/users">
+						<Ionicons
+							name="arrow-forward"
+							size={16}
+							color={textSecondaryColor}
+						/>
+					</Link> */}
+				</View>
 				<FlatList
-					data={blogs}
-					horizontal={true}
+					data={people}
+					horizontal
 					showsHorizontalScrollIndicator={false}
 					contentContainerStyle={{
-						paddingHorizontal: 8,
+						paddingTop: 8,
 					}}
 					className="overflow-x-scroll"
-					renderItem={({ item }) => (
+					renderItem={({ item: user }) => (
 						<Link
-							href={`/search/article/${item.id}`}
-							className="flex flex-col mr-4"
+							key={user.id}
+							href={`/search/oasis/${user.id}`}
+							className="mr-4"
 						>
-							<View style={{ width: 200 }}>
-								<View
-									style={{
-										width: 200,
-										height: 140,
-										borderRadius: 20,
-										overflow: "hidden",
-									}}
-								>
+							<View className="flex-row items-center bg-card rounded-full p-3 pr-5">
+								<View className="w-14 h-14 rounded-full overflow-hidden mr-4">
 									<Image
-										source={{ uri: item.cover }}
-										alt={item.attributes.title}
+										source={{ uri: user.avatar_url }}
+										alt={user.full_name}
 										style={{
 											width: "100%",
 											height: "100%",
-											borderRadius: 20,
 										}}
 									/>
 								</View>
-
-								<View style={{ width: 200 }}>
-									<P
-										className="mt-2 text-left"
-										numberOfLines={2}
-										ellipsizeMode="tail"
-									>
-										{item.attributes.title}
+								<View>
+									<P className="text-base font-medium">{user.full_name}</P>
+									<P className="text-sm text-secondary">
+										{user.favorites.length} products
 									</P>
 								</View>
 							</View>
@@ -177,6 +285,6 @@ export default function TabOneScreen() {
 					keyExtractor={(item) => item.id}
 				/>
 			</View>
-		</View>
+		</ScrollView>
 	);
 }

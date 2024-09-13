@@ -32,7 +32,6 @@ export default function PeoplePage() {
 		<ScrollView
 			contentContainerStyle={{
 				paddingBottom: 80,
-				paddingVertical: 20,
 				paddingHorizontal: 20,
 			}}
 		>

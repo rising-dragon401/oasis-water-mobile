@@ -17,6 +17,12 @@ export function useColorScheme() {
 	const textColor =
 		colorScheme === "dark" ? theme.dark.primary : theme.light.primary;
 
+	const textSecondaryColor =
+		colorScheme === "dark" ? theme.dark.secondary : theme.light.secondary;
+
+	const mutedColor =
+		colorScheme === "dark" ? theme.dark.muted : theme.light.muted;
+
 	return {
 		colorScheme: colorScheme ?? "dark",
 		isDarkColorScheme: colorScheme === "dark",
@@ -26,5 +32,7 @@ export function useColorScheme() {
 		borderColor,
 		backgroundColor,
 		textColor,
+		textSecondaryColor,
+		mutedColor,
 	};
 }

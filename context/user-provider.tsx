@@ -1,6 +1,7 @@
 "use client";
 
 import {
+	createUsername,
 	getCurrentUserData,
 	getSubscription,
 	getUserFavorites,
@@ -29,6 +30,7 @@ interface UserContextType {
 	refreshUserData: () => void;
 	fetchUserFavorites: (uid: string | null) => Promise<void>;
 	fetchSubscription: (uid: string | null) => Promise<any | null>;
+	fetchUserData: (uid: string | null) => Promise<any | null>;
 	logout: () => void;
 }
 
@@ -80,6 +82,22 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 			)
 			.subscribe();
 	}, [userId]);
+
+	useEffect(() => {
+		if (userData && userId) {
+			handleGenerateUsername(userData, userId);
+		}
+	}, [userData, userId]);
+
+	const handleGenerateUsername = async (data: any, uid: string) => {
+		// check for username, create if none exists
+		if (!data?.username) {
+			const username = await createUsername(uid);
+			if (username) {
+				setUserData({ ...data, username });
+			}
+		}
+	};
 
 	const initUser = async (session: any) => {
 		setUserId(session.user?.id);
@@ -146,6 +164,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 			refreshUserData,
 			fetchUserFavorites,
 			fetchSubscription,
+			fetchUserData,
 			logout,
 		}),
 		[
@@ -157,6 +176,8 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 			userFavorites,
 			refreshUserData,
 			fetchUserFavorites,
+			fetchSubscription,
+			fetchUserData,
 			logout,
 		],
 	);

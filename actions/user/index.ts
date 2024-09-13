@@ -45,7 +45,6 @@ export async function getCurrentUserData(uid?: string) {
 }
 
 export async function getSubscription(uid: string | null) {
-	console.log("getSubscription", uid);
 	if (!uid) {
 		return null;
 	}
@@ -62,12 +61,10 @@ export async function getSubscription(uid: string | null) {
 			return null;
 		}
 
-		console.log("subscription[0]: ", JSON.stringify(subscription[0], null, 2));
+		// console.log("subscription[0]: ", JSON.stringify(subscription[0], null, 2));
 
 		// use most recent subscription
 		const activePlan = subscription[0]?.prices?.products?.name;
-
-		console.log("activePlan", activePlan);
 
 		let planPlan = "Free";
 		if (!activePlan) {
@@ -187,6 +184,61 @@ export async function updateUserData(id: string, column: string, value: any) {
 	}
 }
 
+const getUserByUUID = async (uuid: string) => {
+	const { data, error } = await supabase
+		.from("users")
+		.select("*")
+		.eq("id", uuid)
+		.single();
+	if (error) throw error;
+	return data;
+};
+
+// reward user referral if applicabe
+const handleReferral = async (subscriptionData: any, uuid: string) => {
+	try {
+		// Attribute referral code to the user
+		const userData = await getUserByUUID(uuid);
+
+		// referral codes are simply the other user's username
+		const referralCode = userData?.referred_by;
+
+		if (!referralCode) return;
+
+		// Check if a referral record already exists for this subscription
+		const { data: existingReferral, error: fetchError } = await supabase
+			.from("referrals")
+			.select("*")
+			.eq("subscription_id", subscriptionData.id)
+			.single();
+
+		const referralData = {
+			referring_user_id: referralCode,
+			user_id: uuid,
+			subscription_id: subscriptionData.id,
+			price_id: subscriptionData.price_id,
+			amount: subscriptionData.amount,
+			subscription_status: subscriptionData.status,
+		};
+
+		if (existingReferral) {
+			// Update existing referral record
+			const { error } = await supabase
+				.from("referrals")
+				.update(referralData)
+				.eq("id", existingReferral.id);
+
+			throw error;
+		} else {
+			// Insert new referral record
+			const { error } = await supabase.from("referrals").insert([referralData]);
+			throw error;
+		}
+	} catch (error) {
+		console.error("Error handling referral: ", error);
+	}
+};
+
 export async function manageSubscriptionStatusChange(
 	uid: string,
 	rcVustomerInfo: any,
@@ -233,6 +285,7 @@ export async function manageSubscriptionStatusChange(
 				provider,
 				...rcVustomerInfo,
 			},
+			amount: 4700,
 			status,
 			price_id: proPriceId,
 			quantity: 1,
@@ -269,6 +322,9 @@ export async function manageSubscriptionStatusChange(
 			const { error } = await supabase
 				.from("subscriptions")
 				.upsert([subscriptionData]);
+
+			// handle referral
+			await handleReferral(subscriptionData, uid);
 
 			if (error) throw error;
 
@@ -553,4 +609,65 @@ export const awardFreeMonth = async (uid: string) => {
 		console.error("Error awarding free month:", error);
 		return false;
 	}
+};
+
+const checkUsernameExists = async (username: string) => {
+	const { data, error } = await supabase
+		.from("users")
+		.select("*")
+		.eq("username", username)
+		.single();
+
+	return data;
+};
+
+export const createUsername = async (uid: string): Promise<string | false> => {
+	try {
+		const randomString = Math.random().toString(36).substring(2, 15);
+		const username = `oasis-${randomString}`;
+
+		// check if username already exists
+		const existingUsername = await checkUsernameExists(username);
+
+		if (existingUsername) {
+			return await createUsername(uid);
+		}
+
+		const { data, error } = await supabase
+			.from("users")
+			.update({ username: username })
+			.eq("id", uid)
+			.select();
+
+		return username;
+	} catch (error) {
+		console.error("Error creating username:", error);
+		return false;
+	}
+};
+
+export const updateUsername = async (uid: string, username: string) => {
+	const existingUsername = await checkUsernameExists(username);
+
+	if (existingUsername && existingUsername.id !== uid) {
+		return false;
+	}
+
+	const { data, error } = await supabase
+		.from("users")
+		.update({ username: username })
+		.eq("id", uid)
+		.select();
+
+	return data;
+};
+
+export const getUserByUsername = async (username: string) => {
+	const { data, error } = await supabase
+		.from("users")
+		.select("*")
+		.eq("username", username)
+		.single();
+
+	return data;
 };

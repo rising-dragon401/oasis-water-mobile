@@ -1,14 +1,15 @@
+import { Octicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { FlatList, Share, View } from "react-native";
+import { FlatList, Share, TouchableOpacity, View } from "react-native";
 
 import { getCurrentUserData, getUserFavorites } from "@/actions/user";
 import Score from "@/components/sharable/score";
 import { Button } from "@/components/ui/button";
-import { H3, H4, Muted, P } from "@/components/ui/typography";
+import { H3, H4, Large, Muted, P } from "@/components/ui/typography";
 import { Avatar, AvatarImage } from "components/ui/avatar";
 import { PROFILE_AVATAR } from "lib/constants";
-import { default as useSWR } from "swr";
+import useSWR from "swr";
 import ItemPreviewCard from "../item-preview-card";
 import Loader from "../loader";
 
@@ -18,6 +19,7 @@ export default function FavoritesList({
 	userId: string | null | undefined;
 }) {
 	const router = useRouter();
+
 	const [loading, setLoading] = useState(true);
 	const [userData, setUserData] = useState<any>(null);
 
@@ -26,7 +28,10 @@ export default function FavoritesList({
 		return favorites;
 	};
 
-	const { data: favorites } = useSWR("userFavorites", fetchUserFavorites);
+	const { data: favorites } = useSWR(
+		`userFavorites-${userId}`,
+		fetchUserFavorites,
+	);
 
 	// load user favorites
 	useEffect(() => {
@@ -41,16 +46,24 @@ export default function FavoritesList({
 		setLoading(false);
 	};
 
-	const shareProfile = async () => {
-		// deep linking now redirecting to mobile for some reason
-		// const url = `https://www.live-oasis.com/search/oasis/${userId}`;
+	useEffect(() => {
+		if (userId) {
+			fetchThisUserData(userId);
+		}
+	}, [userId, favorites]);
 
-		const url =
-			"https://apps.apple.com/us/app/oasis-water-health-ratings/id6499478532";
+	const shareProfile = async () => {
+		if (!userData.username) return;
+
+		const url = `https://www.oasiswater.app/${userData.username}`;
+
+		// TODO: setup deep linking
+		// const url =
+		// 	"https://apps.apple.com/us/app/oasis-water-health-ratings/id6499478532";
 
 		try {
 			const result = await Share.share({
-				message: `Check out my water health score on Oasis. Download and search for 👉 ${userData?.full_name}.`,
+				message: `Check out my water health score on Oasis`,
 				url,
 			});
 
@@ -78,52 +91,61 @@ export default function FavoritesList({
 	return (
 		<View className="pb-8">
 			<View className="py-4 gap-4 mb-4 flex w-full flex-row justify-between">
-				<View className="flex flex-col gap-2">
+				<View className="flex flex-col">
 					<Avatar className="h-24 w-24" alt="oasis pfp">
 						<AvatarImage src={userData?.avatar_url || PROFILE_AVATAR} />
 					</Avatar>
 
-					<H4>{`${userData?.full_name || userData?.email || "Unknown name"}`}</H4>
-					{userData?.bio && <Muted>{userData?.bio}</Muted>}
+					<H4 className="mt-2">{`${userData?.full_name || userData?.email || "Unknown name"}`}</H4>
+					<Muted className="py-0 my-0">@{userData?.username}</Muted>
+
+					{userData?.bio && (
+						<Muted className="py-0 my-0">{userData?.bio}</Muted>
+					)}
 				</View>
 
-				<View className="max-h-24 flex flex-row">
+				<View className="max-h-24 flex flex-row gap-4">
 					<Score score={userData?.score || "?"} size="sm" showScore />
-					{/* <TouchableOpacity onPress={() => shareProfile()}>
+					<TouchableOpacity onPress={() => shareProfile()}>
 						<Octicons name="share" size={24} color="muted" />
-					</TouchableOpacity> */}
+					</TouchableOpacity>
 				</View>
 			</View>
 
-			{favorites && favorites?.length > 0 ? (
-				<FlatList
-					data={favorites}
-					renderItem={({ item, index }) => (
-						<View
-							key={item?.id}
-							style={{ width: "48%" }}
-							className={`mb-8 ${index < 2 ? "mt-2" : ""}`}
-						>
-							<ItemPreviewCard item={item} size="md" showFavorite />
-						</View>
-					)}
-					keyExtractor={(item) => item?.id}
-					numColumns={2}
-					showsVerticalScrollIndicator={false}
-					columnWrapperStyle={{ justifyContent: "space-between" }}
-				/>
-			) : (
-				<View className="text-center">
-					<H3>No products found</H3>
-					<P>Favorite products to see your Oasis health score</P>
-					<Button
-						variant="outline"
-						className="mt-4"
-						onPress={() => router.push("/(protected)/search")}
-						label="Search products"
+			<View className="flex flex-col">
+				<Large>Products</Large>
+				{favorites && favorites?.length > 0 ? (
+					<FlatList
+						data={favorites}
+						renderItem={({ item, index }) => (
+							<View
+								key={item?.id}
+								style={{ width: "48%" }}
+								className={`mb-2 ${index < 2 ? "mt-2" : ""}`}
+							>
+								<ItemPreviewCard item={item} size="md" showFavorite />
+							</View>
+						)}
+						keyExtractor={(item) => item?.id}
+						numColumns={2}
+						showsVerticalScrollIndicator={false}
+						columnWrapperStyle={{ justifyContent: "space-between" }}
 					/>
-				</View>
-			)}
+				) : (
+					<View className="text-center mt-10">
+						<H3 className="text-center">No products found</H3>
+						<P className="text-center">
+							Favorite products to see your Oasis health score
+						</P>
+						<Button
+							variant="outline"
+							className="mt-4"
+							onPress={() => router.push("/(protected)/search")}
+							label="Search products"
+						/>
+					</View>
+				)}
+			</View>
 		</View>
 	);
 }

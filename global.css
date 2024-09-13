@@ -11,6 +11,7 @@
 		--primary: 20 7% 18%; /* light.primary */
 		--secondary: 40 13% 64%; /* light.secondary */
 		--muted: 30 6% 93%; /* light.muted */
+		--muted-foreground: 0 0% 45%; /* light.muted-foreground */
 		--accent: 229 59% 38%; /* light.accent */
 		--destructive: 0 84.2% 60.2%; /* light.destructive */
 		--border: 30 6% 89%; /* light.border */

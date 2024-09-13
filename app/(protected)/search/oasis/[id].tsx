@@ -24,8 +24,6 @@ export default function OasisScreen() {
 	const local = useLocalSearchParams();
 	const global = useGlobalSearchParams();
 
-	console.log("Local:", local.id, "Global:", global.id);
-
 	const [oasisUser, setOasisUser] = useState<any>({});
 	const [favorites, setFavorites] = useState<any>([]);
 
@@ -67,7 +65,7 @@ export default function OasisScreen() {
 
 	return (
 		<View
-			className="flex-1 items-center justify-between p-4 pb-10 "
+			className="flex-1 items-center justify-between px-2 pb-10"
 			style={{ backgroundColor }}
 		>
 			<View className="flex flex-col items-center p-4 gap-y-4 w-full">

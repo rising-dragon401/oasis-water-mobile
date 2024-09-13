@@ -41,9 +41,7 @@ export default function FavoriteButton({ item, size = 18 }: Props) {
 		e.preventDefault();
 
 		if (!uid || !userData) {
-			alert(
-				"Please sign in and subscribe to add to this product to your Oasis.",
-			);
+			alert("Please sign in to add to this product to your Oasis.");
 			router.push("/(public)/sign-in");
 			return;
 		}
@@ -59,8 +57,8 @@ export default function FavoriteButton({ item, size = 18 }: Props) {
 				await addFavorite(uid, item.type, item.id);
 			}
 
-			calculateUserScore(uid);
-			mutate("userFavorites");
+			await calculateUserScore(uid);
+			mutate(`userFavorites-${uid}`);
 			fetchUserFavorites(uid);
 		} catch (error) {
 			console.error("Error updating favorites", error);
