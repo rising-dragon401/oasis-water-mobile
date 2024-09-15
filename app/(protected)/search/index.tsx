@@ -275,6 +275,7 @@ export default function TabOneScreen() {
 						contentContainerStyle={{
 							paddingTop: 8,
 						}}
+						style={{ height: 80 }}
 						className="overflow-x-scroll"
 						renderItem={({ item: user }) => (
 							<Link
@@ -283,18 +284,17 @@ export default function TabOneScreen() {
 								className="mr-4"
 							>
 								<View className="flex-row items-center bg-card rounded-full p-3 pr-5">
-									<View className="w-[40px] h-[40px] rounded-full overflow-hidden mr-4">
+									<View className="relative w-[40px] h-[40px] rounded-full overflow-hidden mr-4">
 										<Image
 											source={{
-												uri:
-													user.avatar_url ||
-													"https://example.com/default-avatar.png",
+												uri: user.avatar_url,
 											}}
 											alt={user.full_name}
 											style={{
 												width: "100%",
 												height: "100%",
 											}}
+											className="w-14 h-14"
 										/>
 									</View>
 									<View>

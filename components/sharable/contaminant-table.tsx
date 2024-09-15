@@ -4,7 +4,6 @@ import useSWR from "swr";
 
 import { getContaminants } from "@/actions/ingredients";
 import { P } from "@/components/ui/typography";
-import { useColorScheme } from "@/lib/useColorScheme";
 import {
 	Accordion,
 	AccordionContent,
@@ -25,8 +24,6 @@ export default function ContaminantTable({
 	filteredContaminants,
 	categories,
 }: Props) {
-	const { iconColor } = useColorScheme();
-
 	const { data: allContaminants } = useSWR(
 		"water-contaminants",
 		getContaminants,

@@ -204,6 +204,11 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 				showsVerticalScrollIndicator={false}
 				ListEmptyComponent={loading ? renderLoader() : null}
 				ListHeaderComponent={<View style={{ height: 1 }} />}
+				initialNumToRender={8}
+				maxToRenderPerBatch={4}
+				windowSize={5}
+				removeClippedSubviews={true}
+				scrollToOverflowEnabled={false}
 			/>
 		</View>
 	);

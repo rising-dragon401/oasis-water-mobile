@@ -8,7 +8,7 @@ import { P } from "@/components/ui/typography";
 
 type BlurredLineItemProps = {
 	label: string;
-	value: string;
+	value?: string;
 	labelClassName?: string;
 	flexDirection?: "row" | "col";
 	isPaywalled?: boolean;
@@ -44,20 +44,23 @@ export default function BlurredLineItem({
 
 	return (
 		<View className="flex flex-row justify-between w-full">
-			<P className="flex-wrap max-w-30">{label}</P>
-			<View className="flex flex-row gap-2 items-center min-w-18">
+			<P className="flex-wrap">{label}</P>
+
+			<View className="flex flex-row gap-2 items-center">
 				{showPaywall ? (
 					<TouchableOpacity
 						onPress={handleOpenPaywall}
-						className="cursor-pointer"
+						className="cursor-pointer flex flex-row items-center"
 					>
 						<Feather name="lock" size={16} color={textColor} />
+						<View className={`min-w-8 h-4 rounded-full ${colorMark} ml-2`} />
 					</TouchableOpacity>
 				) : (
-					<P className="min-w-14 text-right">{value}</P>
+					<>
+						<P className="text-right">{value}</P>
+						<View className={`min-w-8 h-4 rounded-full ${colorMark}`} />
+					</>
 				)}
-
-				<View className={`min-w-8 h-4 rounded-full ${colorMark}`} />
 			</View>
 		</View>
 	);

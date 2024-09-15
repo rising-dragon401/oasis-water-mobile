@@ -7,7 +7,7 @@ import {
 	useRouter,
 } from "expo-router";
 import { useEffect, useState } from "react";
-import { View } from "react-native";
+import { ScrollView, View } from "react-native";
 
 import { getCurrentUserData, getUserFavorites } from "@/actions/user";
 import FavoritesList from "@/components/sharable/favorites-list";
@@ -64,8 +64,14 @@ export default function OasisScreen() {
 		colorScheme === "dark" ? theme.dark.background : theme.light.background;
 
 	return (
-		<View
-			className="flex-1 items-center justify-between px-2 pb-10"
+		<ScrollView
+			className="flex-1"
+			contentContainerStyle={{
+				alignItems: "center",
+				justifyContent: "space-between",
+				paddingHorizontal: 8,
+				paddingBottom: 40,
+			}}
 			style={{ backgroundColor }}
 		>
 			<View className="flex flex-col items-center p-4 gap-y-4 w-full">
@@ -131,6 +137,6 @@ export default function OasisScreen() {
 					</>
 				)}
 			</View>
-		</View>
+		</ScrollView>
 	);
 }

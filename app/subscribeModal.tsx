@@ -14,9 +14,9 @@ const FEATURES = [
 	{
 		label: "🔓 Unlock all scores and ratings",
 	},
-	// {
-	// 	label: "🤖 Personal AI nutritionist",
-	// },
+	{
+		label: "🌿 Personal AI nutritionist",
+	},
 	{
 		label: "🔬 Latest scientific research",
 	},
@@ -28,7 +28,7 @@ const FEATURES = [
 		label: "🌐 Private community",
 	},
 	{
-		label: "🧬 Supports new lab testings",
+		label: "🧬 Supports new lab tests",
 	},
 ];
 
@@ -103,11 +103,11 @@ export default function SubscribeModal() {
 						))}
 					</View>
 
-					<View className="mt-8 w-full gap-y-4">
+					<View className="mt-8 w-full max-w-sm gap-y-4">
 						<Button
 							className="w-full"
 							variant="default"
-							label="Start your 3 day free trial"
+							label="Start 3 day free trial"
 							loading={loading}
 							onPress={handleSubscribe}
 						/>

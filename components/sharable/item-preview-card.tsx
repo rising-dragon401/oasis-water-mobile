@@ -39,6 +39,8 @@ const ItemPreviewCard = ({
 							height: "100%",
 							borderRadius: 8,
 						}}
+						transition={100}
+						cachePolicy="memory-disk"
 						placeholder={{ blurhash: placeHolderImageBlurHash }}
 					/>
 

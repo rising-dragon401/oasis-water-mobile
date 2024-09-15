@@ -1,83 +1,77 @@
 {
-  "expo": {
-    "name": "Oasis",
-    "slug": "Oasis",
-    "scheme": "oasisapp",
-    "version": "0.1.6",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "automatic",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
-    "ios": {
-      "supportsTablet": false,
-      "usesAppleSignIn": true,
-      "bundleIdentifier": "com.liveoasis.oasis",
-      "buildNumber": "2",
-      "associatedDomains": [
-        "applinks:oasiswater.app"
-      ]
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "package": "com.liveoasis.oasis",
-      "versionCode": 22,
-      "permissions": [
-        "android.permission.RECORD_AUDIO"
-      ]
-    },
-    "experiments": {
-      "typedRoutes": true
-    },
-    "plugins": [
-      "expo-router",
-      "expo-dev-launcher",
-      [
-        "expo-dev-launcher",
-        {
-          "launchMode": "most-recent"
-        }
-      ],
-      "expo-apple-authentication",
-      [
-        "@sentry/react-native/expo",
-        {
-          "url": "https://sentry.io/",
-          "project": "oasis-expo",
-          "organization": "liveoasis"
-        }
-      ],
-      [
-        "expo-image-picker",
-        {
-          "photosPermission": "The app accesses your photos to upload your profile picture."
-        }
-      ],
-      "expo-localization"
-    ],
-    "extra": {
-      "router": {
-        "origin": false
-      },
-      "eas": {
-        "projectId": "ba3ea707-c8f6-4baf-becd-c2dedfa41b76"
-      }
-    },
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
-    "updates": {
-      "url": "https://u.expo.dev/ba3ea707-c8f6-4baf-becd-c2dedfa41b76"
-    },
-    "owner": "oasis-water"
-  }
+	"expo": {
+		"name": "Oasis",
+		"slug": "Oasis",
+		"scheme": "oasisapp",
+		"version": "0.1.7",
+		"orientation": "portrait",
+		"icon": "./assets/icon.png",
+		"userInterfaceStyle": "automatic",
+		"splash": {
+			"image": "./assets/splash.png",
+			"resizeMode": "contain",
+			"backgroundColor": "#ffffff"
+		},
+		"assetBundlePatterns": ["**/*"],
+		"ios": {
+			"supportsTablet": false,
+			"usesAppleSignIn": true,
+			"bundleIdentifier": "com.liveoasis.oasis",
+			"buildNumber": "1",
+			"associatedDomains": ["applinks:oasiswater.app"]
+		},
+		"android": {
+			"adaptiveIcon": {
+				"foregroundImage": "./assets/adaptive-icon.png",
+				"backgroundColor": "#ffffff"
+			},
+			"package": "com.liveoasis.oasis",
+			"versionCode": 23,
+			"permissions": ["android.permission.RECORD_AUDIO"]
+		},
+		"experiments": {
+			"typedRoutes": true
+		},
+		"plugins": [
+			"expo-router",
+			"expo-dev-launcher",
+			[
+				"expo-dev-launcher",
+				{
+					"launchMode": "most-recent"
+				}
+			],
+			"expo-apple-authentication",
+			[
+				"@sentry/react-native/expo",
+				{
+					"url": "https://sentry.io/",
+					"project": "oasis-expo",
+					"organization": "liveoasis"
+				}
+			],
+			[
+				"expo-image-picker",
+				{
+					"photosPermission": "The app accesses your photos to upload your profile picture."
+				}
+			],
+			"expo-localization"
+		],
+		"extra": {
+			"router": {
+				"origin": false
+			},
+			"eas": {
+				"projectId": "ba3ea707-c8f6-4baf-becd-c2dedfa41b76"
+			}
+		},
+		"runtimeVersion": {
+			"policy": "appVersion"
+		},
+		"updates": {
+			"url": "https://u.expo.dev/ba3ea707-c8f6-4baf-becd-c2dedfa41b76"
+		},
+		"owner": "oasis-water"
+	}
 }

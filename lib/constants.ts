@@ -43,8 +43,8 @@ export const IngredientCategories: string[] = [
 	"Volatile Organic Compounds (VOCs)",
 	"Microbiologicals",
 	// 'Microplastics',
-	"Inorganics",
-	"Other",
+	// "Inorganics",
+	// "Other",
 ];
 
 export const PROFILE_AVATAR =

@@ -3,19 +3,18 @@ import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, ScrollView, View } from "react-native";
 
 import { getFilterDetails } from "@/actions/filters";
+import { Muted, P } from "@/components/ui/typography";
+import { useUserProvider } from "@/context/user-provider";
 import { IngredientCategories } from "@/lib/constants";
 import { getContaminants } from "actions/ingredients";
 import * as Linking from "expo-linking";
 import { Button } from "../ui/button";
 import ContaminantTable from "./contaminant-table";
+import FilterMetadata from "./filter-metadata";
 import ItemImage from "./item-image";
 import Score from "./score";
-import ShowerFilterMetadata from "./shower-filter-metadata";
 import Sources from "./sources";
 import Typography from "./typography";
-import WaterFilterMetadata from "./water-filter-metadata";
-
-import { P } from "@/components/ui/typography";
 
 type Props = {
 	id: string;
@@ -30,6 +29,7 @@ interface ContaminantsByCategory {
 
 export function FilterForm({ id }: Props) {
 	const navigation = useNavigation();
+	const { subscription } = useUserProvider();
 
 	const [isLoading, setIsLoading] = useState(true);
 	const [filter, setFilter] = useState<any>({});
@@ -194,22 +194,15 @@ export function FilterForm({ id }: Props) {
 					</View>
 
 					<View>
-						{filter.type === "shower_filter" && (
-							<ShowerFilterMetadata
-								filteredContaminants={filteredContaminants}
-								contaminantsByCategory={contaminantsByCategory}
-							/>
-						)}
-
-						{(filter.type === "filter" || filter.type === "bottle_filter") && (
-							<WaterFilterMetadata
-								contaminantCategories={contaminantCategories}
-							/>
-						)}
+						<FilterMetadata
+							filteredContaminants={filteredContaminants}
+							contaminantsByCategory={contaminantsByCategory}
+							isPaywalled={!subscription}
+						/>
 					</View>
 
-					<View className="flex flex-col items-start">
-						<P>{filter.description}</P>
+					<View className="flex flex-col items-start mx-0 my-2">
+						<Muted className="mx-0">{filter.description}</Muted>
 					</View>
 				</View>
 

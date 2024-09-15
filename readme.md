@@ -57,9 +57,7 @@ Creating android build
 eas build --platform android
 ```
 
-```
-eas submit -p android
-```
+Submit manually by downloading .aab file
 
 Trouble shooting
 
