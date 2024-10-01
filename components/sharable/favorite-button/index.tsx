@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { GestureResponderEvent, TouchableOpacity } from "react-native";
+import { Alert, GestureResponderEvent, TouchableOpacity } from "react-native";
 
 import {
 	addFavorite,
@@ -41,7 +41,16 @@ export default function FavoriteButton({ item, size = 18 }: Props) {
 		e.preventDefault();
 
 		if (!uid || !userData) {
-			alert("Please sign in to add to this product to your Oasis.");
+			Alert.alert(
+				"Sign in to save",
+				"Create an account or sign in to save this product to your Oasis",
+				[
+					{
+						text: "OK",
+						onPress: () => router.push("/(public)/sign-in"),
+					},
+				],
+			);
 			router.push("/(public)/sign-in");
 			return;
 		}

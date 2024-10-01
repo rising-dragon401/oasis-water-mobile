@@ -65,11 +65,14 @@ export const getUserReferralStats = async (userId: string) => {
 	if (data) {
 		// TODO - needs to be tracked by differnt parameter
 		// i.e. if user cancels after paying they still count as a paid referral
-		const totalEarnings = data.reduce(
-			(acc, referral) =>
-				referral.subscription_status === "active" ? acc + referral.amount : acc,
-			0,
-		);
+		const totalEarnings =
+			data.reduce(
+				(acc, referral) =>
+					referral.subscription_status === "active"
+						? acc + referral.amount
+						: acc,
+				0,
+			) * 0.2;
 
 		const totalPaidReferrals = data.reduce(
 			(acc, referral) =>

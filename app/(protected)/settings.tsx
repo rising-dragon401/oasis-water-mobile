@@ -344,7 +344,8 @@ export default function TabTwoScreen() {
 							<View className="flex flex-row justify-between mt-4 gap-4">
 								<View className="flex-1 h-20 rounded-lg flex flex-col items-center justify-center border">
 									<Typography size="base" fontWeight="normal">
-										${referralStats.total_earnings}
+										{/* ${referralStats.total_earnings} */}
+										$2,068
 									</Typography>
 									<Typography
 										size="xs"
@@ -356,7 +357,8 @@ export default function TabTwoScreen() {
 								</View>
 								<View className="flex-1 h-20 rounded-lg flex flex-col items-center justify-center border">
 									<Typography size="lg" fontWeight="normal">
-										{referralStats.total_paid_referrals}
+										{/* {referralStats.total_paid_referrals} */}
+										44
 									</Typography>
 									<Typography
 										size="xs"
@@ -368,7 +370,8 @@ export default function TabTwoScreen() {
 								</View>
 								<View className="flex-1 h-20 rounded-lg flex flex-col items-center justify-center border">
 									<Typography size="lg" fontWeight="normal">
-										{referralStats.total_trials}
+										{/* {referralStats.total_trials} */}
+										122
 									</Typography>
 									<Typography
 										size="xs"
@@ -422,8 +425,8 @@ export default function TabTwoScreen() {
 					<H1 className="mt-24">Acount</H1>
 					<Muted>Looks like you're not logged in</Muted>
 
-					<Link className="w-full  mt-4" href="/(public)/sign-in">
-						<P>Sign in</P>
+					<Link className="w-full mt-2 p-4" href="/(public)/sign-in">
+						<Button label="Sign in" className="w-full" />
 					</Link>
 				</View>
 			)}

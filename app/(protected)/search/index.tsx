@@ -1,3 +1,4 @@
+import Feather from "@expo/vector-icons/Feather";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image } from "expo-image";
 import { Link, usePathname, useRouter } from "expo-router";
@@ -95,13 +96,21 @@ export default function TabOneScreen() {
 
 			<View className="flex-1 flex-col w-ful">
 				<View className="flex flex-row justify-between w-full items-center">
-					<H4 className="text-left">Product categories</H4>
-					<Link href="/(protected)/top-rated">
-						<Ionicons
-							name="arrow-forward"
-							size={16}
-							color={textSecondaryColor}
-						/>
+					<H4 className="text-left">Product ratings</H4>
+
+					<Link
+						href="/(protected)/search/top-rated-all"
+						className="flex flex-row items-center gap-2"
+					>
+						<View className="flex flex-row items-center gap-2">
+							<Muted className="text-center m-0 p-0">top rankings</Muted>
+
+							<Ionicons
+								name="arrow-forward"
+								size={16}
+								color={textSecondaryColor}
+							/>
+						</View>
 					</Link>
 				</View>
 				<FlatList
@@ -131,20 +140,118 @@ export default function TabOneScreen() {
 											borderRadius: 4,
 										}}
 									/>
+									<View className="absolute bottom-0 left-0 w-full p-2 ">
+										<P className="text-left text-md font-medium">
+											{category.title}
+										</P>
+									</View>
 								</View>
 							</Link>
-							<View className="justify-center">
-								<P className="text-left text-md font-medium">
-									{category.title}
-								</P>
-							</View>
 						</View>
 					)}
 					keyExtractor={(item) => item.id}
 				/>
 			</View>
 
-			<View className="flex-1 w-full justify-start mt-12">
+			<View className="flex-1 w-full justify-start mt-10">
+				<View className="flex flex-row justify-between w-full items-center">
+					<H4 className="text-left">Featured users</H4>
+					{/* <Link href="/(protected)/search/users">
+						<Ionicons
+							name="arrow-forward"
+							size={16}
+							color={textSecondaryColor}
+						/>
+					</Link> */}
+				</View>
+				{loadingPeople ? (
+					<FlatList
+						data={[1, 2, 3]} // Placeholder items
+						horizontal
+						renderItem={() => (
+							<View className="mr-4">
+								<Skeleton
+									width={180}
+									height={60}
+									style={{ borderRadius: 30 }}
+								/>
+							</View>
+						)}
+						keyExtractor={(item) => item.toString()}
+					/>
+				) : (
+					<FlatList
+						data={[
+							...people,
+							{
+								id: "create_yours",
+								full_name: "Create yours",
+								favorites: [],
+								avatar_url: "",
+							},
+						]}
+						horizontal
+						showsHorizontalScrollIndicator={false}
+						contentContainerStyle={{
+							paddingTop: 8,
+						}}
+						style={{ height: 80 }}
+						className="overflow-x-scroll"
+						renderItem={({ item: user }) =>
+							user.id !== "create_yours" ? (
+								<Link
+									key={user.id}
+									href={`/search/oasis/${user.id}`}
+									className="mr-4"
+								>
+									<View className="flex-row items-center bg-card rounded-full p-3 pr-5">
+										<View className="relative w-[40px] h-[40px] rounded-full overflow-hidden mr-4">
+											<Image
+												source={{
+													uri: user.avatar_url,
+												}}
+												alt={user.full_name}
+												style={{
+													width: "100%",
+													height: "100%",
+												}}
+												className="w-14 h-14"
+											/>
+										</View>
+										<View>
+											<P className="text-base font-medium">{user.full_name}</P>
+											<P className="text-sm text-secondary">
+												{user.favorites.length} products
+											</P>
+										</View>
+									</View>
+								</Link>
+							) : (
+								<Link
+									key={user.id}
+									href="https://www.oasiswater.app/affiliates"
+									className="mr-4"
+								>
+									<View className="flex-row items-center bg-card rounded-full p-3 pr-5">
+										<View className="relative w-[40px] h-[40px] rounded-full overflow-hidden mr-4 bg-gray-200 flex items-center justify-center rounded-full">
+											<Feather name="arrow-up-right" size={24} color="black" />
+										</View>
+										<View>
+											<P className="text-base font-medium">Create yours</P>
+											<P className="text-sm text-secondary">
+												Share what you drink
+											</P>
+										</View>
+									</View>
+								</Link>
+							)
+						}
+						keyExtractor={(item) => item.id}
+					/>
+				)}
+			</View>
+
+			<View className="flex-1 w-full justify-start mt-8">
 				<View className="flex flex-row justify-between w-full items-center">
 					<H4 className="text-left">Scientific research</H4>
 					<Link href="/(protected)/research">
@@ -232,76 +339,6 @@ export default function TabOneScreen() {
 												{item.attributes.title}
 											</P>
 										</View>
-									</View>
-								</View>
-							</Link>
-						)}
-						keyExtractor={(item) => item.id}
-					/>
-				)}
-			</View>
-
-			<View className="flex-1 w-full justify-start mt-12">
-				<View className="flex flex-row justify-between w-full items-center">
-					<H4 className="text-left">Featured users</H4>
-					{/* <Link href="/(protected)/search/users">
-						<Ionicons
-							name="arrow-forward"
-							size={16}
-							color={textSecondaryColor}
-						/>
-					</Link> */}
-				</View>
-				{loadingPeople ? (
-					<FlatList
-						data={[1, 2, 3]} // Placeholder items
-						horizontal
-						renderItem={() => (
-							<View className="mr-4">
-								<Skeleton
-									width={180}
-									height={60}
-									style={{ borderRadius: 30 }}
-								/>
-							</View>
-						)}
-						keyExtractor={(item) => item.toString()}
-					/>
-				) : (
-					<FlatList
-						data={people}
-						horizontal
-						showsHorizontalScrollIndicator={false}
-						contentContainerStyle={{
-							paddingTop: 8,
-						}}
-						style={{ height: 80 }}
-						className="overflow-x-scroll"
-						renderItem={({ item: user }) => (
-							<Link
-								key={user.id}
-								href={`/search/oasis/${user.id}`}
-								className="mr-4"
-							>
-								<View className="flex-row items-center bg-card rounded-full p-3 pr-5">
-									<View className="relative w-[40px] h-[40px] rounded-full overflow-hidden mr-4">
-										<Image
-											source={{
-												uri: user.avatar_url,
-											}}
-											alt={user.full_name}
-											style={{
-												width: "100%",
-												height: "100%",
-											}}
-											className="w-14 h-14"
-										/>
-									</View>
-									<View>
-										<P className="text-base font-medium">{user.full_name}</P>
-										<P className="text-sm text-secondary">
-											{user.favorites.length} products
-										</P>
 									</View>
 								</View>
 							</Link>

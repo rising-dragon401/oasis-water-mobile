@@ -89,7 +89,7 @@ export default function FavoritesList({
 	}
 
 	return (
-		<View className="pb-8">
+		<View className="pb-0 mb-0">
 			<View className="py-4 gap-4 mb-4 flex w-full flex-row justify-between">
 				<View className="flex flex-col">
 					<Avatar className="h-24 w-24" alt="oasis pfp">
@@ -115,27 +115,36 @@ export default function FavoritesList({
 			<View className="flex flex-col">
 				<Large>Products</Large>
 				{favorites && favorites?.length > 0 ? (
-					<FlatList
-						data={favorites}
-						renderItem={({ item, index }) => (
-							<View
-								key={item?.id}
-								style={{ width: "48%" }}
-								className={`mb-2 ${index < 2 ? "mt-2" : ""}`}
-							>
-								<ItemPreviewCard item={item} size="md" showFavorite />
-							</View>
-						)}
-						keyExtractor={(item) => item?.id}
-						numColumns={2}
-						showsVerticalScrollIndicator={false}
-						columnWrapperStyle={{ justifyContent: "space-between" }}
-					/>
+					<>
+						<FlatList
+							data={favorites}
+							renderItem={({ item, index }) => (
+								<View
+									key={item?.id}
+									style={{ width: "48%" }}
+									className={`mb-2 ${index < 2 ? "mt-2" : ""}`}
+								>
+									<ItemPreviewCard item={item} size="md" showFavorite />
+								</View>
+							)}
+							keyExtractor={(item) => item?.id}
+							numColumns={2}
+							showsVerticalScrollIndicator={false}
+							columnWrapperStyle={{ justifyContent: "space-between" }}
+							contentContainerStyle={{
+								flexGrow: 0,
+								paddingBottom: 0,
+								marginBottom: 0,
+							}}
+							scrollEnabled={false}
+						/>
+					</>
 				) : (
 					<View className="text-center mt-10">
 						<H3 className="text-center">No products found</H3>
 						<P className="text-center">
-							Favorite products to see your Oasis health score
+							Start saving products to your Oasis account to see your health
+							score
 						</P>
 						<Button
 							variant="outline"

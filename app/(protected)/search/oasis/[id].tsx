@@ -12,13 +12,13 @@ import { ScrollView, View } from "react-native";
 import { getCurrentUserData, getUserFavorites } from "@/actions/user";
 import FavoritesList from "@/components/sharable/favorites-list";
 import { Button } from "@/components/ui/button";
-import { H1, Muted } from "@/components/ui/typography";
+import { H1, Large, Muted } from "@/components/ui/typography";
 import { theme } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function OasisScreen() {
 	const navigation = useNavigation();
-	const { uid, userData, subscription } = useUserProvider();
+	const { uid, userData, subscription, userFavorites } = useUserProvider();
 	const router = useRouter();
 	const { colorScheme } = useColorScheme();
 	const local = useLocalSearchParams();
@@ -28,6 +28,8 @@ export default function OasisScreen() {
 	const [favorites, setFavorites] = useState<any>([]);
 
 	const userId = Array.isArray(local?.id) ? local.id[0] : local?.id || uid;
+
+	const isCurrentUser = userId === uid;
 
 	useEffect(() => {
 		if (userId) {
@@ -71,12 +73,17 @@ export default function OasisScreen() {
 				justifyContent: "space-between",
 				paddingHorizontal: 8,
 				paddingBottom: 40,
+				flexGrow: 1,
 			}}
 			style={{ backgroundColor }}
 		>
-			<View className="flex flex-col items-center p-4 gap-y-4 w-full">
+			<View className="flex flex-col items-center p-4 gap-y-4 w-full flex-grow">
 				{favorites ? (
-					<FavoritesList userId={userId} />
+					<>
+						<View style={{ flex: 0, width: "100%" }}>
+							<FavoritesList userId={userId} />
+						</View>
+					</>
 				) : (
 					<>
 						{subscription && !favorites ? (
@@ -137,6 +144,19 @@ export default function OasisScreen() {
 					</>
 				)}
 			</View>
+
+			{!isCurrentUser && (
+				<View className="rounded-full bg-card shadow-md h-14 mt-8">
+					<Link href="https://www.oasiswater.app/affiliates">
+						<View className="flex flex-col items-center p-4 px-6">
+							<Large className="text-center">
+								Share what you drink and earn 💸
+							</Large>
+							{/* <Muted className="text-center">Learn more</Muted> */}
+						</View>
+					</Link>
+				</View>
+			)}
 		</ScrollView>
 	);
 }
