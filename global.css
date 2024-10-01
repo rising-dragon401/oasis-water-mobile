@@ -16,6 +16,7 @@
 		--destructive: 0 84.2% 60.2%; /* light.destructive */
 		--border: 30 6% 89%; /* light.border */
 		--input: 30 6% 93%; /* light.input */
+		--offwhite: 0 0% 95%; /* light.text-foreground */
 	}
 
 	.dark:root {
@@ -30,5 +31,6 @@
 		--destructive: 0 84.2% 60.2%; /* dark.destructive */
 		--border: 220 26% 24%; /* dark.border */
 		--input: 20 7% 18%; /* dark.input */
+		--offwhite: 0 0% 20%; /* dark.fadedblack */
 	}
 }

@@ -7,6 +7,7 @@ import { getCurrentUserData, getUserFavorites } from "@/actions/user";
 import Score from "@/components/sharable/score";
 import { Button } from "@/components/ui/button";
 import { H3, H4, Large, Muted, P } from "@/components/ui/typography";
+import { useColorScheme } from "@/lib/useColorScheme";
 import { Avatar, AvatarImage } from "components/ui/avatar";
 import { PROFILE_AVATAR } from "lib/constants";
 import useSWR from "swr";
@@ -19,6 +20,7 @@ export default function FavoritesList({
 	userId: string | null | undefined;
 }) {
 	const router = useRouter();
+	const { iconColor } = useColorScheme();
 
 	const [loading, setLoading] = useState(true);
 	const [userData, setUserData] = useState<any>(null);
@@ -107,7 +109,7 @@ export default function FavoritesList({
 				<View className="max-h-24 flex flex-row gap-4">
 					<Score score={userData?.score || "?"} size="sm" showScore />
 					<TouchableOpacity onPress={() => shareProfile()}>
-						<Octicons name="share" size={24} color="muted" />
+						<Octicons name="share" size={24} color={iconColor} />
 					</TouchableOpacity>
 				</View>
 			</View>

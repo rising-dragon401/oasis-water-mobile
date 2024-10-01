@@ -25,19 +25,12 @@ export default function SearchLayout() {
 				headerTitleStyle: {
 					color: textColor,
 				},
+				headerTitle: () => <CustomHeader />,
+				headerTitleAlign: "center",
+				headerShadowVisible: false,
 			}}
 		>
-			<Stack.Screen
-				name="index"
-				options={{
-					headerTitle: () => <CustomHeader />,
-					headerTitleAlign: "center",
-					headerShadowVisible: false,
-					headerStyle: {
-						backgroundColor,
-					},
-				}}
-			/>
+			<Stack.Screen name="index" />
 			<Stack.Screen name="item/[id]" />
 			<Stack.Screen name="location/[id]" />
 			<Stack.Screen name="filter/[id]" />

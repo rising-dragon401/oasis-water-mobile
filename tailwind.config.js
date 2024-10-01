@@ -13,6 +13,7 @@ module.exports = {
 				card: "hsl(var(--card))",
 				background: "hsl(var(--background))",
 				foreground: "hsl(var(--foreground))",
+				offwhite: "hsl(var(--offwhite))",
 				primary: {
 					DEFAULT: "hsl(var(--primary))",
 					foreground: "hsl(var(--primary-foreground))",

@@ -140,7 +140,7 @@ export default function TabOneScreen() {
 											borderRadius: 4,
 										}}
 									/>
-									<View className="absolute bottom-0 left-0 w-full p-2 ">
+									<View className="absolute bottom-0 left-0 w-full p-2">
 										<P className="text-left text-md font-medium">
 											{category.title}
 										</P>

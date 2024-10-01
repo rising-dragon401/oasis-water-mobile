@@ -59,8 +59,8 @@ export default function ResultsRow({ results }: Props) {
 		>
 			<View
 				style={{
-					backgroundColor:
-						colorScheme === "dark" ? theme.dark.card : theme.light.card,
+					// backgroundColor:
+					// 	colorScheme === "dark" ? theme.dark.card : theme.light.card,
 					borderRadius: 8,
 					overflow: "hidden",
 					borderWidth: 1,
@@ -70,7 +70,9 @@ export default function ResultsRow({ results }: Props) {
 					shadowOpacity: 0.25,
 					shadowRadius: 3.84,
 					elevation: 5,
+					maxHeight: 240, // Add maxHeight here
 				}}
+				className="bg-input"
 			>
 				<FlatList
 					data={results}
@@ -91,15 +93,15 @@ export default function ResultsRow({ results }: Props) {
 										/>
 										<P className="max-w-72 font-medium">{result.name}</P>
 									</View>
-
-									{/* {getIcon(result)} */}
 								</View>
 							</Link>
 						</View>
 					)}
 					nestedScrollEnabled
+					scrollEnabled
 					showsVerticalScrollIndicator={false}
 					keyboardShouldPersistTaps="handled"
+					style={{ maxHeight: 240 }}
 				/>
 			</View>
 		</KeyboardAvoidingView>

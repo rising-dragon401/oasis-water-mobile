@@ -34,15 +34,15 @@ const buttonVariants = cva(
 );
 
 const buttonTextVariants = cva(
-	"web:whitespace-nowrap text-base native:text-base  text-foreground web:transition-colors",
+	"web:whitespace-nowrap text-base native:text-base !text-foreground web:transition-colors",
 	{
 		variants: {
 			variant: {
-				default: "text-white !font-bold",
+				default: "!text-offwhite !font-bold",
 				destructive: "text-secondary",
 				outline: "group-active:text-accent-foreground",
 				secondary:
-					"text-secondary-foreground group-active:text-secondary-foreground",
+					"text-secondary-foreground dark:text-primary group-active:text-secondary-foreground",
 				ghost: "group-active:text-accent-foreground font-normal",
 				link: "text-primary group-active:underline",
 			},
