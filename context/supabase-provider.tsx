@@ -230,7 +230,7 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 				if (userData && userData?.is_onboarded) {
 					router.replace("/(protected)/search");
 				} else {
-					router.replace("/(protected)/onboarding");
+					router.replace("/(public)/onboarding");
 				}
 			} else if (!session) {
 				router.replace("/(public)/welcome");

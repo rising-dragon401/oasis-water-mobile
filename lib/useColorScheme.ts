@@ -23,6 +23,9 @@ export function useColorScheme() {
 	const mutedColor =
 		colorScheme === "dark" ? theme.dark.muted : theme.light.muted;
 
+	const accentColor =
+		colorScheme === "dark" ? theme.dark.accent : theme.light.accent;
+
 	return {
 		colorScheme: colorScheme ?? "dark",
 		isDarkColorScheme: colorScheme === "dark",
@@ -34,5 +37,6 @@ export function useColorScheme() {
 		textColor,
 		textSecondaryColor,
 		mutedColor,
+		accentColor,
 	};
 }
