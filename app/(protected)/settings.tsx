@@ -422,9 +422,11 @@ export default function TabTwoScreen() {
 					<H1 className="mt-24">Acount</H1>
 					<Muted>Looks like you're not logged in</Muted>
 
-					<Link className="w-full mt-2 p-4" href="/(public)/sign-in">
-						<Button label="Sign in" className="w-full" />
-					</Link>
+					<Button
+						label="Sign in"
+						className="w-full mt-2 p-4"
+						onPress={() => router.push("/(public)/sign-in")}
+					/>
 				</View>
 			)}
 		</ScrollView>

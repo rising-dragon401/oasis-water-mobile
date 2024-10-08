@@ -671,3 +671,26 @@ export const getUserByUsername = async (username: string) => {
 
 	return data;
 };
+
+export const isUserLoggedIn = async () => {
+	const {
+		data: { user },
+		error,
+	} = await supabase.auth.getUser();
+
+	if (error || !user) {
+		return false;
+	}
+
+	const { data, error: userError } = await supabase
+		.from("users")
+		.select("id")
+		.eq("id", user.id)
+		.single();
+
+	if (userError || !data) {
+		return false;
+	}
+
+	return true;
+};

@@ -1,11 +1,10 @@
+import { supabase } from "@/config/supabase";
 import { Session, User } from "@supabase/supabase-js";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { SplashScreen, useRouter, useSegments } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import * as WebBrowser from "expo-web-browser";
 import { createContext, useContext, useEffect, useState } from "react";
-
-import { supabase } from "@/config/supabase";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -209,24 +208,45 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 	}, []);
 
 	useEffect(() => {
-		if (!initialized) return;
+		const fetchData = async () => {
+			if (!initialized) return;
 
-		const inProtectedGroup = segments[0] === "(protected)";
+			const inProtectedGroup = segments[0] === "(protected)";
 
-		if (session && !inProtectedGroup) {
-			router.replace("/(protected)/search");
-		} else if (!session) {
-			router.replace("/(public)/welcome");
-		}
+			if (session && !inProtectedGroup) {
+				const { data: userData, error } = await supabase
+					.from("users")
+					.select("is_onboarded")
+					.eq("id", session.user.id)
+					.single();
 
-		/* HACK: Something must be rendered when determining the initial auth state... 
-		instead of creating a loading screen, we use the SplashScreen and hide it after
-		a small delay (500 ms)
-		*/
+				console.log("userData: ", userData);
 
-		setTimeout(() => {
-			SplashScreen.hideAsync();
-		}, 500);
+				if (error) {
+					console.log("Error fetching user data:", error);
+					return;
+				}
+
+				if (userData && userData?.is_onboarded) {
+					router.replace("/(protected)/search");
+				} else {
+					router.replace("/(protected)/onboarding");
+				}
+			} else if (!session) {
+				router.replace("/(public)/welcome");
+			}
+
+			/* HACK: Something must be rendered when determining the initial auth state... 
+			instead of creating a loading screen, we use the SplashScreen and hide it after
+			a small delay (500 ms)
+			*/
+
+			setTimeout(() => {
+				SplashScreen.hideAsync();
+			}, 500);
+		};
+
+		fetchData();
 	}, [initialized, session]);
 
 	return (

@@ -1,3 +1,4 @@
+import { isUserLoggedIn } from "@/actions/user";
 import PaywallContent from "@/components/sharable/paywall-content";
 import { H2 } from "@/components/ui/typography";
 import { placeHolderImageBlurHash } from "@/lib/constants/images";
@@ -8,9 +9,12 @@ import {
 	useGlobalSearchParams,
 	useLocalSearchParams,
 	useNavigation,
+	usePathname,
+	useRouter,
 } from "expo-router";
 import { useEffect, useState } from "react";
 import {
+	Alert,
 	ScrollView,
 	StyleSheet,
 	View,
@@ -23,6 +27,8 @@ export default function ArticlePage() {
 	const local = useLocalSearchParams();
 	const navigation = useNavigation();
 	const { width: screenWidth } = useWindowDimensions();
+	const pathname = usePathname();
+	const router = useRouter();
 
 	const imageWidth = screenWidth - 48;
 
@@ -32,6 +38,37 @@ export default function ArticlePage() {
 		"1";
 
 	const [entry, setEntry] = useState<any>(null);
+
+	// check if user is logged in
+	// only auth users can view items
+	useEffect(() => {
+		const checkLogin = async () => {
+			console.log("pathname", pathname);
+			if (!pathname.includes("/article")) {
+				return;
+			}
+
+			const loggedIn = await isUserLoggedIn();
+			if (!loggedIn) {
+				Alert.alert(
+					"Sign in to view",
+					"You need to be signed in to view articles",
+					[
+						{
+							text: "Go back",
+							onPress: () => navigation.goBack(),
+							style: "cancel",
+						},
+						{
+							text: "Sign in",
+							onPress: () => router.push("/(public)/sign-in"),
+						},
+					],
+				);
+			}
+		};
+		checkLogin();
+	}, [glob, pathname]);
 
 	useEffect(() => {
 		const fetch = async () => {

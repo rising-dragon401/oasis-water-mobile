@@ -1,5 +1,5 @@
 import { useUserProvider } from "context/user-provider";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { ScrollView, View } from "react-native";
 
 import FavoritesList from "@/components/sharable/favorites-list";
@@ -11,7 +11,7 @@ import { useColorScheme } from "@/lib/useColorScheme";
 export default function OasisScreen() {
 	const { uid, userFavorites } = useUserProvider();
 	const { colorScheme } = useColorScheme();
-
+	const router = useRouter();
 	const backgroundColor =
 		colorScheme === "dark" ? theme.dark.background : theme.light.background;
 
@@ -57,9 +57,11 @@ export default function OasisScreen() {
 						</Muted>
 					</View>
 
-					<Link className="w-full mt-2 p-4 ml-2" href="/(public)/sign-in">
-						<Button label="Sign in" className="w-40" />
-					</Link>
+					<Button
+						label="Sign in"
+						className="w-full mt-2 p-4"
+						onPress={() => router.push("/(public)/sign-in")}
+					/>
 				</View>
 			)}
 		</ScrollView>

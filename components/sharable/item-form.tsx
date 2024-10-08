@@ -3,20 +3,20 @@
 import { getItemDetails } from "actions/items";
 import * as Linking from "expo-linking";
 import { useEffect, useState } from "react";
-import { ScrollView, View } from "react-native";
+import { Alert, ScrollView, View } from "react-native";
 
 import { Octicons } from "@expo/vector-icons";
 
 import { Button } from "@/components/ui/button";
 import { H2, Muted } from "@/components/ui/typography";
-import { Link, useNavigation } from "expo-router";
+import { Link, useNavigation, useRouter } from "expo-router";
 import BlurredLineItem from "./blurred-line-item";
 import ItemImage from "./item-image";
 import PaywallContent from "./paywall-content";
 import Score from "./score";
 import Typography from "./typography";
 
-import { incrementItemsViewed } from "@/actions/user";
+import { incrementItemsViewed, isUserLoggedIn } from "@/actions/user";
 import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
 import ContaminantCard from "./contamintant-card";
@@ -30,11 +30,39 @@ type Props = {
 
 export function ItemForm({ id }: Props) {
 	const navigation = useNavigation();
+	const router = useRouter();
+
 	const { uid } = useUserProvider();
 	const { iconColor } = useColorScheme();
 
 	const [item, setItem] = useState<any>({});
 	const [, setIsLoading] = useState(true);
+
+	// check if user is logged in
+	// only auth users can view items
+	useEffect(() => {
+		const checkLogin = async () => {
+			const loggedIn = await isUserLoggedIn();
+			if (!loggedIn) {
+				Alert.alert(
+					"Please sign in",
+					"You need to be signed in to view this item.",
+					[
+						{
+							text: "Cancel",
+							onPress: () => navigation.goBack(),
+							style: "cancel",
+						},
+						{
+							text: "OK",
+							onPress: () => router.push("/(public)/sign-in"),
+						},
+					],
+				);
+			}
+		};
+		checkLogin();
+	}, []);
 
 	useEffect(() => {
 		incrementItemsViewed(uid);

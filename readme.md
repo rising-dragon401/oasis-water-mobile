@@ -78,3 +78,10 @@ Reproduce Testflight crashing locally
 ```
 npx expo start --no-dev --clear
 ```
+
+Components
+
+Uses `rn-primitives` for the underlying implementation of the components.
+https://rn-primitives.vercel.app/
+Must install manually under `@/components/ui/`
+Fyi think there are duplicates in `@/components/primitives/`
