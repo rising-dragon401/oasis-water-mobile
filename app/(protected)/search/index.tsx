@@ -19,7 +19,7 @@ export default function TabOneScreen() {
 	const { userData, subscription, uid } = useUserProvider();
 	const router = useRouter();
 	const pathname = usePathname();
-	const { textSecondaryColor, mutedColor } = useColorScheme();
+	const { textSecondaryColor } = useColorScheme();
 
 	const [people, setPeople] = useState<any[]>([]);
 	const [blogs, setBlogs] = useState<any[]>([]);

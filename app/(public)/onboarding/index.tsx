@@ -27,9 +27,9 @@ export default function OnboardingScreen() {
 	const [loadingPurchase, setLoadingPurchase] = useState(false);
 
 	const router = useRouter();
-	const { user, userData } = useUserProvider();
+	const { user, userData, subscription } = useUserProvider();
 	const { packages, purchasePackage } = useRevenueCat();
-	const { iconColor } = useColorScheme();
+	const { iconColor, mutedForegroundColor } = useColorScheme();
 
 	const windowWidth = Dimensions.get("window").width;
 	const windowHeight = Dimensions.get("window").height;
@@ -67,13 +67,15 @@ export default function OnboardingScreen() {
 				resizeMode: "contain",
 			},
 			component: (
-				<View className="flex flex-row items-center gap-2 w-full">
-					<Switch
-						checked={isSubscribedToNewsletter}
-						onCheckedChange={setIsSubscribedToNewsletter}
-						nativeID="onboarding-toggle"
-					/>
-					<P>Get weekly updates</P>
+				<View className="flex flex-col items-center w-full">
+					<View className="flex flex-row items-center gap-2 justify-center">
+						<Switch
+							checked={isSubscribedToNewsletter}
+							onCheckedChange={setIsSubscribedToNewsletter}
+							nativeID="onboarding-toggle"
+						/>
+						<P>Get weekly updates</P>
+					</View>
 				</View>
 			),
 			onSubmit: () => {
@@ -117,15 +119,18 @@ export default function OnboardingScreen() {
 		}).start();
 	}, [currentStep, windowWidth]);
 
-	const handleNextStep = (submit: boolean) => {
+	const handleNextStep = async (submit: boolean) => {
 		setDirection("forward");
 
 		// only if user pressed submit button and there is a submit function
 		if (submit && steps[currentStep].onSubmit) {
-			steps[currentStep].onSubmit();
+			await steps[currentStep].onSubmit();
 		}
 
-		if (currentStep === totalSteps - 1) {
+		const nextStep = currentStep + 1;
+
+		// Skip the last step if user already has a subscription
+		if (nextStep === totalSteps - 1 && subscription) {
 			handleFinishOnboarding();
 		} else {
 			setCurrentStep((prev) => Math.min(totalSteps - 1, prev + 1));
@@ -138,7 +143,7 @@ export default function OnboardingScreen() {
 	};
 
 	const handleFinishOnboarding = async () => {
-		await updateUserData(userData.id, "has_onboarded", true);
+		await updateUserData(userData.id, "is_onboarded", true);
 		router.push("/(protected)/search");
 	};
 
@@ -169,6 +174,8 @@ export default function OnboardingScreen() {
 
 			if (res) {
 				// Handle success here
+				handleFinishOnboarding();
+				// TODO impelement toast
 			}
 		} catch (e) {
 			console.log(e);
@@ -188,19 +195,20 @@ export default function OnboardingScreen() {
 	return (
 		<View className="flex-1 pb-14">
 			{/* Back Button and Progress Bar */}
-			<View className="flex flex-row items-center justify-center mb-4 p-4 px-8 w-full">
-				<View className="flex w-14 justify-center">
-					{currentStep !== 0 && (
+			<View className="flex flex-row items-center justify-between mb-4 p-4 px-8 w-full">
+				<View className="w-14 flex flex-row justify-center">
+					{currentStep !== 0 ? (
 						<TouchableOpacity
 							onPress={handlePrevStep}
 							disabled={currentStep === 0}
-							className=""
 						>
 							<Ionicons name="arrow-back" size={24} color={iconColor} />
 						</TouchableOpacity>
+					) : (
+						<View style={{ width: 24, height: 24 }} />
 					)}
 				</View>
-				<View className="flex w-3/4">
+				<View className="flex-1 mx-4">
 					<ProgressPrimitive.Root
 						value={currentStep + 1}
 						max={totalSteps}
@@ -214,11 +222,13 @@ export default function OnboardingScreen() {
 						/>
 					</ProgressPrimitive.Root>
 				</View>
-				<View className="flex w-14 justify-center">
-					{currentStep === totalSteps - 1 && (
+				<View className="w-14 flex flex-row justify-center">
+					{currentStep === totalSteps - 1 ? (
 						<TouchableOpacity onPress={handleFinishOnboarding}>
-							<Ionicons name="close" size={24} color={iconColor} />
+							<Ionicons name="close" size={24} color={mutedForegroundColor} />
 						</TouchableOpacity>
+					) : (
+						<View style={{ width: 24, height: 24 }} />
 					)}
 				</View>
 			</View>
@@ -244,10 +254,7 @@ export default function OnboardingScreen() {
 									/>
 								)}
 								{step.component && (
-									<View
-										className="flex w-full mt-4"
-										style={{ marginBottom: 20 }}
-									>
+									<View className="flex w-full" style={{ marginBottom: 20 }}>
 										{step.component}
 									</View>
 								)}

@@ -220,8 +220,6 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 					.eq("id", session.user.id)
 					.single();
 
-				console.log("userData: ", userData);
-
 				if (error) {
 					console.log("Error fetching user data:", error);
 					return;

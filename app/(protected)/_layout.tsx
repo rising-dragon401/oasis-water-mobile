@@ -46,12 +46,6 @@ export default function ProtectedLayout() {
 					href: null,
 				}}
 			/>
-			<Tabs.Screen
-				name="onboarding"
-				options={{
-					href: null,
-				}}
-			/>
 			<Tabs.Screen name="oasis" />
 			<Tabs.Screen name="settings" />
 		</Tabs>

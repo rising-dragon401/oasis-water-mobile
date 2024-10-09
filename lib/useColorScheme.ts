@@ -23,6 +23,11 @@ export function useColorScheme() {
 	const mutedColor =
 		colorScheme === "dark" ? theme.dark.muted : theme.light.muted;
 
+	const mutedForegroundColor =
+		colorScheme === "dark"
+			? theme.dark["muted-foreground"]
+			: theme.light["muted-foreground"];
+
 	const accentColor =
 		colorScheme === "dark" ? theme.dark.accent : theme.light.accent;
 
@@ -37,6 +42,7 @@ export function useColorScheme() {
 		textColor,
 		textSecondaryColor,
 		mutedColor,
+		mutedForegroundColor,
 		accentColor,
 	};
 }

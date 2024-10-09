@@ -21,6 +21,7 @@ export const theme = {
 		primary: "hsl(44 8% 92%)",
 		secondary: "hsl(40 13% 36%)",
 		muted: "hsl(220 26% 22%)",
+		"muted-foreground": "hsl(220 26% 22%)",
 		accent: "hsl(229 59% 62%)",
 		destructive: "hsl(0 84.2% 60.2%)",
 		border: "hsl(220 26% 24%)",
