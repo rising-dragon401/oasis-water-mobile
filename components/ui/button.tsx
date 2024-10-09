@@ -66,6 +66,7 @@ type ButtonProps = React.ComponentPropsWithoutRef<typeof Pressable> &
 		icon?: React.ReactNode;
 		iconPosition?: "left" | "right";
 		loading?: boolean;
+		textClassName?: string;
 	};
 
 const Button = React.forwardRef<
@@ -75,6 +76,7 @@ const Button = React.forwardRef<
 	(
 		{
 			className,
+			textClassName,
 			variant,
 			size,
 			label,
@@ -97,6 +99,7 @@ const Button = React.forwardRef<
 						props.disabled && "opacity-50 web:pointer-events-none",
 						buttonVariants({ variant, size, className }),
 						"rounded-full flex items-center justify-center",
+						className,
 					)}
 					ref={ref}
 					role="button"
@@ -112,6 +115,7 @@ const Button = React.forwardRef<
 								className={cn(
 									"flex items-center justify-center",
 									buttonTextVariants({ variant, size }),
+									textClassName,
 								)}
 							>
 								{label}

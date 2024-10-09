@@ -1,5 +1,4 @@
 import { isUserLoggedIn } from "@/actions/user";
-import PaywallContent from "@/components/sharable/paywall-content";
 import { H2 } from "@/components/ui/typography";
 import { placeHolderImageBlurHash } from "@/lib/constants/images";
 import { getEntry } from "actions/blogs";
@@ -130,26 +129,28 @@ export default function ArticlePage() {
 					</Markdown>
 				);
 
-				if (index === 0 || index === entry?.attributes?.blocks.length - 1) {
-					return content;
-				}
+				return content;
 
-				if (index > 0) {
-					return (
-						<PaywallContent
-							key={block.id}
-							label="Subscribe to access full article"
-							items={[
-								"Detailed analysis and insights 🔬",
-								"Expert opinions and recommendations 💡",
-								"Exclusive content and updates 📰",
-								"Product recommendations 🌿",
-							]}
-						>
-							{content}
-						</PaywallContent>
-					);
-				}
+				// if (index === 0 || index === entry?.attributes?.blocks.length - 1) {
+				// 	return content;
+				// }
+
+				// if (index > 0) {
+				// 	return (
+				// 		<PaywallContent
+				// 			key={block.id}
+				// 			label="Subscribe to access full article"
+				// 			items={[
+				// 				"Detailed analysis and insights 🔬",
+				// 				"Expert opinions and recommendations 💡",
+				// 				"Exclusive content and updates 📰",
+				// 				"Product recommendations 🌿",
+				// 			]}
+				// 		>
+				// 			{content}
+				// 		</PaywallContent>
+				// 	);
+				// }
 			})}
 
 			<View style={{ height: 40 }} />

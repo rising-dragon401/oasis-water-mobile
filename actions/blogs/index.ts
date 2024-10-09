@@ -22,6 +22,9 @@ export const getBlogs = async () => {
 					return entry;
 				}),
 			);
+
+			blogEntries.reverse();
+
 			return blogEntries;
 		} catch (error) {
 			console.error("Error fetching food data:", error);

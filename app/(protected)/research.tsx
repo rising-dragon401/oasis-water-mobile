@@ -1,11 +1,11 @@
 import Skeleton from "@/components/sharable/skeleton";
 import { H1, Muted, P } from "@/components/ui/typography";
+import { BlogContext } from "@/context/blogs-provider";
 import { theme } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
-import { getBlogs } from "actions/blogs";
 import { Image } from "expo-image";
 import { Link } from "expo-router";
-import { useEffect, useState } from "react";
+import { useContext } from "react";
 import { FlatList, View } from "react-native";
 
 export default function ResearchScreen() {
@@ -14,15 +14,11 @@ export default function ResearchScreen() {
 	const backgroundColor =
 		colorScheme === "dark" ? theme.dark.background : theme.light.background;
 
-	const [blogs, setBlogs] = useState<any[]>([]);
-
-	useEffect(() => {
-		getBlogs().then(setBlogs);
-	}, []);
+	const { blogs } = useContext(BlogContext);
 
 	return (
 		<View className="flex-1  justify-between px-4" style={{ backgroundColor }}>
-			<H1 className="mt-24">Latest research</H1>
+			<H1 className="mt-24">Research</H1>
 			<Muted>
 				Stay current with scientific advances in product health and safety
 			</Muted>

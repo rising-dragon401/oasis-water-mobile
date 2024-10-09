@@ -2,32 +2,30 @@ import Feather from "@expo/vector-icons/Feather";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image } from "expo-image";
 import { Link, usePathname, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FlatList, ScrollView, View } from "react-native";
 
 import Search from "@/components/sharable/search";
 import Skeleton from "@/components/sharable/skeleton";
 import { H2, H4, Muted, P } from "@/components/ui/typography";
+import { BlogContext } from "@/context/blogs-provider";
 import { useUserProvider } from "@/context/user-provider";
 import { CATEGORIES } from "@/lib/constants/categories";
 import { useColorScheme } from "@/lib/useColorScheme";
 import { getFeaturedUsers } from "actions/admin";
-import { getEntry } from "actions/blogs";
-import axios from "axios";
 
 export default function TabOneScreen() {
 	const { userData, subscription, uid } = useUserProvider();
 	const router = useRouter();
 	const pathname = usePathname();
 	const { textSecondaryColor } = useColorScheme();
+	const { blogs } = useContext(BlogContext);
 
 	const [people, setPeople] = useState<any[]>([]);
-	const [blogs, setBlogs] = useState<any[]>([]);
 	const [loadingPeople, setLoadingPeople] = useState(false);
 
 	useEffect(() => {
 		getPeople();
-		getBlogs();
 	}, []);
 
 	// show review modal if user has not reviewed the app
@@ -42,27 +40,6 @@ export default function TabOneScreen() {
 			router.push("/reviewModal");
 		}
 	}, [userData, subscription, uid]);
-
-	async function getBlogs() {
-		try {
-			try {
-				const response = await axios.get(
-					"https://favorable-chickens-2e4f30c189.strapiapp.com/api/articles",
-				);
-				const blogEntries = await Promise.all(
-					response.data.data.map(async (item: any) => {
-						const entry = await getEntry(item.id);
-						return entry;
-					}),
-				);
-				setBlogs(blogEntries);
-			} catch (error) {
-				console.error("Error fetching food data:", error);
-			}
-		} catch (error) {
-			console.error("Error fetching data:", error);
-		}
-	}
 
 	async function getPeople() {
 		setLoadingPeople(true);
@@ -253,7 +230,7 @@ export default function TabOneScreen() {
 
 			<View className="flex-1 w-full justify-start mt-8">
 				<View className="flex flex-row justify-between w-full items-center">
-					<H4 className="text-left">Scientific research</H4>
+					<H4 className="text-left">New research</H4>
 					<Link href="/(protected)/research">
 						<Ionicons
 							name="arrow-forward"

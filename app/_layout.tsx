@@ -5,6 +5,7 @@ import React from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import "../global.css";
 
+import { BlogProvider } from "@/context/blogs-provider";
 import { RevenueCatProvider } from "@/context/revenue-cat-provider";
 import { SupabaseProvider } from "@/context/supabase-provider";
 import UserProvider from "@/context/user-provider";
@@ -13,7 +14,6 @@ import { PortalHost } from "components/primitives/portal";
 import { isRunningInExpoGo } from "expo";
 import { PostHogProvider } from "posthog-react-native";
 import { SWRConfig } from "swr";
-
 const routingInstrumentation = new Sentry.ReactNavigationInstrumentation();
 
 Sentry.init({
@@ -42,64 +42,66 @@ function RootLayout() {
 		<SupabaseProvider>
 			<UserProvider>
 				<RevenueCatProvider>
-					<PostHogProvider
-						apiKey="phc_ifrEiDLe5q1xE20zwCZkeKANkrOF0dg6RqpmypbFDhZ"
-						options={{ host: "https://us.i.posthog.com" }}
-						autocapture
-					>
-						<SWRConfig>
-							<SafeAreaProvider>
-								<Stack
-									screenOptions={{
-										headerShown: false,
-										contentStyle: {
-											backgroundColor,
-										},
-									}}
-								>
-									<Stack.Screen name="(protected)" />
-									<Stack.Screen name="(public)" />
-									<Stack.Screen
-										name="subscribeModal"
-										options={{
-											presentation: "modal",
+					<BlogProvider>
+						<PostHogProvider
+							apiKey="phc_ifrEiDLe5q1xE20zwCZkeKANkrOF0dg6RqpmypbFDhZ"
+							options={{ host: "https://us.i.posthog.com" }}
+							autocapture
+						>
+							<SWRConfig>
+								<SafeAreaProvider>
+									<Stack
+										screenOptions={{
+											headerShown: false,
+											contentStyle: {
+												backgroundColor,
+											},
 										}}
-									/>
-									<Stack.Screen
-										name="deleteAccountModal"
-										options={{
-											presentation: "modal",
-										}}
-									/>
-									<Stack.Screen
-										name="chatModal"
-										options={{
-											presentation: "modal",
-										}}
-									/>
-									<Stack.Screen
-										name="inviteModal"
-										options={{
-											presentation: "modal",
-										}}
-									/>
-									<Stack.Screen
-										name="redeemModal"
-										options={{
-											presentation: "modal",
-										}}
-									/>
-									<Stack.Screen
-										name="reviewModal"
-										options={{
-											presentation: "modal",
-										}}
-									/>
-								</Stack>
-							</SafeAreaProvider>
-							<PortalHost />
-						</SWRConfig>
-					</PostHogProvider>
+									>
+										<Stack.Screen name="(protected)" />
+										<Stack.Screen name="(public)" />
+										<Stack.Screen
+											name="subscribeModal"
+											options={{
+												presentation: "modal",
+											}}
+										/>
+										<Stack.Screen
+											name="deleteAccountModal"
+											options={{
+												presentation: "modal",
+											}}
+										/>
+										<Stack.Screen
+											name="chatModal"
+											options={{
+												presentation: "modal",
+											}}
+										/>
+										<Stack.Screen
+											name="inviteModal"
+											options={{
+												presentation: "modal",
+											}}
+										/>
+										<Stack.Screen
+											name="redeemModal"
+											options={{
+												presentation: "modal",
+											}}
+										/>
+										<Stack.Screen
+											name="reviewModal"
+											options={{
+												presentation: "modal",
+											}}
+										/>
+									</Stack>
+								</SafeAreaProvider>
+								<PortalHost />
+							</SWRConfig>
+						</PostHogProvider>
+					</BlogProvider>
 				</RevenueCatProvider>
 			</UserProvider>
 		</SupabaseProvider>

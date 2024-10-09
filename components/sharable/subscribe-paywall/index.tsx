@@ -1,29 +1,30 @@
-import * as Linking from "expo-linking";
-import { Link, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
-import { View } from "react-native";
-
 import Logo from "@/components/sharable/logo";
 import { Button } from "@/components/ui/button";
 import { H2, Muted, P } from "@/components/ui/typography";
 import { useRevenueCat } from "@/context/revenue-cat-provider";
 import { useUserProvider } from "@/context/user-provider";
+import { useColorScheme } from "@/lib/useColorScheme";
+import { Feather } from "@expo/vector-icons";
+import * as Linking from "expo-linking";
+import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import { View } from "react-native";
 
 const FEATURES = [
 	{
-		label: "🔓 Unlock all scores and ratings",
+		label: "Unlock all scores",
 	},
 	{
-		label: "🌿 Personal AI nutritionist",
+		label: "Unlimited searches and scans",
 	},
 	{
-		label: "🔬 Latest scientific research",
+		label: "Full contaminant breakdowns",
 	},
 	{
-		label: "🌐 Private community",
+		label: "Recommended filters",
 	},
 	{
-		label: "🧬 Supports new lab tests",
+		label: "Supports further testing & research",
 	},
 ];
 
@@ -31,6 +32,7 @@ export function SubscribePaywall() {
 	const { subscription, user, userData } = useUserProvider();
 	const router = useRouter();
 	const { packages, purchasePackage } = useRevenueCat();
+	const { accentColor } = useColorScheme();
 
 	const [loading, setLoading] = useState(false);
 
@@ -75,28 +77,33 @@ export function SubscribePaywall() {
 
 	return (
 		<View className="flex flex-1 items-center justify-between p-4 gap-y-4 pt-20 pb-10 h-full">
-			<View />
-
-			<View className="w-full items-center flex flex-col">
+			<View className="w-full items-center flex flex-col flex-1">
 				<Logo />
 				<H2 className="text-center pt-4">Oasis Member</H2>
 
 				<Muted>Free access for 3 days, then</Muted>
 				<Muted className="mb-4">$47 per year, ($4 /month)</Muted>
 
-				<View className="w-full gap-y-3 bg-card py-4 max-w-sm rounded-lg">
-					{FEATURES.map((feature, index) => (
-						<P key={index} className="text-center">
-							{feature.label}
-						</P>
-					))}
+				<View className="w-full items-center flex flex-col mt-4">
+					<View className="gap-y-6 w-full rounded-lg border border-border px-4 py-4 max-w-sm">
+						{FEATURES.map((feature, index) => (
+							<View
+								key={index}
+								className="flex flex-row gap-5 w-full items-center"
+							>
+								<Feather name="check" size={28} color={accentColor} />
+								<P className="text-center text-lg">{feature.label}</P>
+							</View>
+						))}
+					</View>
 				</View>
 
-				<View className="mt-8 w-full max-w-sm gap-y-4">
+				<View className="mt-14 w-full max-w-sm gap-y-4 ">
 					<Button
-						className="w-full"
+						className="w-full !h-20 mb-4"
+						textClassName="!text-lg"
 						variant="default"
-						label="Start 3 day free trial"
+						label="Try it free"
 						loading={loading}
 						onPress={handleSubscribe}
 					/>
@@ -108,17 +115,18 @@ export function SubscribePaywall() {
 							onPress={handleInviteFriends}
 						/>
 					)}
-					<Link className="w-full text-center mt-4" href="/(public)/sign-in">
+					{/* <Link className="w-full text-center mt-4" href="/(public)/sign-in">
 						<P>Already a member? Sign in</P>
-					</Link>
+					</Link> */}
 				</View>
 			</View>
 
-			<View className="mt-14 px-8">
+			<View className="mt-4 px-8 flex flex-row gap-x-4">
 				<Button
 					label="Terms of Use"
 					size="sm"
 					variant="ghost"
+					textClassName="!text-muted-foreground"
 					onPress={() => {
 						Linking.openURL("https://www.oasiswater.app/terms");
 					}}
@@ -128,6 +136,7 @@ export function SubscribePaywall() {
 					label="Privacy Policy"
 					size="sm"
 					variant="ghost"
+					textClassName="!text-muted-foreground"
 					onPress={() => {
 						Linking.openURL("https://www.oasiswater.app/privacy-policy");
 					}}
@@ -137,6 +146,7 @@ export function SubscribePaywall() {
 					label="Refund Policy"
 					size="sm"
 					variant="ghost"
+					textClassName="!text-muted-foreground"
 					onPress={() => {
 						Linking.openURL("https://www.oasiswater.app/refund-policy");
 					}}

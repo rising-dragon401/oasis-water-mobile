@@ -12,7 +12,7 @@ import { ScrollView, View } from "react-native";
 import { getCurrentUserData, getUserFavorites } from "@/actions/user";
 import FavoritesList from "@/components/sharable/favorites-list";
 import { Button } from "@/components/ui/button";
-import { H1, Large, Muted } from "@/components/ui/typography";
+import { H1, Muted } from "@/components/ui/typography";
 import { theme } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
 
@@ -145,18 +145,17 @@ export default function OasisScreen() {
 				)}
 			</View>
 
-			{!isCurrentUser && (
+			{/* {!isCurrentUser && (
 				<View className="rounded-full bg-card shadow-md h-14 mt-8">
 					<Link href="https://www.oasiswater.app/affiliates">
 						<View className="flex flex-col items-center p-4 px-6">
 							<Large className="text-center">
 								Share what you drink and earn 💸
 							</Large>
-							{/* <Muted className="text-center">Learn more</Muted> */}
 						</View>
 					</Link>
 				</View>
-			)}
+			)} */}
 		</ScrollView>
 	);
 }
