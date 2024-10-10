@@ -6,7 +6,7 @@ export default function SubscribeModal() {
 	const { backgroundColor } = useColorScheme();
 
 	return (
-		<ScrollView contentContainerStyle={{ backgroundColor }}>
+		<ScrollView contentContainerStyle={{ backgroundColor, height: "100%" }}>
 			<SubscribePaywall />
 		</ScrollView>
 	);

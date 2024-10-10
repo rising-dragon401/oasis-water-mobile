@@ -1,26 +1,24 @@
 import Feather from "@expo/vector-icons/Feather";
-import * as Linking from "expo-linking";
 import { ScrollView, View } from "react-native";
 
-import { Button } from "@/components/ui/button";
 import { P } from "@/components/ui/typography";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 const FEATURES = [
 	{
-		label: "Unlock all scores",
+		label: "Access to all scores and ratings",
 	},
 	{
-		label: "Unlimited searches and scans",
+		label: "Unlimited scans and searches",
 	},
 	{
 		label: "Full contaminant breakdowns",
 	},
 	{
-		label: "Recommended filters",
+		label: "Personalized filter recommendations",
 	},
 	{
-		label: "Supports testing more products",
+		label: "Support further testing",
 	},
 ];
 
@@ -36,7 +34,7 @@ export function SubscribeOnboarding() {
 				justifyContent: "space-between",
 			}}
 		>
-			<View className="w-full items-center flex flex-col">
+			<View className="w-full items-center flex flex-co mt-6">
 				<View className="gap-y-6 w-full rounded-lg border border-border px-4 py-4">
 					{FEATURES.map((feature, index) => (
 						<View
@@ -50,7 +48,7 @@ export function SubscribeOnboarding() {
 				</View>
 			</View>
 
-			<View className="flex flex-row gap-x-4 px-8 mt-2 justify-center">
+			{/* <View className="flex flex-row gap-x-4 px-8 mt-2 justify-center">
 				<Button
 					label="Terms of Use"
 					size="sm"
@@ -80,7 +78,7 @@ export function SubscribeOnboarding() {
 						Linking.openURL("https://www.oasiswater.app/refund-policy");
 					}}
 				/>
-			</View>
+			</View> */}
 		</ScrollView>
 	);
 }

@@ -57,21 +57,21 @@ export default function TabOneScreen() {
 				paddingBottom: 60,
 			}}
 			showsVerticalScrollIndicator={false}
-			className="flex flex-col my-4 p-4"
+			className="flex flex-col my-4 p-4 px-4"
 		>
 			<H2 className="text-center max-w-xs border-none pb-0">
 				Search healthy water
 			</H2>
 
 			<Muted className="text-center mb-4 max-w-md">
-				Discover the best water products based on science.
+				Discover the best waters and filters based on science.
 			</Muted>
 
 			<View className="mb-10 w-[90%] z-40">
 				<Search />
 			</View>
 
-			<View className="flex-1 flex-col w-ful">
+			<View className="flex-1 flex-col w-full ">
 				<View className="flex flex-row justify-between w-full items-center">
 					<H4 className="text-left">Product ratings</H4>
 
@@ -117,10 +117,8 @@ export default function TabOneScreen() {
 											borderRadius: 4,
 										}}
 									/>
-									<View className="absolute bottom-0 left-0 w-full p-2">
-										<P className="text-left text-md font-medium">
-											{category.title}
-										</P>
+									<View className="absolute bottom-0 left-0 w-full p-2 py-2">
+										<P className="text-center text-md">{category.title}</P>
 									</View>
 								</View>
 							</Link>

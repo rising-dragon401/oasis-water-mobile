@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { H3, H4, Large, Muted, P } from "@/components/ui/typography";
 import { useColorScheme } from "@/lib/useColorScheme";
 import { Avatar, AvatarImage } from "components/ui/avatar";
+import { useUserProvider } from "context/user-provider";
 import { PROFILE_AVATAR } from "lib/constants";
 import useSWR from "swr";
 import ItemPreviewCard from "../item-preview-card";
@@ -21,9 +22,12 @@ export default function FavoritesList({
 }) {
 	const router = useRouter();
 	const { iconColor } = useColorScheme();
+	const { uid } = useUserProvider();
 
 	const [loading, setLoading] = useState(true);
 	const [userData, setUserData] = useState<any>(null);
+
+	const isAuthUser = userId === uid;
 
 	const fetchUserFavorites = async () => {
 		const favorites = await getUserFavorites(userId || "");
@@ -115,7 +119,7 @@ export default function FavoritesList({
 			</View>
 
 			<View className="flex flex-col">
-				<Large>Products</Large>
+				<Large>Favorites</Large>
 				{favorites && favorites?.length > 0 ? (
 					<>
 						<FlatList
@@ -126,7 +130,12 @@ export default function FavoritesList({
 									style={{ width: "48%" }}
 									className={`mb-2 ${index < 2 ? "mt-2" : ""}`}
 								>
-									<ItemPreviewCard item={item} size="md" showFavorite />
+									<ItemPreviewCard
+										item={item}
+										size="md"
+										showFavorite
+										isAuthUser={isAuthUser}
+									/>
 								</View>
 							)}
 							keyExtractor={(item) => item?.id}

@@ -21,10 +21,13 @@ export default function TopRatedScreen() {
 	}, []);
 
 	return (
-		<View className="flex-1 justify-between px-4" style={{ backgroundColor }}>
-			<H1 className="mt-24">Top rated products</H1>
+		<View
+			className="flex-1 justify-between px-4 mt-6"
+			style={{ backgroundColor }}
+		>
+			<H1>Top rated</H1>
 			<Muted>
-				Discover the best water products based on science ranked by score
+				Discover the best bottled waters and filters based lab tested data.
 			</Muted>
 
 			<View className="flex-1 flex-col mt-4">

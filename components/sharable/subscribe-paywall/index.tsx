@@ -8,23 +8,23 @@ import { Feather } from "@expo/vector-icons";
 import * as Linking from "expo-linking";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { View } from "react-native";
+import { Alert, View } from "react-native";
 
 const FEATURES = [
 	{
-		label: "Unlock all scores",
+		label: "Access to all scores and ratings",
 	},
 	{
-		label: "Unlimited searches and scans",
+		label: "Unlimited scans and searches",
 	},
 	{
 		label: "Full contaminant breakdowns",
 	},
 	{
-		label: "Recommended filters",
+		label: "Personalized filter recommendations",
 	},
 	{
-		label: "Supports further testing & research",
+		label: "Support further testing",
 	},
 ];
 
@@ -46,9 +46,24 @@ export function SubscribePaywall() {
 		setLoading(true);
 
 		try {
-			if (!user || !userData) {
-				router.back();
-				router.push("/(public)/sign-in");
+			if (!user) {
+				Alert.alert(
+					"Sign in first",
+					"You must be signed in to subscribe and start a trial.",
+					[
+						{
+							text: "Cancel",
+							style: "cancel",
+						},
+						{
+							text: "OK, Sign in",
+							onPress: () => {
+								router.back();
+								router.push("/(public)/sign-in");
+							},
+						},
+					],
+				);
 				throw new Error("User not found");
 			}
 
@@ -71,20 +86,22 @@ export function SubscribePaywall() {
 		setLoading(false);
 	};
 
-	const handleInviteFriends = () => {
-		router.push("/inviteModal");
-	};
+	// const handleInviteFriends = () => {
+	// 	router.push("/inviteModal");
+	// };
 
 	return (
-		<View className="flex flex-1 items-center justify-between p-4 gap-y-4 pt-20 pb-10 h-full">
-			<View className="w-full items-center flex flex-col flex-1">
+		<View className="flex-1 justify-between p-4 py-14 h-full">
+			{/* Content Section */}
+			<View className="items-center flex-1">
 				<Logo />
-				<H2 className="text-center pt-4">Oasis Member</H2>
-
-				<Muted>Free access for 3 days, then</Muted>
-				<Muted className="mb-4">$47 per year, ($4 /month)</Muted>
-
-				<View className="w-full items-center flex flex-col mt-4">
+				<H2 className="text-center pt-4">Unlock the truth in your water</H2>
+				<Muted className="text-center max-w-sm">
+					Your membership funds independent lab testing (which is expensive!)
+					and helps keep Oasis unbiased.
+				</Muted>
+				{/* Features */}
+				<View className="w-full items-center flex flex-col mt-14">
 					<View className="gap-y-6 w-full rounded-lg border border-border px-4 py-4 max-w-sm">
 						{FEATURES.map((feature, index) => (
 							<View
@@ -97,60 +114,55 @@ export function SubscribePaywall() {
 						))}
 					</View>
 				</View>
-
-				<View className="mt-14 w-full max-w-sm gap-y-4 ">
-					<Button
-						className="w-full !h-20 mb-4"
-						textClassName="!text-lg"
-						variant="default"
-						label="Try it free"
-						loading={loading}
-						onPress={handleSubscribe}
-					/>
-					{!userData?.has_redeemed_free_month && (
-						<Button
-							className="w-full bg-transparent"
-							variant="outline"
-							label="Invite 3 friends, get 1 month free 🤝"
-							onPress={handleInviteFriends}
-						/>
-					)}
-					{/* <Link className="w-full text-center mt-4" href="/(public)/sign-in">
-						<P>Already a member? Sign in</P>
-					</Link> */}
-				</View>
 			</View>
 
-			<View className="mt-4 px-8 flex flex-row gap-x-4">
+			{/* Subscribe Button Section */}
+			<View className="w-full flex-col items-center mt-auto justify-center">
+				{/* mt-auto pushes this section to the bottom */}
 				<Button
-					label="Terms of Use"
-					size="sm"
-					variant="ghost"
-					textClassName="!text-muted-foreground"
-					onPress={() => {
-						Linking.openURL("https://www.oasiswater.app/terms");
-					}}
+					className="w-full max-w-lg !h-20 mb-4"
+					textClassName="!text-lg"
+					variant="default"
+					label="Try it free"
+					loading={loading}
+					onPress={handleSubscribe}
 				/>
+				<View className="flex flex-col gap-y-2 w-full">
+					<Muted className="text-center">
+						Free access for 3 days, then $47 per year, ($4 /month)
+					</Muted>
+				</View>
+				<View className="mt-14 px-8 flex flex-row gap-x-4">
+					<Button
+						label="Terms of Use"
+						size="sm"
+						variant="ghost"
+						textClassName="!text-muted-foreground"
+						onPress={() => {
+							Linking.openURL("https://www.oasiswater.app/terms");
+						}}
+					/>
 
-				<Button
-					label="Privacy Policy"
-					size="sm"
-					variant="ghost"
-					textClassName="!text-muted-foreground"
-					onPress={() => {
-						Linking.openURL("https://www.oasiswater.app/privacy-policy");
-					}}
-				/>
+					<Button
+						label="Privacy Policy"
+						size="sm"
+						variant="ghost"
+						textClassName="!text-muted-foreground"
+						onPress={() => {
+							Linking.openURL("https://www.oasiswater.app/privacy-policy");
+						}}
+					/>
 
-				<Button
-					label="Refund Policy"
-					size="sm"
-					variant="ghost"
-					textClassName="!text-muted-foreground"
-					onPress={() => {
-						Linking.openURL("https://www.oasiswater.app/refund-policy");
-					}}
-				/>
+					<Button
+						label="Refund Policy"
+						size="sm"
+						variant="ghost"
+						textClassName="!text-muted-foreground"
+						onPress={() => {
+							Linking.openURL("https://www.oasiswater.app/refund-policy");
+						}}
+					/>
+				</View>
 			</View>
 		</View>
 	);

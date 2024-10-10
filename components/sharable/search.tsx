@@ -123,7 +123,7 @@ export default function Search({ indices }: { indices?: string[] }) {
 					onChangeText={onChangeText}
 					aria-labelledbyledBy="inputLabel"
 					aria-errormessage="inputError"
-					className="!rounded-full w-full pl-6 z-40"
+					className="!rounded-full w-full pl-6 z-40 !h-16"
 				/>
 
 				<View
@@ -139,7 +139,7 @@ export default function Search({ indices }: { indices?: string[] }) {
 							</TouchableOpacity>
 						) : (
 							<TouchableOpacity onPress={handleClear}>
-								<Octicons name="x-circle-fill" size={18} color={iconColor} />
+								<Octicons name="x-circle-fill" size={20} color={iconColor} />
 							</TouchableOpacity>
 						)}
 						{/* 

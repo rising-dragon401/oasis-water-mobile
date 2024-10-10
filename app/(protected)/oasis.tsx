@@ -51,8 +51,7 @@ export default function OasisScreen() {
 				</View>
 			) : (
 				<View className="w-full gap-y-2">
-					<View className="flex flex-col p-4 gap-y-4 w-full">
-						<H1 className="\">My products</H1>
+					<View className="flex flex-col gap-y-4 w-full">
 						<Muted className="">
 							Sign in to add products and see your water score
 						</Muted>

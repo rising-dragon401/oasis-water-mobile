@@ -86,9 +86,9 @@ export default function OnboardingScreen() {
 			canSkip: false,
 		},
 		{
-			title: "Unlock the best water and filters",
+			title: "Unlock the top rated water and filters",
 			subtitle:
-				"See the top ranking bottled water and filters based on lab and scientific testing.",
+				"Your membership funds independent lab testing (which is expensive!) and helps keep Oasis unbiased.",
 			image:
 				"https://connect.live-oasis.com/storage/v1/object/public/website/images/onboarding/paywall%20cards.jpg",
 			imageStyle: {

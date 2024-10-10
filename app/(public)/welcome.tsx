@@ -21,7 +21,7 @@ export default function WelcomeScreen() {
 		<SafeAreaView className="flex flex-1 p-4">
 			<View className="flex flex-1 mt-24 gap-y-2 items-center">
 				<Logo />
-				<H1 className="text-center text-primary mt-4">Step Into Your Oasis</H1>
+				<H1 className="text-center text-primary mt-4">Welcome to your Oasis</H1>
 				<P className="text-center max-w-xs">
 					Find the healthiest drinking water and filters based on science.
 				</P>
