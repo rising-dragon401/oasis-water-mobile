@@ -8,14 +8,14 @@ function CustomHeader() {
 	return <Image source={OasisLogo} style={{ width: 85, height: 24 }} />;
 }
 
-export default function SearchLayout() {
+export default function LocationsLayout() {
 	const { backgroundColor, textColor } = useColorScheme();
 
 	return (
 		<Stack
 			screenOptions={{
 				headerShown: true,
-				headerBackTitle: "Search",
+				headerBackTitle: "Locations",
 				contentStyle: {
 					backgroundColor,
 				},
@@ -30,18 +30,7 @@ export default function SearchLayout() {
 				headerShadowVisible: false,
 			}}
 		>
-			<Stack.Screen name="index" />
-			<Stack.Screen name="item/[id]" />
-			<Stack.Screen name="location/[id]" />
-			<Stack.Screen name="ingredient/[id]" />
-			<Stack.Screen name="filter/[id]" />
-			<Stack.Screen name="article/[id]" />
-			<Stack.Screen name="bottled-waters/index" />
-			<Stack.Screen name="tap-water/index" />
-			<Stack.Screen name="filters/index" />
-			<Stack.Screen name="oasis/[id]" />
-			<Stack.Screen name="top-rated/[id]" />
-			<Stack.Screen name="top-rated-all/index" />
+			<Stack.Screen name="state/index" />
 		</Stack>
 	);
 }

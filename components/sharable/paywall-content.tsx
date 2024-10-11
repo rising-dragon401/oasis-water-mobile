@@ -16,6 +16,7 @@ type PaywallContentProps = {
 	label: string;
 	title?: string;
 	items?: string[];
+	buttonLabel?: string;
 };
 
 const PaywallContent: React.FC<PaywallContentProps> = ({
@@ -25,6 +26,7 @@ const PaywallContent: React.FC<PaywallContentProps> = ({
 	title,
 	label,
 	items,
+	buttonLabel,
 }) => {
 	const router = useRouter();
 	const { colorScheme } = useColorScheme();
@@ -56,7 +58,7 @@ const PaywallContent: React.FC<PaywallContentProps> = ({
 				</Typography>
 			)}
 			<TouchableOpacity onPress={handleUpgradeClick}>
-				<View className="flex hover:cursor-pointer w-[90vw] bg-secondary p-4 py-6 rounded-md gap-x-4 items-center gap-y-4">
+				<View className="flex hover:cursor-pointer w-[90vw] bg-secondary p-4 py-6 rounded-lg gap-x-4 items-center gap-y-4">
 					{label && (
 						<Typography
 							size="2xl"
@@ -84,7 +86,7 @@ const PaywallContent: React.FC<PaywallContentProps> = ({
 
 					<Button
 						variant="default"
-						label="Upgrade now"
+						label={buttonLabel || "Upgrade now"}
 						onPress={handleUpgradeClick}
 						iconPosition="right"
 						icon={<Octicons name="lock" size={16} color={iconColor} />}

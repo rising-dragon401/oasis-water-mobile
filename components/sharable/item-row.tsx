@@ -45,9 +45,9 @@ export default function ItemRow({ title, items, type }: Props) {
 				{items.map((item, index) => (
 					<View key={item.id} className="mr-5">
 						{type === "user" ? (
-							<UserPreviewCard item={item} size="md" />
+							<UserPreviewCard item={item} size="sm" />
 						) : (
-							<ItemPreviewCard item={item} size="md" />
+							<ItemPreviewCard item={item} isGeneralListing />
 						)}
 					</View>
 				))}

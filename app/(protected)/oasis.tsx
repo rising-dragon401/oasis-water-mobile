@@ -17,14 +17,15 @@ export default function OasisScreen() {
 
 	return (
 		<ScrollView
-			className="flex-1 px-8 pb-10 pt-24"
+			className="flex-1 px-8 pb-10"
 			contentContainerStyle={{
 				justifyContent: "space-between",
 				paddingBottom: 100,
+				paddingTop: 80,
 			}}
 			style={{ backgroundColor }}
 		>
-			<H1>Favorites</H1>
+			<H1>My favorites</H1>
 			{uid ? (
 				<View className="flex flex-col items-center py-4 gap-y-4 w-full">
 					{userFavorites ? (

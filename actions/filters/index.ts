@@ -135,10 +135,6 @@ export const getFilterDetails = async (id: string) => {
 			(contaminant) => contaminant !== null,
 		); // Filter out null values
 	}
-
-	console.log("filter.brand.name: ", filter.brand.name);
-	console.log("filter.company.name: ", filter.company.name);
-
 	// Constructing the final object with all details
 	const filterWithDetails = {
 		...filter,

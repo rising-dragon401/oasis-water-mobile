@@ -1,8 +1,8 @@
 import { useColorScheme } from "@/lib/useColorScheme";
 import { useUserProvider } from "context/user-provider";
 import { Image } from "expo-image";
-import { Link, usePathname } from "expo-router";
-import React from "react";
+import { Link } from "expo-router";
+import React, { useMemo } from "react";
 import { Text, View } from "react-native";
 
 import { H4, Muted, P } from "@/components/ui/typography";
@@ -18,29 +18,35 @@ type Props = {
 	item: any;
 	showFavorite?: boolean;
 	isAuthUser?: boolean;
+	isGeneralListing?: boolean;
 };
 
 const ItemPreviewCard = ({
 	item,
 	showFavorite = false,
 	isAuthUser = false,
+	isGeneralListing = false,
 }: Props) => {
 	const { subscription } = useUserProvider();
 	const { textColor } = useColorScheme();
-	const pathname = usePathname();
 
-	// Check if the content should be blurred
-	const shouldBlur =
-		(!subscription || !isAuthUser) && pathname.includes("/search/oasis");
+	// show if listed in top-rate or preview list but not on favorites page
+	// unless subscribed or is the auth user
+	const showData = subscription || isAuthUser || isGeneralListing;
 
-	const randomBlurIamge =
-		RANDOM_BLUR_IMAGES[Math.floor(Math.random() * RANDOM_BLUR_IMAGES?.length)];
+	const randomBlurImage = useMemo(
+		() =>
+			RANDOM_BLUR_IMAGES[
+				Math.floor(Math.random() * RANDOM_BLUR_IMAGES?.length)
+			],
+		[],
+	);
 
 	const renderImage = () => {
-		if (shouldBlur) {
+		if (!showData) {
 			return (
 				<Image
-					source={{ uri: randomBlurIamge }}
+					source={{ uri: randomBlurImage }}
 					style={{
 						width: "100%",
 						height: "100%",
@@ -74,12 +80,12 @@ const ItemPreviewCard = ({
 
 	return (
 		// @ts-ignore
-		<Link href={!shouldBlur ? determineLink(item) : "/subscribeModal"}>
+		<Link href={showData ? determineLink(item) : "/subscribeModal"}>
 			<View className="flex flex-col items-center gap-2">
 				<View className="relative h-48 w-48">
 					{renderImage()}
 
-					{showFavorite && !shouldBlur && (
+					{showFavorite && showData && (
 						<View
 							style={{ position: "absolute", top: 12, right: 12, zIndex: 99 }}
 						>
@@ -90,7 +96,7 @@ const ItemPreviewCard = ({
 
 				<View className="flex-row w-48 justify-between items-start px-1 pb-1 mt-1">
 					<View className="relative w-2/3">
-						{!shouldBlur ? (
+						{showData ? (
 							<P className={`flex flex-wrap w-full h-14 `}>{item.name}</P>
 						) : (
 							<View className="flex flex-col gap-1">

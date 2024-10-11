@@ -1,6 +1,6 @@
 "use client";
 
-import { getLocationDetails } from "actions/locations";
+import { getLocationDetails, updateLocationScore } from "actions/locations";
 
 import { useNavigation } from "expo-router";
 import { useEffect, useState } from "react";
@@ -14,10 +14,10 @@ import {
 	AccordionItem,
 	AccordionTrigger,
 } from "components/ui/accordion";
+import { H2, Large } from "../ui/typography";
 import BlurredLineItem from "./blurred-line-item";
-import ContaminantCard from "./contamintant-card";
+import HorizontalContaminantCard from "./contamintant-card-hz";
 import ItemImage from "./item-image";
-import PaywallContent from "./paywall-content";
 import RecommendedFilterRow from "./recommended-filter-row";
 import Score from "./score";
 import Sources from "./sources";
@@ -49,6 +49,14 @@ export function LocationForm({ id }: Props) {
 			title: location.name,
 		});
 
+		// manually update score if not already set
+		if (!location.score) {
+			const score =
+				location.utilities?.length > 0 ? location.utilities[0].score : null;
+
+			if (score) updateLocationScore(id, score);
+		}
+
 		setIsLoading(false);
 
 		return location;
@@ -72,10 +80,10 @@ export function LocationForm({ id }: Props) {
 				paddingBottom: 80,
 			}}
 		>
-			<View className="flex-col flex w-full px-8">
-				<View className="md:py-10 py-6 px-2">
+			<View className="flex-col flex w-full px-4">
+				<View className="pb pt-2 -6 px-2">
 					<View className="flex flex-col items-center gap-6 w-full">
-						<View className="flex justify-center items-center h-80 w-80 p-4">
+						<View className="flex justify-center items-center h-48 w-48">
 							<ItemImage
 								src={location.image}
 								alt={location.name}
@@ -84,10 +92,8 @@ export function LocationForm({ id }: Props) {
 						</View>
 
 						<View className="flex flex-row w-full justify-between gap-6">
-							<View className="flex flex-col w-2/3">
-								<Typography size="3xl" fontWeight="normal" className="w-2/3">
-									{location.name} Tap Water
-								</Typography>
+							<View className="flex flex-col !w-3/5">
+								<H2>{location.name}</H2>
 
 								<BlurredLineItem
 									label="Contaminants"
@@ -102,7 +108,7 @@ export function LocationForm({ id }: Props) {
 								/>
 							</View>
 
-							<View className="flex w-1/3">
+							<View className="flex !w-2/5 justify-center items-center">
 								<Score
 									score={
 										location.utilities?.length > 0
@@ -110,6 +116,7 @@ export function LocationForm({ id }: Props) {
 											: 0
 									}
 									size="md"
+									showScore
 								/>
 							</View>
 						</View>
@@ -117,13 +124,16 @@ export function LocationForm({ id }: Props) {
 
 					{location?.utilities && (
 						<View className="flex flex-col mt-4">
-							<Typography size="2xl" fontWeight="normal">
-								Water Utilities
-							</Typography>
-							<Accordion type="single" collapsible defaultValue={openUtility}>
+							<Large className="mb-0 pb-0">Utilities</Large>
+							<Accordion
+								type="single"
+								collapsible
+								defaultValue={openUtility}
+								className="mt-0 pt-0"
+							>
 								{location.utilities.map((utility: any, index: number) => (
 									<AccordionItem key={index} value={index.toString()}>
-										<AccordionTrigger className="w-full flex flex-row justify-start">
+										<AccordionTrigger className="w-full flex flex-row justify-start pb-0 mt-0 py-0">
 											<View className="w-full">
 												<Typography
 													size="base"
@@ -135,19 +145,14 @@ export function LocationForm({ id }: Props) {
 											</View>
 										</AccordionTrigger>
 										<AccordionContent>
-											<PaywallContent
-												className="mt-8"
-												label="View contaminants in this tap water"
-											>
-												<View className="grid md:grid-cols-2 grid-cols-1 gap-6 w-full">
-													{utility.contaminants.map((contaminant: any) => (
-														<ContaminantCard
-															key={contaminant.id}
-															data={contaminant}
-														/>
-													))}
-												</View>
-											</PaywallContent>
+											<View className="flex flex-wrap gap-4 w-full pt-2">
+												{utility.contaminants.map((contaminant: any) => (
+													<HorizontalContaminantCard
+														key={contaminant.id}
+														data={contaminant}
+													/>
+												))}
+											</View>
 										</AccordionContent>
 									</AccordionItem>
 								))}

@@ -1,13 +1,11 @@
-import { Octicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { FlatList, Share, TouchableOpacity, View } from "react-native";
+import { FlatList, Share, View } from "react-native";
 
 import { getCurrentUserData, getUserFavorites } from "@/actions/user";
 import Score from "@/components/sharable/score";
 import { Button } from "@/components/ui/button";
 import { H3, H4, Large, Muted, P } from "@/components/ui/typography";
-import { useColorScheme } from "@/lib/useColorScheme";
 import { Avatar, AvatarImage } from "components/ui/avatar";
 import { useUserProvider } from "context/user-provider";
 import { PROFILE_AVATAR } from "lib/constants";
@@ -21,7 +19,6 @@ export default function FavoritesList({
 	userId: string | null | undefined;
 }) {
 	const router = useRouter();
-	const { iconColor } = useColorScheme();
 	const { uid } = useUserProvider();
 
 	const [loading, setLoading] = useState(true);
@@ -96,7 +93,7 @@ export default function FavoritesList({
 
 	return (
 		<View className="pb-0 mb-0">
-			<View className="py-4 gap-4 mb-4 flex w-full flex-row justify-between">
+			<View className="py-4 gap-4 flex w-full flex-row justify-between">
 				<View className="flex flex-col">
 					<Avatar className="h-24 w-24" alt="oasis pfp">
 						<AvatarImage src={userData?.avatar_url || PROFILE_AVATAR} />
@@ -112,16 +109,16 @@ export default function FavoritesList({
 
 				<View className="max-h-24 flex flex-row gap-4">
 					<Score score={userData?.score || "?"} size="sm" showScore />
-					<TouchableOpacity onPress={() => shareProfile()}>
+					{/* <TouchableOpacity onPress={() => shareProfile()}>
 						<Octicons name="share" size={24} color={iconColor} />
-					</TouchableOpacity>
+					</TouchableOpacity> */}
 				</View>
 			</View>
 
 			<View className="flex flex-col">
-				<Large>Favorites</Large>
 				{favorites && favorites?.length > 0 ? (
 					<>
+						<Large>Favorites</Large>
 						<FlatList
 							data={favorites}
 							renderItem={({ item, index }) => (
@@ -132,7 +129,6 @@ export default function FavoritesList({
 								>
 									<ItemPreviewCard
 										item={item}
-										size="md"
 										showFavorite
 										isAuthUser={isAuthUser}
 									/>
@@ -151,17 +147,16 @@ export default function FavoritesList({
 						/>
 					</>
 				) : (
-					<View className="text-center mt-10">
+					<View className="text-center mt-4 bg-secondary p-4 rounded-lg ">
 						<H3 className="text-center">No products found</H3>
 						<P className="text-center">
-							Start saving products to your Oasis account to see your health
-							score
+							Start saving products to see your health score
 						</P>
 						<Button
 							variant="outline"
 							className="mt-4"
 							onPress={() => router.push("/(protected)/search")}
-							label="Search products"
+							label="Explore"
 						/>
 					</View>
 				)}

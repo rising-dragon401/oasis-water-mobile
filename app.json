@@ -3,7 +3,7 @@
 		"name": "Oasis",
 		"slug": "Oasis",
 		"scheme": "oasisapp",
-		"version": "1.1.1",
+		"version": "1.1.3",
 		"orientation": "portrait",
 		"icon": "./assets/icon.png",
 		"userInterfaceStyle": "automatic",
@@ -17,7 +17,7 @@
 			"supportsTablet": false,
 			"usesAppleSignIn": true,
 			"bundleIdentifier": "com.liveoasis.oasis",
-			"buildNumber": "3",
+			"buildNumber": "1",
 			"associatedDomains": ["applinks:oasiswater.app"]
 		},
 		"android": {
@@ -26,7 +26,7 @@
 				"backgroundColor": "#ffffff"
 			},
 			"package": "com.liveoasis.oasis",
-			"versionCode": 29,
+			"versionCode": 31,
 			"permissions": ["android.permission.RECORD_AUDIO"]
 		},
 		"experiments": {

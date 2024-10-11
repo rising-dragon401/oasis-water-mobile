@@ -1,4 +1,5 @@
 import { updateUserData } from "@/actions/user";
+import LocationSelector from "@/components/sharable/location-selector";
 import { SubscribeOnboarding } from "@/components/sharable/subscribe-onboarding";
 import { Button } from "@/components/ui/button";
 import * as ProgressPrimitive from "@/components/ui/progress";
@@ -25,6 +26,15 @@ export default function OnboardingScreen() {
 		useState(true); // Default to yes
 	const [direction, setDirection] = useState("forward"); // Track direction of navigation
 	const [loadingPurchase, setLoadingPurchase] = useState(false);
+	const [selectedAddress, setSelectedAddress] = useState<{
+		placeId: string;
+		reference: string;
+		formattedAddress: string;
+		zipCode: string;
+		city: string;
+		state: string;
+		country: string;
+	} | null>(null);
 
 	const router = useRouter();
 	const { user, userData, subscription } = useUserProvider();
@@ -80,6 +90,29 @@ export default function OnboardingScreen() {
 			),
 			onSubmit: () => {
 				handleUpateSubStatus();
+			},
+			submitButtonLabel: "Continue",
+			onSkip: null,
+			canSkip: false,
+		},
+		{
+			title: "Where are you based?",
+			subtitle:
+				"This will help us find the best local water and filter brands for you (keep in mind we only support the US currently).",
+			image: null,
+			imageStyle: {
+				width: "100%",
+				height: windowHeight * 0.44,
+				resizeMode: "contain",
+			},
+			component: (
+				<LocationSelector
+					address={selectedAddress}
+					setAddress={setSelectedAddress}
+				/>
+			),
+			onSubmit: () => {
+				handleUpdateLocation();
 			},
 			submitButtonLabel: "Continue",
 			onSkip: null,
@@ -155,6 +188,11 @@ export default function OnboardingScreen() {
 		);
 	};
 
+	const handleUpdateLocation = async () => {
+		console.log("selectedAddress", selectedAddress);
+		await updateUserData(userData.id, "location", selectedAddress);
+	};
+
 	const handleSubscribe = async () => {
 		setLoadingPurchase(true);
 
@@ -163,7 +201,9 @@ export default function OnboardingScreen() {
 				throw new Error("User not found");
 			}
 
-			const pack = packages[1];
+			const pack = packages[0];
+
+			console.log("pack", pack);
 
 			if (!pack) {
 				console.log("No package found");
@@ -178,7 +218,7 @@ export default function OnboardingScreen() {
 				// TODO impelement toast
 			}
 		} catch (e) {
-			console.log(e);
+			throw new Error(e as string);
 		}
 
 		setLoadingPurchase(false);
@@ -269,7 +309,7 @@ export default function OnboardingScreen() {
 				<Button
 					onPress={() => handleNextStep(true)}
 					variant="default"
-					className="!h-16 w-full"
+					className="!h-20 w-full"
 					label={steps[currentStep].submitButtonLabel}
 					loading={loadingPurchase}
 				/>

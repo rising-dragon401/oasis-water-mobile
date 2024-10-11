@@ -28,13 +28,16 @@ export default function RecommendedFilterRow({
 
 	return (
 		<View className="mb-10">
-			<View className="pt-4 pb-8 flex flex-row justify-between">
+			<View className="pt-4 pb-4 flex flex-row justify-between">
 				<Typography size="2xl" fontWeight="normal">
 					Recommended filter
 				</Typography>
 			</View>
 
-			<PaywallContent label="Unlock recommended filter">
+			<PaywallContent
+				label="Unlock recommended filter"
+				buttonLabel="See filter"
+			>
 				<View className="flex overflow-x-auto gap-6 hide-scrollbar">
 					{recommended &&
 						recommended.map((item: any) => (
@@ -43,7 +46,7 @@ export default function RecommendedFilterRow({
 								className="flex-shrink-0"
 								style={{ minWidth: "20%" }}
 							>
-								<ItemPreviewCard item={item} size="md" />
+								<ItemPreviewCard item={item} isGeneralListing />
 							</View>
 						))}
 				</View>

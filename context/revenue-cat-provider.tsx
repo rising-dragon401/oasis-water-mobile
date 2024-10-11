@@ -1,4 +1,4 @@
-import { manageSubscriptionStatusChange } from "@/actions/user";
+import { getUserData, manageSubscriptionStatusChange } from "@/actions/user";
 import {
 	createContext,
 	useCallback,
@@ -83,7 +83,10 @@ export const RevenueCatProvider = ({ children }: any) => {
 
 	const loadOfferings = async () => {
 		const offerings = await Purchases.getOfferings();
-		setPackages(offerings.current?.availablePackages || []);
+		const annualPackage = offerings.current?.annual
+			? [offerings.current.annual]
+			: [];
+		setPackages(annualPackage);
 	};
 
 	// console.log("packages", packages);
@@ -113,6 +116,11 @@ export const RevenueCatProvider = ({ children }: any) => {
 			// 	JSON.stringify(customerInfo, null, 2),
 			// );
 			// console.log("updateCustomerInfo uid", uid);
+
+			const userData = await getUserData(uid);
+			if (userData?.do_not_override_sub) {
+				return;
+			}
 
 			if (!customerInfo || !uid) {
 				console.error("No customer info or uid");

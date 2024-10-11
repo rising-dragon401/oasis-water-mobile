@@ -7,8 +7,6 @@ export async function getCurrentUserData(uid?: string) {
 		return null;
 	}
 
-	console.log("userId", userId);
-
 	const { data, error } = await supabase
 		.from("users")
 		.select("*")
@@ -43,6 +41,11 @@ export async function getCurrentUserData(uid?: string) {
 
 	return dataWithFields;
 }
+
+export const getUserData = async (uid: string) => {
+	const user = await getCurrentUserData(uid);
+	return user;
+};
 
 export async function getSubscription(uid: string | null) {
 	if (!uid) {

@@ -150,3 +150,62 @@ export const getLocationDetails = async (id: string) => {
 
 	return locationWithDetails;
 };
+
+export const getLocationStates = async () => {
+	const { data, error } = await supabase
+		.from("tap_water_locations")
+		.select("*");
+
+	if (error) {
+		console.error("Error fetching locations:", error);
+		return [];
+	}
+
+	const stateScores: {
+		[key: string]: { totalScore: number; count: number; cities: Set<string> };
+	} = {};
+
+	data.forEach((location: any) => {
+		const state = location.state;
+		const score = location.score || 0;
+		// Use location.name instead of location.city
+		const city = location.name;
+
+		if (!stateScores[state]) {
+			stateScores[state] = { totalScore: 0, count: 0, cities: new Set() };
+		}
+
+		stateScores[state].totalScore += score;
+		stateScores[state].count += 1;
+		stateScores[state].cities.add(city);
+	});
+
+	const statesWithAverageScores = Object.keys(stateScores).map((state) => {
+		const { totalScore, count, cities } = stateScores[state];
+		let averageScore = Math.round(totalScore / count);
+		if (averageScore === 0) averageScore = 1;
+		return { state, averageScore, numberOfCities: cities.size };
+	});
+
+	statesWithAverageScores.sort((a, b) => a.state.localeCompare(b.state));
+
+	return statesWithAverageScores;
+};
+
+export const getAllCitiesInState = async (state: string) => {
+	const { data, error } = await supabase
+		.from("tap_water_locations")
+		.select("*")
+		.eq("state", state);
+
+	return data;
+};
+
+export const updateLocationScore = async (id: string, score: number) => {
+	const { error } = await supabase
+		.from("tap_water_locations")
+		.update({ score })
+		.eq("id", id);
+
+	return error ? false : true;
+};

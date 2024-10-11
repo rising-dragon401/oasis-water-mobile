@@ -17,3 +17,17 @@ export const getContaminants = async () => {
 
 	return contaminants;
 };
+
+export const getIngredient = async (id: string) => {
+	const { data: ingredient, error } = await supabase
+		.from("ingredients")
+		.select()
+		.eq("id", id);
+
+	if (error) {
+		console.error("Error fetching ingredient:", error);
+		return null;
+	}
+
+	return ingredient;
+};

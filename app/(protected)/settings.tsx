@@ -166,17 +166,14 @@ export default function TabTwoScreen() {
 		<ScrollView
 			contentContainerStyle={{
 				display: "flex",
-				// alignItems: "center",
-				// justifyContent: "space-between",
+
 				backgroundColor,
-				// height: "100%",
-				paddingBottom: 64,
 			}}
 			className="overflow-y-scroll"
 		>
 			{userData ? (
 				<View className="w-full flex flex-col h-full justify-between pb-14 px-8">
-					<H1 className="mt-24">Account</H1>
+					<H1 className="mt-24">Account settings</H1>
 
 					<View className="flex flex-col mt-6">
 						<ImageUpload
@@ -397,7 +394,7 @@ export default function TabTwoScreen() {
 						</View>
 					</View>
 
-					<View className="flex flex-col mt-10 pb-20">
+					<View className="flex flex-col mt-10 pb-8">
 						<View className="mt-8">
 							<Button
 								variant="ghost"

@@ -60,7 +60,7 @@ export default function FilterMetadata({
 										? "neutral"
 										: isSingleContaminant
 											? filteredContaminants?.some(
-													(fc: any) => fc.name === value,
+													(fc: any) => fc?.name === value,
 												)
 												? "good"
 												: "bad"

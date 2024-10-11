@@ -152,7 +152,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 	}, [categoryId, subscription, uid]);
 
 	const renderItem = ({ item }: { item: any }) => (
-		<ItemPreviewCard key={item.id} item={item} />
+		<ItemPreviewCard key={item.id} item={item} isGeneralListing />
 	);
 
 	const renderLoader = () => (
