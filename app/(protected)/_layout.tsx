@@ -35,16 +35,18 @@ export default function ProtectedLayout() {
 						return (
 							<Ionicons name="heart-outline" size={24} color={iconColor} />
 						);
-					} else if (route.name === "locations") {
-						return (
-							<Ionicons name="location-outline" size={24} color={iconColor} />
-						);
 					}
+
+					// else if (route.name === "locations") {
+					// 	return (
+					// 		<Ionicons name="location-outline" size={24} color={iconColor} />
+					// 	);
+					// }
 				},
 			})}
 		>
 			<Tabs.Screen name="search" />
-			<Tabs.Screen name="locations" />
+
 			<Tabs.Screen
 				name="research"
 				options={{

@@ -4,7 +4,7 @@ export const getLocations = async ({
 	limit,
 	sortMethod,
 }: { limit?: number; sortMethod?: "name" | "score" } = {}) => {
-	let orderBy = sortMethod || "name";
+	const orderBy = sortMethod || "name";
 
 	try {
 		let locations;
@@ -110,7 +110,7 @@ export const getLocationDetails = async (id: string) => {
 						(ingredient) => ingredient.id === contaminant.ingredient_id,
 					);
 
-					let limit =
+					const limit =
 						ingredient?.legal_limit || ingredient?.health_guideline || 0;
 					let exceedingLimit = 0;
 					if (limit && contaminant.amount) {
@@ -151,6 +151,47 @@ export const getLocationDetails = async (id: string) => {
 	return locationWithDetails;
 };
 
+const calculateStateAverageScore = (locations: any[]) => {
+	const stateScores: {
+		[key: string]: {
+			id: string;
+			totalScore: number;
+			count: number;
+			cities: Set<string>;
+		};
+	} = {};
+
+	locations.forEach((location: any) => {
+		const state = location.state;
+		const score = location.score || 0;
+		const city = location.name;
+
+		if (!stateScores[state]) {
+			stateScores[state] = {
+				id: location.id,
+				totalScore: 0,
+				count: 0,
+				cities: new Set(),
+			};
+		}
+
+		stateScores[state].totalScore += score;
+		stateScores[state].count += 1;
+		stateScores[state].cities.add(city);
+	});
+
+	const { id, totalScore, count, cities } = stateScores[locations[0].state];
+	let averageScore = Math.round(totalScore / count);
+	if (averageScore === 0) averageScore = 1;
+
+	return {
+		id,
+		state: locations[0].state,
+		averageScore,
+		numberOfCities: cities.size,
+	};
+};
+
 export const getLocationStates = async () => {
 	const { data, error } = await supabase
 		.from("tap_water_locations")
@@ -161,31 +202,15 @@ export const getLocationStates = async () => {
 		return [];
 	}
 
-	const stateScores: {
-		[key: string]: { totalScore: number; count: number; cities: Set<string> };
-	} = {};
-
-	data.forEach((location: any) => {
-		const state = location.state;
-		const score = location.score || 0;
-		// Use location.name instead of location.city
-		const city = location.name;
-
-		if (!stateScores[state]) {
-			stateScores[state] = { totalScore: 0, count: 0, cities: new Set() };
-		}
-
-		stateScores[state].totalScore += score;
-		stateScores[state].count += 1;
-		stateScores[state].cities.add(city);
-	});
-
-	const statesWithAverageScores = Object.keys(stateScores).map((state) => {
-		const { totalScore, count, cities } = stateScores[state];
-		let averageScore = Math.round(totalScore / count);
-		if (averageScore === 0) averageScore = 1;
-		return { state, averageScore, numberOfCities: cities.size };
-	});
+	const statesWithAverageScores = Object.values(
+		data.reduce((acc: { [key: string]: any[] }, location: any) => {
+			if (!acc[location.state]) {
+				acc[location.state] = [];
+			}
+			acc[location.state].push(location);
+			return acc;
+		}, {}),
+	).map(calculateStateAverageScore);
 
 	statesWithAverageScores.sort((a, b) => a.state.localeCompare(b.state));
 
@@ -198,7 +223,14 @@ export const getAllCitiesInState = async (state: string) => {
 		.select("*")
 		.eq("state", state);
 
-	return data;
+	if (error) {
+		console.error("Error fetching cities in state:", error);
+		return { cities: [], stateInfo: null };
+	}
+
+	const stateInfo = calculateStateAverageScore(data);
+
+	return { cities: data, score: stateInfo.averageScore };
 };
 
 export const updateLocationScore = async (id: string, score: number) => {
@@ -207,5 +239,5 @@ export const updateLocationScore = async (id: string, score: number) => {
 		.update({ score })
 		.eq("id", id);
 
-	return error ? false : true;
+	return !error;
 };

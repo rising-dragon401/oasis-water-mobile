@@ -56,15 +56,18 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 		null,
 	);
 
+	// set active session and refresh user data
 	useEffect(() => {
 		setActiveSession(session);
 
 		if (session && session !== activeSession) {
 			initUser(session);
 			refreshUserData(session.user.id);
+		} else if (session === null) {
+			clearUserData();
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [session, activeSession]);
+	}, [session]);
 
 	// subscription listener
 	useEffect(() => {
@@ -74,7 +77,6 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 				"postgres_changes",
 				{ event: "*", schema: "public", table: "subscriptions" },
 				(payload) => {
-					console.log("Change received!", payload);
 					if (userId) {
 						fetchSubscription(userId);
 					}
@@ -83,6 +85,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 			.subscribe();
 	}, [userId]);
 
+	// handle generate username for all users
 	useEffect(() => {
 		if (userData && userId) {
 			handleGenerateUsername(userData, userId);
@@ -130,7 +133,10 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
 	const refreshUserData = useCallback(
 		async (uid?: string | null) => {
-			let userId = uid ?? null;
+			if (!uid) {
+				return;
+			}
+			const userId = uid ?? null;
 
 			await Promise.all([
 				fetchSubscription(userId),
@@ -151,6 +157,8 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 		setUserData(null);
 		setUserId(null);
 		setUserFavorites(null);
+		setActiveSession(null);
+		setSubscription(null);
 	};
 
 	const context = useMemo(

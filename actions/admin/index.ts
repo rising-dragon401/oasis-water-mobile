@@ -21,7 +21,8 @@ export const getFeaturedUsers = async () => {
 	const { data: featuredUsers, error: featuredError } = await supabase
 		.from("users")
 		.select("*")
-		.eq("is_featured", true);
+		.eq("is_featured", true)
+		.order("created_at", { ascending: false });
 
 	if (featuredError) {
 		console.error("Error fetching featured users:", featuredError);
@@ -46,6 +47,13 @@ export const getFeaturedUsers = async () => {
 		type: "user",
 		favorites: favorites.filter((fav) => fav.uid === user.id),
 	}));
+
+	// sort by most recent favorite
+	usersWithFavorites.sort((a, b) => {
+		const maxFavoriteA = Math.max(...a.favorites.map((fav: any) => fav.id));
+		const maxFavoriteB = Math.max(...b.favorites.map((fav: any) => fav.id));
+		return maxFavoriteB - maxFavoriteA;
+	});
 
 	return usersWithFavorites;
 };

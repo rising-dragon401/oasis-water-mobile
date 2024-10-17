@@ -1,7 +1,7 @@
-import OasisLogo from "@/assets/oasis-word.png";
 import { Image } from "expo-image";
 import { Stack } from "expo-router";
 
+import OasisLogo from "@/assets/oasis-word.png";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 function CustomHeader() {
@@ -14,7 +14,7 @@ export default function LocationsLayout() {
 	return (
 		<Stack
 			screenOptions={{
-				headerShown: true,
+				headerShown: false,
 				headerBackTitle: "Locations",
 				contentStyle: {
 					backgroundColor,
@@ -30,7 +30,8 @@ export default function LocationsLayout() {
 				headerShadowVisible: false,
 			}}
 		>
-			<Stack.Screen name="state/index" />
+			<Stack.Screen name="index" />
+			<Stack.Screen name="state/[id]" />
 		</Stack>
 	);
 }

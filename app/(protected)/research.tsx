@@ -1,12 +1,13 @@
+import { Image } from "expo-image";
+import { Link } from "expo-router";
+import { useContext } from "react";
+import { FlatList, View } from "react-native";
+
 import Skeleton from "@/components/sharable/skeleton";
 import { H1, Muted, P } from "@/components/ui/typography";
 import { BlogContext } from "@/context/blogs-provider";
 import { theme } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
-import { Image } from "expo-image";
-import { Link } from "expo-router";
-import { useContext } from "react";
-import { FlatList, View } from "react-native";
 
 export default function ResearchScreen() {
 	const { colorScheme } = useColorScheme();
@@ -56,13 +57,13 @@ export default function ResearchScreen() {
 						data={blogs}
 						numColumns={2}
 						columnWrapperStyle={{ justifyContent: "space-between" }}
-						contentContainerStyle={{ paddingVertical: 5 }}
-						ItemSeparatorComponent={() => <View style={{ height: 6 }} />}
+						contentContainerStyle={{ paddingVertical: 10 }}
+						ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
 						renderItem={({ item }) => (
 							<Link
 								href={`/search/article/${item.id}`}
 								className="flex flex-col"
-								style={{ width: "48%" }}
+								style={{ width: "48%", marginBottom: 12 }}
 							>
 								<View>
 									<Image
@@ -77,7 +78,7 @@ export default function ResearchScreen() {
 
 									<View>
 										<P
-											className="mt-1 text-left"
+											className="mt-2 text-left"
 											numberOfLines={2}
 											ellipsizeMode="tail"
 										>

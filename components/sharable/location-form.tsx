@@ -1,20 +1,14 @@
-"use client";
-
 import { getLocationDetails, updateLocationScore } from "actions/locations";
-
-import { useNavigation } from "expo-router";
-import { useEffect, useState } from "react";
-import { ScrollView, View } from "react-native";
-
-import { incrementItemsViewed } from "@/actions/user";
-import { useUserProvider } from "@/context/user-provider";
 import {
 	Accordion,
 	AccordionContent,
 	AccordionItem,
 	AccordionTrigger,
 } from "components/ui/accordion";
-import { H2, Large } from "../ui/typography";
+import { useNavigation } from "expo-router";
+import { useEffect, useState } from "react";
+import { ScrollView, View } from "react-native";
+
 import BlurredLineItem from "./blurred-line-item";
 import HorizontalContaminantCard from "./contamintant-card-hz";
 import ItemImage from "./item-image";
@@ -22,6 +16,11 @@ import RecommendedFilterRow from "./recommended-filter-row";
 import Score from "./score";
 import Sources from "./sources";
 import Typography from "./typography";
+
+import { incrementItemsViewed } from "@/actions/user";
+import Skeleton from "@/components/sharable/skeleton";
+import { H2, Large, P } from "@/components/ui/typography";
+import { useUserProvider } from "@/context/user-provider";
 
 type Props = {
 	id: string;
@@ -74,6 +73,46 @@ export function LocationForm({ id }: Props) {
 		(contaminant: any) => contaminant.exceedingLimit > 0,
 	);
 
+	if (isLoading)
+		return (
+			<View className="flex-1 px-4 py-4">
+				<View className="pb pt-2 -6 px-2">
+					<View className="flex flex-col items-center gap-6 w-full">
+						<View className="flex justify-center items-center h-48 w-48">
+							<Skeleton height={192} width={192} />
+						</View>
+
+						<View className="flex flex-row w-full justify-between gap-6">
+							<View className="flex flex-col !w-3/5 gap-2">
+								<Skeleton height={36} width="100%" />
+								<Skeleton height={24} width="100%" />
+								<Skeleton height={24} width="100%" />
+							</View>
+
+							<View className="flex !w-2/5 justify-center items-center">
+								<Skeleton
+									height={72}
+									width={72}
+									style={{ borderRadius: 100 }}
+								/>
+							</View>
+						</View>
+
+						<View className="flex flex-col w-full gap-4">
+							<Skeleton height={64} width="100%" />
+							<Skeleton height={64} width="100%" />
+							<Skeleton height={64} width="100%" />
+							<Skeleton height={64} width="100%" />
+							<Skeleton height={64} width="100%" />
+							<Skeleton height={64} width="100%" />
+							<Skeleton height={64} width="100%" />
+							<Skeleton height={64} width="100%" />
+						</View>
+					</View>
+				</View>
+			</View>
+		);
+
 	return (
 		<ScrollView
 			contentContainerStyle={{
@@ -124,7 +163,7 @@ export function LocationForm({ id }: Props) {
 
 					{location?.utilities && (
 						<View className="flex flex-col mt-4">
-							<Large className="mb-0 pb-0">Utilities</Large>
+							<Large className="mb-0 pb-0">Contaminants found</Large>
 							<Accordion
 								type="single"
 								collapsible
@@ -135,13 +174,7 @@ export function LocationForm({ id }: Props) {
 									<AccordionItem key={index} value={index.toString()}>
 										<AccordionTrigger className="w-full flex flex-row justify-start pb-0 mt-0 py-0">
 											<View className="w-full">
-												<Typography
-													size="base"
-													fontWeight="normal"
-													className="text-left"
-												>
-													{utility.name}
-												</Typography>
+												<P className="text-left">{utility.name} utility</P>
 											</View>
 										</AccordionTrigger>
 										<AccordionContent>

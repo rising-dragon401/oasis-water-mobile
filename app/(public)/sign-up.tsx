@@ -1,6 +1,6 @@
-import BackButton from "@/components/sharable/back-button";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -13,8 +13,10 @@ import {
 } from "react-native";
 import * as z from "zod";
 
+import OasisLogo from "@/assets/oasis-word.png";
 import { SafeAreaView } from "@/components/safe-area-view";
 import { AppleAuthButton } from "@/components/sharable/apple-auth-button";
+import BackButton from "@/components/sharable/back-button";
 import { Button } from "@/components/ui/button";
 import { Form, FormField, FormInput } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
@@ -93,6 +95,10 @@ export default function SignUp() {
 
 	return (
 		<SafeAreaView className="flex-1 p-4">
+			<View className="flex-row justify-center items-center mb-4">
+				<Image source={OasisLogo} style={{ width: 85, height: 24 }} />
+			</View>
+
 			<KeyboardAvoidingView
 				behavior={Platform.OS === "ios" ? "padding" : "height"}
 				className="flex-1"
@@ -154,36 +160,37 @@ export default function SignUp() {
 							</View>
 						</Form>
 					</View>
-					<View className="gap-y-4 mt-2">
-						<Button
-							size="default"
-							variant="default"
-							onPress={form.handleSubmit(onSubmit)}
-							loading={form.formState.isSubmitting}
-							label="Sign Up"
-						/>
-						<Separator orientation="horizontal" />
-						<Button
-							variant="secondary"
-							loading={loading}
-							onPress={() => onSignInWithGoogle()}
-							label="Sign Up with Google"
-							icon={<FontAwesome6 name="google" size={12} color={iconColor} />}
-							iconPosition="left"
-						/>
-						<AppleAuthButton />
-						<Muted
-							className="text-center"
-							onPress={() => {
-								router.replace("/sign-in");
-							}}
-						>
-							Already have an account?{" "}
-							<Muted className="text-foreground">Sign in</Muted>
-						</Muted>
-					</View>
 				</ScrollView>
 			</KeyboardAvoidingView>
+
+			<View className="gap-y-4 mt-2">
+				<Button
+					size="default"
+					variant="default"
+					onPress={form.handleSubmit(onSubmit)}
+					loading={form.formState.isSubmitting}
+					label="Sign Up"
+				/>
+				<Separator orientation="horizontal" />
+				<Button
+					variant="secondary"
+					loading={loading}
+					onPress={() => onSignInWithGoogle()}
+					label="Sign Up with Google"
+					icon={<FontAwesome6 name="google" size={12} color={iconColor} />}
+					iconPosition="left"
+				/>
+				<AppleAuthButton />
+				<Muted
+					className="text-center"
+					onPress={() => {
+						router.replace("/sign-in");
+					}}
+				>
+					Already have an account?{" "}
+					<Muted className="text-foreground">Sign in</Muted>
+				</Muted>
+			</View>
 		</SafeAreaView>
 	);
 }

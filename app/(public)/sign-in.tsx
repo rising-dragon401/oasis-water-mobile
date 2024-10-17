@@ -1,5 +1,6 @@
 import { FontAwesome6 } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import { useEffect, useState } from "react";
@@ -14,6 +15,7 @@ import {
 } from "react-native";
 import * as z from "zod";
 
+import OasisLogo from "@/assets/oasis-word.png";
 import { SafeAreaView } from "@/components/safe-area-view";
 import { AppleAuthButton } from "@/components/sharable/apple-auth-button";
 import BackButton from "@/components/sharable/back-button";
@@ -24,7 +26,6 @@ import { H1, Muted } from "@/components/ui/typography";
 import { useSupabase } from "@/context/supabase-provider";
 import { theme } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
-
 const formSchema = z.object({
 	email: z.string().email("Please enter a valid email address."),
 	password: z
@@ -32,6 +33,10 @@ const formSchema = z.object({
 		.min(8, "Please enter at least 8 characters.")
 		.max(64, "Please enter fewer than 64 characters."),
 });
+
+function CustomHeader() {
+	return <Image source={OasisLogo} style={{ width: 85, height: 24 }} />;
+}
 
 export default function SignIn() {
 	const { signInWithPassword, signInWithGoogle } = useSupabase();
@@ -83,6 +88,10 @@ export default function SignIn() {
 
 	return (
 		<SafeAreaView className="flex-1 flex-col p-4">
+			<View className="flex-row justify-center items-center mb-4">
+				<Image source={OasisLogo} style={{ width: 85, height: 24 }} />
+			</View>
+
 			<KeyboardAvoidingView
 				behavior={Platform.OS === "ios" ? "padding" : "height"}
 				className="flex-1"
@@ -128,41 +137,41 @@ export default function SignIn() {
 							</View>
 						</Form>
 					</View>
-
-					<View className="gap-y-4 mt-2">
-						<Button
-							size="default"
-							variant="default"
-							onPress={form.handleSubmit(onSubmit)}
-							label="Sign In"
-						>
-							{form.formState.isSubmitting && (
-								<ActivityIndicator size="small" />
-							)}
-						</Button>
-
-						<Separator orientation="horizontal" />
-						<Button
-							variant="secondary"
-							loading={loading}
-							onPress={() => onSignInWithGoogle()}
-							label="Sign In with Google"
-							icon={<FontAwesome6 name="google" size={12} color={iconColor} />}
-							iconPosition="left"
-						/>
-						<AppleAuthButton />
-
-						<Muted
-							className="text-center"
-							onPress={() => {
-								router.replace("/sign-up");
-							}}
-						>
-							Don't have an account?{" "}
-							<Muted className="text-foreground">Sign up</Muted>
-						</Muted>
-					</View>
 				</ScrollView>
+
+				<View className="gap-y-4 mt-2">
+					<Button
+						size="default"
+						variant="default"
+						onPress={form.handleSubmit(onSubmit)}
+						label="Sign In"
+					>
+						{form.formState.isSubmitting && <ActivityIndicator size="small" />}
+					</Button>
+
+					<Separator orientation="horizontal" />
+
+					<Button
+						variant="secondary"
+						loading={loading}
+						onPress={() => onSignInWithGoogle()}
+						label="Sign In with Google"
+						icon={<FontAwesome6 name="google" size={12} color={iconColor} />}
+						iconPosition="left"
+					/>
+
+					<AppleAuthButton />
+
+					<Muted
+						className="text-center"
+						onPress={() => {
+							router.replace("/sign-up");
+						}}
+					>
+						Don't have an account?{" "}
+						<Muted className="text-foreground">Sign up</Muted>
+					</Muted>
+				</View>
 			</KeyboardAvoidingView>
 		</SafeAreaView>
 	);

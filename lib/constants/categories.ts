@@ -52,24 +52,24 @@ export const CATEGORIES: CategoryType[] = [
 		image:
 			"https://connect.live-oasis.com/storage/v1/object/public/website/images/categories/water_bottle_filter.png",
 	},
-	{
-		id: "flavored_water",
-		title: "Flavored drinks",
-		image:
-			"https://connect.live-oasis.com/storage/v1/object/public/website/images/categories/sparkling_water_cover.png",
-		tags: ["still", "sparkling"],
-	},
-	{
-		id: "energy_drink",
-		title: "Energy drinks",
-		image:
-			"https://connect.live-oasis.com/storage/v1/object/public/website/images/categories/energy%20drink%20cover.png",
-	},
-	{
-		id: "coconut_water",
-		title: "Coconut water",
-		image:
-			"https://connect.live-oasis.com/storage/v1/object/public/website/images/categories/coconut%20water%20category%20cover.png",
-		is_new: false,
-	},
+	// {
+	// 	id: "flavored_water",
+	// 	title: "Flavored drinks",
+	// 	image:
+	// 		"https://connect.live-oasis.com/storage/v1/object/public/website/images/categories/sparkling_water_cover.png",
+	// 	tags: ["still", "sparkling"],
+	// },
+	// {
+	// 	id: "energy_drink",
+	// 	title: "Energy drinks",
+	// 	image:
+	// 		"https://connect.live-oasis.com/storage/v1/object/public/website/images/categories/energy%20drink%20cover.png",
+	// },
+	// {
+	// 	id: "coconut_water",
+	// 	title: "Coconut water",
+	// 	image:
+	// 		"https://connect.live-oasis.com/storage/v1/object/public/website/images/categories/coconut%20water%20category%20cover.png",
+	// 	is_new: false,
+	// },
 ];

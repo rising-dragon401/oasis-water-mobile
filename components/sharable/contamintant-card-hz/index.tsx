@@ -1,7 +1,7 @@
-import { P } from "@/components/ui/typography";
 import { Link } from "expo-router";
 import { View } from "react-native";
-import Typography from "../typography";
+
+import { Muted, P } from "@/components/ui/typography";
 
 type Props = {
 	data: any;
@@ -15,11 +15,14 @@ export default function HorizontalContaminantCard({ data }: Props) {
 					<View className="flex flex-row justify-between items-start w-full">
 						<View className="flex-1 pr-4 w-full">
 							<P className="text-base font-bold">{data?.name}</P>
+							<Muted className="mt-1 line-clamp-1 overflow-hidden">
+								{data?.amount} {data?.measure}
+							</Muted>
 							<P
-								className="text-muted-foreground mt-1 line-clamp-1 overflow-hidden"
+								className="text-muted-foreground mt-1 line-clamp-2 overflow-hidden"
 								ellipsizeMode="tail"
 							>
-								{data?.description}
+								{data?.risks ? data?.risks : data?.description}
 							</P>
 						</View>
 						{data.exceedingLimit > 1 && (
@@ -28,13 +31,7 @@ export default function HorizontalContaminantCard({ data }: Props) {
 									data.exceedingLimit > 1 && "bg-red-400"
 								}`}
 							>
-								<Typography
-									size="base"
-									fontWeight="bold"
-									className="text-background"
-								>
-									{data.exceedingLimit}x
-								</Typography>
+								<P className="text-background">{data.exceedingLimit}x</P>
 							</View>
 						)}
 					</View>

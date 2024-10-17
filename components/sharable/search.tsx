@@ -1,6 +1,5 @@
 import { Octicons } from "@expo/vector-icons";
 import algoliasearch from "algoliasearch";
-import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 
@@ -19,8 +18,6 @@ const searchClient = algoliasearch(
 );
 
 export default function Search({ indices }: { indices?: string[] }) {
-	const router = useRouter();
-
 	const [results, setResults] = useState<any[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
 	const [, setQueryCompleted] = useState(false);
@@ -118,7 +115,7 @@ export default function Search({ indices }: { indices?: string[] }) {
 		<>
 			<View className="flex flex-row gap-2 items-center relative">
 				<Input
-					placeholder="Search water, filters, location..."
+					placeholder="Search your water, filter or city"
 					value={value}
 					onChangeText={onChangeText}
 					aria-labelledbyledBy="inputLabel"

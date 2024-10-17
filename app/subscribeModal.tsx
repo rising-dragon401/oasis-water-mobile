@@ -1,14 +1,15 @@
+import { Feather } from "@expo/vector-icons";
+import * as Linking from "expo-linking";
+import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import { Alert, ScrollView, View } from "react-native";
+
 import Logo from "@/components/sharable/logo";
 import { Button } from "@/components/ui/button";
 import { H2, Muted, P } from "@/components/ui/typography";
 import { useRevenueCat } from "@/context/revenue-cat-provider";
 import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
-import { Feather } from "@expo/vector-icons";
-import * as Linking from "expo-linking";
-import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
-import { Alert, ScrollView, View } from "react-native";
 
 const FEATURES = [
 	{
@@ -128,7 +129,7 @@ export default function SubscribeModal() {
 					/>
 					<View className="flex flex-col gap-y-2 w-full">
 						<Muted className="text-center">
-							Free access for 3 days, then $47 per year, ($4 /month)
+							Free access for 3 days then $4 /mo ($47 billed annually)
 						</Muted>
 					</View>
 					<View className="mt-14 px-8 flex flex-row gap-x-4">

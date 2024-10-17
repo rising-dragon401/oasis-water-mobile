@@ -1,10 +1,12 @@
 import Feather from "@expo/vector-icons/Feather";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { getFeaturedUsers } from "actions/admin";
 import { Image } from "expo-image";
 import { Link, usePathname, useRouter } from "expo-router";
 import { useContext, useEffect, useState } from "react";
 import { FlatList, ScrollView, View } from "react-native";
 
+import LocationCard from "@/components/sharable/location-card";
 import Search from "@/components/sharable/search";
 import Skeleton from "@/components/sharable/skeleton";
 import { H2, H4, Muted, P } from "@/components/ui/typography";
@@ -12,7 +14,44 @@ import { BlogContext } from "@/context/blogs-provider";
 import { useUserProvider } from "@/context/user-provider";
 import { CATEGORIES } from "@/lib/constants/categories";
 import { useColorScheme } from "@/lib/useColorScheme";
-import { getFeaturedUsers } from "actions/admin";
+
+const FEATURED_LOCATIONS = [
+	{
+		id: "California",
+		name: "California",
+		image:
+			"https://connect.live-oasis.com/storage/v1/object/public/website/images/locations/california.jpg?t=2024-10-16T21%3A16%3A45.884Z",
+		score: 18,
+	},
+	{
+		id: "New York",
+		name: "New York",
+		image:
+			"https://connect.live-oasis.com/storage/v1/object/public/website/images/locations/new_york.jpg?t=2024-10-16T21%3A37%3A24.980Z",
+		score: 14,
+	},
+	{
+		id: "Florida",
+		name: "Florida",
+		image:
+			"https://connect.live-oasis.com/storage/v1/object/public/website/images/locations/florida.jpg?t=2024-10-16T21%3A42%3A04.239Z",
+		score: 22,
+	},
+	{
+		id: "Washington",
+		name: "Washington",
+		image:
+			"https://connect.live-oasis.com/storage/v1/object/public/website/images/locations/washington.jpg?t=2024-10-16T21%3A48%3A53.558Z",
+		score: 15,
+	},
+	{
+		id: "Texas",
+		name: "Texas",
+		image:
+			"https://connect.live-oasis.com/storage/v1/object/public/website/images/locations/texas.jpg?t=2024-10-16T21%3A50%3A33.613Z",
+		score: 11,
+	},
+];
 
 export default function TabOneScreen() {
 	const { userData, subscription, uid } = useUserProvider();
@@ -60,20 +99,21 @@ export default function TabOneScreen() {
 			className="flex flex-col my-4 p-4 px-4"
 		>
 			<H2 className="text-center max-w-xs border-none pb-0">
-				Search healthy water
+				What's in your water?
 			</H2>
 
 			<Muted className="text-center mb-4 max-w-md">
-				Discover the best waters and filters based on science.
+				90% of water contains toxins most filters don't remove them
 			</Muted>
 
 			<View className="mb-10 w-[90%] z-40">
 				<Search />
 			</View>
 
-			<View className="flex-1 flex-col w-full ">
+			{/* Top waters and filters */}
+			<View className="flex-1 flex-col w-full mb-10">
 				<View className="flex flex-row justify-between w-full items-center">
-					<H4 className="text-left">Product ratings</H4>
+					<H4 className="text-left">Top waters and filters</H4>
 
 					<Link
 						href="/(protected)/search/top-rated-all"
@@ -94,31 +134,32 @@ export default function TabOneScreen() {
 					data={CATEGORIES.sort(
 						(a, b) => (b.is_new ? 1 : 0) - (a.is_new ? 1 : 0),
 					)}
-					horizontal={true}
+					horizontal
 					showsHorizontalScrollIndicator={false}
 					contentContainerStyle={{
 						paddingTop: 8,
 					}}
 					className="overflow-x-scroll"
 					renderItem={({ item: category }) => (
-						<View className="mr-3 w-[140px] py-1 rounded-xl">
+						<View className="mr-3 w-[120px] py-1 rounded-xl">
 							<Link
 								key={category.id}
 								href={`/search/top-rated/${category.id}`}
 								className="flex flex-col"
 							>
-								<View className="relative w-[140px] h-[140px] flex items-center justify-center rounded-xl bg-card">
+								<View className="relative w-[120px] h-[120px] flex items-center justify-center rounded-xl bg-card">
 									<Image
 										source={{ uri: category.image }}
 										alt={category.title}
 										style={{
-											width: "70%",
-											height: "70%",
+											width: "60%",
+											height: "60%",
 											borderRadius: 4,
 										}}
+										className="mb-2"
 									/>
-									<View className="absolute bottom-0 left-0 w-full p-2 py-2">
-										<P className="text-center text-md">{category.title}</P>
+									<View className="absolute bottom-0 left-0 w-full p-2 pb-2">
+										<P className="text-center text-base">{category.title}</P>
 									</View>
 								</View>
 							</Link>
@@ -128,9 +169,50 @@ export default function TabOneScreen() {
 				/>
 			</View>
 
-			<View className="flex-1 w-full justify-start mt-10">
+			{/* Featured locations */}
+			<View className="flex flex-col w-full mb-10">
 				<View className="flex flex-row justify-between w-full items-center">
-					<H4 className="text-left">Featured users</H4>
+					<H4 className="text-left">Top water ratings</H4>
+
+					<Link
+						href="/(protected)/search/locations"
+						className="flex flex-row items-center gap-2"
+					>
+						<View className="flex flex-row items-center gap-2">
+							<Muted className="text-center m-0 p-0">all locations</Muted>
+
+							<Ionicons
+								name="arrow-forward"
+								size={16}
+								color={textSecondaryColor}
+							/>
+						</View>
+					</Link>
+				</View>
+				<FlatList
+					data={FEATURED_LOCATIONS}
+					horizontal
+					showsHorizontalScrollIndicator={false}
+					contentContainerStyle={{
+						paddingTop: 8,
+						maxHeight: 100,
+					}}
+					className="overflow-x-scroll"
+					renderItem={({ item: location }) => (
+						<View className="mr-4">
+							<Link href={`/search/locations/state/${location.id}`}>
+								<LocationCard location={location} />
+							</Link>
+						</View>
+					)}
+					keyExtractor={(item) => item.id}
+				/>
+			</View>
+
+			{/* What others are drinking */}
+			<View className="flex-1 w-full justify-start mb-6">
+				<View className="flex flex-row justify-between w-full items-center">
+					<H4 className="text-left">What others are drinking</H4>
 					{/* <Link href="/(protected)/search/users">
 						<Ionicons
 							name="arrow-forward"
@@ -226,9 +308,10 @@ export default function TabOneScreen() {
 				)}
 			</View>
 
-			<View className="flex-1 w-full justify-start mt-8">
+			{/* New research */}
+			<View className="flex-1 w-full justify-start mb-6">
 				<View className="flex flex-row justify-between w-full items-center">
-					<H4 className="text-left">New research</H4>
+					<H4 className="text-left">News and research</H4>
 					<Link href="/(protected)/research">
 						<Ionicons
 							name="arrow-forward"
@@ -241,7 +324,7 @@ export default function TabOneScreen() {
 				{blogs.length === 0 ? (
 					<FlatList
 						data={[1, 2, 3]}
-						horizontal={true}
+						horizontal
 						showsHorizontalScrollIndicator={false}
 						contentContainerStyle={{
 							paddingTop: 8,
@@ -263,7 +346,7 @@ export default function TabOneScreen() {
 				) : (
 					<FlatList
 						data={blogs}
-						horizontal={true}
+						horizontal
 						showsHorizontalScrollIndicator={false}
 						contentContainerStyle={{
 							paddingTop: 8,

@@ -1,7 +1,3 @@
-import { getAllCitiesInState } from "@/actions/locations";
-import { Circle } from "@/components/sharable/circle";
-import { H1, H3, Muted } from "@/components/ui/typography";
-import { useColorScheme } from "@/lib/useColorScheme";
 import {
 	useGlobalSearchParams,
 	useLocalSearchParams,
@@ -9,6 +5,11 @@ import {
 } from "expo-router";
 import { useEffect, useState } from "react";
 import { FlatList, Image, TouchableOpacity, View } from "react-native";
+
+import { getAllCitiesInState } from "@/actions/locations";
+import { Circle } from "@/components/sharable/circle";
+import { H1, H3, Muted } from "@/components/ui/typography";
+import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function StateScreen() {
 	const glob = useGlobalSearchParams();
@@ -19,14 +20,16 @@ export default function StateScreen() {
 	const id =
 		(Array.isArray(local?.id) ? local?.id[0] : local?.id) ||
 		(Array.isArray(glob?.id) ? glob?.id[0] : glob?.id) ||
-		"1";
+		"California";
 
 	const [cities, setCities] = useState<any[]>([]);
+	const [score, setScore] = useState<number | null>(null);
 
 	useEffect(() => {
 		const fetchCities = async () => {
 			const cities = await getAllCitiesInState(id);
-			setCities(cities || []);
+			setScore(cities.score ?? null);
+			setCities(cities.cities || []);
 		};
 		fetchCities();
 	}, [id]);
@@ -53,15 +56,23 @@ export default function StateScreen() {
 				</View>
 
 				<View className="flex-1 items-end justify-center pr-4">
-					<Circle value={item.score} size={40} strokeWidth={4} />
+					<Circle
+						value={Math.max(Math.round(item.score), 1)}
+						size={40}
+						strokeWidth={4}
+					/>
 				</View>
 			</TouchableOpacity>
 		);
 	};
 
 	return (
-		<View className="flex-1 px-4 " style={{ backgroundColor }}>
-			<H1 className="mt-4">{id} tap water</H1>
+		<View className="flex-1 px-4" style={{ backgroundColor }}>
+			<View className="flex flex-row items-center justify-between pr-4 pb-2">
+				<H1 className="mt-4 w-3/4">{id} tap water</H1>
+
+				{score && <Circle value={score} size={56} strokeWidth={4} />}
+			</View>
 
 			<FlatList
 				data={cities}

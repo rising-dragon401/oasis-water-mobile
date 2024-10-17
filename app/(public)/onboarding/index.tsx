@@ -1,13 +1,3 @@
-import { updateUserData } from "@/actions/user";
-import LocationSelector from "@/components/sharable/location-selector";
-import { SubscribeOnboarding } from "@/components/sharable/subscribe-onboarding";
-import { Button } from "@/components/ui/button";
-import * as ProgressPrimitive from "@/components/ui/progress";
-import { Switch } from "@/components/ui/switch";
-import { H1, P } from "@/components/ui/typography";
-import { useRevenueCat } from "@/context/revenue-cat-provider";
-import { useUserProvider } from "@/context/user-provider";
-import { useColorScheme } from "@/lib/useColorScheme";
 import { Ionicons } from "@expo/vector-icons"; // If using expo for icons
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
@@ -19,6 +9,18 @@ import {
 	View,
 	ViewStyle,
 } from "react-native";
+import Toast from "react-native-root-toast";
+
+import { updateUserData } from "@/actions/user";
+import LocationSelector from "@/components/sharable/location-selector";
+import { SubscribeOnboarding } from "@/components/sharable/subscribe-onboarding";
+import { Button } from "@/components/ui/button";
+import * as ProgressPrimitive from "@/components/ui/progress";
+import { Switch } from "@/components/ui/switch";
+import { H1, P } from "@/components/ui/typography";
+import { useRevenueCat } from "@/context/revenue-cat-provider";
+import { useUserProvider } from "@/context/user-provider";
+import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function OnboardingScreen() {
 	const [currentStep, setCurrentStep] = useState(0); // Adjust based on your total number of steps
@@ -49,7 +51,7 @@ export default function OnboardingScreen() {
 		{
 			title: "Drink with confidence",
 			subtitle:
-				"Get lab-tested data on your water and filters, ensuring transparency and healthier choices every time.",
+				"The majority of water is contaminated with toxins and most filters don't remove them. Get the lab-tested data and rankings to drink the best water for you.",
 			image:
 				"https://connect.live-oasis.com/storage/v1/object/public/website/images/onboarding/toxins%20in%20water%20graphic.png?t=2024-10-08T05%3A26%3A22.658Z", // Add image option
 			imageStyle: {
@@ -115,8 +117,11 @@ export default function OnboardingScreen() {
 				handleUpdateLocation();
 			},
 			submitButtonLabel: "Continue",
-			onSkip: null,
-			canSkip: false,
+			onSkip: () => {
+				setCurrentStep((prev) => Math.min(totalSteps - 1, prev + 1));
+			},
+			canSkip: true,
+			skipButtonLabel: "Skip",
 		},
 		{
 			title: "Unlock the top rated water and filters",
@@ -136,7 +141,7 @@ export default function OnboardingScreen() {
 			submitButtonLabel: "Start 3 day free trial",
 			onSkip: null,
 			skipButtonLabel: "No thanks, continue with basic and view limited data",
-			canSkip: true,
+			canSkip: false,
 		},
 	];
 
@@ -189,7 +194,6 @@ export default function OnboardingScreen() {
 	};
 
 	const handleUpdateLocation = async () => {
-		console.log("selectedAddress", selectedAddress);
 		await updateUserData(userData.id, "location", selectedAddress);
 	};
 
@@ -197,13 +201,15 @@ export default function OnboardingScreen() {
 		setLoadingPurchase(true);
 
 		try {
-			if (!user || !userData) {
+			if (!user) {
+				Toast.show("No user found", {
+					duration: Toast.durations.LONG,
+				});
+
 				throw new Error("User not found");
 			}
 
 			const pack = packages[0];
-
-			console.log("pack", pack);
 
 			if (!pack) {
 				console.log("No package found");
@@ -216,6 +222,13 @@ export default function OnboardingScreen() {
 				// Handle success here
 				handleFinishOnboarding();
 				// TODO impelement toast
+			} else {
+				setLoadingPurchase(false);
+
+				Toast.show("Unable to subscribe. Please try again.", {
+					duration: Toast.durations.LONG,
+				});
+				throw new Error("Failed to purchase package");
 			}
 		} catch (e) {
 			throw new Error(e as string);
@@ -319,15 +332,16 @@ export default function OnboardingScreen() {
 							Free for 3 days then $4 /mo ($47 annual charge)
 						</P>
 					)}
+
+					{steps[currentStep].canSkip && (
+						<Button
+							onPress={() => handleNextStep(false)}
+							variant="ghost"
+							className="h-16 w-full"
+							label={steps[currentStep].skipButtonLabel}
+						/>
+					)}
 				</View>
-				{/* {steps[currentStep].canSkip && (
-					<Button
-						onPress={() => handleNextStep(false)}
-						variant="ghost"
-						className="!h-16 w-full"
-						label="No thanks, continue with basic and view limited data"
-					/>
-				)} */}
 			</View>
 		</View>
 	);

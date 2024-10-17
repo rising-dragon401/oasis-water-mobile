@@ -1,12 +1,13 @@
-import { H1, Muted, P } from "@/components/ui/typography";
-import { theme } from "@/lib/constants";
-import { CATEGORIES } from "@/lib/constants/categories";
-import { useColorScheme } from "@/lib/useColorScheme";
 import { getBlogs } from "actions/blogs";
 import { Image } from "expo-image";
 import { Link } from "expo-router";
 import { useEffect, useState } from "react";
 import { FlatList, View } from "react-native";
+
+import { H1, Muted, P } from "@/components/ui/typography";
+import { theme } from "@/lib/constants";
+import { CATEGORIES } from "@/lib/constants/categories";
+import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function TopRatedScreen() {
 	const { colorScheme } = useColorScheme();
@@ -27,7 +28,7 @@ export default function TopRatedScreen() {
 		>
 			<H1>Top rated</H1>
 			<Muted>
-				Discover the best bottled waters and filters based lab tested data.
+				Discover the best bottled waters and filters based on lab tested data.
 			</Muted>
 
 			<View className="flex-1 flex-col mt-4">

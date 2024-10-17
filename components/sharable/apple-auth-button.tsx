@@ -18,7 +18,7 @@ export function AppleAuthButton() {
 						: AppleAuthentication.AppleAuthenticationButtonStyle.BLACK
 				}
 				cornerRadius={100}
-				style={{ width: "100%", height: 42 }}
+				style={{ width: "100%", height: 48 }}
 				onPress={signInWithApple}
 			/>
 		);

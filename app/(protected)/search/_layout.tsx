@@ -1,7 +1,7 @@
-import OasisLogo from "@/assets/oasis-word.png";
 import { Image } from "expo-image";
 import { Stack } from "expo-router";
 
+import OasisLogo from "@/assets/oasis-word.png";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 function CustomHeader() {

@@ -1,4 +1,3 @@
-import { getUserData, manageSubscriptionStatusChange } from "@/actions/user";
 import {
 	createContext,
 	useCallback,
@@ -12,7 +11,10 @@ import Purchases, {
 	LOG_LEVEL,
 	PurchasesPackage,
 } from "react-native-purchases";
+
 import { useUserProvider } from "./user-provider";
+
+import { getUserData, manageSubscriptionStatusChange } from "@/actions/user";
 
 const APIKeys = {
 	apple: "appl_OIAHthcBxHjpVWGXmtLvBKRTtrR",
@@ -38,7 +40,6 @@ export const useRevenueCat = () => {
 	if (!context) {
 		throw new Error("useRevenueCat must be used within a RevenueCatProvider");
 	}
-
 	return context;
 };
 
@@ -83,6 +84,7 @@ export const RevenueCatProvider = ({ children }: any) => {
 
 	const loadOfferings = async () => {
 		const offerings = await Purchases.getOfferings();
+
 		const annualPackage = offerings.current?.annual
 			? [offerings.current.annual]
 			: [];
@@ -93,7 +95,6 @@ export const RevenueCatProvider = ({ children }: any) => {
 
 	const purchasePackage = async (pack: PurchasesPackage) => {
 		try {
-			console.log("purchasePackage pack", pack);
 			await Purchases.purchasePackage(pack);
 
 			if (pack.identifier === "pro") {
@@ -149,8 +150,8 @@ export const RevenueCatProvider = ({ children }: any) => {
 	const value = {
 		purchasePackage,
 		restorePurchases,
-		userSubscription: userSubscription,
-		packages: packages,
+		userSubscription,
+		packages,
 	};
 
 	return (

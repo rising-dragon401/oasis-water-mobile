@@ -1,11 +1,12 @@
+import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import { Pressable, ScrollView, View } from "react-native";
+
 import { getLocationStates } from "@/actions/locations";
 import { Circle } from "@/components/sharable/circle";
 import { Input } from "@/components/ui/input";
 import { H1, Large, Muted } from "@/components/ui/typography";
 import { useColorScheme } from "@/lib/useColorScheme";
-import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
-import { Pressable, ScrollView, View } from "react-native";
 
 export default function LocationsScreen() {
 	const { backgroundColor } = useColorScheme();
@@ -28,7 +29,7 @@ export default function LocationsScreen() {
 
 	return (
 		<View className="flex-1 px-2" style={{ backgroundColor }}>
-			<H1 className="mt-4 px-4">Tap Water Ratings</H1>
+			<H1 className="mt-4 px-4">Tap water ratings</H1>
 			<Muted className="px-4">
 				Discover the quality of tap water in your area
 			</Muted>
@@ -48,7 +49,11 @@ export default function LocationsScreen() {
 					filteredStates?.map((state) => (
 						<Pressable
 							key={state.id}
-							onPress={() => router.push(`/locations/state/${state.state}`)}
+							onPress={() =>
+								router.push(
+									`/(protected)/search/locations/state/${state.state}`,
+								)
+							}
 							className="flex-row items-center justify-between p-4 bg-card border border-border rounded-lg"
 						>
 							<View className="flex-1">

@@ -1,10 +1,11 @@
-import { supabase } from "@/config/supabase";
 import { Session, User } from "@supabase/supabase-js";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { SplashScreen, useRouter, useSegments } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import * as WebBrowser from "expo-web-browser";
 import { createContext, useContext, useEffect, useState } from "react";
+
+import { supabase } from "@/config/supabase";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -110,8 +111,6 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 
 			// Sign in via Supabase Auth.
 			if (credential.identityToken) {
-				console.log(" credential.identityToken: ", credential.identityToken);
-
 				const {
 					error,
 					data: { user },
@@ -119,8 +118,6 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 					provider: "apple",
 					token: credential.identityToken,
 				});
-
-				console.log("signInWithApple: ", error);
 
 				console.log(JSON.stringify({ error, user }, null, 2));
 
@@ -241,7 +238,7 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 
 			setTimeout(() => {
 				SplashScreen.hideAsync();
-			}, 500);
+			}, 100);
 		};
 
 		fetchData();

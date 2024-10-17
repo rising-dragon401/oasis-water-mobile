@@ -6,9 +6,15 @@ interface CircleProps {
 	value: number;
 	size: number;
 	strokeWidth: number;
+	textClassName?: string;
 }
 
-export function Circle({ value, size, strokeWidth }: CircleProps) {
+export function Circle({
+	value,
+	size,
+	strokeWidth,
+	textClassName,
+}: CircleProps) {
 	const radius = (size - strokeWidth) / 2;
 	const circumference = radius * 2 * Math.PI;
 	const progress = (value / 100) * circumference;
@@ -55,7 +61,7 @@ export function Circle({ value, size, strokeWidth }: CircleProps) {
 					alignItems: "center",
 				}}
 			>
-				<Text>{value}</Text>
+				<Text className={`${textClassName}`}>{value}</Text>
 			</View>
 		</View>
 	);
