@@ -3,7 +3,7 @@
 		"name": "Oasis",
 		"slug": "Oasis",
 		"scheme": "oasisapp",
-		"version": "1.1.3",
+		"version": "1.1.4",
 		"orientation": "portrait",
 		"icon": "./assets/icon.png",
 		"userInterfaceStyle": "automatic",
@@ -17,7 +17,7 @@
 			"supportsTablet": false,
 			"usesAppleSignIn": true,
 			"bundleIdentifier": "com.liveoasis.oasis",
-			"buildNumber": "1",
+			"buildNumber": "3",
 			"associatedDomains": ["applinks:oasiswater.app"]
 		},
 		"android": {
@@ -26,7 +26,7 @@
 				"backgroundColor": "#ffffff"
 			},
 			"package": "com.liveoasis.oasis",
-			"versionCode": 31,
+			"versionCode": 33,
 			"permissions": ["android.permission.RECORD_AUDIO"]
 		},
 		"experiments": {
@@ -34,6 +34,8 @@
 		},
 		"plugins": [
 			"expo-router",
+			"expo-camera",
+
 			"expo-dev-launcher",
 			[
 				"expo-dev-launcher",
@@ -54,6 +56,13 @@
 				"expo-image-picker",
 				{
 					"photosPermission": "The app accesses your photos to upload your profile picture."
+				}
+			],
+			[
+				"expo-camera",
+				{
+					"cameraPermission": "Allow Oasis to access your camera to scan your water bottle or filter.",
+					"recordAudioAndroid": true
 				}
 			],
 			"expo-localization"

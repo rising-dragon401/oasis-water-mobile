@@ -54,7 +54,7 @@ const FEATURED_LOCATIONS = [
 ];
 
 export default function TabOneScreen() {
-	const { userData, subscription, uid } = useUserProvider();
+	const { userData, subscription, uid, refreshUserData } = useUserProvider();
 	const router = useRouter();
 	const pathname = usePathname();
 	const { textSecondaryColor } = useColorScheme();
@@ -65,6 +65,8 @@ export default function TabOneScreen() {
 
 	useEffect(() => {
 		getPeople();
+		// mannually refresh user data to be safe
+		refreshUserData();
 	}, []);
 
 	// show review modal if user has not reviewed the app
@@ -138,8 +140,9 @@ export default function TabOneScreen() {
 					showsHorizontalScrollIndicator={false}
 					contentContainerStyle={{
 						paddingTop: 8,
+						height: "100%",
 					}}
-					className="overflow-x-scroll"
+					className="overflow-x-scroll flex"
 					renderItem={({ item: category }) => (
 						<View className="mr-3 w-[120px] py-1 rounded-xl">
 							<Link
@@ -172,7 +175,7 @@ export default function TabOneScreen() {
 			{/* Featured locations */}
 			<View className="flex flex-col w-full mb-10">
 				<View className="flex flex-row justify-between w-full items-center">
-					<H4 className="text-left">Top water ratings</H4>
+					<H4 className="text-left">Tap water ratings</H4>
 
 					<Link
 						href="/(protected)/search/locations"

@@ -1,17 +1,18 @@
+import { Avatar, AvatarImage } from "components/ui/avatar";
+import { useUserProvider } from "context/user-provider";
 import { useRouter } from "expo-router";
+import { PROFILE_AVATAR } from "lib/constants";
 import { useEffect, useState } from "react";
 import { FlatList, Share, View } from "react-native";
+import useSWR from "swr";
+
+import ItemPreviewCard from "../item-preview-card";
+import Loader from "../loader";
 
 import { getCurrentUserData, getUserFavorites } from "@/actions/user";
 import Score from "@/components/sharable/score";
 import { Button } from "@/components/ui/button";
 import { H3, H4, Large, Muted, P } from "@/components/ui/typography";
-import { Avatar, AvatarImage } from "components/ui/avatar";
-import { useUserProvider } from "context/user-provider";
-import { PROFILE_AVATAR } from "lib/constants";
-import useSWR from "swr";
-import ItemPreviewCard from "../item-preview-card";
-import Loader from "../loader";
 
 export default function FavoritesList({
 	userId,

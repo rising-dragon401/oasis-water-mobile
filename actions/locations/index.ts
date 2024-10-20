@@ -204,15 +204,19 @@ export const getLocationStates = async () => {
 
 	const statesWithAverageScores = Object.values(
 		data.reduce((acc: { [key: string]: any[] }, location: any) => {
-			if (!acc[location.state]) {
-				acc[location.state] = [];
+			if (location.state) {
+				if (!acc[location.state]) {
+					acc[location.state] = [];
+				}
+				acc[location.state].push(location);
 			}
-			acc[location.state].push(location);
 			return acc;
 		}, {}),
 	).map(calculateStateAverageScore);
 
-	statesWithAverageScores.sort((a, b) => a.state.localeCompare(b.state));
+	statesWithAverageScores.sort((a, b) =>
+		(a.state || "").localeCompare(b.state || ""),
+	);
 
 	return statesWithAverageScores;
 };

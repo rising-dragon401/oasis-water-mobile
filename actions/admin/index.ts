@@ -1,3 +1,4 @@
+import { getItemDetails } from "@/actions/items";
 import { supabase } from "@/config/supabase";
 
 export const handleDeleteUser = async (uid: string) => {
@@ -102,4 +103,154 @@ export const getUserReferralStats = async (userId: string) => {
 	}
 
 	return stats;
+};
+
+export const uploadChatImage = async (image: string, uid: string) => {
+	const { data, error } = await supabase.storage
+		.from("users")
+		.upload(`users/${uid}/${Date.now()}_chat_image.jpg`, image, {
+			cacheControl: "3600",
+			upsert: false,
+		});
+
+	if (error) {
+		console.error("Error uploading image:", error);
+		return { success: false, error };
+	}
+
+	return { success: true, data };
+};
+
+export const getEmbedding = async (text: string) => {
+	const response = await fetch("https://api.openai.com/v1/embeddings", {
+		method: "POST",
+		headers: {
+			Authorization: `Bearer ${process.env.EXPO_PUBLIC_OPENAI_API_KEY}`,
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify({
+			input: text,
+			model: "text-embedding-ada-002",
+			encoding_format: "float",
+		}),
+	});
+
+	if (!response.ok) {
+		const error = await response.json();
+		console.error("Error fetching embedding:", error);
+		return { success: false, error: error.message };
+	}
+
+	const responseData = await response.json();
+	const embedding = responseData.data[0].embedding;
+
+	return { success: true, embedding };
+};
+
+export const getAllItemIdsAndNames = async () => {
+	const { data, error } = await supabase.from("items").select("id, name");
+
+	if (error) {
+		console.error("Error fetching item ids and names:", error);
+		return [];
+	}
+
+	return data;
+};
+
+export const getAllFilterIdsAndNames = async () => {
+	const { data, error } = await supabase
+		.from("water_filters")
+		.select("id, name");
+
+	if (error) {
+		console.error("Error fetching filter ids and names:", error);
+		return [];
+	}
+
+	return data;
+};
+
+export const searchForProduct = async (
+	productIdentified: {
+		name: string;
+		type: "filter" | "water bottle";
+	},
+	allItems: any[],
+	allFilters: any[],
+) => {
+	// Normalize input name
+	const productName = productIdentified.name.trim().toLowerCase();
+
+	const listToSearch =
+		productIdentified.type === "filter" ? allFilters : allItems;
+
+	console.log("productName: ", productName);
+
+	// ask open ai to search for the closes match
+	const requestBody = {
+		model: "gpt-4o",
+		messages: [
+			{
+				role: "user",
+				content: [
+					{
+						type: "text",
+						text: `What item from listToSearch most closely matches productName.
+							listToSearch: ${JSON.stringify(listToSearch)}
+							productName: ${productName}
+
+
+							Only respond with the name of the product and type like this: {id: 'id', name: 'name'}.
+							`,
+					},
+				],
+			},
+		],
+		// max_tokens: 300,
+	};
+
+	const response = await fetch("https://api.openai.com/v1/chat/completions", {
+		method: "POST",
+		headers: {
+			Authorization: `Bearer ${process.env.EXPO_PUBLIC_OPENAI_API_KEY}`,
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify(requestBody),
+	});
+	const responseData = await response.json();
+
+	const rowIdentifiedObject = responseData.choices[0].message.content.match(
+		/{\s*id:\s*'([^']*)',\s*name:\s*'([^']*)'\s*}/,
+	);
+
+	if (!rowIdentifiedObject) {
+		throw new Error("Error parsing rowIdentified");
+	}
+
+	const rowIdentified = {
+		id: rowIdentifiedObject[1],
+		name: rowIdentifiedObject[2],
+	};
+
+	console.log("rowIdentified: ", rowIdentified);
+
+	const productId = rowIdentified.id;
+
+	try {
+		console.log("productId: ", productId);
+		const productDetails = await getItemDetails(productId);
+
+		// If product details were found, return them
+		if (productDetails) {
+			return { success: true, data: productDetails };
+		} else {
+			return { success: false, message: "Product details not found." };
+		}
+	} catch (detailError) {
+		return {
+			success: false,
+			message: `Error fetching details: ${detailError instanceof Error ? detailError.message : "Unknown error"}`,
+		};
+	}
 };

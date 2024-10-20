@@ -1,18 +1,19 @@
-import { useColorScheme } from "@/lib/useColorScheme";
+import { Octicons } from "@expo/vector-icons";
 import { useUserProvider } from "context/user-provider";
 import { Image } from "expo-image";
 import { Link } from "expo-router";
 import React, { useMemo } from "react";
 import { Text, View } from "react-native";
 
+import FavoriteButton from "./favorite-button";
+
 import { H4, Muted, P } from "@/components/ui/typography";
 import {
 	placeHolderImageBlurHash,
 	RANDOM_BLUR_IMAGES,
 } from "@/lib/constants/images";
+import { useColorScheme } from "@/lib/useColorScheme";
 import { determineLink } from "@/lib/utils";
-import { Octicons } from "@expo/vector-icons";
-import FavoriteButton from "./favorite-button";
 
 type Props = {
 	item: any;

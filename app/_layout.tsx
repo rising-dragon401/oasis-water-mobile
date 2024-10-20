@@ -1,20 +1,23 @@
 import * as Sentry from "@sentry/react-native";
+import { PortalHost } from "components/primitives/portal";
+import { isRunningInExpoGo } from "expo";
 import "expo-dev-client";
 import { Stack, useNavigationContainerRef } from "expo-router";
+import { PostHogProvider } from "posthog-react-native";
 import React from "react";
+import { RootSiblingParent } from "react-native-root-siblings";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+
 import "../global.css";
+
+import { SWRConfig } from "swr";
 
 import { BlogProvider } from "@/context/blogs-provider";
 import { RevenueCatProvider } from "@/context/revenue-cat-provider";
 import { SupabaseProvider } from "@/context/supabase-provider";
+import { ToastProvider } from "@/context/toast-provider";
 import UserProvider from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
-import { PortalHost } from "components/primitives/portal";
-import { isRunningInExpoGo } from "expo";
-import { PostHogProvider } from "posthog-react-native";
-import { RootSiblingParent } from "react-native-root-siblings";
-import { SWRConfig } from "swr";
 
 const routingInstrumentation = new Sentry.ReactNavigationInstrumentation();
 
@@ -52,56 +55,64 @@ function RootLayout() {
 						>
 							<SWRConfig>
 								<RootSiblingParent>
-									<SafeAreaProvider>
-										<Stack
-											screenOptions={{
-												headerShown: false,
-												contentStyle: {
-													backgroundColor,
-												},
-											}}
-										>
-											<Stack.Screen name="(protected)" />
-											<Stack.Screen name="(public)" />
-											<Stack.Screen
-												name="subscribeModal"
-												options={{
-													presentation: "modal",
+									<ToastProvider>
+										<SafeAreaProvider>
+											<Stack
+												screenOptions={{
+													headerShown: false,
+													contentStyle: {
+														backgroundColor,
+													},
 												}}
-											/>
-											<Stack.Screen
-												name="deleteAccountModal"
-												options={{
-													presentation: "modal",
-												}}
-											/>
-											<Stack.Screen
-												name="chatModal"
-												options={{
-													presentation: "modal",
-												}}
-											/>
-											<Stack.Screen
-												name="inviteModal"
-												options={{
-													presentation: "modal",
-												}}
-											/>
-											<Stack.Screen
-												name="redeemModal"
-												options={{
-													presentation: "modal",
-												}}
-											/>
-											<Stack.Screen
-												name="reviewModal"
-												options={{
-													presentation: "modal",
-												}}
-											/>
-										</Stack>
-									</SafeAreaProvider>
-									<PortalHost />
+											>
+												<Stack.Screen name="(protected)" />
+												<Stack.Screen name="(public)" />
+												<Stack.Screen
+													name="subscribeModal"
+													options={{
+														presentation: "modal",
+													}}
+												/>
+												<Stack.Screen
+													name="deleteAccountModal"
+													options={{
+														presentation: "modal",
+													}}
+												/>
+												<Stack.Screen
+													name="chatModal"
+													options={{
+														presentation: "modal",
+													}}
+												/>
+												<Stack.Screen
+													name="inviteModal"
+													options={{
+														presentation: "modal",
+													}}
+												/>
+												<Stack.Screen
+													name="redeemModal"
+													options={{
+														presentation: "modal",
+													}}
+												/>
+												<Stack.Screen
+													name="reviewModal"
+													options={{
+														presentation: "modal",
+													}}
+												/>
+												<Stack.Screen
+													name="scanModal"
+													options={{
+														presentation: "modal",
+													}}
+												/>
+											</Stack>
+										</SafeAreaProvider>
+										<PortalHost />
+									</ToastProvider>
 								</RootSiblingParent>
 							</SWRConfig>
 						</PostHogProvider>

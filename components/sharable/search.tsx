@@ -1,5 +1,6 @@
-import { Octicons } from "@expo/vector-icons";
+import { Feather, Octicons } from "@expo/vector-icons";
 import algoliasearch from "algoliasearch";
+import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 
@@ -9,7 +10,6 @@ import { Input } from "@/components/ui/input";
 import { theme } from "@/lib/constants";
 import { useDebounce } from "@/lib/hooks/use-debounce";
 import { useColorScheme } from "@/lib/useColorScheme";
-
 const numResults = 5;
 
 const searchClient = algoliasearch(
@@ -23,8 +23,9 @@ export default function Search({ indices }: { indices?: string[] }) {
 	const [, setQueryCompleted] = useState(false);
 	const [value, setValue] = useState("");
 
-	const debouncedQuery = useDebounce(value, 500);
-	const { colorScheme } = useColorScheme();
+	const debouncedQuery = useDebounce(value, 200);
+	const { colorScheme, mutedColor } = useColorScheme();
+	const router = useRouter();
 
 	useEffect(() => {
 		setQueryCompleted(false);
@@ -108,6 +109,10 @@ export default function Search({ indices }: { indices?: string[] }) {
 		}
 	};
 
+	const handleScan = () => {
+		router.push("/scanModal");
+	};
+
 	const iconColor =
 		colorScheme === "dark" ? theme.dark.primary : theme.light.primary;
 
@@ -120,30 +125,22 @@ export default function Search({ indices }: { indices?: string[] }) {
 					onChangeText={onChangeText}
 					aria-labelledbyledBy="inputLabel"
 					aria-errormessage="inputError"
-					className="!rounded-full w-full pl-6 z-40 !h-16"
+					className="!rounded-full w-full pl-4 z-40 !h-16"
 				/>
 
 				<View
-					className="flex flex-row gap-3 mr-4 z-50 items-center"
+					className="flex flex-row gap-3 z-50 items-center"
 					style={{ position: "absolute", right: 10 }}
 				>
+					{value && (
+						<TouchableOpacity onPress={handleClear}>
+							<Octicons name="x-circle-fill" size={20} color={iconColor} />
+						</TouchableOpacity>
+					)}
+					<TouchableOpacity onPress={handleScan} className="mr-4">
+						<Feather name="camera" size={20} color={iconColor} />
+					</TouchableOpacity>
 					{isLoading && <ActivityIndicator size="small" color={iconColor} />}
-
-					<View className="flex flex-row gap-3">
-						{!value ? (
-							<TouchableOpacity>
-								<Octicons name="search" size={18} color={iconColor} />
-							</TouchableOpacity>
-						) : (
-							<TouchableOpacity onPress={handleClear}>
-								<Octicons name="x-circle-fill" size={20} color={iconColor} />
-							</TouchableOpacity>
-						)}
-						{/* 
-						<TouchableOpacity onPress={() => router.push("/chatModal")}>
-							<Ionicons name="sparkles-outline" size={18} color={iconColor} />
-						</TouchableOpacity> */}
-					</View>
 				</View>
 			</View>
 			{results.length > 0 && <ResultsRow results={results} />}
