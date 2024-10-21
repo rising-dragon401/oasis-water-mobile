@@ -1,5 +1,6 @@
-import { theme } from "@/lib/constants";
 import { useColorScheme as useNativewindColorScheme } from "nativewind";
+
+import { theme } from "@/lib/constants";
 
 export function useColorScheme() {
 	const { colorScheme, setColorScheme, toggleColorScheme } =
@@ -31,6 +32,9 @@ export function useColorScheme() {
 	const accentColor =
 		colorScheme === "dark" ? theme.dark.accent : theme.light.accent;
 
+	const foregroundColor =
+		colorScheme === "dark" ? theme.dark.foreground : theme.light.foreground;
+
 	return {
 		colorScheme: colorScheme ?? "dark",
 		isDarkColorScheme: colorScheme === "dark",
@@ -44,5 +48,6 @@ export function useColorScheme() {
 		mutedColor,
 		mutedForegroundColor,
 		accentColor,
+		foregroundColor,
 	};
 }

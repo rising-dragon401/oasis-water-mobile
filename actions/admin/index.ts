@@ -1,3 +1,4 @@
+import { getFilterDetails } from "@/actions/filters";
 import { getItemDetails } from "@/actions/items";
 import { supabase } from "@/config/supabase";
 
@@ -174,7 +175,7 @@ export const getAllFilterIdsAndNames = async () => {
 export const searchForProduct = async (
 	productIdentified: {
 		name: string;
-		type: "filter" | "water bottle";
+		type: "filter" | "bottled_water";
 	},
 	allItems: any[],
 	allFilters: any[],
@@ -196,7 +197,7 @@ export const searchForProduct = async (
 				content: [
 					{
 						type: "text",
-						text: `What item from listToSearch most closely matches productName.
+						text: `What item from listToSearch most closely matches productName. If it includes gallon, make sure to select the gallon named item, otherwise select the item without gallon in the name
 							listToSearch: ${JSON.stringify(listToSearch)}
 							productName: ${productName}
 
@@ -239,7 +240,12 @@ export const searchForProduct = async (
 
 	try {
 		console.log("productId: ", productId);
-		const productDetails = await getItemDetails(productId);
+		let productDetails;
+		if (productIdentified.type === "filter") {
+			productDetails = await getFilterDetails(productId);
+		} else {
+			productDetails = await getItemDetails(productId);
+		}
 
 		// If product details were found, return them
 		if (productDetails) {

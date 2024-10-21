@@ -1,17 +1,16 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Alert, GestureResponderEvent, TouchableOpacity } from "react-native";
+import { mutate } from "swr";
 
 import {
 	addFavorite,
 	calculateUserScore,
 	removeFavorite,
 } from "@/actions/user";
-import { Octicons } from "@expo/vector-icons";
-
 import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
-import { mutate } from "swr";
 
 type Props = {
 	item: any;
@@ -22,7 +21,7 @@ export default function FavoriteButton({ item, size = 18 }: Props) {
 	const { userFavorites, uid, userData, fetchUserFavorites } =
 		useUserProvider();
 	const router = useRouter();
-	const { iconColor } = useColorScheme();
+	const { iconColor, mutedForegroundColor } = useColorScheme();
 
 	const [loadingFavorite, setLoadingFavorite] = useState(false);
 	const [isItemInFavorites, setIsItemInFavorites] = useState(false);
@@ -79,9 +78,9 @@ export default function FavoriteButton({ item, size = 18 }: Props) {
 	return (
 		<TouchableOpacity onPress={handleFavoriteClick}>
 			{isItemInFavorites ? (
-				<Octicons name="heart-fill" size={24} color={iconColor} />
+				<Ionicons name="heart" size={22} color={mutedForegroundColor} />
 			) : (
-				<Octicons name="heart" size={24} color={iconColor} />
+				<Ionicons name="heart-outline" size={22} color={iconColor} />
 			)}
 		</TouchableOpacity>
 	);

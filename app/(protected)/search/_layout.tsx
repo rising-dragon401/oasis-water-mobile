@@ -42,6 +42,7 @@ export default function SearchLayout() {
 			<Stack.Screen name="oasis/[id]" />
 			<Stack.Screen name="top-rated/[id]" />
 			<Stack.Screen name="top-rated-all/index" />
+			<Stack.Screen name="company/[id]" />
 		</Stack>
 	);
 }

@@ -96,7 +96,7 @@ export default function FavoritesList({
 		<View className="pb-0 mb-0">
 			<View className="py-4 gap-4 flex w-full flex-row justify-between">
 				<View className="flex flex-col">
-					<Avatar className="h-24 w-24" alt="oasis pfp">
+					<Avatar className="h-20 w-20" alt="oasis pfp">
 						<AvatarImage src={userData?.avatar_url || PROFILE_AVATAR} />
 					</Avatar>
 

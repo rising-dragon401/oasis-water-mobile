@@ -1,12 +1,14 @@
 import { Session, User } from "@supabase/supabase-js";
 import * as AppleAuthentication from "expo-apple-authentication";
-import { SplashScreen, useRouter, useSegments } from "expo-router";
+import { useRouter, useSegments } from "expo-router";
 import * as SecureStore from "expo-secure-store";
+import * as SplashScreen from "expo-splash-screen";
 import * as WebBrowser from "expo-web-browser";
 import { createContext, useContext, useEffect, useState } from "react";
 
 import { supabase } from "@/config/supabase";
 
+// Splash screen stuck and loading : https://github.com/expo/fyi/blob/main/splash-screen-hanging.md
 SplashScreen.preventAutoHideAsync();
 
 // type oAuthProviders = "google";
@@ -197,6 +199,11 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 			setSession(session);
 			setUser(session ? session.user : null);
 			setInitialized(true);
+
+			// HACK: Prevents app from opening 404 page when logging in
+			setTimeout(() => {
+				SplashScreen.hideAsync();
+			}, 400);
 		});
 
 		return () => {
@@ -235,10 +242,6 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 			instead of creating a loading screen, we use the SplashScreen and hide it after
 			a small delay (500 ms)
 			*/
-
-			setTimeout(() => {
-				SplashScreen.hideAsync();
-			}, 100);
 		};
 
 		fetchData();

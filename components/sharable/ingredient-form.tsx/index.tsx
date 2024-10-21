@@ -1,8 +1,10 @@
-import { getIngredient } from "@/actions/ingredients";
-import { H1, P } from "@/components/ui/typography";
 import { Link } from "expo-router";
 import { useEffect, useState } from "react";
 import { Image, View } from "react-native";
+
+import { getIngredient } from "@/actions/ingredients";
+import { H1, P } from "@/components/ui/typography";
+
 export function IngredientForm({ ingredientId }: { ingredientId: string }) {
 	const [ingredient, setIngredient] = useState<any>(null);
 

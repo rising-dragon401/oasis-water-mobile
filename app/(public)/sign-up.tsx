@@ -94,8 +94,8 @@ export default function SignUp() {
 		colorScheme === "dark" ? theme.dark.primary : theme.light.primary;
 
 	return (
-		<SafeAreaView className="flex-1 p-4">
-			<View className="flex-row justify-center items-center mb-4">
+		<SafeAreaView className="flex-1 px-4">
+			<View className="flex-row justify-center items-center mb-2">
 				<Image source={OasisLogo} style={{ width: 85, height: 24 }} />
 			</View>
 

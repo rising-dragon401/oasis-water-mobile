@@ -1,27 +1,28 @@
 "use client";
 
+import { Octicons } from "@expo/vector-icons";
 import { getItemDetails } from "actions/items";
 import * as Linking from "expo-linking";
+import { Link, useNavigation } from "expo-router";
 import { useEffect, useState } from "react";
 import { ScrollView, View } from "react-native";
 
-import { Octicons } from "@expo/vector-icons";
-
-import { Button } from "@/components/ui/button";
-import { H2, Muted } from "@/components/ui/typography";
-import { Link, useNavigation } from "expo-router";
 import BlurredLineItem from "./blurred-line-item";
+import ContaminantCard from "./contamintant-card";
+import IngredientsCard from "./ingredients-card";
 import ItemImage from "./item-image";
+import MetaDataCard from "./metadata-card";
 import PaywallContent from "./paywall-content";
 import Score from "./score";
 import Typography from "./typography";
 
 import { incrementItemsViewed } from "@/actions/user";
+import { Button } from "@/components/ui/button";
+import { H2, Muted } from "@/components/ui/typography";
+
 import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
-import ContaminantCard from "./contamintant-card";
-import IngredientsCard from "./ingredients-card";
-import MetaDataCard from "./metadata-card";
+
 import Sources from "./sources";
 
 type Props = {

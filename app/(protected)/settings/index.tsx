@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Octicons from "@expo/vector-icons/Octicons";
 import { useUserProvider } from "context/user-provider";
@@ -166,14 +167,24 @@ export default function TabTwoScreen() {
 		<ScrollView
 			contentContainerStyle={{
 				display: "flex",
-
 				backgroundColor,
 			}}
 			className="overflow-y-scroll"
 		>
 			{userData ? (
 				<View className="w-full flex flex-col h-full justify-between pb-14 px-8">
-					<H1 className="mt-24">Account settings</H1>
+					<View className="flex-row w-full justify-between items-center mt-24">
+						<H1>Account</H1>
+						<View>
+							<Link href="/(protected)/settings/help">
+								<Ionicons
+									name="help-circle-outline"
+									size={24}
+									color={iconColor}
+								/>
+							</Link>
+						</View>
+					</View>
 
 					<View className="flex flex-col mt-6">
 						<ImageUpload
@@ -416,7 +427,18 @@ export default function TabTwoScreen() {
 					className="w-full min-h-screen justify-start gap-y-2 px-8 mt-2"
 					style={{ backgroundColor }}
 				>
-					<H1 className="mt-24">Acount</H1>
+					<View className="flex-row w-full justify-between items-center mt-24">
+						<H1>Account </H1>
+						<View>
+							<Link href="/(protected)/settings/help">
+								<Ionicons
+									name="help-circle-outline"
+									size={24}
+									color={iconColor}
+								/>
+							</Link>
+						</View>
+					</View>
 					<Muted>Looks like you're not logged in</Muted>
 
 					<Button

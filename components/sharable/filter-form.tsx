@@ -1,20 +1,21 @@
-import { useNavigation } from "expo-router";
+import { getContaminants } from "actions/ingredients";
+import * as Linking from "expo-linking";
+import { Link, useNavigation } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, ScrollView, View } from "react-native";
 
-import { getFilterDetails } from "@/actions/filters";
-import { Muted, P } from "@/components/ui/typography";
-import { useUserProvider } from "@/context/user-provider";
-import { IngredientCategories } from "@/lib/constants";
-import { getContaminants } from "actions/ingredients";
-import * as Linking from "expo-linking";
-import { Button } from "../ui/button";
-import ContaminantTable from "./contaminant-table";
-import FilterMetadata from "./filter-metadata";
 import ItemImage from "./item-image";
 import Score from "./score";
 import Sources from "./sources";
 import Typography from "./typography";
+
+import { getFilterDetails } from "@/actions/filters";
+import ContaminantTable from "@/components/sharable/contaminant-table";
+import FilterMetadata from "@/components/sharable/filter-metadata";
+import { Button } from "@/components/ui/button";
+import { Muted } from "@/components/ui/typography";
+import { useUserProvider } from "@/context/user-provider";
+import { IngredientCategories } from "@/lib/constants";
 
 type Props = {
 	id: string;
@@ -132,13 +133,6 @@ export function FilterForm({ id }: Props) {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [contaminants, filteredContaminants]);
 
-	const contaminantCategories = Object.fromEntries(
-		filter?.filtered_contaminant_categories?.map((category: any) => [
-			category.category,
-			category.percentage,
-		]) ?? [],
-	);
-
 	if (filter.is_draft) {
 		return (
 			<View>This filter has not been rated yet. Please check back later.</View>
@@ -167,14 +161,11 @@ export function FilterForm({ id }: Props) {
 								{filter.name}
 							</Typography>
 							{/* <Link href={`/search/company/${filter.company?.name}`}> */}
-							<P>
-								{filter.brand} - {filter.company}
-							</P>
-							{/* </Link> */}
-
-							{/* <P className="text-left">
-								Certifications: {filter.certifications || "None"}
-							</P> */}
+							<Link href={`/search/company/${filter.company}`}>
+								<Muted>
+									{filter.brand} - {filter.company}
+								</Muted>
+							</Link>
 
 							{filter.affiliate_url && (
 								<Button

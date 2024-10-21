@@ -17,7 +17,7 @@
 			"supportsTablet": false,
 			"usesAppleSignIn": true,
 			"bundleIdentifier": "com.liveoasis.oasis",
-			"buildNumber": "3",
+			"buildNumber": "0",
 			"associatedDomains": ["applinks:oasiswater.app"]
 		},
 		"android": {

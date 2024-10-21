@@ -1,20 +1,20 @@
-import { getFilters } from "@/actions/filters";
-import { getItems } from "@/actions/items";
 import { Octicons } from "@expo/vector-icons";
 import { useNavigation, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import { FlatList, View } from "react-native";
 
+import ItemPreviewCard from "./item-preview-card";
+import Loader from "./loader";
+
+import { getFilters } from "@/actions/filters";
+import { getItems } from "@/actions/items";
 import { Button } from "@/components/ui/button";
 import { H2, Muted } from "@/components/ui/typography";
 import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
 
-import { useEffect, useState } from "react";
-import ItemPreviewCard from "./item-preview-card";
-import Loader from "./loader";
-
 export default function RankingList({ categoryId }: { categoryId: string }) {
-	const { subscription, uid } = useUserProvider();
+	const { subscription, uid, user } = useUserProvider();
 	const router = useRouter();
 	const navigation = useNavigation();
 	const { backgroundColor } = useColorScheme();
@@ -22,6 +22,8 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 	const [loading, setLoading] = useState(true);
 	const [allItems, setAllItems] = useState<any[]>([]);
 	const [title, setTitle] = useState<string>("");
+
+	const isAuthUser = uid === user?.uid;
 
 	const fetchAndSetData = async (
 		key: string,
@@ -196,7 +198,20 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 			)}
 			<FlatList
 				data={allItems?.filter((item) => !item.is_draft) || []}
-				renderItem={renderItem}
+				renderItem={({ item, index }) => (
+					<View
+						key={item?.id}
+						style={{ width: "46%" }}
+						className={`mb-2 ${index < 2 ? "mt-2" : ""}`}
+					>
+						<ItemPreviewCard
+							item={item}
+							showFavorite
+							isAuthUser={isAuthUser}
+							isGeneralListing
+						/>
+					</View>
+				)}
 				keyExtractor={(item) => item.id}
 				numColumns={2}
 				columnWrapperStyle={{ justifyContent: "space-around", gap: 8 }}
@@ -207,7 +222,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 				initialNumToRender={8}
 				maxToRenderPerBatch={4}
 				windowSize={5}
-				removeClippedSubviews={true}
+				removeClippedSubviews
 				scrollToOverflowEnabled={false}
 			/>
 		</View>

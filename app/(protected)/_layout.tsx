@@ -47,6 +47,7 @@ export default function ProtectedLayout() {
 		>
 			<Tabs.Screen name="search" />
 
+			{/* Required for hiding the research tab from the bottom tab bar */}
 			<Tabs.Screen
 				name="research"
 				options={{

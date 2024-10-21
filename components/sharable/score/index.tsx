@@ -1,11 +1,13 @@
-import { Muted, P } from "@/components/ui/typography";
-import { useColorScheme } from "@/lib/useColorScheme";
 import { Feather, Octicons } from "@expo/vector-icons";
 import { useUserProvider } from "context/user-provider";
 import { useRouter } from "expo-router";
 import { TouchableOpacity, View } from "react-native";
 import { Circle, Svg } from "react-native-svg";
+
 import Typography from "../typography";
+
+import { Muted, P } from "@/components/ui/typography";
+import { useColorScheme } from "@/lib/useColorScheme";
 
 type Props = {
 	score: number;
@@ -27,7 +29,9 @@ export default function Score({ score, size, showScore = false }: Props) {
 					? 50
 					: size === "sm"
 						? 50
-						: 40;
+						: size === "xs"
+							? 34
+							: 40;
 
 	const strokeWidth = 6;
 	const svgSize = 2 * (radius + strokeWidth); // Adjust SVG size to accommodate stroke
@@ -43,7 +47,9 @@ export default function Score({ score, size, showScore = false }: Props) {
 					? 10
 					: size === "sm"
 						? 12
-						: 10;
+						: size === "xs"
+							? 12
+							: 10;
 
 	const grade = () => {
 		if (score >= 90) {
@@ -132,7 +138,7 @@ export default function Score({ score, size, showScore = false }: Props) {
 			</Svg>
 			<View className="absolute flex flex-col justify-center items-center">
 				{score ? (
-					<P>{score} / 100</P>
+					<P style={{ fontSize }}>{score} / 100</P>
 				) : (
 					<View className="flex flex-row gap-1">
 						<Feather name="alert-triangle" size={24} color="red" />
@@ -140,14 +146,16 @@ export default function Score({ score, size, showScore = false }: Props) {
 					</View>
 				)}
 
-				<Typography
-					size="xs"
-					fontWeight="normal"
-					className="text-primary"
-					style={{ fontSize }}
-				>
-					{grade()}
-				</Typography>
+				{size !== "xs" && (
+					<Typography
+						size="xs"
+						fontWeight="normal"
+						className="text-primary"
+						style={{ fontSize }}
+					>
+						{grade()}
+					</Typography>
+				)}
 			</View>
 		</View>
 	);

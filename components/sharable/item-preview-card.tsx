@@ -1,13 +1,13 @@
-import { Octicons } from "@expo/vector-icons";
+import { Ionicons, Octicons } from "@expo/vector-icons";
 import { useUserProvider } from "context/user-provider";
 import { Image } from "expo-image";
 import { Link } from "expo-router";
 import React, { useMemo } from "react";
-import { Text, View } from "react-native";
+import { ImageStyle, View } from "react-native";
 
 import FavoriteButton from "./favorite-button";
 
-import { H4, Muted, P } from "@/components/ui/typography";
+import { H4, P } from "@/components/ui/typography";
 import {
 	placeHolderImageBlurHash,
 	RANDOM_BLUR_IMAGES,
@@ -29,7 +29,7 @@ const ItemPreviewCard = ({
 	isGeneralListing = false,
 }: Props) => {
 	const { subscription } = useUserProvider();
-	const { textColor } = useColorScheme();
+	const { iconColor } = useColorScheme();
 
 	// show if listed in top-rate or preview list but not on favorites page
 	// unless subscribed or is the auth user
@@ -44,16 +44,18 @@ const ItemPreviewCard = ({
 	);
 
 	const renderImage = () => {
+		const imageStyle: ImageStyle = {
+			width: "100%",
+			aspectRatio: 1, // This makes the image square
+			resizeMode: "cover" as const,
+			borderRadius: 10,
+		};
+
 		if (!showData) {
 			return (
 				<Image
 					source={{ uri: randomBlurImage }}
-					style={{
-						width: "100%",
-						height: "100%",
-						resizeMode: "cover",
-						borderRadius: 10,
-					}}
+					style={imageStyle}
 					className="rounded-xl"
 					transition={100}
 					cachePolicy="memory-disk"
@@ -64,12 +66,7 @@ const ItemPreviewCard = ({
 			return (
 				<Image
 					source={{ uri: item.image }}
-					style={{
-						width: "100%",
-						height: "100%",
-						resizeMode: "cover",
-						borderRadius: 10,
-					}}
+					style={imageStyle}
 					className="rounded-xl"
 					transition={100}
 					cachePolicy="memory-disk"
@@ -79,64 +76,87 @@ const ItemPreviewCard = ({
 		}
 	};
 
+	const renderScore = () => {
+		if (subscription) {
+			let dotColor;
+
+			if (item.score >= 80) {
+				dotColor = "rgba(144, 238, 144, 0.6)";
+			} else if (item.score >= 50) {
+				dotColor = "rgba(255, 255, 0, 0.6)";
+				dotColor = "rgba(255, 0, 0, 0.6)";
+			}
+
+			return (
+				<View className="flex flex-row items-center gap-2">
+					<View
+						style={{
+							width: 10,
+							height: 10,
+							backgroundColor: dotColor,
+							borderRadius: 5,
+							marginLeft: 4,
+						}}
+					/>
+					<H4>{item.score}</H4>
+				</View>
+			);
+		}
+	};
+
 	return (
 		// @ts-ignore
 		<Link href={showData ? determineLink(item) : "/subscribeModal"}>
-			<View className="flex flex-col items-center gap-2">
-				<View className="relative h-48 w-48">
+			<View className="flex flex-col items-center gap-2 h-full w-full">
+				<View className="relative w-full aspect-square rounded-xl overflow-hidden">
 					{renderImage()}
-
 					{showFavorite && showData && (
-						<View
-							style={{ position: "absolute", top: 12, right: 12, zIndex: 99 }}
-						>
+						<View className="absolute top-4 right-4 z-10">
 							<FavoriteButton item={item} />
 						</View>
 					)}
 				</View>
 
-				<View className="flex-row w-48 justify-between items-start px-1 pb-1 mt-1">
-					<View className="relative w-2/3">
+				<View className="flex-1 flex-row w-full items-start justify-between pb-2 px-2">
+					<View className="flex-1 mr-2">
 						{showData ? (
-							<P className={`flex flex-wrap w-full h-14 `}>{item.name}</P>
+							<P className="font-semibold pb-2 h-18" numberOfLines={2}>
+								{item.name}
+							</P>
 						) : (
-							<View className="flex flex-col gap-1">
+							<>
 								<View
 									style={{
-										width: `${Math.min(item.name.length * 5, 100)}%`,
+										width: "100%",
 										height: 10,
-										backgroundColor: "#E0E0E0",
+										backgroundColor: "rgba(224, 224, 224, 0.5)",
 										borderRadius: 2,
+										marginBottom: 4,
 									}}
 								/>
 								<View
 									style={{
-										width: `${Math.min(item.name.length * 3, 80)}%`,
+										width: "80%",
 										height: 10,
-										backgroundColor: "#E0E0E0",
+										backgroundColor: "rgba(224, 224, 224, 0.5)",
 										borderRadius: 2,
 									}}
 								/>
-							</View>
+							</>
 						)}
 					</View>
 
-					{subscription ? (
-						<>
-							{item.score ? (
-								<View className="flex flex-col gap-0 items-end justify-end">
-									<H4>{item.score}</H4>
-									<Muted>/100</Muted>
-								</View>
+					<View className="flex-shrink-0">
+						{subscription ? (
+							item.score ? (
+								renderScore()
 							) : (
-								<View className="w-full flex text-right justify-end">
-									<Text style={{ fontSize: 14 }}>⚠️</Text>
-								</View>
-							)}
-						</>
-					) : (
-						<Octicons name="lock" size={16} color={textColor} />
-					)}
+								<Ionicons name="warning" size={16} color={iconColor} />
+							)
+						) : (
+							<Octicons name="lock" size={16} color={iconColor} />
+						)}
+					</View>
 				</View>
 			</View>
 		</Link>

@@ -87,8 +87,8 @@ export default function SignIn() {
 		colorScheme === "dark" ? theme.dark.primary : theme.light.primary;
 
 	return (
-		<SafeAreaView className="flex-1 flex-col p-4">
-			<View className="flex-row justify-center items-center mb-4">
+		<SafeAreaView className="flex-1 flex-col px-4">
+			<View className="flex-row justify-center items-center mb-2">
 				<Image source={OasisLogo} style={{ width: 85, height: 24 }} />
 			</View>
 

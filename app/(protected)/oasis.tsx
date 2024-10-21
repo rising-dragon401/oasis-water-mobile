@@ -25,7 +25,7 @@ export default function OasisScreen() {
 			}}
 			style={{ backgroundColor }}
 		>
-			<H1>My favorites</H1>
+			<H1>My oasis</H1>
 			{uid ? (
 				<View className="flex flex-col items-center py-4 gap-y-4 w-full">
 					{userFavorites ? (

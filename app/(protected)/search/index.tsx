@@ -62,6 +62,7 @@ export default function TabOneScreen() {
 
 	const [people, setPeople] = useState<any[]>([]);
 	const [loadingPeople, setLoadingPeople] = useState(false);
+	const [searchInputActive, setSearchInputActive] = useState(false);
 
 	useEffect(() => {
 		getPeople();
@@ -90,6 +91,8 @@ export default function TabOneScreen() {
 		setLoadingPeople(false);
 	}
 
+	const scrollEnabled = !searchInputActive;
+
 	return (
 		<ScrollView
 			contentContainerStyle={{
@@ -98,6 +101,7 @@ export default function TabOneScreen() {
 				paddingBottom: 60,
 			}}
 			showsVerticalScrollIndicator={false}
+			scrollEnabled={scrollEnabled}
 			className="flex flex-col my-4 p-4 px-4"
 		>
 			<H2 className="text-center max-w-xs border-none pb-0">
@@ -109,7 +113,7 @@ export default function TabOneScreen() {
 			</Muted>
 
 			<View className="mb-10 w-[90%] z-40">
-				<Search />
+				<Search setActive={setSearchInputActive} />
 			</View>
 
 			{/* Top waters and filters */}
@@ -159,9 +163,9 @@ export default function TabOneScreen() {
 											height: "60%",
 											borderRadius: 4,
 										}}
-										className="mb-2"
+										className="mb-4"
 									/>
-									<View className="absolute bottom-0 left-0 w-full p-2 pb-2">
+									<View className="absolute bottom-0 left-0 w-full p-2 pb-2 mt-4">
 										<P className="text-center text-base">{category.title}</P>
 									</View>
 								</View>

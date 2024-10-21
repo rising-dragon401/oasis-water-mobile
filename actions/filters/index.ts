@@ -10,7 +10,7 @@ export const getFilters = async ({
 	type?: "filter" | "shower_filter" | "bottle_filter" | null;
 } = {}) => {
 	let filters;
-	let orderBy = sortMethod || "name";
+	const orderBy = sortMethod || "name";
 
 	let query = supabase.from("water_filters").select().order(orderBy);
 
@@ -109,8 +109,6 @@ export const getFilterDetails = async (id: string) => {
         `,
 		)
 		.eq("id", id);
-
-	console.log("getFilterDetails: ", item);
 
 	if (!item || item.length === 0) {
 		return null;

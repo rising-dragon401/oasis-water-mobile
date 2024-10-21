@@ -65,8 +65,8 @@ function RootLayout() {
 													},
 												}}
 											>
-												<Stack.Screen name="(protected)" />
 												<Stack.Screen name="(public)" />
+												<Stack.Screen name="(protected)" />
 												<Stack.Screen
 													name="subscribeModal"
 													options={{
