@@ -1,8 +1,9 @@
 import { View } from "react-native";
 
-import { Muted } from "@/components/ui/typography";
 import { ChatMessage } from "./chat-message";
 import Loader from "./loader";
+
+import { Muted } from "@/components/ui/typography";
 
 export interface ChatListProps {
 	messages: any[];

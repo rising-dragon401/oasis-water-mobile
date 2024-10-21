@@ -3,6 +3,7 @@ import { FlatList, Image, ScrollView, View } from "react-native";
 
 import { getCompanyAndProducts } from "@/actions/companies";
 import ItemPreviewCard from "@/components/sharable/item-preview-card";
+import Skeleton from "@/components/sharable/skeleton";
 import { H1, P } from "@/components/ui/typography";
 import { BLUR_IMAGE_PLACEHOLDER } from "@/lib/constants/images";
 
@@ -29,7 +30,29 @@ export function CompanyForm({ companyName }: { companyName: string }) {
 	console.log("company: ", company);
 
 	if (loading) {
-		return <H1>Loading...</H1>;
+		return (
+			<View className="flex px-4">
+				<View className="p-5 rounded-lg flex flex-col items-center justify-start w-full">
+					<Skeleton
+						width={160}
+						height={160}
+						style={{ borderRadius: 8, marginBottom: 16 }}
+					/>
+					{/* <Skeleton width="75%" height={32} style={{ marginBottom: 16 }} />
+					<Skeleton width="100%" height={80} style={{ marginBottom: 16 }} /> */}
+					<View className="flex flex-row flex-wrap justify-between w-full gap-2">
+						{Array.from({ length: 4 }).map((_, index) => (
+							<Skeleton
+								key={index}
+								width={160}
+								height={160}
+								style={{ margin: 4 }}
+							/>
+						))}
+					</View>
+				</View>
+			</View>
+		);
 	}
 
 	if (error) {

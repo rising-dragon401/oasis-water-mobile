@@ -1,6 +1,8 @@
 import React from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import Svg, { Circle as SvgCircle } from "react-native-svg";
+
+import { P } from "@/components/ui/typography";
 
 interface CircleProps {
 	value: number;
@@ -61,7 +63,7 @@ export function Circle({
 					alignItems: "center",
 				}}
 			>
-				<Text className={`${textClassName}`}>{value}</Text>
+				<P className={`${textClassName}`}>{value}</P>
 			</View>
 		</View>
 	);

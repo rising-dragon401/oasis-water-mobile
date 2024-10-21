@@ -36,6 +36,7 @@ export function useColorScheme() {
 		colorScheme === "dark" ? theme.dark.foreground : theme.light.foreground;
 
 	return {
+		colorMode: colorScheme,
 		colorScheme: colorScheme ?? "dark",
 		isDarkColorScheme: colorScheme === "dark",
 		setColorScheme,

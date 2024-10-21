@@ -1,5 +1,3 @@
-import { H2 } from "@/components/ui/typography";
-import { placeHolderImageBlurHash } from "@/lib/constants/images";
 import { getEntry } from "actions/blogs";
 import { Image } from "expo-image";
 import {
@@ -16,6 +14,9 @@ import {
 	useWindowDimensions,
 } from "react-native";
 import Markdown from "react-native-markdown-display";
+
+import { H1, H2, P } from "@/components/ui/typography";
+import { placeHolderImageBlurHash } from "@/lib/constants/images";
 
 export default function ArticlePage() {
 	const glob = useGlobalSearchParams();
@@ -69,6 +70,15 @@ export default function ArticlePage() {
 						key={block.id}
 						style={markdownStyles}
 						rules={{
+							heading1: (node, children, parent, styles) => (
+								<H1 key={node.key}>{children}</H1>
+							),
+							heading2: (node, children, parent, styles) => (
+								<H2 key={node.key}>{children}</H2>
+							),
+							paragraph: (node, children, parent, styles) => (
+								<P key={node.key}>{children}</P>
+							),
 							link: (node, children, parent, styles) => (
 								<Link href={node.attributes.href} key={node.key}>
 									{children}

@@ -10,9 +10,10 @@ import { determineLink } from "@/lib/utils";
 
 type Props = {
 	results: any[];
+	noResults?: boolean;
 };
 
-export default function ResultsRow({ results }: Props) {
+export default function ResultsRow({ results, noResults }: Props) {
 	const { colorScheme } = useColorScheme();
 
 	const borderColor = colorScheme === "dark" ? "#333" : "#ddd";
@@ -57,51 +58,57 @@ export default function ResultsRow({ results }: Props) {
 				}}
 				className="bg-input rounded-xl"
 			>
-				<FlatList
-					data={results}
-					keyExtractor={(item) => item.id.toString()}
-					renderItem={({ item: result }) => (
-						<View className="p-2">
-							<Link
-								// @ts-ignore
-								href={determineLink(result)}
-							>
-								<View className="flex flex-row items-center justify-between w-full py-1">
-									<View className="flex flex-row gap-2 items-start justify-center pl-2 h-12">
-										<Image
-											source={{
-												uri:
-													result.type === "tap_water"
-														? result.image_url
-														: result.image || "",
-											}}
-											alt={result.name || ""}
-											style={{ width: 40, height: "100%", borderRadius: 5 }}
-											placeholder={{ blurhash: placeHolderImageBlurHash }}
-											transition={1000}
-										/>
-										<View className="flex flex-col">
-											<P
-												className="max-w-72 font-medium"
-												numberOfLines={1}
-												ellipsizeMode="tail"
-											>
-												{result.name}
-											</P>
-											<Muted>{readableType(result.type)}</Muted>
+				{noResults ? (
+					<View className="flex justify-center pl-4 h-12">
+						<Muted>No results found</Muted>
+					</View>
+				) : (
+					<FlatList
+						data={results}
+						keyExtractor={(item) => item.id.toString()}
+						renderItem={({ item: result }) => (
+							<View className="p-2">
+								<Link
+									// @ts-ignore
+									href={determineLink(result)}
+								>
+									<View className="flex flex-row items-center justify-between w-full py-1">
+										<View className="flex flex-row gap-2 items-start justify-center pl-2 h-12">
+											<Image
+												source={{
+													uri:
+														result.type === "tap_water"
+															? result.image_url
+															: result.image || "",
+												}}
+												alt={result.name || ""}
+												style={{ width: 40, height: "100%", borderRadius: 5 }}
+												placeholder={{ blurhash: placeHolderImageBlurHash }}
+												transition={1000}
+											/>
+											<View className="flex flex-col">
+												<P
+													className="max-w-72 font-medium"
+													numberOfLines={1}
+													ellipsizeMode="tail"
+												>
+													{result.name}
+												</P>
+												<Muted>{readableType(result.type)}</Muted>
+											</View>
 										</View>
 									</View>
-								</View>
-							</Link>
-						</View>
-					)}
-					nestedScrollEnabled
-					scrollEnabled
-					showsVerticalScrollIndicator={false}
-					keyboardShouldPersistTaps="handled"
-					style={{ maxHeight: 240 }}
-					contentContainerStyle={{ flexGrow: 1 }}
-				/>
+								</Link>
+							</View>
+						)}
+						nestedScrollEnabled
+						scrollEnabled
+						showsVerticalScrollIndicator={false}
+						keyboardShouldPersistTaps="handled"
+						style={{ maxHeight: 240 }}
+						contentContainerStyle={{ flexGrow: 1 }}
+					/>
+				)}
 			</View>
 		</View>
 	);

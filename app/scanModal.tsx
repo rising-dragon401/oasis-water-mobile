@@ -33,9 +33,11 @@ import { useColorScheme } from "@/lib/useColorScheme";
 export default function ScanModal() {
 	const navigation = useNavigation();
 	const router = useRouter();
-	const { uid } = useUserProvider();
+	const { uid, subscription } = useUserProvider();
 	const showToast = useToast();
-	const { textSecondaryColor, borderColor, foregroundColor } = useColorScheme();
+	const { textSecondaryColor, borderColor, foregroundColor, colorMode } =
+		useColorScheme();
+
 	const [loading, setLoading] = useState(false);
 	const [loadingText, setLoadingText] = useState(
 		"Snap a pic of your water or filter",
@@ -163,13 +165,25 @@ export default function ScanModal() {
 		loadSavedState();
 	}, []);
 
+	// Manage loading text and product state
 	useEffect(() => {
 		if (mode === "preview" && product) {
 			setLoadingText("Product identified");
 		} else if (mode === "scan" && !loading) {
 			setLoadingText("Snap a pic of your water or filter");
 		}
-	}, [product, mode]);
+
+		if (!photo) {
+			setMode("scan");
+		}
+
+		// Reset product state when returning to scan mode
+		// if (mode === "scan" && photo) {
+		// 	setPhoto(null);
+		// 	setProduct(null);
+		// 	setProductType(null);
+		// }
+	}, [product, mode, photo]);
 
 	// Save state to AsyncStorage
 	useEffect(() => {
@@ -206,11 +220,11 @@ export default function ScanModal() {
 		}
 
 		if (cameraRef) {
-			setLoadingText("Analyzing image...");
-			setLoading(true);
 			const photo = await cameraRef.takePictureAsync();
 			setPhoto(photo);
 			setProduct(null);
+			setLoadingText("Analyzing image...");
+			setLoading(true);
 			setMode("scan");
 			sendToOpenAI(photo);
 		}
@@ -312,11 +326,15 @@ export default function ScanModal() {
 					type,
 				);
 
+				console.log("metadata: ", metadata);
+
 				setProduct({
 					data: productDetails.data,
 					type: parsedProductIdentified.type,
 					metadata,
 				});
+
+				console.log("set product data");
 
 				setMode("preview");
 				setLoadingText("Product identified ");
@@ -326,11 +344,15 @@ export default function ScanModal() {
 		} catch (error) {
 			// console.error("Error sending image to OpenAI:", error);
 			setLoadingText("Snap a pic of your water or filter");
-			Alert.alert("Could not identify product", "", [
-				{
-					text: "Try again",
-				},
-			]);
+			Alert.alert(
+				"Could not identify product",
+				"Either the product is not in our database or the image is too blurry",
+				[
+					{
+						text: "Try again",
+					},
+				],
+			);
 			showToast("Could not identify product", 1000);
 		} finally {
 			setLoading(false);
@@ -430,7 +452,7 @@ export default function ScanModal() {
 						flex: 1,
 						justifyContent: "center",
 						alignItems: "center",
-						marginTop: 50, // Adjust this value as needed
+						marginTop: 50,
 					}}
 				>
 					{(mode === "scan" || loading) && (
@@ -530,7 +552,7 @@ export default function ScanModal() {
 
 				{/* Product card */}
 				{product && product.data && mode === "preview" && (
-					<View className="flex flex-col items-center w-full px-6 mb-4">
+					<View className="flex flex-col items-center w-full px-6 mb-4 n">
 						{mode === "preview" && (
 							<P className="text-white mb-2 text-lg">{loadingText}</P>
 						)}
@@ -548,7 +570,11 @@ export default function ScanModal() {
 									paddingHorizontal: 16,
 									borderRadius: 15,
 									width: "100%",
-									backgroundColor: "rgba(255, 255, 255, 0.7)",
+									backgroundColor:
+										colorMode === "dark"
+											? "rgba(0, 0, 0, 0.7)"
+											: "rgba(255, 255, 255, 0.7)", // Dark glassmorphic background for dark mode
+
 									borderColor,
 									borderWidth: 1,
 									shadowColor: foregroundColor,
@@ -574,12 +600,12 @@ export default function ScanModal() {
 										transition={1000}
 									/>
 									<View className="flex-1 flex-col">
-										<P className="!text-stone-500 text-sm">
+										<P className="text-sm">
 											{productType === "bottled_water"
 												? product.data.company?.name
 												: product.data.company}
 										</P>
-										<P className="text-wrap pr-8 !text-stone-900 text-lg font-semibold leading-tight">
+										<P className="text-wrap pr-8  text-lg font-semibold leading-tight">
 											{product.data.name.length > 36
 												? `${product.data.name.substring(0, 33)}...`
 												: product.data.name}
@@ -595,8 +621,14 @@ export default function ScanModal() {
 									{productType === "bottled_water" && product.metadata && (
 										<View className="flex flex-row flex-wrap items-start justify-start gap-1 mb-2 w-full pr-10">
 											{product.metadata.totalContaminants > 0 && (
-												<View className="h-8 rounded-full px-3 items-center justify-center bg-red-200 px">
-													<P>
+												<View className="h-8 rounded-full px-3 items-center justify-center bg-red-200">
+													<P
+														className={
+															colorMode === "dark"
+																? "text-background"
+																: "text-primary"
+														}
+													>
 														{product.metadata.totalContaminants} contaminants
 													</P>
 												</View>
@@ -604,7 +636,13 @@ export default function ScanModal() {
 
 											{product.metadata.contaminantsAboveLimit > 0 && (
 												<View className="h-8 rounded-full px-2 items-center justify-center bg-red-200">
-													<P>
+													<P
+														className={
+															colorMode === "dark"
+																? "text-background"
+																: "text-primary"
+														}
+													>
 														{product.metadata.contaminantsAboveLimit} above
 														guidelines
 													</P>
@@ -613,13 +651,29 @@ export default function ScanModal() {
 
 											{product.metadata.pfas === true && (
 												<View className="h-8 rounded-full px-2 items-center justify-center bg-red-200">
-													<P>PFAS</P>
+													<P
+														className={
+															colorMode === "dark"
+																? "text-background"
+																: "text-primary"
+														}
+													>
+														PFAS
+													</P>
 												</View>
 											)}
 
 											{product.metadata.fluoride === true && (
 												<View className="h-8 rounded-full px-2 items-center justify-center bg-red-200">
-													<P>Fluoride</P>
+													<P
+														className={
+															colorMode === "dark"
+																? "text-background"
+																: "text-primary"
+														}
+													>
+														Fluoride
+													</P>
 												</View>
 											)}
 										</View>

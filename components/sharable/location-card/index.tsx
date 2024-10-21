@@ -3,8 +3,11 @@ import { View } from "react-native";
 
 import { Circle } from "@/components/sharable/circle";
 import { P } from "@/components/ui/typography";
+import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function LocationCard({ location }: { location: any }) {
+	const { colorMode } = useColorScheme();
+
 	return (
 		<View className="relative rounded-xl my-2 w-44 h-24 max-h-24 overflow-hidden ">
 			<Image
@@ -19,7 +22,7 @@ export default function LocationCard({ location }: { location: any }) {
 					value={location.score}
 					size={32}
 					strokeWidth={3}
-					textClassName="text-muted"
+					textClassName={colorMode !== "dark" ? "text-muted" : "text-primary"}
 				/>
 			</View>
 

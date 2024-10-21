@@ -2,7 +2,7 @@ import { Feather, Octicons } from "@expo/vector-icons";
 import algoliasearch from "algoliasearch";
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 
 import ResultsRow from "./results-row";
 
@@ -28,8 +28,9 @@ export default function Search({
 	const [isLoading, setIsLoading] = useState(false);
 	const [, setQueryCompleted] = useState(false);
 	const [value, setValue] = useState("");
+	const [noResults, setNoResults] = useState(false);
 
-	const debouncedQuery = useDebounce(value, 200);
+	const debouncedQuery = useDebounce(value, 400);
 	const debouncedUnfocus = useDebounce(value, 500);
 	const { colorScheme, mutedForegroundColor } = useColorScheme();
 	const router = useRouter();
@@ -54,6 +55,7 @@ export default function Search({
 	};
 
 	const handleSearch = async (query: string) => {
+		setNoResults(false);
 		setIsLoading(true);
 
 		let queries: any[] = [];
@@ -108,6 +110,7 @@ export default function Search({
 			const hits = response.results.map((result: any) => result.hits);
 
 			setResults(hits.flat());
+			setNoResults(hits.flat().length === 0);
 		} catch (error) {
 			console.error("Failed to fetch from Algolia", error);
 			// Handle the error appropriately in the UI
@@ -171,12 +174,14 @@ export default function Search({
 					<TouchableOpacity onPress={handleScan} className="mr-4">
 						<Feather name="camera" size={20} color={iconColor} />
 					</TouchableOpacity>
-					{isLoading && (
+					{/* {isLoading && (
 						<ActivityIndicator size="small" color={mutedForegroundColor} />
-					)}
+					)} */}
 				</View>
 			</View>
-			{results.length > 0 && <ResultsRow results={results} />}
+			{(results.length > 0 || (noResults && value.length > 0)) && (
+				<ResultsRow results={results} noResults={noResults} />
+			)}
 		</>
 	);
 }

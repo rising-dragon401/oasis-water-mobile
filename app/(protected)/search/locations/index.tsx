@@ -41,12 +41,12 @@ export default function LocationsScreen() {
 		<View className="flex-1 px-2" style={{ backgroundColor }}>
 			<H1 className="mt-4 px-4">Tap water ratings</H1>
 			<Muted className="px-4">
-				Discover the quality of tap water in your area
+				Discover the quality of tap water in your state.
 			</Muted>
 			<View className="px-4 mt-4">
 				<Input
-					placeholder="Search by state"
-					className="border border-gray-300 p-3 mb-0 rounded-full w-full"
+					placeholder="Enter your state"
+					className="border border-gray-300 p-3 pl-5 mb-0 rounded-full w-full"
 					value={search}
 					onChangeText={setSearch}
 				/>
