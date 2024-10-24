@@ -104,7 +104,7 @@ export default function FavoritesList({
 					<Muted className="py-0 my-0">@{userData?.username}</Muted>
 
 					{userData?.bio && (
-						<Muted className="py-0 my-0">{userData?.bio}</Muted>
+						<Muted className="py-0 my-0 max-w-72">{userData?.bio}</Muted>
 					)}
 				</View>
 

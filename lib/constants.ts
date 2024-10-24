@@ -1,9 +1,11 @@
+// also managed in global.css
+
 export const theme = {
 	light: {
 		background: "hsl(40 42.86% 97.25%)",
 		foreground: "hsl(20 14.3% 4.1%)",
 		card: "hsl(42 42% 94%)",
-		popover: "hsl(39 57% 96)",
+		popover: "hsl(30 4.2% 38.82%)",
 		primary: "hsl(20 7% 18%)",
 		secondary: "hsl(40 13% 64%)",
 		"muted-foreground": "hsl(0 0% 45%)",
@@ -43,7 +45,7 @@ export const IngredientCategories: string[] = [
 	"Semi-Volatile Compounds",
 	"Volatile Organic Compounds (VOCs)",
 	"Microbiologicals",
-	// 'Microplastics',
+	"Microplastics",
 	// "Inorganics",
 	// "Other",
 ];

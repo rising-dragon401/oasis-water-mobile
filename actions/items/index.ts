@@ -4,16 +4,16 @@ export const getItems = async ({
 	limit,
 	sortMethod,
 	type,
-}: { limit?: number; sortMethod?: "name" | "score"; type?: any } = {}) => {
-	let orderBy = sortMethod || "name";
+}: { limit?: number; sortMethod?: "name" | "score"; type?: any[] } = {}) => {
+	const orderBy = sortMethod || "name";
 
 	let query = supabase
 		.from("items")
 		.select()
 		.order(orderBy, { ascending: true });
 
-	if (type) {
-		query = query.eq("type", type);
+	if (type && type.length > 0) {
+		query = query.in("type", type);
 	}
 
 	if (limit !== undefined) {
@@ -88,7 +88,7 @@ export const getItemDetails = async (id: string) => {
 							amount: ingredient.amount,
 							legal_limit: detail?.legal_limit,
 							health_guideline: detail?.health_guideline,
-							exceedingLimit: exceedingLimit,
+							exceedingLimit,
 						};
 					})
 					?.filter((ingredient: any) => ingredient !== null)
@@ -127,7 +127,7 @@ export const getFlavoredWater = async ({
 	limit,
 	sortMethod,
 }: { limit?: number; sortMethod?: "name" | "score" } = {}) => {
-	let orderBy = sortMethod || "name";
+	const orderBy = sortMethod || "name";
 
 	const { data: items, error } = await supabase
 		.from("items")
@@ -142,7 +142,7 @@ export const getWaterGallons = async ({
 	limit,
 	sortMethod,
 }: { limit?: number; sortMethod?: "name" | "score" } = {}) => {
-	let orderBy = sortMethod || "name";
+	const orderBy = sortMethod || "name";
 
 	const { data: items, error } = await supabase
 		.from("items")
@@ -175,7 +175,7 @@ export const getMineralPackets = async ({
 	limit,
 	sortMethod,
 }: { limit?: number; sortMethod?: "name" | "score" } = {}) => {
-	let orderBy = sortMethod || "name";
+	const orderBy = sortMethod || "name";
 
 	const { data: items, error } = await supabase
 		.from("items")

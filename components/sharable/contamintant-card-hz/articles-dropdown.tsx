@@ -1,3 +1,9 @@
+import { Octicons } from "@expo/vector-icons";
+import { Link } from "expo-router";
+import { useState } from "react";
+
+import Typography from "../typography";
+
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -9,10 +15,6 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useColorScheme } from "@/lib/useColorScheme";
-import { Octicons } from "@expo/vector-icons";
-import { Link } from "expo-router";
-import { useState } from "react";
-import Typography from "../typography";
 
 type Props = {
 	sources: any[];

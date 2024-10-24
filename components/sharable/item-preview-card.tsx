@@ -107,7 +107,7 @@ const ItemPreviewCard = ({
 	return (
 		// @ts-ignore
 		<Link href={showData ? determineLink(item) : "/subscribeModal"}>
-			<View className="flex flex-col items-center gap-2 h-full w-full">
+			<View className="flex flex-col items-center gap-2">
 				<View className="relative w-full aspect-square rounded-xl overflow-hidden">
 					{renderImage()}
 					{showFavorite && showData && (

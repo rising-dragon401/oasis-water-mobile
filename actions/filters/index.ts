@@ -7,18 +7,16 @@ export const getFilters = async ({
 }: {
 	limit?: number;
 	sortMethod?: "name" | "score";
-	type?: "filter" | "shower_filter" | "bottle_filter" | null;
+	type?: string[] | null;
 } = {}) => {
 	let filters;
 	const orderBy = sortMethod || "name";
 
 	let query = supabase.from("water_filters").select().order(orderBy);
 
-	if (type) {
-		query = query.eq("type", type);
+	if (type && type.length > 0) {
+		query = query.in("type", type);
 	}
-
-	console.log("type: ", type);
 
 	if (limit) {
 		query = query.limit(limit);

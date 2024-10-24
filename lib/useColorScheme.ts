@@ -9,6 +9,9 @@ export function useColorScheme() {
 	const iconColor =
 		colorScheme === "dark" ? theme.dark.primary : theme.light.primary;
 
+	const secondaryColor =
+		colorScheme === "dark" ? theme.dark.secondary : theme.light.secondary;
+
 	const borderColor =
 		colorScheme === "dark" ? theme.dark.border : theme.light.border;
 
@@ -39,6 +42,7 @@ export function useColorScheme() {
 		colorMode: colorScheme,
 		colorScheme: colorScheme ?? "dark",
 		isDarkColorScheme: colorScheme === "dark",
+		secondaryColor,
 		setColorScheme,
 		toggleColorScheme,
 		iconColor,

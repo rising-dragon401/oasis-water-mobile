@@ -1,6 +1,6 @@
 import { Session, User } from "@supabase/supabase-js";
 import * as AppleAuthentication from "expo-apple-authentication";
-import { useRouter, useSegments } from "expo-router";
+import { usePathname, useRouter, useSegments } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import * as SplashScreen from "expo-splash-screen";
 import * as WebBrowser from "expo-web-browser";
@@ -51,6 +51,8 @@ export const useSupabase = () => useContext(SupabaseContext);
 export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 	const router = useRouter();
 	const segments = useSegments();
+	const pathname = usePathname();
+
 	const [user, setUser] = useState<User | null>(null);
 	const [session, setSession] = useState<Session | null>(null);
 	const [initialized, setInitialized] = useState<boolean>(false);
@@ -215,6 +217,8 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 		const fetchData = async () => {
 			if (!initialized) return;
 
+			console.log("fetchData");
+
 			const inProtectedGroup = segments[0] === "(protected)";
 
 			if (session && !inProtectedGroup) {
@@ -230,12 +234,18 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 				}
 
 				if (userData && userData?.is_onboarded) {
-					router.replace("/(protected)/search");
+					if (pathname !== "/(protected)/search") {
+						router.replace("/(protected)/search");
+					}
 				} else {
-					router.replace("/(public)/onboarding");
+					if (pathname !== "/(public)/onboarding") {
+						router.replace("/(public)/onboarding");
+					}
 				}
 			} else if (!session) {
-				router.replace("/(public)/welcome");
+				if (pathname !== "/(public)/welcome") {
+					router.replace("/(public)/welcome");
+				}
 			}
 
 			/* HACK: Something must be rendered when determining the initial auth state... 

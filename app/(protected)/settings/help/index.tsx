@@ -34,7 +34,7 @@ const FAQ_LIST = [
 		value: "how-scoring-works",
 		trigger: "How does the scoring work?",
 		content:
-			"Scoring for waters and filters is mainly based on contaminant levels and performance data presented in the lab reports. Check How scoring works page for more details.",
+			"Scoring for waters and filters is based on a comprehensive analysis of the scientific data and elements from the lab reports. Please see the 'How Scoring Works' page on our website for more details.",
 	},
 	{
 		value: "tap-water-rated-higher",
@@ -59,6 +59,18 @@ const FAQ_LIST = [
 		trigger: "Can I get my water tested?",
 		content:
 			"We partner with Tapscore to provide testing kits and analyze toxins in water. You can learn more on the Lab testing page",
+	},
+	{
+		value: "people-pages",
+		trigger: "How can I create my own Oasis page?",
+		content:
+			"Your page is automatically generated after creating an account and adding items to your favorites. Please note that certain pages were curated by the Oasis research team to showcase their public recommendations",
+	},
+	{
+		value: "warning-score",
+		trigger: "Why do some scores have a warning and untested symbol?",
+		content:
+			"We show a warning (untested) symbol for any waters and filters that are listed on Oasis but do not provide a lab / performance report. We are unable to provide a score for these items since there is no data to backup their claims. Users that add these items to their favorites may also see a warning symbol in their personal score.",
 	},
 ];
 

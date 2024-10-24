@@ -10,7 +10,8 @@ import { Input } from "@/components/ui/input";
 import { theme } from "@/lib/constants";
 import { useDebounce } from "@/lib/hooks/use-debounce";
 import { useColorScheme } from "@/lib/useColorScheme";
-const numResults = 5;
+
+const numResults = 10;
 
 const searchClient = algoliasearch(
 	process.env.EXPO_PUBLIC_ALGOIA_APP_ID!,
@@ -65,7 +66,7 @@ export default function Search({
 				query,
 				params: {
 					restrictSearchableAttributes: ["name"],
-					hitsPerPage: numResults || 5,
+					hitsPerPage: numResults || 15,
 				},
 			}));
 		} else {

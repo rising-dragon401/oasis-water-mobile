@@ -14,7 +14,7 @@ const buttonVariants = cva(
 				default: "bg-primary web:hover:opacity-90 active:opacity-90",
 				destructive: "bg-destructive web:hover:opacity-90 active:opacity-90",
 				outline:
-					"border border-input bg-background  web:hover:text-accent-foreground ",
+					"border border-border bg-background web:hover:text-accent-foreground ",
 				secondary: "bg-secondary web:hover:opacity-80 active:opacity-80",
 				ghost: "web:hover:text-accent-foreground",
 				link: "web:underline-offset-4 web:hover:underline web:focus:underline ",
@@ -106,9 +106,7 @@ const Button = React.forwardRef<
 					{...props}
 				>
 					<View className="flex flex-row gap-2 items-center justify-center">
-						{icon && iconPosition === "left" && (
-							<React.Fragment>{icon}</React.Fragment>
-						)}
+						{icon && iconPosition === "left" && <>{icon}</>}
 
 						{label && (
 							<Text
@@ -122,9 +120,7 @@ const Button = React.forwardRef<
 							</Text>
 						)}
 
-						{icon && iconPosition === "right" && (
-							<React.Fragment>{icon}</React.Fragment>
-						)}
+						{icon && iconPosition === "right" && <>{icon}</>}
 
 						{loading && <ActivityIndicator size="small" />}
 					</View>
