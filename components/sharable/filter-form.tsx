@@ -12,6 +12,7 @@ import Typography from "./typography";
 import { getFilterDetails } from "@/actions/filters";
 import ContaminantTable from "@/components/sharable/contaminant-table";
 import FilterMetadata from "@/components/sharable/filter-metadata";
+import Skeleton from "@/components/sharable/skeleton";
 import { Button } from "@/components/ui/button";
 import { Muted } from "@/components/ui/typography";
 import { useUserProvider } from "@/context/user-provider";
@@ -169,18 +170,26 @@ export function FilterForm({ id }: Props) {
 
 							{filter.affiliate_url && (
 								<Button
-									variant={filter.score > 70 ? "default" : "secondary"}
+									variant={filter.score > 70 ? "outline" : "outline"}
 									onPress={() => {
 										Linking.openURL(filter.affiliate_url);
 									}}
 									className="w-56 !h-10 !py-0"
-									label="Learn more"
+									label="Where to buy"
 								/>
 							)}
 						</View>
 
-						<View className="w-1/3">
-							<Score score={filter.score} size="md" />
+						<View className="flex w-1/3 justify-end">
+							{isLoading ? (
+								<Skeleton
+									width={100}
+									height={100}
+									style={{ borderRadius: 99 }}
+								/>
+							) : (
+								<Score score={filter.score} size="md" />
+							)}
 						</View>
 					</View>
 

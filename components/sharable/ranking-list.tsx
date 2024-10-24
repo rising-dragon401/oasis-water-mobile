@@ -74,11 +74,11 @@ const CONTAMINANTS = [
 	// 	id: "microplastics",
 	// 	label: "Microplastics",
 	// },
-	// {
-	// 	id: "PFAS",
-	// 	supabase_ids: [95, 96, 97, 98, 99, 69],
-	// 	label: "PFAS",
-	// },
+	{
+		id: "PFAS",
+		supabase_ids: [95, 96, 97, 98, 99, 69],
+		label: "PFAS",
+	},
 	{
 		id: "nitrate",
 		supabase_ids: [23],
@@ -89,10 +89,6 @@ const CONTAMINANTS = [
 		supabase_ids: [162, 163, 16],
 		label: "Radium",
 	},
-	// {
-	// 	id: "haloacetic_acids",
-	// 	label: "Haloacetic Acids",
-	// },
 ];
 
 const FILTER_CONTAMINANTS = [
@@ -165,9 +161,6 @@ const categorizeItems = (items: any[]) => {
 		return { ...item, categories };
 	});
 };
-
-// Define the renderLoader function
-const renderLoader = () => <Loader />;
 
 export default function RankingList({ categoryId }: { categoryId: string }) {
 	const { subscription, uid, user } = useUserProvider();
@@ -268,6 +261,8 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 		if (defaultTags) {
 			setSelectedTags(defaultTags.split(", "));
 		}
+
+		setLoading(false);
 	}, [categoryId]);
 
 	const toggleTagSelection = useCallback((tag: string) => {
@@ -285,9 +280,6 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 				: [...prevSelectedContaminants, contaminantId],
 		);
 	}, []);
-
-	// Memoize the ItemPreviewCard component
-	const MemoizedItemPreviewCard = React.memo(ItemPreviewCard);
 
 	const filteredItems = useMemo(() => {
 		if (!allItems) return [];
@@ -323,20 +315,6 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 							(contaminant) => contaminant.id === contaminantId,
 						);
 
-						// Check for PFAS and Microplastics conditions
-						// if (contaminantId === "PFAS" && item.metadata?.pfas !== "No") {
-						// 	console.log("PFAS: ", item.metadata?.pfas);
-						// 	return true;
-						// }
-
-						// if (
-						// 	contaminantId === "microplastics" &&
-						// 	item.packaging !== "glass"
-						// ) {
-						// 	console.log("");
-						// 	return true;
-						// }
-
 						return (
 							contaminant &&
 							contaminant.supabase_ids &&
@@ -359,21 +337,6 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 
 		return itemsFilteredByContaminants;
 	}, [selectedTags, selectedContaminants, allItems]);
-
-	const renderItem = useCallback(
-		({ item, index }: { item: any; index: number }) => (
-			<View
-				key={item?.id}
-				style={{ width: "46%" }}
-				className={`mb-2 ${index < 2 ? "mt-0" : ""}`}
-			>
-				<MemoizedItemPreviewCard item={item} showFavorite isGeneralListing />
-			</View>
-		),
-		[],
-	);
-
-	const keyExtractor = useCallback((item: any, index: number) => item.id, []);
 
 	const renderFilters = useCallback(() => {
 		return (
@@ -498,6 +461,16 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 		productType,
 	]);
 
+	const renderLoader = () => (
+		<>
+			{Array(10)
+				.fill(0)
+				.map((_, index) => (
+					<Loader key={`loader-${index}`} />
+				))}
+		</>
+	);
+
 	return (
 		<View className="flex-1 md:mt-4 mt-0 w-screen px-4">
 			{!subscription ? (
@@ -533,24 +506,9 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 
 			{subscription && renderFilters()}
 
-			{filteredItems?.length > 0 ? (
-				// <MemoizedFlatList
-				// 	data={filteredItems}
-				// 	renderItem={renderItem}
-				// 	keyExtractor={keyExtractor}
-				// 	numColumns={2}
-				// 	columnWrapperStyle={{ justifyContent: "space-around", gap: 8 }}
-				// 	contentContainerStyle={{ paddingTop: 0, paddingBottom: 0, gap: 16 }}
-				// 	showsVerticalScrollIndicator={false}
-				// 	// ListEmptyComponent={loading ? renderLoader() : null}
-				// 	ListHeaderComponent={<View style={{ height: 1 }} />}
-				// 	initialNumToRender={30}
-				// 	maxToRenderPerBatch={30}
-				// 	windowSize={30}
-				// 	removeClippedSubviews={false}
-				// 	scrollToOverflowEnabled={false}
-				// />
+			{loading ? renderLoader() : null}
 
+			{filteredItems?.length > 0 ? (
 				<FlatList
 					data={filteredItems}
 					renderItem={({ item, index }) => (
@@ -581,10 +539,16 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 					scrollToOverflowEnabled={false}
 				/>
 			) : (
-				<View className="flex-1 justify-center items-center">
-					<P className="text-center">
-						No items match this criteria. Try removing some filters
-					</P>
+				<View>
+					{loading ? (
+						renderLoader()
+					) : (
+						<View className="flex-1 justify-center items-center">
+							<P className="text-center">
+								No items match this criteria. Try removing some filters
+							</P>
+						</View>
+					)}
 				</View>
 			)}
 		</View>

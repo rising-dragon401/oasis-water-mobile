@@ -41,7 +41,7 @@ export default function ResultsRow({ results, noResults }: Props) {
 				width: "100%",
 				maxHeight: 240,
 				marginTop: 60,
-				zIndex: 100,
+				zIndex: 999,
 			}}
 		>
 			<View

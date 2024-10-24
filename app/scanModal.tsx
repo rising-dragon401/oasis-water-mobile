@@ -24,8 +24,9 @@ import {
 	searchForProduct,
 } from "@/actions/admin";
 import { uploadCameraImage } from "@/actions/files";
+import OasisLogo from "@/assets/oasis-word.png";
 import Score from "@/components/sharable/score";
-import { Large, Muted, P } from "@/components/ui/typography";
+import { Muted, P } from "@/components/ui/typography";
 import { useToast } from "@/context/toast-provider";
 import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
@@ -33,7 +34,7 @@ import { useColorScheme } from "@/lib/useColorScheme";
 export default function ScanModal() {
 	const navigation = useNavigation();
 	const router = useRouter();
-	const { uid, subscription } = useUserProvider();
+	const { uid } = useUserProvider();
 	const showToast = useToast();
 	const { textSecondaryColor, borderColor, foregroundColor, colorMode } =
 		useColorScheme();
@@ -443,7 +444,8 @@ export default function ScanModal() {
 					>
 						<Ionicons name="close" size={24} color="white" />
 					</TouchableOpacity>
-					<Large className="text-white items-center">Scan item</Large>
+					<Image source={OasisLogo} style={{ width: 85, height: 24 }} />
+					{/* <Large className="text-white items-center">Scan item</Large> */}
 				</View>
 
 				{/* Scan grid */}
@@ -546,7 +548,7 @@ export default function ScanModal() {
 					)}
 
 					{mode === "scan" && (
-						<P className="text-white mt-2 text-lg">{loadingText}</P>
+						<P className="text-white mt-4 text-lg font-medium">{loadingText}</P>
 					)}
 				</View>
 

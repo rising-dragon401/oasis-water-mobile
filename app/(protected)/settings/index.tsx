@@ -25,6 +25,7 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { H1, Large, Muted, P } from "@/components/ui/typography";
 import { useRevenueCat } from "@/context/revenue-cat-provider";
+import { useToast } from "@/context/toast-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function TabTwoScreen() {
@@ -32,6 +33,7 @@ export default function TabTwoScreen() {
 		useUserProvider();
 	const { restorePurchases } = useRevenueCat();
 	const { backgroundColor, iconColor } = useColorScheme();
+	const showToast = useToast();
 	const router = useRouter();
 
 	const [newName, setNewName] = useState("");
@@ -45,16 +47,30 @@ export default function TabTwoScreen() {
 		total_trials: 0,
 	});
 	const [loading, setLoading] = useState(false);
+	const [socials, setSocials] = useState({
+		instagram: "",
+		youtube: "",
+		twitter: "",
+	});
+	const [loadingSocials, setLoadingSocials] = useState(false);
 
 	useEffect(() => {
 		if (userData) {
 			setNewName(userData.full_name || "");
 			setNewBio(userData.bio || "");
 			setNewAvatar(userData.avatar_url || "");
+			setSocials({
+				instagram: userData.socials?.instagram || "",
+				youtube: userData.socials?.youtube || "",
+				twitter: userData.socials?.twitter || "",
+			});
+
 			setNewUsername(userData.username || "");
+
 			if (userData.referred_by) {
 				referredByUser(userData.referred_by);
 			}
+
 			getReferralStats();
 		}
 	}, [userData]);
@@ -100,7 +116,7 @@ export default function TabTwoScreen() {
 
 		const username = await updateUsername(userData.id, newUsername);
 		if (!username) {
-			Alert.alert("Username already taken");
+			showToast("Username already taken");
 			setLoading(false);
 			return;
 		}
@@ -109,17 +125,16 @@ export default function TabTwoScreen() {
 		const res2 = await updateUserData(uid, "bio", newBio);
 
 		if (newReferralCode) {
-			console.log("newReferralCode", newReferralCode);
 			const user = await getUserByUsername(newReferralCode);
 			if (user) {
 				await updateUserData(uid, "referred_by", user.id);
 			} else {
-				Alert.alert("Invalid referral code");
+				showToast("Invalid referral code");
 			}
 		}
 
 		if (!res || !res2) {
-			Alert.alert("Error", "Failed to update profile");
+			showToast("Failed to update profile");
 		}
 
 		fetchUserData(userData.id);
@@ -137,6 +152,32 @@ export default function TabTwoScreen() {
 		setLoading(false);
 
 		Alert.alert("Profile updated");
+	};
+
+	const handleSocialsUpdate = async () => {
+		try {
+			setLoadingSocials(true);
+
+			const res = await updateUserData(userData.id, "socials", {
+				instagram: socials.instagram,
+				youtube: socials.youtube,
+				twitter: socials.twitter,
+			});
+
+			console.log("res", res);
+
+			if (res) {
+				showToast("Socials updated");
+				fetchUserData(userData.id);
+			} else {
+				showToast("Error updating socials");
+			}
+		} catch (error) {
+			console.error("Error updating socials:", error);
+			showToast("Error updating socials");
+		}
+
+		setLoadingSocials(false);
 	};
 
 	const handleManageSubscription = () => {
@@ -260,6 +301,64 @@ export default function TabTwoScreen() {
 								variant="secondary"
 								loading={loading}
 								onPress={handleUpdateProfile}
+								className="w-36 mt-4"
+								label="Update"
+							/>
+						</View>
+					</View>
+
+					<View className="flex flex-col gap-y-2 mt-6">
+						<P className="text-muted-foreground">Socials</P>
+						<View className="bg-muted p-4 rounded-xl border border-border">
+							<View className="flex flex-col w-full space-y-2 mt-4">
+								<Label nativeID="instagram" className="text-sm">
+									Instagram
+								</Label>
+								<View className="flex flex-row w-full gap-2">
+									<Input
+										placeholder="https://www.instagram.com/oasiswaterapp"
+										value={socials.instagram}
+										onChangeText={(text) =>
+											setSocials({ ...socials, instagram: text })
+										}
+										className="w-full border border-border rounded-md bg-background"
+									/>
+								</View>
+							</View>
+							<View className="flex flex-col w-full space-y-2 mt-4">
+								<Label nativeID="youtube" className="text-sm">
+									YouTube
+								</Label>
+								<View className="flex flex-row w-full gap-2">
+									<Input
+										placeholder="https://www.youtube.com/@oasiswaterapp"
+										value={socials.youtube}
+										onChangeText={(text) =>
+											setSocials({ ...socials, youtube: text })
+										}
+										className="w-full border border-border rounded-md bg-background"
+									/>
+								</View>
+							</View>
+							<View className="flex flex-col w-full space-y-2 mt-4">
+								<Label nativeID="twitter" className="text-sm">
+									X (Twitter)
+								</Label>
+								<View className="flex flex-row w-full gap-2">
+									<Input
+										placeholder="https://x.com/oasiswaterapp"
+										value={socials.twitter}
+										onChangeText={(text) =>
+											setSocials({ ...socials, twitter: text })
+										}
+										className="w-full border border-border rounded-md bg-background"
+									/>
+								</View>
+							</View>
+							<Button
+								variant="secondary"
+								loading={loadingSocials}
+								onPress={handleSocialsUpdate}
 								className="w-36 mt-4"
 								label="Update"
 							/>

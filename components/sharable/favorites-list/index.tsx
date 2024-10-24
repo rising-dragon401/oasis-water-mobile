@@ -1,9 +1,11 @@
+import Feather from "@expo/vector-icons/Feather";
 import { Avatar, AvatarImage } from "components/ui/avatar";
 import { useUserProvider } from "context/user-provider";
+import * as Linking from "expo-linking";
 import { useRouter } from "expo-router";
 import { PROFILE_AVATAR } from "lib/constants";
 import { useEffect, useState } from "react";
-import { FlatList, Share, View } from "react-native";
+import { FlatList, Share, TouchableOpacity, View } from "react-native";
 import useSWR from "swr";
 
 import ItemPreviewCard from "../item-preview-card";
@@ -12,7 +14,13 @@ import Loader from "../loader";
 import { getCurrentUserData, getUserFavorites } from "@/actions/user";
 import Score from "@/components/sharable/score";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { H3, H4, Large, Muted, P } from "@/components/ui/typography";
+import { useColorScheme } from "@/lib/useColorScheme";
+
+const WATER_TYPES = ["bottled_water", "water_gallon"];
+
+const FILTER_TYPES = ["filter", "shower_filter", "bottle_filter"];
 
 export default function FavoritesList({
 	userId,
@@ -21,9 +29,10 @@ export default function FavoritesList({
 }) {
 	const router = useRouter();
 	const { uid } = useUserProvider();
-
+	const { iconColor } = useColorScheme();
 	const [loading, setLoading] = useState(true);
 	const [userData, setUserData] = useState<any>(null);
+	const [tabValue, setTabValue] = useState("all");
 
 	const isAuthUser = userId === uid;
 
@@ -96,15 +105,52 @@ export default function FavoritesList({
 		<View className="pb-0 mb-0">
 			<View className="py-4 gap-4 flex w-full flex-row justify-between">
 				<View className="flex flex-col">
-					<Avatar className="h-20 w-20" alt="oasis pfp">
-						<AvatarImage src={userData?.avatar_url || PROFILE_AVATAR} />
-					</Avatar>
+					<View className="flex flex-row gap-4">
+						<Avatar className="h-20 w-20" alt="oasis pfp">
+							<AvatarImage src={userData?.avatar_url || PROFILE_AVATAR} />
+						</Avatar>
 
-					<H4 className="mt-2">{`${userData?.full_name || userData?.email || "Unknown name"}`}</H4>
-					<Muted className="py-0 my-0">@{userData?.username}</Muted>
+						<View className="flex flex-col">
+							<H4 className="mt-2">{`${userData?.full_name || userData?.email || "Unknown name"}`}</H4>
+							<Muted className="py-0 my-0">@{userData?.username}</Muted>
+							{userData?.socials && (
+								<View className="flex flex-row flex-wrap gap-4 mt-1">
+									{userData?.socials?.instagram && (
+										<TouchableOpacity
+											onPress={() =>
+												Linking.openURL(userData?.socials?.instagram)
+											}
+										>
+											<Feather name="instagram" size={16} color={iconColor} />
+										</TouchableOpacity>
+									)}
+
+									{userData?.socials?.twitter && (
+										<TouchableOpacity
+											onPress={() =>
+												Linking.openURL(userData?.socials?.twitter)
+											}
+										>
+											<Feather name="twitter" size={16} color={iconColor} />
+										</TouchableOpacity>
+									)}
+
+									{userData?.socials?.youtube && (
+										<TouchableOpacity
+											onPress={() =>
+												Linking.openURL(userData?.socials?.youtube)
+											}
+										>
+											<Feather name="youtube" size={16} color={iconColor} />
+										</TouchableOpacity>
+									)}
+								</View>
+							)}
+						</View>
+					</View>
 
 					{userData?.bio && (
-						<Muted className="py-0 my-0 max-w-72">{userData?.bio}</Muted>
+						<Muted className="py-0 my-0 max-w-72 mt-2">{userData?.bio}</Muted>
 					)}
 				</View>
 
@@ -119,33 +165,109 @@ export default function FavoritesList({
 			<View className="flex flex-col">
 				{favorites && favorites?.length > 0 ? (
 					<>
-						<Large>Favorites</Large>
-						<FlatList
-							data={favorites}
-							renderItem={({ item, index }) => (
-								<View
-									key={item?.id}
-									style={{ width: "48%" }}
-									className={`mb-2 ${index < 2 ? "mt-2" : ""}`}
-								>
-									<ItemPreviewCard
-										item={item}
-										showFavorite
-										isAuthUser={isAuthUser}
-									/>
-								</View>
-							)}
-							keyExtractor={(item) => item?.id}
-							numColumns={2}
-							showsVerticalScrollIndicator={false}
-							columnWrapperStyle={{ justifyContent: "space-between" }}
-							contentContainerStyle={{
-								flexGrow: 0,
-								paddingBottom: 0,
-								marginBottom: 0,
-							}}
-							scrollEnabled={false}
-						/>
+						<Large>Products</Large>
+
+						<Tabs value={tabValue} onValueChange={setTabValue}>
+							<TabsList>
+								<TabsTrigger value="all">
+									<P>All</P>
+								</TabsTrigger>
+								<TabsTrigger value="water">
+									<P>Water</P>
+								</TabsTrigger>
+								<TabsTrigger value="filters">
+									<P>Filters</P>
+								</TabsTrigger>
+							</TabsList>
+							<TabsContent value="all">
+								<FlatList
+									data={favorites}
+									renderItem={({ item, index }) => (
+										<View
+											key={item?.id}
+											style={{ width: "48%" }}
+											className={`mb-2 ${index < 2 ? "mt-2" : ""}`}
+										>
+											<ItemPreviewCard
+												item={item}
+												showFavorite
+												isAuthUser={isAuthUser}
+											/>
+										</View>
+									)}
+									keyExtractor={(item) => item?.id}
+									numColumns={2}
+									showsVerticalScrollIndicator={false}
+									columnWrapperStyle={{ justifyContent: "space-between" }}
+									contentContainerStyle={{
+										flexGrow: 0,
+										paddingBottom: 0,
+										marginBottom: 0,
+									}}
+									scrollEnabled={false}
+								/>
+							</TabsContent>
+							<TabsContent value="water">
+								<FlatList
+									data={favorites?.filter((item) =>
+										WATER_TYPES.includes(item.type),
+									)}
+									renderItem={({ item, index }) => (
+										<View
+											key={item?.id}
+											style={{ width: "48%" }}
+											className={`mb-2 ${index < 2 ? "mt-2" : ""}`}
+										>
+											<ItemPreviewCard
+												item={item}
+												showFavorite
+												isAuthUser={isAuthUser}
+											/>
+										</View>
+									)}
+									keyExtractor={(item) => item?.id}
+									numColumns={2}
+									showsVerticalScrollIndicator={false}
+									columnWrapperStyle={{ justifyContent: "space-between" }}
+									contentContainerStyle={{
+										flexGrow: 0,
+										paddingBottom: 0,
+										marginBottom: 0,
+									}}
+									scrollEnabled={false}
+								/>
+							</TabsContent>
+							<TabsContent value="filters">
+								<FlatList
+									data={favorites?.filter((item) =>
+										FILTER_TYPES.includes(item.type),
+									)}
+									renderItem={({ item, index }) => (
+										<View
+											key={item?.id}
+											style={{ width: "48%" }}
+											className={`mb-2 ${index < 2 ? "mt-2" : ""}`}
+										>
+											<ItemPreviewCard
+												item={item}
+												showFavorite
+												isAuthUser={isAuthUser}
+											/>
+										</View>
+									)}
+									keyExtractor={(item) => item?.id}
+									numColumns={2}
+									showsVerticalScrollIndicator={false}
+									columnWrapperStyle={{ justifyContent: "space-between" }}
+									contentContainerStyle={{
+										flexGrow: 0,
+										paddingBottom: 0,
+										marginBottom: 0,
+									}}
+									scrollEnabled={false}
+								/>
+							</TabsContent>
+						</Tabs>
 					</>
 				) : (
 					<View className="text-center mt-4 bg-secondary p-4 rounded-lg ">

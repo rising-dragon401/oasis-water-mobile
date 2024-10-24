@@ -8,9 +8,19 @@ const ToastContext = createContext<ShowToastFunction | null>(null);
 export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
 	const showToast: ShowToastFunction = useCallback(
 		(message: string, duration = Toast.durations.LONG) => {
-			console.log("Showing toast: ", message);
 			const toast = Toast.show(message, {
 				duration,
+				position: Toast.positions.BOTTOM, // Example: Change position
+				shadow: true, // Example: Add shadow
+				animation: true, // Example: Enable animation
+				hideOnPress: true, // Example: Hide on press
+				delay: 0, // Example: No delay
+				backgroundColor: "#645E58", // Example: Change background color
+				textColor: "#EDE8DA", // Example: Change text color
+				opacity: 1.0, // Example: Set opacity
+				containerStyle: {
+					borderRadius: 99,
+				},
 			});
 
 			setTimeout(() => {

@@ -18,7 +18,7 @@ type Props = {
 export default function Score({ score, size, showScore = false }: Props) {
 	const router = useRouter();
 	const { subscription } = useUserProvider();
-	const { textColor } = useColorScheme();
+	const { textColor, secondaryColor } = useColorScheme();
 
 	const radius =
 		size === "xl"
@@ -28,7 +28,7 @@ export default function Score({ score, size, showScore = false }: Props) {
 				: size === "md"
 					? 50
 					: size === "sm"
-						? 50
+						? 46
 						: size === "xs"
 							? 34
 							: 40;
@@ -37,6 +37,8 @@ export default function Score({ score, size, showScore = false }: Props) {
 	const svgSize = 2 * (radius + strokeWidth); // Adjust SVG size to accommodate stroke
 	const circumference = 2 * Math.PI * radius;
 	const offset = circumference - (score / 100) * circumference;
+
+	console.log(score);
 
 	const fontSize =
 		size === "xl"
@@ -61,7 +63,7 @@ export default function Score({ score, size, showScore = false }: Props) {
 		} else if (score >= 35) {
 			return "Poor";
 			// @ts-ignore
-		} else if (score === "?") {
+		} else if (score === "?" || score === undefined || score === null) {
 			return "Unknown";
 		} else {
 			return "Bad";
@@ -141,7 +143,7 @@ export default function Score({ score, size, showScore = false }: Props) {
 					<P style={{ fontSize }}>{score} / 100</P>
 				) : (
 					<View className="flex flex-row gap-1">
-						<Feather name="alert-triangle" size={24} color="red" />
+						<Feather name="alert-triangle" size={18} color={secondaryColor} />
 						<P>/ 100</P>
 					</View>
 				)}

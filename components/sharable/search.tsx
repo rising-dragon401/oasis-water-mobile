@@ -2,7 +2,7 @@ import { Feather, Octicons } from "@expo/vector-icons";
 import algoliasearch from "algoliasearch";
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 
 import ResultsRow from "./results-row";
 
@@ -32,7 +32,6 @@ export default function Search({
 	const [noResults, setNoResults] = useState(false);
 
 	const debouncedQuery = useDebounce(value, 400);
-	const debouncedUnfocus = useDebounce(value, 500);
 	const { colorScheme, mutedForegroundColor } = useColorScheme();
 	const router = useRouter();
 
@@ -83,7 +82,7 @@ export default function Search({
 					indexName: "tap_water_locations",
 					query,
 					params: {
-						restrictSearchableAttributes: ["name"],
+						restrictSearchableAttributes: ["name", "state", "zip_codes"],
 						hitsPerPage: numResults || 5,
 					},
 				},
@@ -130,11 +129,6 @@ export default function Search({
 
 	const inputRef = useRef<any>(null);
 
-	// Function to blur (unfocus) the input
-	const blurInput = () => {
-		inputRef.current?.blur();
-	};
-
 	useEffect(() => {
 		if (debouncedQuery) {
 			handleSearch(debouncedQuery);
@@ -143,41 +137,38 @@ export default function Search({
 		}
 	}, [debouncedQuery]);
 
-	useEffect(() => {
-		// Blur the input when the debounced unfocus value changes
-		blurInput();
-	}, [debouncedUnfocus]);
-
 	return (
 		<>
-			<View className="flex flex-row gap-2 items-center relative z-50">
+			<View className="flex flex-row gap-2 items-center relative z-10">
 				<Input
 					ref={inputRef}
-					placeholder="Search your water, filter or city"
+					placeholder="Search your water, filter or location"
 					value={value}
 					onChangeText={onChangeText}
 					aria-labelledbyledBy="inputLabel"
 					aria-errormessage="inputError"
-					className="w-full pl-4 z-40 !h-16 !rounded-full"
+					className="w-full pl-6 z-20 !h-16 !rounded-full"
 					onFocus={() => setActive(true)}
 					onBlur={() => setActive(false)}
 				/>
 
 				<View
-					className="flex flex-row gap-4 z-50 items-center"
+					className="flex flex-row gap-4 z-20 items-center"
 					style={{ position: "absolute", right: 10 }}
 				>
-					{value && (
+					{value && !isLoading && (
 						<TouchableOpacity onPress={handleClear}>
 							<Octicons name="x-circle-fill" size={20} color={iconColor} />
 						</TouchableOpacity>
 					)}
+
+					{isLoading && (
+						<ActivityIndicator size="small" color={mutedForegroundColor} />
+					)}
+
 					<TouchableOpacity onPress={handleScan} className="mr-4">
 						<Feather name="camera" size={20} color={iconColor} />
 					</TouchableOpacity>
-					{/* {isLoading && (
-						<ActivityIndicator size="small" color={mutedForegroundColor} />
-					)} */}
 				</View>
 			</View>
 			{(results.length > 0 || (noResults && value.length > 0)) && (

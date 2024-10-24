@@ -18,7 +18,9 @@ eas build --profile development --platform ios
 eas build --profile development --platform android
 ```
 
-Then run this to preview the app
+Run preview on simulator
+(Must first open simulator and enter Expo preview link in browser to install on the simulator device
+)
 
 ```
 npx expo start --dev-client
@@ -45,6 +47,7 @@ Android development build
 
 ```
 eas build --platform android --profile development
+
 ```
 
 ```

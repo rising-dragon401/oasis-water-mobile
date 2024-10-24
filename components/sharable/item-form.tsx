@@ -14,16 +14,14 @@ import ItemImage from "./item-image";
 import MetaDataCard from "./metadata-card";
 import PaywallContent from "./paywall-content";
 import Score from "./score";
+import Sources from "./sources";
 import Typography from "./typography";
 
 import { incrementItemsViewed } from "@/actions/user";
 import { Button } from "@/components/ui/button";
 import { H2, Muted } from "@/components/ui/typography";
-
 import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
-
-import Sources from "./sources";
 
 type Props = {
 	id: string;
@@ -244,7 +242,7 @@ export function ItemForm({ id }: Props) {
 								onPress={() => {
 									Linking.openURL(item.affiliate_url);
 								}}
-								label="Learn more"
+								label="Where to buy"
 								icon={
 									<Octicons name="arrow-right" size={12} color={iconColor} />
 								}
@@ -269,8 +267,8 @@ export function ItemForm({ id }: Props) {
 								fontWeight="normal"
 								className="text-primary"
 							>
-								This item has not been tested. Proceed with caution as there may
-								be unexpected contaminants inside. Score is subject to change
+								This item was found to not have complete lab reports. Proceed
+								with caution as there may be unexpected contaminants inside.
 							</Typography>
 						</View>
 					</View>
