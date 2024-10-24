@@ -43,11 +43,11 @@ export default function TopRatedScreen() {
 					}}
 					columnWrapperStyle={{ justifyContent: "space-between" }}
 					ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
-					renderItem={({ item: category }) => (
+					renderItem={({ item: category, index }) => (
 						<View className="mb-4 w-[48%] py-2 rounded-xl">
 							<Link
-								key={category.id}
-								href={`/search/top-rated/${category.id}`}
+								key={category.id + index.toString()}
+								href={`/search/top-rated/${category.typeId}?tags=${category.tags}`}
 								className=""
 							>
 								<View className="relative w-full aspect-square flex items-center justify-center rounded-xl bg-card">

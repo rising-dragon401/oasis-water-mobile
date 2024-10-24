@@ -9,9 +9,10 @@
 		--card: 42 42% 94%; /* light.card */
 		--popover: 30 4.2% 38.82%; /* light.popover */
 		--primary: 20 7% 18%; /* light.primary */
-		--secondary: 40 13% 64%; /* light.secondary */
+		--secondary: 30 4.2% 38.82%; /* light.secondary */
 		--muted: 30 6% 93%; /* light.muted */
 		--muted-foreground: 0 0% 45%; /* light.muted-foreground */
+		--secondary-foreground: 40 13% 92.94%; /* light.secondary-foreground */
 		--accent: 229 59% 38%; /* light.accent */
 		--destructive: 0 84.2% 60.2%; /* light.destructive */
 		--border: 30 6% 89%; /* light.border */

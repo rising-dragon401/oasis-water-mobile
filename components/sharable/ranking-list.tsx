@@ -1,5 +1,5 @@
 import { Octicons } from "@expo/vector-icons";
-import { useNavigation, useRouter } from "expo-router";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { FlatList, TouchableOpacity, View } from "react-native";
 
@@ -20,8 +20,8 @@ import { useColorScheme } from "@/lib/useColorScheme";
 
 const CATEOGRIES = [
 	{
-		id: "bottled_water",
-		name: "Bottled Water",
+		id: "water",
+		name: "Water",
 		tags: "gallon, sparkling, still, spring, alkaline",
 	},
 	{
@@ -31,17 +31,24 @@ const CATEOGRIES = [
 	},
 ];
 
-const TAG_CATEGORY_MAP: { [key: string]: string } = {
-	counter: "countertop",
-	bottle: "bottle",
-	gallon: "gallon",
-	// Add more mappings as needed
+const TAG_CATEGORY_MAP = {
+	gallon: ["gallon", "5 gallon"],
+	sparkling: ["sparkling"],
+	still: ["still"],
+	spring: ["spring"],
+	alkaline: ["alkaline"],
+	shower: ["shower"],
+	bottle: ["bottle"],
+	pitcher: ["pitcher"],
+	countertop: ["countertop"],
+	sink: ["sink", "under sink"],
+	home: ["home", "house"],
 };
 
 const ITEM_TYPES = [
 	{
 		id: "water",
-		types: ["bottled_water", "water_gallon"],
+		types: ["bottled_water", "water_gallon", "gallon"],
 	},
 	{
 		id: "filter",
@@ -67,15 +74,20 @@ const CONTAMINANTS = [
 	// 	id: "microplastics",
 	// 	label: "Microplastics",
 	// },
-	{
-		id: "PFAS",
-		supabase_ids: [95, 96, 97, 98, 99, 69],
-		label: "PFAS",
-	},
+	// {
+	// 	id: "PFAS",
+	// 	supabase_ids: [95, 96, 97, 98, 99, 69],
+	// 	label: "PFAS",
+	// },
 	{
 		id: "nitrate",
 		supabase_ids: [23],
 		label: "Nitrates",
+	},
+	{
+		id: "radium",
+		supabase_ids: [162, 163, 16],
+		label: "Radium",
 	},
 	// {
 	// 	id: "haloacetic_acids",
@@ -144,8 +156,11 @@ const categorizeItems = (items: any[]) => {
 	return items.map((item) => {
 		const categories = Array.isArray(item?.tags)
 			? item.tags
-					.map((tag: string) => TAG_CATEGORY_MAP[tag])
-					.filter((category: string | undefined) => category !== undefined)
+					.flatMap(
+						(tag: string) =>
+							TAG_CATEGORY_MAP[tag as keyof typeof TAG_CATEGORY_MAP] || [],
+					)
+					.filter((category: string) => category !== undefined)
 			: [];
 		return { ...item, categories };
 	});
@@ -159,6 +174,8 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 	const router = useRouter();
 	const navigation = useNavigation();
 	const { backgroundColor } = useColorScheme();
+	const params = useLocalSearchParams<{ tags?: string }>();
+	const { tags: defaultTags } = params;
 
 	const [loading, setLoading] = useState(true);
 	const [allItems, setAllItems] = useState<any[]>([]);
@@ -204,12 +221,13 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 	};
 
 	useEffect(() => {
-		setLoading(true);
-
 		const type = ITEM_TYPES.find((item) => item.types.includes(categoryId));
-		setProductType(type?.id || "");
 
-		switch (type?.id) {
+		const productType_ = type?.id || "";
+
+		setProductType(productType_);
+
+		switch (productType_) {
 			case "water":
 				fetchAndSetData("bottled_water", () =>
 					getItems({
@@ -243,9 +261,13 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 
 		setTags(
 			(
-				CATEOGRIES.find((category) => category.id === categoryId)?.tags || ""
+				CATEOGRIES.find((category) => category.id === productType_)?.tags || ""
 			).split(", "),
 		);
+
+		if (defaultTags) {
+			setSelectedTags(defaultTags.split(", "));
+		}
 	}, [categoryId]);
 
 	const toggleTagSelection = useCallback((tag: string) => {
@@ -272,26 +294,52 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 
 		const itemsWithoutDrafts = allItems.filter((item) => !item.is_draft);
 
-		const testedItems = itemsWithoutDrafts.filter((item) => item.is_indexed);
+		let nextItems = itemsWithoutDrafts;
 
-		const itemsFilteredByTags = testedItems.filter(
-			(item) =>
-				selectedTags?.length === 0 ||
-				selectedTags?.some((tag) => item.tags?.includes(tag)),
-		);
+		// Don't include non-indexed items if tags are selected
+		// since they can't be guaranteed to not include / remove the contaminants
+		if (selectedContaminants.length > 0) {
+			nextItems = itemsWithoutDrafts.filter((item) => item.is_indexed);
+		}
+
+		const itemsFilteredByTags = nextItems.filter((item) => {
+			if (selectedTags.length === 0) return true;
+
+			const possibleTags = selectedTags.flatMap(
+				(tag: string) =>
+					TAG_CATEGORY_MAP[tag as keyof typeof TAG_CATEGORY_MAP] || [],
+			);
+
+			return possibleTags.some((tag) => item.tags?.includes(tag));
+		});
 
 		const itemsFilteredByContaminants = itemsFilteredByTags.filter((item) => {
-			if (selectedContaminants?.length === 0) return true;
+			if (selectedContaminants.length === 0) return true;
 
-			if (productType === "bottled_water") {
+			if (productType === "water") {
 				return !item.ingredients?.some((ing: any) =>
 					selectedContaminants.some((contaminantId) => {
 						const contaminant = CONTAMINANTS.find(
 							(contaminant) => contaminant.id === contaminantId,
 						);
 
+						// Check for PFAS and Microplastics conditions
+						// if (contaminantId === "PFAS" && item.metadata?.pfas !== "No") {
+						// 	console.log("PFAS: ", item.metadata?.pfas);
+						// 	return true;
+						// }
+
+						// if (
+						// 	contaminantId === "microplastics" &&
+						// 	item.packaging !== "glass"
+						// ) {
+						// 	console.log("");
+						// 	return true;
+						// }
+
 						return (
 							contaminant &&
+							contaminant.supabase_ids &&
 							contaminant.supabase_ids.includes(ing?.ingredient_id)
 						);
 					}),
@@ -313,53 +361,60 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 	}, [selectedTags, selectedContaminants, allItems]);
 
 	const renderItem = useCallback(
-		({ item, index }) => (
+		({ item, index }: { item: any; index: number }) => (
 			<View
 				key={item?.id}
 				style={{ width: "46%" }}
 				className={`mb-2 ${index < 2 ? "mt-0" : ""}`}
 			>
-				<MemoizedItemPreviewCard
-					item={item}
-					showFavorite
-					isAuthUser={isAuthUser}
-					isGeneralListing
-				/>
+				<MemoizedItemPreviewCard item={item} showFavorite isGeneralListing />
 			</View>
 		),
-		[isAuthUser],
+		[],
 	);
 
-	const keyExtractor = useCallback((item: any) => item.id, []);
+	const keyExtractor = useCallback((item: any, index: number) => item.id, []);
 
-	// Memoize the FlatList component
-	// const MemoizedFlatList = React.memo(FlatList);
-
-	const renderFilters = () => {
+	const renderFilters = useCallback(() => {
 		return (
-			<View className="flex flex-row flex-wrap w-full justify-start pb-2">
+			<View className="flex flex-row flex-wrap w-full justify-start pb-2 px-0 ml-0 gap-2">
 				<DropdownMenu
 					open={openContaminantDropdown}
 					onOpenChange={setOpenContaminantDropdown}
-					className="px-2 rounded-xl "
+					className=" rounded-xl "
 				>
 					<DropdownMenuTrigger asChild>
-						<Button variant="outline" label="Contaminants" size="sm" />
+						<Button
+							variant={
+								selectedContaminants.length > 0 ? "secondary" : "outline"
+							}
+							className={
+								selectedContaminants?.length < 1 && openContaminantDropdown
+									? "border-pirmary text-primary"
+									: ""
+							}
+							label={`Contaminants ${
+								selectedContaminants.length > 0
+									? `(${selectedContaminants.length})`
+									: ""
+							}`}
+							size="sm"
+						/>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent
-						className="w-96 flex flex-col mt-2 py-2 px-2"
+						className="w-96 flex flex-col mt-2 py-2 px-2 roounded-2xl"
 						align="start"
 					>
 						<Muted className="text-muted pl-1 mb-1">
-							{productType === "bottled_water" ? "Free of:" : "Removes:"}
+							{productType === "water" ? "Free of:" : "Removes:"}
 						</Muted>
 						<View className="flex flex-row flex-wrap gap-x-2">
-							{(productType === "bottled_water"
+							{(productType === "water"
 								? CONTAMINANTS
 								: FILTER_CONTAMINANTS
-							).map((contaminant) => (
+							).map((contaminant, index) => (
 								<TouchableOpacity
-									key={contaminant.id}
+									key={contaminant.id + index.toString()}
 									className={`border rounded-full border-muted px-2 py-1 my-2 ${
 										selectedContaminants.includes(contaminant.id)
 											? "border-muted border-2"
@@ -384,16 +439,26 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 						</View>
 					</DropdownMenuContent>
 				</DropdownMenu>
+
 				<DropdownMenu
 					open={openTypeDropdown}
 					onOpenChange={setOpenTypeDropdown}
-					className="px-2  rounded-xl "
+					className="rounded-xl "
 				>
 					<DropdownMenuTrigger asChild>
-						<Button variant="outline" label="Type" size="sm" />
+						<Button
+							variant={selectedTags.length > 0 ? "secondary" : "outline"}
+							label={`Type ${selectedTags.length > 0 ? `(${selectedTags.length})` : ""}`}
+							className={
+								selectedTags?.length < 1 && openTypeDropdown
+									? "border-primary text-primary"
+									: ""
+							}
+							size="sm"
+						/>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent
-						className="w-96 flex flex-row flex-wrap rounded-xl px-4 gap-x-2 mt-2 py-1"
+						className="w-96 flex flex-row flex-wrap rounded-2xl px-4 gap-x-2 mt-2 py-1"
 						align="center"
 					>
 						{tags.map((tag: string) => (
@@ -422,7 +487,16 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 				</DropdownMenu>
 			</View>
 		);
-	};
+	}, [
+		openContaminantDropdown,
+		openTypeDropdown,
+		selectedContaminants,
+		selectedTags,
+		tags,
+		toggleContaminantSelection,
+		toggleTagSelection,
+		productType,
+	]);
 
 	return (
 		<View className="flex-1 md:mt-4 mt-0 w-screen px-4">
@@ -459,11 +533,41 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 
 			{subscription && renderFilters()}
 
-			{filteredItems.length > 0 ? (
+			{filteredItems?.length > 0 ? (
+				// <MemoizedFlatList
+				// 	data={filteredItems}
+				// 	renderItem={renderItem}
+				// 	keyExtractor={keyExtractor}
+				// 	numColumns={2}
+				// 	columnWrapperStyle={{ justifyContent: "space-around", gap: 8 }}
+				// 	contentContainerStyle={{ paddingTop: 0, paddingBottom: 0, gap: 16 }}
+				// 	showsVerticalScrollIndicator={false}
+				// 	// ListEmptyComponent={loading ? renderLoader() : null}
+				// 	ListHeaderComponent={<View style={{ height: 1 }} />}
+				// 	initialNumToRender={30}
+				// 	maxToRenderPerBatch={30}
+				// 	windowSize={30}
+				// 	removeClippedSubviews={false}
+				// 	scrollToOverflowEnabled={false}
+				// />
+
 				<FlatList
 					data={filteredItems}
-					renderItem={renderItem}
-					keyExtractor={keyExtractor}
+					renderItem={({ item, index }) => (
+						<View
+							key={item?.id}
+							style={{ width: "46%" }}
+							className={`mb-2 ${index < 2 ? "mt-2" : ""}`}
+						>
+							<ItemPreviewCard
+								item={item}
+								showFavorite
+								isAuthUser={isAuthUser}
+								isGeneralListing
+							/>
+						</View>
+					)}
+					keyExtractor={(item) => item.id}
 					numColumns={2}
 					columnWrapperStyle={{ justifyContent: "space-around", gap: 8 }}
 					contentContainerStyle={{ paddingTop: 0, paddingBottom: 0, gap: 16 }}

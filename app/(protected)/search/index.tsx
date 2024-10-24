@@ -126,7 +126,7 @@ export default function TabOneScreen() {
 						className="flex flex-row items-center gap-2"
 					>
 						<View className="flex flex-row items-center gap-2">
-							<Muted className="text-center m-0 p-0">top rankings</Muted>
+							<Muted className="text-center m-0 p-0">all categories</Muted>
 
 							<Ionicons
 								name="arrow-forward"
@@ -147,11 +147,11 @@ export default function TabOneScreen() {
 						height: "100%",
 					}}
 					className="overflow-x-scroll flex"
-					renderItem={({ item: category }) => (
+					renderItem={({ item: category, index }) => (
 						<View className="mr-3 w-[120px] py-1 rounded-xl">
 							<Link
-								key={category.id}
-								href={`/search/top-rated/${category.id}`}
+								key={category.id + index.toString()}
+								href={`/search/top-rated/${category.typeId}?tags=${category.tags}`}
 								className="flex flex-col"
 							>
 								<View className="relative w-[120px] h-[120px] flex items-center justify-center rounded-xl bg-card">
