@@ -260,3 +260,19 @@ export const searchForProduct = async (
 		};
 	}
 };
+
+// fetch science articles
+export const getResearch = async () => {
+	const { data, error } = await supabase
+		.from("research")
+		.select("*")
+		.order("created_at", { ascending: false });
+
+	if (error) {
+		console.error("error", error);
+
+		return [];
+	}
+
+	return data;
+};

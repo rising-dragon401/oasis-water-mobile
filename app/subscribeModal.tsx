@@ -25,6 +25,9 @@ const FEATURES = [
 		label: "Personalized filter recommendations",
 	},
 	{
+		label: "Oasis Research AI",
+	},
+	{
 		label: "Support further testing",
 	},
 ];
@@ -95,7 +98,7 @@ export default function SubscribeModal() {
 				{/* Content Section */}
 				<View className="items-center flex-1">
 					<Logo />
-					<H2 className="text-center pt-4">Unlock the truth in your water</H2>
+					<H2 className="text-center pt-4">Unlock healthy hydration</H2>
 					<Muted className="text-center max-w-sm">
 						Your membership funds independent lab testing (which is expensive!)
 						and helps keep Oasis unbiased.

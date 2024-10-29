@@ -18,6 +18,9 @@ const FEATURES = [
 		label: "Personalized filter recommendations",
 	},
 	{
+		label: "Oasis Research AI",
+	},
+	{
 		label: "Support further testing",
 	},
 ];

@@ -32,7 +32,7 @@ export default function ChatList({
 
 			{isLoading && (
 				<View className="ml-2 mt-4 flex flex-col items-center gap-4 justify-center text-center">
-					<Muted>Analayzing data & research (10-20 sec)</Muted>
+					<Muted>Analayzing data & research (5-10 sec)</Muted>
 					<Loader defaultColor="dark" size="small" />
 				</View>
 			)}

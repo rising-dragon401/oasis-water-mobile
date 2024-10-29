@@ -1,7 +1,6 @@
 import { Session, User } from "@supabase/supabase-js";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { usePathname, useRouter, useSegments } from "expo-router";
-import * as SecureStore from "expo-secure-store";
 import * as SplashScreen from "expo-splash-screen";
 import * as WebBrowser from "expo-web-browser";
 import { createContext, useContext, useEffect, useState } from "react";
@@ -164,10 +163,10 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 				});
 
 				// You can optionally store Google's access token if you need it later
-				SecureStore.setItemAsync(
-					"google-access-token",
-					JSON.stringify(data.provider_token),
-				);
+				// SecureStore.setItemAsync(
+				// 	"google-access-token",
+				// 	JSON.stringify(data.provider_token),
+				// );
 			}
 		} catch (error) {
 			// Handle error here
@@ -216,8 +215,6 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 	useEffect(() => {
 		const fetchData = async () => {
 			if (!initialized) return;
-
-			console.log("fetchData");
 
 			const inProtectedGroup = segments[0] === "(protected)";
 

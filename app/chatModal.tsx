@@ -27,12 +27,11 @@ interface Message {
 }
 
 const STARTER_PROMPTS = [
-	"Filters that remove PFAS",
-	"Why are microplastics in water?",
-	"Bottled water with Fluoride",
-	"Water filters for lead",
-	"What are phthalates?",
-	"What are PFAS?",
+	"What are PFAS",
+	"Chocolate with lead",
+	"Importance of minerals in water",
+	"Detoxing heavy metals",
+	"Dishwasher tablets and gut damage",
 ];
 
 export default function ChatModal() {
@@ -81,6 +80,11 @@ export default function ChatModal() {
 			throw new Error("No user id found");
 		}
 
+		console.log(
+			"createNewAssistant: ",
+			`${process.env.EXPO_PUBLIC_API_ENDPOINT}/api/create-new-assistant`,
+		);
+
 		try {
 			const response = await fetch(
 				`${process.env.EXPO_PUBLIC_API_ENDPOINT}/api/create-new-assistant`,
@@ -109,6 +113,10 @@ export default function ChatModal() {
 	}
 
 	async function createNewThread() {
+		console.log(
+			"createNewThread: ",
+			`${process.env.EXPO_PUBLIC_API_ENDPOINT}/api/create-new-thread`,
+		);
 		try {
 			const response = await fetch(
 				`${process.env.EXPO_PUBLIC_API_ENDPOINT}/api/create-new-thread`,
@@ -221,6 +229,8 @@ export default function ChatModal() {
 				},
 			);
 
+			console.log("response: ", response);
+
 			const data = await response.json();
 			console.log("data: ", data.content);
 			const reply = data.content[0].text.value;
@@ -255,7 +265,7 @@ export default function ChatModal() {
 			<View className="flex flex-1 flex-col pt-5 py-4">
 				<View className="flex flex-row items-center justify-center relative">
 					<View />
-					<H3 className="text-center mb-4">Chat with Oasis</H3>
+					<H3 className="text-center mb-4">Chat with Oasis Reseach</H3>
 					<Button
 						variant="ghost"
 						onPress={handleReset}
@@ -288,24 +298,32 @@ export default function ChatModal() {
 								<Logo />
 							</View>
 
-							{starterPrompts.map((prompt) => (
-								<Button
-									key={prompt}
-									variant="outline"
-									label={prompt}
-									onPress={() => {
-										handleSendMessage(prompt);
-									}}
-									className="mb-2"
-								/>
-							))}
+							<View className="my-2">
+								<Muted>
+									Provides answers surrounding scientific research articles.
+								</Muted>
+							</View>
+
+							<View className="flex flex-col ">
+								{starterPrompts.map((prompt) => (
+									<Button
+										key={prompt}
+										variant="outline"
+										label={prompt}
+										onPress={() => {
+											handleSendMessage(prompt);
+										}}
+										className="mb-2"
+									/>
+								))}
+							</View>
 						</View>
 					)}
 				</ScrollView>
 				<View className="flex flex-col items-center justify-center px-6 pb-4">
 					<View className="w-full relative items-center">
 						<Input
-							placeholder="Ask Oasis"
+							placeholder="Ask Oasis resaerch"
 							value={query}
 							onChangeText={setQuery}
 							aria-labelledbyledBy="inputLabel"

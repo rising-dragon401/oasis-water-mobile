@@ -308,12 +308,18 @@ export default function TabOneScreen() {
 				<View className="w-full justify-start mb-6">
 					<View className="flex flex-row justify-between w-full items-center">
 						<H4 className="text-left">News and research</H4>
-						<Link href="/(protected)/research">
-							<Ionicons
-								name="arrow-forward"
-								size={16}
-								color={textSecondaryColor}
-							/>
+						<Link
+							href="/(protected)/research"
+							className="flex flex-row items-center gap-2"
+						>
+							<View className="flex flex-row items-center gap-2">
+								<Muted className="text-center m-0 p-0">all research</Muted>
+								<Ionicons
+									name="arrow-forward"
+									size={16}
+									color={textSecondaryColor}
+								/>
+							</View>
 						</Link>
 					</View>
 

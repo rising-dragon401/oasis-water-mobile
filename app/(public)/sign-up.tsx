@@ -173,7 +173,7 @@ export default function SignUp() {
 				/>
 				<Separator orientation="horizontal" />
 				<Button
-					variant="secondary"
+					variant="outline"
 					loading={loading}
 					onPress={() => onSignInWithGoogle()}
 					label="Sign Up with Google"
