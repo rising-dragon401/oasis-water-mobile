@@ -1,7 +1,6 @@
 import { Label } from "components/ui/label";
 import { Switch } from "components/ui/switch";
 import { Muted } from "components/ui/typography";
-import { useRouter } from "expo-router";
 import { useState } from "react";
 import { View } from "react-native";
 
@@ -15,7 +14,6 @@ type Props = {
 };
 
 export function OasisSwitch({ userData, uid, subscription }: Props) {
-	const router = useRouter();
 	const [checked, setChecked] = useState(userData?.is_oasis_public);
 
 	const handleChange = async (value: boolean) => {

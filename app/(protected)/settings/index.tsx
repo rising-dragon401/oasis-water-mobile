@@ -29,8 +29,16 @@ import { useToast } from "@/context/toast-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function TabTwoScreen() {
-	const { uid, user, userData, subscription, fetchUserData, logout } =
-		useUserProvider();
+	const {
+		uid,
+		user,
+		userData,
+		subscription,
+		subscriptionData,
+		subscriptionProvider,
+		fetchUserData,
+		logout,
+	} = useUserProvider();
 	const { restorePurchases } = useRevenueCat();
 	const { backgroundColor, iconColor } = useColorScheme();
 	const showToast = useToast();
@@ -181,10 +189,12 @@ export default function TabTwoScreen() {
 	};
 
 	const handleManageSubscription = () => {
-		Linking.openURL(subscription.metadata?.managementURL || "");
+		console.log(
+			"subscriptionData.metadata?.managementURL",
+			subscriptionData.metadata?.managementURL,
+		);
+		Linking.openURL(subscriptionData.metadata?.managementURL || "");
 	};
-
-	const provider = subscription?.metadata?.provider || "stripe";
 
 	const handleRestorePurchases = async () => {
 		await restorePurchases();
@@ -377,30 +387,28 @@ export default function TabTwoScreen() {
 											color={iconColor}
 										/>
 										<Typography size="base" fontWeight="normal">
-											{subscription?.plan === "Pro" && "💫"}
+											{subscriptionData?.plan === "Pro" && "💫"}
 											Oasis member
 										</Typography>
 									</View>
 
-									{subscription.cancel_at_period_end && (
+									{subscriptionData?.cancel_at_period_end && (
 										<Typography size="base" fontWeight="normal">
 											Expires on{" "}
 											{new Date(
-												subscription.current_period_end,
+												subscriptionData?.current_period_end,
 											).toLocaleDateString()}
 										</Typography>
 									)}
 
-									{provider === "revenue_cat" ? (
+									{subscriptionProvider === "revenue_cat" ? (
 										<View className="flex flex-col gap-4 text-center mt-2">
-											<Button
-												variant="outline"
-												label="Manage subscription"
-												onPress={handleManageSubscription}
-											/>
+											<Muted>
+												Manage your subscription in your phone settings
+											</Muted>
 										</View>
 									) : (
-										<Muted>Manage your subscription online</Muted>
+										<Muted>Manage your subscription on the Oasis website</Muted>
 									)}
 								</>
 							) : (

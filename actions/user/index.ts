@@ -49,14 +49,17 @@ export const getUserData = async (uid: string) => {
 
 export async function getSubscription(uid: string | null) {
 	if (!uid) {
-		return null;
+		return {
+			success: false,
+			data: null,
+		};
 	}
 
 	try {
-		// fetch all subscriptions
+		// fetch all subscriptions including metadata
 		const { data: subscription } = await supabase
 			.from("subscriptions")
-			.select("*, prices(*, products(*))")
+			.select("*, prices(*, products(*)), metadata")
 			.in("status", ["trialing", "active"])
 			.eq("user_id", uid);
 
@@ -64,15 +67,16 @@ export async function getSubscription(uid: string | null) {
 			return null;
 		}
 
-		// console.log("subscription[0]: ", JSON.stringify(subscription[0], null, 2));
-
 		// use most recent subscription
 		const activePlan = subscription[0]?.prices?.products?.name;
 
 		let planPlan = "Free";
 		if (!activePlan) {
 			planPlan = "Free";
-			return false;
+			return {
+				success: false,
+				data: null,
+			};
 		} else if (
 			activePlan?.toLowerCase() === "pro (test)" ||
 			activePlan?.toLowerCase() === "pro (beta)" ||
@@ -82,20 +86,21 @@ export async function getSubscription(uid: string | null) {
 		}
 
 		const subscriptionDetails = {
-			...subscription,
+			...subscription[0],
 			plan: planPlan,
 		};
 
-		// console.log(
-		// 	"subscriptionDetails",
-		// 	JSON.stringify(subscriptionDetails, null, 2),
-		// );
-
 		// only return subscription details if user is subscribed
-		return subscriptionDetails;
+		return {
+			success: true,
+			data: subscriptionDetails,
+		};
 	} catch (error) {
 		console.error("Error:", error);
-		return null;
+		return {
+			success: false,
+			data: null,
+		};
 	}
 }
 
@@ -215,6 +220,8 @@ const handleReferral = async (subscriptionData: any, uuid: string) => {
 			.eq("subscription_id", subscriptionData.id)
 			.single();
 
+		console.log("existingReferral", existingReferral);
+
 		const referralData = {
 			referring_user_id: referralCode,
 			user_id: uuid,
@@ -242,6 +249,29 @@ const handleReferral = async (subscriptionData: any, uuid: string) => {
 	}
 };
 
+// when in doubt mark as inactive
+const markSubscriptionAsInactive = async (uid: string) => {
+	const { error } = await supabase
+		.from("subscriptions")
+		.update({ status: "expired" })
+		.eq("user_id", uid);
+
+	if (error) {
+		console.error("Error marking subscription as inactive:", error);
+	}
+};
+
+const markSubscriptionAsActive = async (uid: string) => {
+	const { error } = await supabase
+		.from("subscriptions")
+		.update({ status: "active" })
+		.eq("user_id", uid);
+
+	if (error) {
+		console.error("Error marking subscription as active:", error);
+	}
+};
+
 export async function manageSubscriptionStatusChange(
 	uid: string,
 	rcVustomerInfo: any,
@@ -256,9 +286,11 @@ export async function manageSubscriptionStatusChange(
 		// if no active subscriptions, then return
 		const purchases = rcVustomerInfo?.allPurchasedProductIdentifiers;
 		if (!purchases || purchases.length === 0) {
-			return;
+			await markSubscriptionAsInactive(uid);
+			return {
+				success: false,
+			};
 		}
-
 		const provider = "revenue_cat";
 		const entitlements = rcVustomerInfo.entitlements;
 		const proEntitlement = entitlements?.all?.pro;
@@ -267,20 +299,20 @@ export async function manageSubscriptionStatusChange(
 		const proCreatedAt = proEntitlement?.originalPurchaseDate || null;
 		const proPriceId = proEntitlement?.productIdentifier || null;
 		const proWillRenew = proEntitlement?.willRenew || false;
-
-		console.log("proWillRenew", proWillRenew);
-		// determine if active or cancelled based on proIsActive and expirationDate
 		const pastExpirationDate = proExpiresDate < new Date();
-		console.log("proIsActive", proIsActive);
-		const status = !proIsActive && pastExpirationDate ? "canceled" : "active";
-		// const status = !proIsActive ? "canceled" : "active";
+
+		// Mark subscription as expired if trial has ended or pro is not active
+		const status = proIsActive && !pastExpirationDate ? "active" : "expired";
+
 		const subscriptionId = "sub_rc_" + proCreatedAt?.toString() + proPriceId;
 
 		// check if required fields are present
 		if (!subscriptionId || !proCreatedAt || !proExpiresDate || !proPriceId) {
+			await markSubscriptionAsInactive(uid);
 			throw new Error("Missing required fields");
 		}
 
+		// Latest data from rev cat
 		const subscriptionData = {
 			id: subscriptionId,
 			user_id: uid,
@@ -305,49 +337,59 @@ export async function manageSubscriptionStatusChange(
 			.single();
 
 		// Compare existing data with new data
-		let isDataSame =
+		let hasChanged = false;
+		// only update if status has changed
+		if (
 			existingSubscription &&
-			Object.keys(subscriptionData).every((key) => {
-				return (
-					// @ts-ignore
-					JSON.stringify(subscriptionData[key]) ===
-					JSON.stringify(existingSubscription[key])
-				);
-			});
-
-		if (!existingSubscription) {
-			isDataSame = false;
+			subscriptionData.status !== existingSubscription.status
+		) {
+			hasChanged = true;
 		}
 
-		// const hasStripeSubscription = existingSubscription.metadata?.provider !== "revenue_cat";
-
-		if (!isDataSame) {
+		if (hasChanged) {
 			const { error } = await supabase
 				.from("subscriptions")
 				.upsert([subscriptionData]);
-
 			// handle referral
-			await handleReferral(subscriptionData, uid);
+			// only reward referral if subscription is active
+			if (status === "active") {
+				await handleReferral(subscriptionData, uid);
+			}
 
 			if (error) throw error;
-
 			console.log(
 				`Inserted/updated subscription [${subscriptionId}] for user [${uid}]`,
 			);
 		} else {
-			console.log(
-				`No changes detected for subscription [${subscriptionId}]. No update performed.`,
-			);
+			// console.log(
+			// 	`No changes detected for subscription [${subscriptionId}]. No update performed.`,
+			// );
 		}
+
+		// redundant update subscription
+		// definitely paranoia lol
+		if (status === "active") {
+			await markSubscriptionAsActive(uid);
+		} else {
+			await markSubscriptionAsInactive(uid);
+		}
+
+		return {
+			success: true,
+		};
 	} catch (error) {
+		await markSubscriptionAsInactive(uid);
 		console.error("Error inserting/updating subscription:", error);
+		return {
+			success: false,
+		};
 	}
 }
 
 export async function addFavorite(uid: string, type: any, itemId: number) {
 	const { data, error } = await supabase
 		.from("favorites")
-		.insert({ uid: uid, type: type, item_id: itemId })
+		.insert({ uid, type, item_id: itemId })
 		.single();
 
 	if (error) {
@@ -638,7 +680,7 @@ export const createUsername = async (uid: string): Promise<string | false> => {
 
 		const { data, error } = await supabase
 			.from("users")
-			.update({ username: username })
+			.update({ username })
 			.eq("id", uid)
 			.select();
 
@@ -658,7 +700,7 @@ export const updateUsername = async (uid: string, username: string) => {
 
 	const { data, error } = await supabase
 		.from("users")
-		.update({ username: username })
+		.update({ username })
 		.eq("id", uid)
 		.select();
 

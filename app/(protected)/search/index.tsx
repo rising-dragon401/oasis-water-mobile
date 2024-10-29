@@ -77,7 +77,8 @@ export default function TabOneScreen() {
 			uid &&
 			subscription &&
 			!userData?.has_reviewed_app &&
-			pathname !== "/reviewModal"
+			pathname !== "/reviewModal" &&
+			userData?.is_onboarded
 		) {
 			router.push("/reviewModal");
 		}

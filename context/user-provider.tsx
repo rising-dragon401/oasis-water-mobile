@@ -26,13 +26,18 @@ interface UserContextType {
 	user: any;
 	userData: any;
 	userFavorites: any[] | null | undefined;
-	subscription: any | null | undefined;
+	subscription: boolean;
+	subscriptionData: any | null | undefined;
+	subscriptionProvider: SubscriptionProviderType;
 	refreshUserData: () => void;
 	fetchUserFavorites: (uid: string | null) => Promise<void>;
 	fetchSubscription: (uid: string | null) => Promise<any | null>;
+	setSubscription: (value: boolean) => void;
 	fetchUserData: (uid: string | null) => Promise<any | null>;
 	logout: () => void;
 }
+
+type SubscriptionProviderType = null | "revenue_cat" | "stripe";
 
 const UserContext = createContext<UserContextType | null>(null);
 
@@ -50,7 +55,10 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 	const [activeSession, setActiveSession] = useState<any>(null);
 	const [userId, setUserId] = useState<string | null | undefined>(null);
 	const [provider, setProvider] = useState<any>(null);
-	const [subscription, setSubscription] = useState<any>(null);
+	const [subscription, setSubscription] = useState<boolean>(false);
+	const [subscriptionData, setSubscriptionData] = useState<any>(null);
+	const [subscriptionProvider, setSubscriptionProvider] =
+		useState<SubscriptionProviderType>(null);
 	const [userData, setUserData] = useState<any>(null);
 	const [userFavorites, setUserFavorites] = useState<any[] | null | undefined>(
 		null,
@@ -127,7 +135,26 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
 	const fetchSubscription = async (uid: string | null) => {
 		const data = await getSubscription(uid);
-		setSubscription(data);
+
+		if (data && data?.success) {
+			const provider =
+				data?.data?.metadata && data?.data?.metadata?.provider === "revenue_cat"
+					? "revenue_cat"
+					: "stripe";
+
+			setSubscriptionProvider(provider);
+
+			if (provider === "revenue_cat") {
+				setSubscription(true);
+			} else {
+				setSubscription(false);
+			}
+
+			// setSubscription(true);
+			setSubscriptionData(data);
+		} else {
+			setSubscription(false);
+		}
 		return data;
 	};
 
@@ -150,7 +177,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 	const logout = useCallback(async () => {
 		clearUserData();
 		await supabase.auth.signOut();
-		setSubscription(null);
+		setSubscription(false);
 	}, [supabase.auth]);
 
 	const clearUserData = () => {
@@ -158,7 +185,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 		setUserId(null);
 		setUserFavorites(null);
 		setActiveSession(null);
-		setSubscription(null);
+		setSubscription(false);
 	};
 
 	const context = useMemo(
@@ -167,11 +194,14 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 			provider,
 			uid: userId,
 			subscription,
+			subscriptionData,
 			userData,
 			userFavorites,
+			subscriptionProvider,
 			refreshUserData,
 			fetchUserFavorites,
 			fetchSubscription,
+			setSubscription,
 			fetchUserData,
 			logout,
 		}),
@@ -180,11 +210,14 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 			provider,
 			userId,
 			subscription,
+			subscriptionData,
 			userData,
 			userFavorites,
+			subscriptionProvider,
 			refreshUserData,
 			fetchUserFavorites,
 			fetchSubscription,
+			setSubscription,
 			fetchUserData,
 			logout,
 		],

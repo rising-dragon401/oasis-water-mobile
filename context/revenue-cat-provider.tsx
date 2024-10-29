@@ -44,7 +44,8 @@ export const useRevenueCat = () => {
 };
 
 export const RevenueCatProvider = ({ children }: any) => {
-	const { subscription, uid, fetchSubscription } = useUserProvider();
+	const { subscription, uid, fetchSubscription, setSubscription } =
+		useUserProvider();
 	const [userSubscription, setUserSubscription] = useState<UserState>({
 		pro: false,
 	});
@@ -119,12 +120,15 @@ export const RevenueCatProvider = ({ children }: any) => {
 			// console.log("updateCustomerInfo uid", uid);
 
 			const userData = await getUserData(uid);
+			// for admin use and testing
 			if (userData?.do_not_override_sub) {
 				return;
 			}
 
+			// manually override subscription
 			if (!customerInfo || !uid) {
 				console.error("No customer info or uid");
+				setSubscription(false);
 				return;
 			}
 
@@ -134,7 +138,14 @@ export const RevenueCatProvider = ({ children }: any) => {
 
 			// console.log("calling manageSubscriptionStatusChange");
 
-			await manageSubscriptionStatusChange(uid, customerInfo);
+			const updatedSubscription = await manageSubscriptionStatusChange(
+				uid,
+				customerInfo,
+			);
+			// manually override subscription if there is an error with revenue cat
+			if (!updatedSubscription?.success) {
+				setSubscription(false);
+			}
 
 			// update user provider subscription
 			fetchSubscription(uid);

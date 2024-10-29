@@ -23,7 +23,7 @@ const routingInstrumentation = new Sentry.ReactNavigationInstrumentation();
 
 Sentry.init({
 	dsn: "https://7ebff0e9678f504c4a2fb71623d6ff85@o4507189223817216.ingest.us.sentry.io/4507189225062400",
-	debug: true,
+	// debug: true,
 	integrations: [
 		new Sentry.ReactNativeTracing({
 			routingInstrumentation,

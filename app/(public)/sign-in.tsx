@@ -88,7 +88,7 @@ export default function SignIn() {
 
 	return (
 		<SafeAreaView className="flex-1 flex-col px-4">
-			<View className="flex-row justify-center items-center mb-2">
+			<View className="flex-row justify-center items-center">
 				<Image source={OasisLogo} style={{ width: 85, height: 24 }} />
 			</View>
 
@@ -138,41 +138,41 @@ export default function SignIn() {
 						</Form>
 					</View>
 				</ScrollView>
-
-				<View className="gap-y-4 mt-2">
-					<Button
-						size="default"
-						variant="default"
-						onPress={form.handleSubmit(onSubmit)}
-						label="Sign In"
-					>
-						{form.formState.isSubmitting && <ActivityIndicator size="small" />}
-					</Button>
-
-					<Separator orientation="horizontal" />
-
-					<Button
-						variant="outline"
-						loading={loading}
-						onPress={() => onSignInWithGoogle()}
-						label="Sign In with Google"
-						icon={<FontAwesome6 name="google" size={12} color={iconColor} />}
-						iconPosition="left"
-					/>
-
-					<AppleAuthButton />
-
-					<Muted
-						className="text-center"
-						onPress={() => {
-							router.replace("/sign-up");
-						}}
-					>
-						Don't have an account?{" "}
-						<Muted className="text-foreground">Sign up</Muted>
-					</Muted>
-				</View>
 			</KeyboardAvoidingView>
+
+			<View className="gap-y-4 mt-2">
+				<Button
+					size="default"
+					variant="default"
+					onPress={form.handleSubmit(onSubmit)}
+					label="Sign In"
+				>
+					{form.formState.isSubmitting && <ActivityIndicator size="small" />}
+				</Button>
+
+				<Separator orientation="horizontal" />
+
+				<Button
+					variant="outline"
+					loading={loading}
+					onPress={() => onSignInWithGoogle()}
+					label="Sign In with Google"
+					icon={<FontAwesome6 name="google" size={12} color={iconColor} />}
+					iconPosition="left"
+				/>
+
+				<AppleAuthButton />
+
+				<Muted
+					className="text-center"
+					onPress={() => {
+						router.replace("/sign-up");
+					}}
+				>
+					Don't have an account?{" "}
+					<Muted className="text-foreground">Sign up</Muted>
+				</Muted>
+			</View>
 		</SafeAreaView>
 	);
 }

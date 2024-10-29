@@ -1,14 +1,14 @@
-import { updateUserData } from "@/actions/user";
-import Logo from "@/components/sharable/logo";
-import { H1, P } from "@/components/ui/typography";
-import { useUserProvider } from "@/context/user-provider";
-import { useColorScheme } from "@/lib/useColorScheme";
-
 import { AntDesign } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import * as StoreReview from "expo-store-review";
 import { useState } from "react";
 import { Alert, TouchableOpacity, View } from "react-native";
+
+import { updateUserData } from "@/actions/user";
+import Logo from "@/components/sharable/logo";
+import { H1, P } from "@/components/ui/typography";
+import { useUserProvider } from "@/context/user-provider";
+import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function ReviewModal() {
 	const { uid } = useUserProvider();

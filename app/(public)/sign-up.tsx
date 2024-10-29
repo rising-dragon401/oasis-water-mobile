@@ -95,7 +95,7 @@ export default function SignUp() {
 
 	return (
 		<SafeAreaView className="flex-1 px-4">
-			<View className="flex-row justify-center items-center mb-2">
+			<View className="flex-row justify-center items-center">
 				<Image source={OasisLogo} style={{ width: 85, height: 24 }} />
 			</View>
 
