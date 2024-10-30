@@ -199,22 +199,20 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 
 	useEffect(() => {
 		const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
-			console.log("onAuthStateChange: ", event, session);
+			setSession(session);
+			setUser(session ? session.user : null);
+			setInitialized(true);
 
 			if (session) {
 				// Link user session to posthog user
-				posthog.identify(session.user.id);
+				posthog?.identify(session.user.id);
 
 				// Capture sign in event
-				posthog.capture("sign_in", {
+				posthog?.capture("sign_in", {
 					event,
 					session,
 				});
 			}
-
-			setSession(session);
-			setUser(session ? session.user : null);
-			setInitialized(true);
 
 			// HACK: Prevents app from opening 404 page when logging in
 			setTimeout(() => {
@@ -225,7 +223,7 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 		return () => {
 			data.subscription.unsubscribe();
 		};
-	}, []);
+	}, [posthog]);
 
 	useEffect(() => {
 		const fetchData = async () => {

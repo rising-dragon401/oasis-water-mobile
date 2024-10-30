@@ -82,9 +82,11 @@ export default function ResultsRow({ results, noResults }: Props) {
 															: result.image || "",
 												}}
 												alt={result.name || ""}
+												allowDownscaling
 												style={{ width: 40, height: "100%", borderRadius: 5 }}
 												placeholder={{ blurhash: placeHolderImageBlurHash }}
-												transition={1000}
+												transition={300}
+												cachePolicy="disk"
 											/>
 											<View className="flex flex-col">
 												<P

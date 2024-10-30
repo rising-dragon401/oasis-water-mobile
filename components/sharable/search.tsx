@@ -1,6 +1,7 @@
 import { Feather, Octicons } from "@expo/vector-icons";
 import algoliasearch from "algoliasearch";
 import { useRouter } from "expo-router";
+import { usePostHog } from "posthog-react-native";
 import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 
@@ -10,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { theme } from "@/lib/constants";
 import { useDebounce } from "@/lib/hooks/use-debounce";
 import { useColorScheme } from "@/lib/useColorScheme";
+
 const numResults = 10;
 
 const searchClient = algoliasearch(
@@ -33,7 +35,7 @@ export default function Search({
 	const debouncedQuery = useDebounce(value, 400);
 	const { colorScheme, mutedForegroundColor } = useColorScheme();
 	const router = useRouter();
-
+	const posthog = usePostHog();
 	useEffect(() => {
 		setQueryCompleted(false);
 		if (debouncedQuery) {
@@ -104,7 +106,7 @@ export default function Search({
 			];
 		}
 
-		posthog.capture("search", {
+		posthog?.capture("search", {
 			query,
 		});
 

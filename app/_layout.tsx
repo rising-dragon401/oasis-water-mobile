@@ -49,8 +49,15 @@ function RootLayout() {
 				<RevenueCatProvider>
 					<BlogProvider>
 						<PostHogProvider
-							apiKey="phc_DgpoHcLfjkFjGPfzDpqSxL46lHoqbX0dgAkHdp2b81b"
-							options={{ host: "https://us.i.posthog.com" }}
+							apiKey="phc_VmBnr5ASsMA5JqVfFzwvxnfe1SJlNu85lH8pWfiAsYZ"
+							options={{
+								host: "https://us.i.posthog.com",
+								enableSessionReplay: true,
+								// Deboucer delay used to reduce the number of snapshots captured and reduce performance impact. Default is 500ms
+								// androidDebouncerDelayMs: 500,
+								// Deboucer delay used to reduce the number of snapshots captured and reduce performance impact. Default is 1000ms
+								// iOSdebouncerDelayMs: 1000,
+							}}
 							autocapture
 						>
 							<SWRConfig>

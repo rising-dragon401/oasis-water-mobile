@@ -76,7 +76,6 @@ export const RevenueCatProvider = ({ children }: any) => {
 			});
 
 			const customerInfo = await Purchases.getCustomerInfo();
-			console.log("customerInfo", customerInfo);
 			setCustomerInfo(customerInfo);
 			updateCustomerInfo(customerInfo, uid || "");
 
@@ -156,12 +155,6 @@ export const RevenueCatProvider = ({ children }: any) => {
 	// get latest sub data from revenue cat
 	const updateCustomerInfo = useCallback(
 		async (customerInfo: CustomerInfo, uid: string) => {
-			// console.log(
-			// 	"updateCustomerInfo info",
-			// 	JSON.stringify(customerInfo, null, 2),
-			// );
-			// console.log("updateCustomerInfo uid", uid);
-
 			const userData = await getUserData(uid);
 			// for admin use and testing
 			if (userData?.do_not_override_sub) {
