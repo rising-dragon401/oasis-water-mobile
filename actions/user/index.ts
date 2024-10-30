@@ -276,10 +276,12 @@ export async function manageSubscriptionStatusChange(
 	uid: string,
 	rcVustomerInfo: any,
 ) {
-	// console.log(
-	// 	"manageSubscriptionStatusChange: ",
-	// 	JSON.stringify(rcVustomerInfo, null, 2),
-	// );
+	console.log(
+		"manageSubscriptionStatusChange: ",
+		JSON.stringify(rcVustomerInfo, null, 2),
+	);
+
+	console.log("uid", uid);
 
 	try {
 		// check for any active subscriptions
@@ -293,6 +295,9 @@ export async function manageSubscriptionStatusChange(
 		}
 		const provider = "revenue_cat";
 		const entitlements = rcVustomerInfo.entitlements;
+
+		console.log("entitlements", JSON.stringify(entitlements, null, 2));
+
 		const proEntitlement = entitlements?.all?.pro;
 		const proIsActive = proEntitlement?.isActive === true || false;
 		const proExpiresDate = proEntitlement?.expirationDate || null;
@@ -301,8 +306,15 @@ export async function manageSubscriptionStatusChange(
 		const proWillRenew = proEntitlement?.willRenew || false;
 		const pastExpirationDate = proExpiresDate < new Date();
 
+		console.log("proEntitlement", JSON.stringify(proEntitlement, null, 2));
+
+		console.log("proIsActive", proIsActive);
+		console.log("pastExpirationDate", pastExpirationDate);
+
 		// Mark subscription as expired if trial has ended or pro is not active
 		const status = proIsActive && !pastExpirationDate ? "active" : "expired";
+
+		console.log("status", status);
 
 		const subscriptionId = "sub_rc_" + proCreatedAt?.toString() + proPriceId;
 
@@ -341,12 +353,15 @@ export async function manageSubscriptionStatusChange(
 		// only update if status has changed
 		if (
 			existingSubscription &&
-			subscriptionData.status !== existingSubscription.status
+			subscriptionData?.status !== existingSubscription?.status
 		) {
 			hasChanged = true;
 		}
 
-		if (hasChanged) {
+		console.log("hasChanged", hasChanged);
+
+		if (hasChanged || !existingSubscription) {
+			console.log("upserting subscription");
 			const { error } = await supabase
 				.from("subscriptions")
 				.upsert([subscriptionData]);

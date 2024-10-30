@@ -225,16 +225,17 @@ export default function TabTwoScreen() {
 			{userData ? (
 				<View className="w-full flex flex-col h-full justify-between pb-14 px-8">
 					<View className="flex-row w-full justify-between items-center mt-24">
-						<H1>Account</H1>
-						<View>
-							<Link href="/(protected)/settings/help">
-								<Ionicons
-									name="help-circle-outline"
-									size={24}
-									color={iconColor}
-								/>
-							</Link>
-						</View>
+						<H1>Settings</H1>
+						<TouchableOpacity
+							onPress={() => router.push("/(protected)/settings/help")}
+							style={{ backgroundColor: "transparent" }}
+						>
+							<Ionicons
+								name="help-circle-outline"
+								size={24}
+								color={iconColor}
+							/>
+						</TouchableOpacity>
 					</View>
 
 					<View className="flex flex-col mt-6">
@@ -246,6 +247,76 @@ export default function TabTwoScreen() {
 						/>
 						<Large>{userData.full_name || "Unknown name"}</Large>
 						<Muted>@{userData.username || "No username set"}</Muted>
+					</View>
+
+					<View className="flex flex-col gap-y-2 mt-6">
+						<P className="text-muted-foreground">Subscription</P>
+						<View className="bg-muted p-4 rounded-xl border border-accent shadow-sm shadow-blue-500/50">
+							{subscription ? (
+								<>
+									<View className="flex flex-row items-center gap-x-1">
+										<MaterialCommunityIcons
+											name="check-decagram-outline"
+											size={18}
+											color={iconColor}
+										/>
+										<Typography size="base" fontWeight="normal">
+											Oasis member
+										</Typography>
+									</View>
+
+									{subscriptionData?.cancel_at_period_end && (
+										<Typography size="base" fontWeight="normal">
+											Expires on{" "}
+											{new Date(
+												subscriptionData?.current_period_end,
+											).toLocaleDateString()}
+										</Typography>
+									)}
+
+									{subscriptionProvider === "revenue_cat" ? (
+										<View className="flex flex-col gap-4 text-center mt-2">
+											<Muted>
+												Thank you for supporting Oasis and the independent lab
+												testing of water. You can manage your subscription in
+												your phone settings at any time.
+											</Muted>
+										</View>
+									) : (
+										<Muted>
+											{" "}
+											Thank you for supporting Oasis and the independent lab
+											testing of water. Your can manage your subscription on the
+											Oasis website at any time.
+										</Muted>
+									)}
+								</>
+							) : (
+								<View className="mt-4 flex flex-col items-center gap-y-2">
+									<UpgradeButton />
+
+									{!userData?.has_redeemed_free_month && (
+										<>
+											<Separator />
+
+											<Button
+												className="w-full"
+												variant="outline"
+												label="Invite 3 friends, get 1 month free 🤝"
+												onPress={handleLoadInviteModal}
+											/>
+
+											<Button
+												className="w-full"
+												variant="ghost"
+												label="Redeem invite code"
+												onPress={handleLoadRedeemModal}
+											/>
+										</>
+									)}
+								</View>
+							)}
+						</View>
 					</View>
 
 					<View className="flex flex-col gap-y-2 mt-6">
@@ -376,70 +447,6 @@ export default function TabTwoScreen() {
 					</View>
 
 					<View className="flex flex-col gap-y-2 mt-6">
-						<P className="text-muted-foreground">Subscription</P>
-						<View className="bg-muted p-4 rounded-xl border border-border">
-							{subscription ? (
-								<>
-									<View className="flex flex-row items-center gap-x-1">
-										<MaterialCommunityIcons
-											name="check-decagram-outline"
-											size={18}
-											color={iconColor}
-										/>
-										<Typography size="base" fontWeight="normal">
-											{subscriptionData?.plan === "Pro" && "💫"}
-											Oasis member
-										</Typography>
-									</View>
-
-									{subscriptionData?.cancel_at_period_end && (
-										<Typography size="base" fontWeight="normal">
-											Expires on{" "}
-											{new Date(
-												subscriptionData?.current_period_end,
-											).toLocaleDateString()}
-										</Typography>
-									)}
-
-									{subscriptionProvider === "revenue_cat" ? (
-										<View className="flex flex-col gap-4 text-center mt-2">
-											<Muted>
-												Manage your subscription in your phone settings
-											</Muted>
-										</View>
-									) : (
-										<Muted>Manage your subscription on the Oasis website</Muted>
-									)}
-								</>
-							) : (
-								<View className="mt-4 flex flex-col items-center gap-y-2">
-									<UpgradeButton />
-
-									{!userData?.has_redeemed_free_month && (
-										<>
-											<Separator />
-
-											<Button
-												className="w-full bg-blue-500"
-												variant="default"
-												label="Invite 3 friends, get 1 month free 🤝"
-												onPress={handleLoadInviteModal}
-											/>
-
-											<Button
-												className="w-full"
-												variant="outline"
-												label="Redeem invite code"
-												onPress={handleLoadRedeemModal}
-											/>
-										</>
-									)}
-								</View>
-							)}
-						</View>
-					</View>
-
-					<View className="flex flex-col gap-y-2 mt-6">
 						<P className="text-muted-foreground">Referrals and Earnings</P>
 						<View className="bg-muted p-4 rounded-xl border border-border">
 							<View className="flex flex-col gap-y-2">
@@ -535,7 +542,7 @@ export default function TabTwoScreen() {
 					style={{ backgroundColor }}
 				>
 					<View className="flex-row w-full justify-between items-center mt-24">
-						<H1>Account </H1>
+						<H1>Settings</H1>
 						<View>
 							<Link href="/(protected)/settings/help">
 								<Ionicons

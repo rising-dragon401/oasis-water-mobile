@@ -32,9 +32,7 @@ export default function ProtectedLayout() {
 							<Ionicons name="flask-outline" size={24} color={iconColor} />
 						);
 					} else if (route.name === "oasis") {
-						return (
-							<Ionicons name="heart-outline" size={24} color={iconColor} />
-						);
+						return <Octicons name="person" size={24} color={iconColor} />;
 					}
 
 					// else if (route.name === "locations") {

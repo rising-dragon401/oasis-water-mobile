@@ -8,8 +8,26 @@ function CustomHeader() {
 	return <Image source={OasisLogo} style={{ width: 85, height: 24 }} />;
 }
 
+// function UpgradeHeader({ onCrownPress }: { onCrownPress: () => void }) {
+// 	return (
+// 		<>
+// 			<Image source={OasisLogo} style={{ width: 85, height: 24 }} />
+// 			<TouchableOpacity
+// 				onPress={onCrownPress}
+// 				style={{ position: "absolute", right: 10 }}
+// 			>
+// 				<Image source={CrownIcon} style={{ width: 24, height: 24 }} />
+// 			</TouchableOpacity>
+// 		</>
+// 	);
+// }
+
 export default function SearchLayout() {
 	const { backgroundColor, textColor } = useColorScheme();
+
+	// const openSubscribeModal = () => {
+	// 	setSubscribeModalVisible(true);
+	// };
 
 	return (
 		<Stack
@@ -30,7 +48,14 @@ export default function SearchLayout() {
 				headerShadowVisible: false,
 			}}
 		>
-			<Stack.Screen name="index" />
+			<Stack.Screen
+				name="index"
+				// options={{
+				// 	headerTitle: () => (
+				// 		<UpgradeHeader onCrownPress={openSubscribeModal} />
+				// 	),
+				// }}
+			/>
 			<Stack.Screen name="item/[id]" />
 			<Stack.Screen name="location/[id]" />
 			<Stack.Screen name="ingredient/[id]" />

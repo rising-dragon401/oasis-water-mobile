@@ -24,6 +24,7 @@ const APIKeys = {
 interface RevenueCatProps {
 	purchasePackage: (pack: PurchasesPackage) => Promise<boolean>;
 	restorePurchases: () => Promise<CustomerInfo>;
+	refetchCustomerAndSubscription: (uid: string) => Promise<void>;
 	userSubscription: UserState;
 	packages: PurchasesPackage[];
 }
@@ -50,6 +51,7 @@ export const RevenueCatProvider = ({ children }: any) => {
 		pro: false,
 	});
 	const [packages, setPackages] = useState<PurchasesPackage[]>([]);
+	const [customerInfo, setCustomerInfo] = useState<CustomerInfo | null>(null);
 	const [, setIsReady] = useState(false);
 
 	useEffect(() => {
@@ -65,6 +67,7 @@ export const RevenueCatProvider = ({ children }: any) => {
 			Purchases.setLogLevel(LOG_LEVEL.DEBUG);
 
 			Purchases.addCustomerInfoUpdateListener(async (customerInfo) => {
+				setCustomerInfo(customerInfo);
 				updateCustomerInfo(customerInfo, uid || "");
 			});
 
@@ -83,13 +86,26 @@ export const RevenueCatProvider = ({ children }: any) => {
 		}
 	}, [subscription]);
 
+	useEffect(() => {
+		if (customerInfo) {
+			setUserSubscription({
+				pro: customerInfo.entitlements.active.pro?.isActive || false,
+			});
+		}
+	}, [customerInfo]);
+
 	const loadOfferings = async () => {
 		const offerings = await Purchases.getOfferings();
 
 		const annualPackage = offerings.current?.annual
 			? [offerings.current.annual]
 			: [];
-		setPackages(annualPackage);
+
+		const weeklyPackage = offerings.current?.weekly
+			? [offerings.current.weekly]
+			: [];
+
+		setPackages([...annualPackage, ...weeklyPackage]);
 	};
 
 	// console.log("packages", packages);
@@ -100,6 +116,8 @@ export const RevenueCatProvider = ({ children }: any) => {
 
 			if (pack.identifier === "pro") {
 				setUserSubscription({ ...userSubscription, pro: true });
+				setSubscription(true);
+				refetchCustomerAndSubscription(uid || "");
 			}
 
 			return true;
@@ -111,6 +129,16 @@ export const RevenueCatProvider = ({ children }: any) => {
 		}
 	};
 
+	const refetchCustomerAndSubscription = useCallback(
+		async (uid: string) => {
+			if (customerInfo) {
+				updateCustomerInfo(customerInfo, uid);
+			}
+		},
+		[customerInfo],
+	);
+
+	// get latest sub data from revenue cat
 	const updateCustomerInfo = useCallback(
 		async (customerInfo: CustomerInfo, uid: string) => {
 			// console.log(
@@ -142,6 +170,9 @@ export const RevenueCatProvider = ({ children }: any) => {
 				uid,
 				customerInfo,
 			);
+
+			console.log("updatedSubscription", updatedSubscription);
+
 			// manually override subscription if there is an error with revenue cat
 			if (!updatedSubscription?.success) {
 				setSubscription(false);
@@ -161,6 +192,7 @@ export const RevenueCatProvider = ({ children }: any) => {
 	const value = {
 		purchasePackage,
 		restorePurchases,
+		refetchCustomerAndSubscription,
 		userSubscription,
 		packages,
 	};

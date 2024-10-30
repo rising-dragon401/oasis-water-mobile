@@ -56,8 +56,8 @@ export default function ReviewModal() {
 				<Logo />
 				<H1 className="text-center mt-3">Enjoying Oasis?</H1>
 				<P className="text-center max-w-md mt-2">
-					We are a team of 1 trying to create transparency in the water world.
-					Please support with your feedback.
+					We are a small team working to independenlty lab test products and
+					keep brands accountable.. Please support with your feedback.
 				</P>
 
 				<View className="flex flex-row gap-x-2 mt-10">

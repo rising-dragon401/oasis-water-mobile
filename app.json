@@ -37,15 +37,15 @@
 		"plugins": [
 			"expo-router",
 			"expo-camera",
-
 			"expo-dev-launcher",
+			"expo-localization",
+			"expo-apple-authentication",
 			[
 				"expo-dev-launcher",
 				{
 					"launchMode": "most-recent"
 				}
 			],
-			"expo-apple-authentication",
 			[
 				"@sentry/react-native/expo",
 				{
@@ -66,8 +66,7 @@
 					"cameraPermission": "Allow Oasis to access your camera to scan your water bottle or filter.",
 					"recordAudioAndroid": true
 				}
-			],
-			"expo-localization"
+			]
 		],
 		"extra": {
 			"router": {

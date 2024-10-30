@@ -2,7 +2,7 @@ import { Feather } from "@expo/vector-icons";
 import * as Linking from "expo-linking";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { Alert, ScrollView, View } from "react-native";
+import { Alert, ScrollView, TouchableOpacity, View } from "react-native";
 
 import Logo from "@/components/sharable/logo";
 import { Button } from "@/components/ui/button";
@@ -39,9 +39,12 @@ export default function SubscribeModal() {
 	const { accentColor, backgroundColor } = useColorScheme();
 
 	const [loading, setLoading] = useState(false);
+	const [selectedPlan, setSelectedPlan] = useState<"annual" | "weekly">(
+		"weekly",
+	);
 
 	useEffect(() => {
-		if (subscription?.active) {
+		if (subscription) {
 			router.back();
 		}
 	}, [subscription]);
@@ -71,9 +74,10 @@ export default function SubscribeModal() {
 				throw new Error("User not found");
 			}
 
-			console.log(packages);
+			const annualPackage = packages.find((p) => p.packageType === "ANNUAL");
+			const weeklyPackage = packages.find((p) => p.packageType === "WEEKLY");
 
-			const pack = packages[0];
+			const pack = selectedPlan === "annual" ? annualPackage : weeklyPackage;
 
 			if (!pack) {
 				console.log("No package found");
@@ -94,18 +98,18 @@ export default function SubscribeModal() {
 
 	return (
 		<ScrollView contentContainerStyle={{ backgroundColor, height: "100%" }}>
-			<View className="flex-1 justify-between p-4 py-16 h-full">
+			<View className="flex-1 justify-between p-4 py-16 h-full items-center ">
 				{/* Content Section */}
-				<View className="items-center flex-1">
+				<View className="items-center flex-1 max-w-md">
 					<Logo />
 					<H2 className="text-center pt-4">Unlock healthy hydration</H2>
-					<Muted className="text-center max-w-sm">
+					{/* <Muted className="text-center max-w-sm">
 						Your membership funds independent lab testing (which is expensive!)
 						and helps keep Oasis unbiased.
-					</Muted>
+					</Muted> */}
 					{/* Features */}
-					<View className="w-full items-center flex flex-col mt-14">
-						<View className="gap-y-6 w-full rounded-lg border border-border px-4 py-4 max-w-sm">
+					<View className="w-full items-center flex flex-col mt-4">
+						<View className="gap-y-6 wrounded-lg border border-border px-4 py-4  w-full">
 							{FEATURES.map((feature, index) => (
 								<View
 									key={index}
@@ -120,22 +124,48 @@ export default function SubscribeModal() {
 				</View>
 
 				{/* Subscribe Button Section */}
-				<View className="w-full flex-col items-center mt-auto justify-center">
+				<View className="w-full flex-col items-center mt-auto justify-center max-w-md">
+					<View className="flex flex-row gap-4 w-full p-4 mb-4">
+						<TouchableOpacity
+							className={`flex-1 flex flex-col justify-between border border-border rounded-lg py-2 px-4 ${selectedPlan === "annual" ? "border-primary border-2" : ""}`}
+							onPress={() => setSelectedPlan("annual")}
+						>
+							<P className="text-left text-lg font-semibold">Yearly access</P>
+
+							<View className="flex flex-row justify-between items-end mt-4">
+								<P className="text-xl font-semibold">$47</P>
+								<Muted className="">$0.90 /wk</Muted>
+							</View>
+						</TouchableOpacity>
+
+						<TouchableOpacity
+							className={`flex-1 flex flex-col justify-between border border-border rounded-lg py-2 px-4 ${selectedPlan === "weekly" ? "border-primary border-2" : ""}`}
+							onPress={() => setSelectedPlan("weekly")}
+						>
+							<P className="text-lg font-semibold">Weekly access</P>
+							<View className="flex flex-row justify-between mt-4">
+								<P className="text-xl font-semibold">$4.99</P>
+								{/* <Muted className="">$0.90 / week</Muted> */}
+							</View>
+						</TouchableOpacity>
+					</View>
 					{/* mt-auto pushes this section to the bottom */}
 					<Button
-						className="w-full !max-w-sm !h-20 mb-4"
+						className="w-full !max-w-sm !h-20 mb-4 !bg-gradient-to-r from-blue-500 to-blue-300 shadow-lg shadow-blue-500/50"
 						textClassName="!text-lg"
 						variant="default"
-						label="Try it free"
+						label="Upgrade"
 						loading={loading}
-						onPress={handleSubscribe}
+						onPress={() => handleSubscribe()}
 					/>
+
 					<View className="flex flex-col gap-y-2 w-full">
 						<Muted className="text-center">
-							Free access for 3 days then $4 /mo ($47 billed annually)
+							Your membership funds independent lab testing (which is
+							expensive!) and helps keep Oasis unbiased.
 						</Muted>
 					</View>
-					<View className="mt-14 px-8 flex flex-row gap-x-4">
+					<View className="mt-6 px-8 flex flex-row gap-x-4">
 						<Button
 							label="Terms of Use"
 							size="sm"

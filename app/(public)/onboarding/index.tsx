@@ -17,7 +17,7 @@ import { SubscribeOnboarding } from "@/components/sharable/subscribe-onboarding"
 import { Button } from "@/components/ui/button";
 import * as ProgressPrimitive from "@/components/ui/progress";
 import { Switch } from "@/components/ui/switch";
-import { H1, P } from "@/components/ui/typography";
+import { H1, Muted, P } from "@/components/ui/typography";
 import { useRevenueCat } from "@/context/revenue-cat-provider";
 import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
@@ -37,6 +37,7 @@ export default function OnboardingScreen() {
 		state: string;
 		country: string;
 	} | null>(null);
+	const [selectedPlan, setSelectedPlan] = useState("weekly");
 
 	const router = useRouter();
 	const { user, userData, subscription } = useUserProvider();
@@ -49,14 +50,14 @@ export default function OnboardingScreen() {
 	// Onboarding steps
 	const steps = [
 		{
-			title: "Drink with confidence",
-			subtitle:
-				"The majority of water is contaminated with toxins and most filters don't remove them. Get the lab-tested data and rankings to drink the best water for you.",
+			title: "Our water is contaminated",
+			subtitle: `Most bottled and tap water contains endocrine disruptors, forever chemicals and other toxins that increase the risk of inflammation, illness and skin issues.`,
+			subSubtitle: "We show you what's actually inside: ",
 			image:
 				"https://connect.live-oasis.com/storage/v1/object/public/website/images/onboarding/toxins%20in%20water%20graphic.png?t=2024-10-08T05%3A26%3A22.658Z", // Add image option
 			imageStyle: {
 				width: "100%",
-				height: windowHeight * 0.44,
+				height: windowHeight * 0.4,
 				resizeMode: "contain",
 				borderRadius: 20,
 				marginTop: 18,
@@ -124,21 +125,28 @@ export default function OnboardingScreen() {
 			skipButtonLabel: "Skip",
 		},
 		{
-			title: "Unlock the top rated water and filters",
-			subtitle:
-				"Your membership funds independent lab testing (which is expensive!) and helps keep Oasis unbiased.",
+			title: "The best waters for you",
+			subtitle: "Hydrate with confidence and peace of mind",
 			image:
 				"https://connect.live-oasis.com/storage/v1/object/public/website/images/onboarding/paywall%20cards.jpg",
+			// image: null,
 			imageStyle: {
-				width: "100%",
-				height: windowHeight * 0.2,
+				width: "80%",
+				height: windowHeight * 0.15,
 				resizeMode: "contain",
 			},
-			component: <SubscribeOnboarding />,
+			component: (
+				<SubscribeOnboarding
+					setSelectedPlan={setSelectedPlan}
+					selectedPlan={selectedPlan}
+				/>
+			),
 			onSubmit: () => {
 				handleSubscribe();
 			},
-			submitButtonLabel: "Start 3 day free trial",
+			submitButtonLabel: "Unlock 💧",
+			submitButtonStyles:
+				"!bg-gradient-to-r from-blue-500 to-blue-300 shadow-lg shadow-blue-500/50",
 			onSkip: null,
 			skipButtonLabel: "No thanks, continue with basic and view limited data",
 			canSkip: false,
@@ -209,7 +217,10 @@ export default function OnboardingScreen() {
 				throw new Error("User not found");
 			}
 
-			const pack = packages[0];
+			const annualPackage = packages.find((p) => p.packageType === "ANNUAL");
+			const weeklyPackage = packages.find((p) => p.packageType === "WEEKLY");
+
+			const pack = selectedPlan === "annual" ? annualPackage : weeklyPackage;
 
 			if (!pack) {
 				console.log("No package found");
@@ -248,7 +259,7 @@ export default function OnboardingScreen() {
 	return (
 		<View className="flex-1 pb-14">
 			{/* Back Button and Progress Bar */}
-			<View className="flex flex-row items-center justify-between mb-4 p-4 px-8 w-full">
+			<View className="flex flex-row items-center justify-between mb-2 p-4 px-8 w-full">
 				<View className="w-14 flex flex-row justify-center">
 					{currentStep !== 0 ? (
 						<TouchableOpacity
@@ -296,6 +307,7 @@ export default function OnboardingScreen() {
 							<View className="flex flex-col gap-2">
 								<H1>{step.title}</H1>
 								<P>{step.subtitle}</P>
+								{step?.subSubtitle && <P>{step.subSubtitle}</P>}
 							</View>
 							<View className="flex justify-center items-center mb-4">
 								{step.image && (
@@ -322,15 +334,15 @@ export default function OnboardingScreen() {
 				<Button
 					onPress={() => handleNextStep(true)}
 					variant="default"
-					className="!h-20 w-full"
+					className={`!h-20 w-full ${steps[currentStep].submitButtonStyles}`}
 					label={steps[currentStep].submitButtonLabel}
 					loading={loadingPurchase}
 				/>
-				<View className="text-center mt-2 h-8">
+				<View className="text-center mt-2 h-8 flex flex-col items-center">
 					{currentStep === steps.length - 1 && (
-						<P className="text-center">
-							Free for 3 days then $4 /mo ($47 annual charge)
-						</P>
+						<Muted className="text-center max-w-sm">
+							Your membership helps fund independent lab testing
+						</Muted>
 					)}
 
 					{steps[currentStep].canSkip && (

@@ -25,7 +25,7 @@ export default function OasisScreen() {
 			}}
 			style={{ backgroundColor }}
 		>
-			<H1>Favorites</H1>
+			<H1>Profile</H1>
 			{uid ? (
 				<View className="flex flex-col items-center py-4 gap-y-4 w-full">
 					{userFavorites ? (
@@ -53,9 +53,7 @@ export default function OasisScreen() {
 			) : (
 				<View className="w-full gap-y-2">
 					<View className="flex flex-col gap-y-4 w-full">
-						<Muted className="">
-							Sign in to add products and see your water score
-						</Muted>
+						<Muted>Sign in to add products and see your water score</Muted>
 					</View>
 
 					<Button

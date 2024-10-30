@@ -1,4 +1,4 @@
-import { Octicons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { Alert, KeyboardAvoidingView, Platform, View } from "react-native";
 
@@ -14,7 +14,7 @@ export default function RedeemModal() {
 	const { uid } = useUserProvider();
 	const { colorScheme } = useColorScheme();
 
-	const [loading, setLoading] = useState(true);
+	const [loading, setLoading] = useState(false);
 	const [code, setCode] = useState("");
 
 	const iconColor =
@@ -48,10 +48,10 @@ export default function RedeemModal() {
 
 				<View className="w-full flex flex-col items-center">
 					<View className="mb-8">
-						<Octicons name="unlock" size={24} color={iconColor} />
+						<Ionicons name="ticket-outline" size={24} color={iconColor} />
 					</View>
 					<H1 className="text-center">Redeem your invite code</H1>
-					<P className="text-center max-w-md">
+					<P className="text-center max-w-sm">
 						Entering this code rewards the person who shared it with you.
 					</P>
 
