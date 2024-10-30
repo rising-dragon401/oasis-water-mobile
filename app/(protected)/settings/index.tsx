@@ -228,7 +228,7 @@ export default function TabTwoScreen() {
 						<H1>Settings</H1>
 						<TouchableOpacity
 							onPress={() => router.push("/(protected)/settings/help")}
-							style={{ backgroundColor: "transparent" }}
+							className="!bg-transparent"
 						>
 							<Ionicons
 								name="help-circle-outline"

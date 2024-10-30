@@ -309,19 +309,32 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 			if (selectedContaminants.length === 0) return true;
 
 			if (productType === "water") {
-				return !item.ingredients?.some((ing: any) =>
-					selectedContaminants.some((contaminantId) => {
-						const contaminant = CONTAMINANTS.find(
-							(contaminant) => contaminant.id === contaminantId,
-						);
+				// console.log("selectedContaminants", selectedContaminants);
 
-						return (
-							contaminant &&
-							contaminant.supabase_ids &&
-							contaminant.supabase_ids.includes(ing?.ingredient_id)
-						);
-					}),
-				);
+				// PFAS is manually tracked
+				if (selectedContaminants.includes("PFAS")) {
+					console.log("item.metaadata?.pfas", item.metaadata?.pfas);
+					if (item.metadata?.pfas !== "No") {
+						return false;
+					} else {
+						return true;
+					}
+				} else {
+					// check for contaminants present in ingredients like normal
+					return !item.ingredients?.some((ing: any) =>
+						selectedContaminants.some((contaminantId) => {
+							const contaminant = CONTAMINANTS.find(
+								(contaminant) => contaminant.id === contaminantId,
+							);
+
+							return (
+								contaminant &&
+								contaminant.supabase_ids &&
+								contaminant.supabase_ids.includes(ing?.ingredient_id)
+							);
+						}),
+					);
+				}
 			} else if (productType === "filter") {
 				return selectedContaminants.every((contaminantId) =>
 					item.filtered_contaminant_categories?.some(

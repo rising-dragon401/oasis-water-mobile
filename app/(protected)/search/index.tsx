@@ -4,7 +4,7 @@ import { getFeaturedUsers } from "actions/admin";
 import { Image } from "expo-image";
 import { Link, usePathname, useRouter } from "expo-router";
 import { useContext, useEffect, useState } from "react";
-import { FlatList, ScrollView, View } from "react-native";
+import { FlatList, ScrollView, TouchableOpacity, View } from "react-native";
 
 import LocationCard from "@/components/sharable/location-card";
 import Search from "@/components/sharable/search";
@@ -90,6 +90,14 @@ export default function TabOneScreen() {
 
 		setPeople(data || []);
 		setLoadingPeople(false);
+	}
+
+	function handleCreateYourOwn() {
+		if (userData) {
+			router.push(`/search/oasis/${userData.id}`);
+		} else {
+			router.push("/sign-in");
+		}
 	}
 
 	const sections = [
@@ -274,9 +282,9 @@ export default function TabOneScreen() {
 										</View>
 									</Link>
 								) : (
-									<Link
+									<TouchableOpacity
 										key={user.id}
-										href="https://www.oasiswater.app/affiliates"
+										onPress={handleCreateYourOwn}
 										className="mr-4"
 									>
 										<View className="flex-row items-center bg-card rounded-full p-3 pr-5">
@@ -294,7 +302,7 @@ export default function TabOneScreen() {
 												</P>
 											</View>
 										</View>
-									</Link>
+									</TouchableOpacity>
 								)
 							}
 							keyExtractor={(item) => item.id}

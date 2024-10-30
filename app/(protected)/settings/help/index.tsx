@@ -78,7 +78,7 @@ export default function TabTwoScreen() {
 	const [copyStatus, setCopyStatus] = useState("Copy email");
 
 	const handleCopyEmail = async () => {
-		await Clipboard.setStringAsync("cormac@live-oasis.com");
+		await Clipboard.setStringAsync("hello@live-oasis.com");
 		setCopyStatus("Copied!");
 		setTimeout(() => setCopyStatus("Copy email"), 2000);
 	};
@@ -92,7 +92,7 @@ export default function TabTwoScreen() {
 					<H3 className="text-left">Contact us</H3>
 					<P className="text-left">
 						We may be in the lab or out searching for the best water but we will
-						get back to you as soon as possible. Email cormac@live-oasis.com for
+						get back to you as soon as possible. Email hello@live-oasis.com for
 						the quickest response.
 					</P>
 					<Button
