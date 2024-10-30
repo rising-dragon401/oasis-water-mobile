@@ -1,3 +1,4 @@
+import { usePostHog } from "posthog-react-native";
 import {
 	createContext,
 	useCallback,
@@ -50,6 +51,8 @@ export const RevenueCatProvider = ({ children }: any) => {
 	const [userSubscription, setUserSubscription] = useState<UserState>({
 		pro: false,
 	});
+	const posthog = usePostHog();
+
 	const [packages, setPackages] = useState<PurchasesPackage[]>([]);
 	const [customerInfo, setCustomerInfo] = useState<CustomerInfo | null>(null);
 	const [, setIsReady] = useState(false);
@@ -66,10 +69,16 @@ export const RevenueCatProvider = ({ children }: any) => {
 
 			Purchases.setLogLevel(LOG_LEVEL.DEBUG);
 
+			// listen for customer info updates
 			Purchases.addCustomerInfoUpdateListener(async (customerInfo) => {
 				setCustomerInfo(customerInfo);
 				updateCustomerInfo(customerInfo, uid || "");
 			});
+
+			const customerInfo = await Purchases.getCustomerInfo();
+			console.log("customerInfo", customerInfo);
+			setCustomerInfo(customerInfo);
+			updateCustomerInfo(customerInfo, uid || "");
 
 			await loadOfferings();
 		};
@@ -117,6 +126,12 @@ export const RevenueCatProvider = ({ children }: any) => {
 			if (pack.identifier === "pro") {
 				setUserSubscription({ ...userSubscription, pro: true });
 				setSubscription(true);
+
+				posthog.capture("purchase", {
+					type: "subscription",
+					package: pack.identifier,
+				});
+
 				refetchCustomerAndSubscription(uid || "");
 			}
 
@@ -171,7 +186,7 @@ export const RevenueCatProvider = ({ children }: any) => {
 				customerInfo,
 			);
 
-			console.log("updatedSubscription", updatedSubscription);
+			// console.log("updatedSubscription", updatedSubscription);
 
 			// manually override subscription if there is an error with revenue cat
 			if (!updatedSubscription?.success) {

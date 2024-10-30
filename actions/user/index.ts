@@ -48,6 +48,8 @@ export const getUserData = async (uid: string) => {
 };
 
 export async function getSubscription(uid: string | null) {
+	console.log("getSubscription", uid);
+
 	if (!uid) {
 		return {
 			success: false,
@@ -64,6 +66,7 @@ export async function getSubscription(uid: string | null) {
 			.eq("user_id", uid);
 
 		if (!subscription) {
+			console.log("no subscription found");
 			return null;
 		}
 
@@ -276,27 +279,25 @@ export async function manageSubscriptionStatusChange(
 	uid: string,
 	rcVustomerInfo: any,
 ) {
-	console.log(
-		"manageSubscriptionStatusChange: ",
-		JSON.stringify(rcVustomerInfo, null, 2),
-	);
-
-	console.log("uid", uid);
-
+	// console.log(
+	// 	"manageSubscriptionStatusChange rcVustomerInfo: ",
+	// 	JSON.stringify(rcVustomerInfo, null, 2),
+	// );
 	try {
 		// check for any active subscriptions
 		// if no active subscriptions, then return
 		const purchases = rcVustomerInfo?.allPurchasedProductIdentifiers;
 		if (!purchases || purchases.length === 0) {
-			await markSubscriptionAsInactive(uid);
-			return {
-				success: false,
-			};
+			throw new Error("No rev cat purchases found");
+			// console.log("no purchases found");
+			// await markSubscriptionAsInactive(uid);
+			// return {
+			// 	data: "no purchases found",
+			// 	success: true,
+			// };
 		}
 		const provider = "revenue_cat";
 		const entitlements = rcVustomerInfo.entitlements;
-
-		console.log("entitlements", JSON.stringify(entitlements, null, 2));
 
 		const proEntitlement = entitlements?.all?.pro;
 		const proIsActive = proEntitlement?.isActive === true || false;
@@ -306,22 +307,26 @@ export async function manageSubscriptionStatusChange(
 		const proWillRenew = proEntitlement?.willRenew || false;
 		const pastExpirationDate = proExpiresDate < new Date();
 
-		console.log("proEntitlement", JSON.stringify(proEntitlement, null, 2));
-
-		console.log("proIsActive", proIsActive);
-		console.log("pastExpirationDate", pastExpirationDate);
-
 		// Mark subscription as expired if trial has ended or pro is not active
 		const status = proIsActive && !pastExpirationDate ? "active" : "expired";
-
-		console.log("status", status);
 
 		const subscriptionId = "sub_rc_" + proCreatedAt?.toString() + proPriceId;
 
 		// check if required fields are present
-		if (!subscriptionId || !proCreatedAt || !proExpiresDate || !proPriceId) {
+		if (!subscriptionId || !proCreatedAt || !proPriceId) {
+			// console.log(
+			// 	"No rev cat subscription  found – missing required fields:",
+			// 	subscriptionId,
+			// 	":",
+			// 	proCreatedAt,
+			// 	":",
+			// 	proPriceId,
+			// );
+
 			await markSubscriptionAsInactive(uid);
-			throw new Error("Missing required fields");
+			throw new Error(
+				"Rev cat sub details not found - Missing required fields",
+			);
 		}
 
 		// Latest data from rev cat
@@ -358,7 +363,7 @@ export async function manageSubscriptionStatusChange(
 			hasChanged = true;
 		}
 
-		console.log("hasChanged", hasChanged);
+		// console.log("hasChanged", hasChanged);
 
 		if (hasChanged || !existingSubscription) {
 			console.log("upserting subscription");

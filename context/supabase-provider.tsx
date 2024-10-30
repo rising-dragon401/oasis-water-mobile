@@ -3,6 +3,7 @@ import * as AppleAuthentication from "expo-apple-authentication";
 import { usePathname, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import * as WebBrowser from "expo-web-browser";
+import { usePostHog } from "posthog-react-native";
 import { createContext, useContext, useEffect, useState } from "react";
 
 import { supabase } from "@/config/supabase";
@@ -51,6 +52,7 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 	const router = useRouter();
 	const segments = useSegments();
 	const pathname = usePathname();
+	const posthog = usePostHog();
 
 	const [user, setUser] = useState<User | null>(null);
 	const [session, setSession] = useState<Session | null>(null);
@@ -197,6 +199,19 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 
 	useEffect(() => {
 		const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
+			console.log("onAuthStateChange: ", event, session);
+
+			if (session) {
+				// Link user session to posthog user
+				posthog.identify(session.user.id);
+
+				// Capture sign in event
+				posthog.capture("sign_in", {
+					event,
+					session,
+				});
+			}
+
 			setSession(session);
 			setUser(session ? session.user : null);
 			setInitialized(true);

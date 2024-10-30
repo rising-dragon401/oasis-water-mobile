@@ -80,11 +80,6 @@ export default function ChatModal() {
 			throw new Error("No user id found");
 		}
 
-		console.log(
-			"createNewAssistant: ",
-			`${process.env.EXPO_PUBLIC_API_ENDPOINT}/api/create-new-assistant`,
-		);
-
 		try {
 			const response = await fetch(
 				`${process.env.EXPO_PUBLIC_API_ENDPOINT}/api/create-new-assistant`,
@@ -94,8 +89,6 @@ export default function ChatModal() {
 			);
 
 			const data = await response.json();
-
-			console.log("data: ", data);
 
 			if (response.ok) {
 				// add assistant to user
@@ -229,12 +222,8 @@ export default function ChatModal() {
 				},
 			);
 
-			console.log("response: ", response);
-
 			const data = await response.json();
-			console.log("data: ", data.content);
 			const reply = data.content[0].text.value;
-			console.log("reply: ", reply);
 
 			updatedMessages.push({
 				role: "assistant",

@@ -28,23 +28,27 @@ export default function WelcomeScreen() {
 				<H1 className="text-center text-primary mt-8">
 					Discover the best water based on science
 				</H1>
-				{/* <P className="text-center max-w-xs">
-					Find the healthiest drinking water and filters based on science.
-				</P> */}
 
-				<View className="flex flex-col items-center justify-center h-[42vh] w-full mt-8">
+				<View
+					className="flex flex-col items-center justify-center h-full w-full"
+					style={{
+						// transform: [{ scale: 1.05 }],
+						height: "100%",
+					}}
+				>
 					<Image
 						source={SplashGraphic}
 						contentFit="contain"
 						style={{
-							width: "100%",
-							height: "100%",
+							width: "80%",
+							height: "70%",
+							marginBottom: 100,
 						}}
 					/>
 				</View>
 			</View>
 
-			<View className="flex flex-col gap-y-6 justify-center items-center ">
+			<View className="flex flex-col gap-y-6 justify-center items-center mt-4">
 				<View className="flex flex-col gap-x-4 gap-y-4 max-w-sm w-full ">
 					<Button
 						size="default"

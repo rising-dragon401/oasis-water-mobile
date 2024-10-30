@@ -10,7 +10,6 @@ import { Input } from "@/components/ui/input";
 import { theme } from "@/lib/constants";
 import { useDebounce } from "@/lib/hooks/use-debounce";
 import { useColorScheme } from "@/lib/useColorScheme";
-
 const numResults = 10;
 
 const searchClient = algoliasearch(
@@ -104,6 +103,10 @@ export default function Search({
 				},
 			];
 		}
+
+		posthog.capture("search", {
+			query,
+		});
 
 		try {
 			const response = await searchClient.multipleQueries(queries);

@@ -23,7 +23,7 @@ const routingInstrumentation = new Sentry.ReactNavigationInstrumentation();
 
 Sentry.init({
 	dsn: "https://7ebff0e9678f504c4a2fb71623d6ff85@o4507189223817216.ingest.us.sentry.io/4507189225062400",
-	// debug: true,
+	debug: true,
 	integrations: [
 		new Sentry.ReactNativeTracing({
 			routingInstrumentation,
@@ -49,7 +49,7 @@ function RootLayout() {
 				<RevenueCatProvider>
 					<BlogProvider>
 						<PostHogProvider
-							apiKey="phc_ifrEiDLe5q1xE20zwCZkeKANkrOF0dg6RqpmypbFDhZ"
+							apiKey="phc_DgpoHcLfjkFjGPfzDpqSxL46lHoqbX0dgAkHdp2b81b"
 							options={{ host: "https://us.i.posthog.com" }}
 							autocapture
 						>
