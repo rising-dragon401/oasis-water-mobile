@@ -10,7 +10,7 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
 		(message: string, duration = Toast.durations.LONG) => {
 			const toast = Toast.show(message, {
 				duration,
-				position: Toast.positions.BOTTOM, // Example: Change position
+				position: -100, // Example: Change position
 				shadow: true, // Example: Add shadow
 				animation: true, // Example: Enable animation
 				hideOnPress: true, // Example: Hide on press

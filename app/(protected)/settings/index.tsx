@@ -6,7 +6,13 @@ import * as Clipboard from "expo-clipboard";
 import * as Linking from "expo-linking";
 import { Link, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { Alert, ScrollView, TouchableOpacity, View } from "react-native";
+import {
+	Alert,
+	RefreshControl,
+	ScrollView,
+	TouchableOpacity,
+	View,
+} from "react-native";
 
 import { getUserReferralStats } from "@/actions/admin";
 import { addUserToAlgolia } from "@/actions/algolia";
@@ -39,7 +45,7 @@ export default function TabTwoScreen() {
 		fetchUserData,
 		logout,
 	} = useUserProvider();
-	const { restorePurchases } = useRevenueCat();
+	const { restorePurchases, refetchCustomerAndSubscription } = useRevenueCat();
 	const { backgroundColor, iconColor } = useColorScheme();
 	const showToast = useToast();
 	const router = useRouter();
@@ -61,6 +67,16 @@ export default function TabTwoScreen() {
 		twitter: "",
 	});
 	const [loadingSocials, setLoadingSocials] = useState(false);
+	const [refreshing, setRefreshing] = useState(false);
+
+	const handleRefresh = async () => {
+		setRefreshing(true);
+		// Add your refresh logic here, e.g., refetch user data
+		await fetchUserData(uid || "");
+		await refetchCustomerAndSubscription(uid || "");
+		setRefreshing(false);
+		showToast("Refreshed data");
+	};
 
 	useEffect(() => {
 		if (userData) {
@@ -221,6 +237,9 @@ export default function TabTwoScreen() {
 				backgroundColor,
 			}}
 			className="overflow-y-scroll"
+			refreshControl={
+				<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+			}
 		>
 			{userData ? (
 				<View className="w-full flex flex-col h-full justify-between pb-14 px-8">

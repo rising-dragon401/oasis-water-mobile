@@ -1,5 +1,6 @@
 import { Feather, Octicons } from "@expo/vector-icons";
 import algoliasearch from "algoliasearch";
+import { Camera } from "expo-camera";
 import { useRouter } from "expo-router";
 import { usePostHog } from "posthog-react-native";
 import { useEffect, useRef, useState } from "react";
@@ -8,6 +9,7 @@ import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 import ResultsRow from "./results-row";
 
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/context/toast-provider";
 import { theme } from "@/lib/constants";
 import { useDebounce } from "@/lib/hooks/use-debounce";
 import { useColorScheme } from "@/lib/useColorScheme";
@@ -36,6 +38,9 @@ export default function Search({
 	const { colorScheme, mutedForegroundColor } = useColorScheme();
 	const router = useRouter();
 	const posthog = usePostHog();
+	const showToast = useToast();
+	const [permission, requestPermission] = Camera.useCameraPermissions();
+
 	useEffect(() => {
 		setQueryCompleted(false);
 		if (debouncedQuery) {
@@ -125,8 +130,17 @@ export default function Search({
 		}
 	};
 
-	const handleScan = () => {
-		router.push("/scanModal");
+	const handleScan = async () => {
+		if (permission?.granted) {
+			router.push("/scanModal");
+		} else if (!permission?.granted) {
+			const permission_granted = await requestPermission();
+			if (permission_granted?.granted) {
+				router.push("/scanModal");
+			} else {
+				showToast("Please allow camera access to use the product scanner");
+			}
+		}
 	};
 
 	const iconColor =

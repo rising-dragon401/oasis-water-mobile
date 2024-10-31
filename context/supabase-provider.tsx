@@ -217,7 +217,7 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 			// HACK: Prevents app from opening 404 page when logging in
 			setTimeout(() => {
 				SplashScreen.hideAsync();
-			}, 100);
+			}, 200);
 		});
 
 		return () => {

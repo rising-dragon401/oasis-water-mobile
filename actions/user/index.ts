@@ -48,8 +48,6 @@ export const getUserData = async (uid: string) => {
 };
 
 export async function getSubscription(uid: string | null) {
-	console.log("getSubscription", uid);
-
 	if (!uid) {
 		return {
 			success: false,
@@ -288,9 +286,9 @@ export async function manageSubscriptionStatusChange(
 		// if no active subscriptions, then return
 		const purchases = rcVustomerInfo?.allPurchasedProductIdentifiers;
 		if (!purchases || purchases.length === 0) {
+			await markSubscriptionAsInactive(uid);
 			throw new Error("No rev cat purchases found");
 			// console.log("no purchases found");
-			// await markSubscriptionAsInactive(uid);
 			// return {
 			// 	data: "no purchases found",
 			// 	success: true,
@@ -402,6 +400,7 @@ export async function manageSubscriptionStatusChange(
 		console.error("Error inserting/updating subscription:", error);
 		return {
 			success: false,
+			data: error,
 		};
 	}
 }

@@ -75,10 +75,6 @@ export const RevenueCatProvider = ({ children }: any) => {
 				updateCustomerInfo(customerInfo, uid || "");
 			});
 
-			const customerInfo = await Purchases.getCustomerInfo();
-			setCustomerInfo(customerInfo);
-			updateCustomerInfo(customerInfo, uid || "");
-
 			await loadOfferings();
 		};
 
@@ -95,12 +91,12 @@ export const RevenueCatProvider = ({ children }: any) => {
 	}, [subscription]);
 
 	useEffect(() => {
-		if (customerInfo) {
+		if (customerInfo && uid) {
 			setUserSubscription({
 				pro: customerInfo.entitlements.active.pro?.isActive || false,
 			});
 		}
-	}, [customerInfo]);
+	}, [customerInfo, uid]);
 
 	const loadOfferings = async () => {
 		const offerings = await Purchases.getOfferings();
@@ -116,8 +112,6 @@ export const RevenueCatProvider = ({ children }: any) => {
 		setPackages([...annualPackage, ...weeklyPackage]);
 	};
 
-	// console.log("packages", packages);
-
 	const purchasePackage = async (pack: PurchasesPackage) => {
 		try {
 			await Purchases.purchasePackage(pack);
@@ -126,12 +120,12 @@ export const RevenueCatProvider = ({ children }: any) => {
 				setUserSubscription({ ...userSubscription, pro: true });
 				setSubscription(true);
 
-				posthog.capture("purchase", {
+				refetchCustomerAndSubscription(uid || "");
+
+				posthog?.capture("purchase", {
 					type: "subscription",
 					package: pack.identifier,
 				});
-
-				refetchCustomerAndSubscription(uid || "");
 			}
 
 			return true;
@@ -157,7 +151,7 @@ export const RevenueCatProvider = ({ children }: any) => {
 		async (customerInfo: CustomerInfo, uid: string) => {
 			const userData = await getUserData(uid);
 			// for admin use and testing
-			if (userData?.do_not_override_sub) {
+			if (userData?.do_not_override_sub === true) {
 				return;
 			}
 
@@ -172,14 +166,10 @@ export const RevenueCatProvider = ({ children }: any) => {
 			// 	pro: customerInfo.entitlements.active.pro?.isActive || false,
 			// });
 
-			// console.log("calling manageSubscriptionStatusChange");
-
 			const updatedSubscription = await manageSubscriptionStatusChange(
 				uid,
 				customerInfo,
 			);
-
-			// console.log("updatedSubscription", updatedSubscription);
 
 			// manually override subscription if there is an error with revenue cat
 			if (!updatedSubscription?.success) {
@@ -189,7 +179,7 @@ export const RevenueCatProvider = ({ children }: any) => {
 			// update user provider subscription
 			fetchSubscription(uid);
 		},
-		[uid],
+		[uid, customerInfo],
 	);
 
 	const restorePurchases = async () => {

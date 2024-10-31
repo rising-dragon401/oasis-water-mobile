@@ -26,7 +26,7 @@ import {
 import { uploadCameraImage } from "@/actions/files";
 import OasisLogo from "@/assets/oasis-word.png";
 import Score from "@/components/sharable/score";
-import { Muted, P } from "@/components/ui/typography";
+import { Large, Muted, P } from "@/components/ui/typography";
 import { useToast } from "@/context/toast-provider";
 import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
@@ -36,16 +36,22 @@ export default function ScanModal() {
 	const router = useRouter();
 	const { uid } = useUserProvider();
 	const showToast = useToast();
-	const { textSecondaryColor, borderColor, foregroundColor, colorMode } =
-		useColorScheme();
+	const {
+		textSecondaryColor,
+		borderColor,
+		foregroundColor,
+		colorMode,
+		iconColor,
+	} = useColorScheme();
+	const [permission] = Camera.useCameraPermissions();
 
 	const [loading, setLoading] = useState(false);
 	const [loadingText, setLoadingText] = useState(
 		"Snap a pic of your water or filter",
 	);
-	const [hasPermission, setHasPermission] = useState<boolean | null>(null);
 	const [cameraRef, setCameraRef] = useState<Camera | null>(null);
 	const [photo, setPhoto] = useState<CameraCapturedPicture | null>(null);
+
 	const [productType, setProductType] = useState<string | null>(null);
 	const [product, setProduct] = useState<any | null>({
 		data: null,
@@ -123,14 +129,6 @@ export default function ScanModal() {
 		};
 
 		fetchData();
-	}, []);
-
-	// Request camera permissions
-	useEffect(() => {
-		(async () => {
-			const { status } = await Camera.requestCameraPermissionsAsync();
-			setHasPermission(status === "granted");
-		})();
 	}, []);
 
 	// Toggle auto focus
@@ -420,18 +418,10 @@ export default function ScanModal() {
 		}
 	};
 
-	if (hasPermission === null) {
-		return <View />;
-	}
-
-	if (hasPermission === false) {
-		return <Muted>No access to camera</Muted>;
-	}
-
 	const renderControls = () => {
 		return (
 			<SafeAreaView style={{ flex: 1 }}>
-				<View className="flex-row justify-center items-center p-5 absolute top-2 left-0 right-0 z-10">
+				<View className="flex-row justify-center items-center p-5 absolute top-2 left-0 right-0 z-50">
 					<TouchableOpacity
 						style={{
 							position: "absolute",
@@ -719,6 +709,7 @@ export default function ScanModal() {
 						alignItems: "center",
 						marginBottom: 30,
 					}}
+					className="z-50"
 				>
 					<TouchableOpacity
 						style={{
@@ -736,6 +727,7 @@ export default function ScanModal() {
 							shadowRadius: 3,
 							position: "relative",
 						}}
+						className="z-50"
 						disabled={loading}
 						onPress={mode === "scan" ? takePicture : () => setMode("scan")}
 					>
@@ -758,10 +750,9 @@ export default function ScanModal() {
 							top: 20,
 							justifyContent: "center",
 							alignItems: "center",
-							zIndex: 10,
 						}}
 						onPress={resetState}
-						className="bg-white/20 rounded-full p-2"
+						className="bg-white/20 rounded-full p-2 z-50"
 					>
 						<Ionicons name="refresh" size={24} color="white" />
 					</TouchableOpacity>
@@ -769,6 +760,19 @@ export default function ScanModal() {
 			</SafeAreaView>
 		);
 	};
+
+	if (!permission?.granted) {
+		return (
+			<View style={{ flex: 1 }}>
+				<Feather name="camera-off" size={24} color={iconColor} />
+				<Large>Unable to access camera</Large>
+				<Muted>
+					Please turn on Camera permissions for Oasis in your phone Privacy
+					settings to start scanning waters and filters.
+				</Muted>
+			</View>
+		);
+	}
 
 	return (
 		<View style={{ flex: 1 }}>

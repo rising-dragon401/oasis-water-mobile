@@ -19,7 +19,10 @@
 			"bundleIdentifier": "com.liveoasis.oasis",
 			"buildNumber": "0",
 			"associatedDomains": ["applinks:oasiswater.app"],
-			"userInterfaceStyle": "light"
+			"userInterfaceStyle": "light",
+			"infoPlist": {
+				"NSCameraUsageDescription": "Allow Oasis to access your camera to scan your water bottle or filter."
+			}
 		},
 		"android": {
 			"adaptiveIcon": {
@@ -36,7 +39,6 @@
 		},
 		"plugins": [
 			"expo-router",
-			"expo-camera",
 			"expo-dev-launcher",
 			"expo-localization",
 			"expo-apple-authentication",
