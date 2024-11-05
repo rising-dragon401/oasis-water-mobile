@@ -5,12 +5,10 @@ import { Link } from "expo-router";
 import React, { useMemo } from "react";
 import { ImageStyle, View } from "react-native";
 
-import FavoriteButton from "./favorite-button";
-
-import { H4, P } from "@/components/ui/typography";
+import { H4, Muted, P } from "@/components/ui/typography";
 import {
-	placeHolderImageBlurHash,
 	RANDOM_BLUR_IMAGES,
+	placeHolderImageBlurHash,
 } from "@/lib/constants/images";
 import { useColorScheme } from "@/lib/useColorScheme";
 import { determineLink } from "@/lib/utils";
@@ -29,7 +27,7 @@ const ItemPreviewCard = ({
 	isGeneralListing = false,
 }: Props) => {
 	const { subscription } = useUserProvider();
-	const { iconColor } = useColorScheme();
+	const { iconColor, mutedForegroundColor } = useColorScheme();
 
 	// show if listed in top-rate or preview list but not on favorites page
 	// unless subscribed or is the auth user
@@ -46,34 +44,46 @@ const ItemPreviewCard = ({
 	const renderImage = () => {
 		const imageStyle: ImageStyle = {
 			width: "100%",
-			aspectRatio: 1, // This makes the image square
+			height: "100%",
+			aspectRatio: 1,
 			resizeMode: "cover" as const,
 			borderRadius: 10,
 		};
 
-		if (!showData) {
-			return (
-				<Image
-					source={{ uri: randomBlurImage }}
-					style={imageStyle}
-					className="rounded-xl"
-					transition={100}
-					cachePolicy="memory-disk"
-					placeholder={{ blurhash: placeHolderImageBlurHash }}
-				/>
-			);
-		} else {
-			return (
-				<Image
-					source={{ uri: item.image }}
-					style={imageStyle}
-					className="rounded-xl"
-					transition={100}
-					cachePolicy="memory-disk"
-					placeholder={{ blurhash: placeHolderImageBlurHash }}
-				/>
-			);
-		}
+		return (
+			<Image
+				source={{ uri: item.image }}
+				style={imageStyle}
+				className="rounded-xl"
+				transition={100}
+				cachePolicy="memory-disk"
+				placeholder={{ blurhash: placeHolderImageBlurHash }}
+			/>
+		);
+
+		// if (!showData) {
+		// 	return (
+		// 		<Image
+		// 			source={{ uri: randomBlurImage }}
+		// 			style={imageStyle}
+		// 			className="rounded-xl"
+		// 			transition={100}
+		// 			cachePolicy="memory-disk"
+		// 			placeholder={{ blurhash: placeHolderImageBlurHash }}
+		// 		/>
+		// 	);
+		// } else {
+		// 	return (
+		// 		<Image
+		// 			source={{ uri: item.image }}
+		// 			style={imageStyle}
+		// 			className="rounded-xl"
+		// 			transition={100}
+		// 			cachePolicy="memory-disk"
+		// 			placeholder={{ blurhash: placeHolderImageBlurHash }}
+		// 		/>
+		// 	);
+		// }
 	};
 
 	const renderScore = () => {
@@ -81,10 +91,13 @@ const ItemPreviewCard = ({
 			let dotColor;
 
 			if (item.score >= 80) {
-				dotColor = "rgba(144, 238, 144, 0.6)";
+				dotColor = "bg-green-300";
 			} else if (item.score >= 50) {
-				dotColor = "rgba(255, 255, 0, 0.6)";
-				dotColor = "rgba(255, 0, 0, 0.6)";
+				dotColor = "bg-yellow-300";
+			} else if (item.score >= 0) {
+				dotColor = "bg-red-300";
+			} else {
+				dotColor = "bg-gray-300";
 			}
 
 			return (
@@ -93,10 +106,9 @@ const ItemPreviewCard = ({
 						style={{
 							width: 10,
 							height: 10,
-							backgroundColor: dotColor,
 							borderRadius: 5,
-							marginLeft: 4,
 						}}
+						className={dotColor}
 					/>
 					<H4>{item.score}</H4>
 				</View>
@@ -107,56 +119,60 @@ const ItemPreviewCard = ({
 	return (
 		// @ts-ignore
 		<Link href={showData ? determineLink(item) : "/subscribeModal"}>
-			<View className="flex flex-col items-center gap-2">
-				<View className="relative w-full aspect-square rounded-xl overflow-hidden">
+			<View className="relative w-full aspect-square rounded-xl overflow-hidden">
+				<View className="flex justify-center items-center w-full h-full bg-white px-2 pt-0 pb-8 ">
 					{renderImage()}
-					{showFavorite && showData && (
-						<View className="absolute top-4 right-4 z-10">
-							<FavoriteButton item={item} />
-						</View>
-					)}
 				</View>
 
-				<View className="flex-1 flex-row w-full items-start justify-between pb-2 px-2">
-					<View className="flex-1 mr-2">
-						{showData ? (
-							<P className="font-semibold pb-2 h-18" numberOfLines={2}>
-								{item.name}
-							</P>
-						) : (
-							<>
-								<View
-									style={{
-										width: "100%",
-										height: 10,
-										backgroundColor: "rgba(224, 224, 224, 0.5)",
-										borderRadius: 2,
-										marginBottom: 4,
-									}}
-								/>
-								<View
-									style={{
-										width: "80%",
-										height: 10,
-										backgroundColor: "rgba(224, 224, 224, 0.5)",
-										borderRadius: 2,
-									}}
-								/>
-							</>
-						)}
-					</View>
+				{showData ? (
+					<P
+						className="absolute bottom-2 left-2 bg-opacity-50 px-2 text-base flex-wrap"
+						numberOfLines={2}
+					>
+						{item.name}
+					</P>
+				) : (
+					<>
+						<View
+							style={{
+								width: "100%",
+								height: 10,
+								backgroundColor: "rgba(224, 224, 224, 0.5)",
+								borderRadius: 2,
+								marginBottom: 4,
+							}}
+						/>
+						<View
+							style={{
+								width: "80%",
+								height: 10,
+								backgroundColor: "rgba(224, 224, 224, 0.5)",
+								borderRadius: 2,
+							}}
+						/>
+					</>
+				)}
 
-					<View className="flex-shrink-0">
-						{subscription ? (
-							item.score ? (
-								renderScore()
-							) : (
-								<Ionicons name="warning" size={16} color={iconColor} />
-							)
+				<View className="absolute top-2 right-2 z-10">
+					{subscription ? (
+						item.score ? (
+							renderScore()
 						) : (
-							<Octicons name="lock" size={16} color={iconColor} />
-						)}
-					</View>
+							<View className="flex flex-row items-center gap-2">
+								<Ionicons
+									name="warning"
+									size={14}
+									color={mutedForegroundColor}
+								/>
+								<Muted>/ 100</Muted>
+							</View>
+						)
+					) : (
+						<View className="flex flex-row items-center gap-2">
+							<Octicons name="lock" size={14} color={mutedForegroundColor} />
+							<Muted>/ 100</Muted>
+						</View>
+					)}
 				</View>
 			</View>
 		</Link>

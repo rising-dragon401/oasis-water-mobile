@@ -1,25 +1,40 @@
 import React, { createContext, useCallback, useContext } from "react";
 import Toast from "react-native-root-toast";
 
-type ShowToastFunction = (message: string, duration?: number) => void;
+type ShowToastFunction = (
+	message: string,
+	duration?: number,
+	position?: "top" | "bottom",
+) => void;
 
 const ToastContext = createContext<ShowToastFunction | null>(null);
 
 export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
 	const showToast: ShowToastFunction = useCallback(
-		(message: string, duration = Toast.durations.LONG) => {
+		(
+			message: string,
+			duration = Toast.durations.LONG,
+			position?: "top" | "bottom",
+		) => {
+			const toastPosition =
+				position === "top"
+					? Toast.positions.TOP
+					: position === "bottom"
+						? Toast.positions.BOTTOM
+						: -100;
 			const toast = Toast.show(message, {
 				duration,
-				position: -100, // Example: Change position
-				shadow: true, // Example: Add shadow
-				animation: true, // Example: Enable animation
-				hideOnPress: true, // Example: Hide on press
-				delay: 0, // Example: No delay
-				backgroundColor: "#645E58", // Example: Change background color
-				textColor: "#EDE8DA", // Example: Change text color
-				opacity: 1.0, // Example: Set opacity
+				position: toastPosition,
+				shadow: true,
+				animation: true,
+				hideOnPress: true,
+				delay: 0,
+				backgroundColor: "#645E58",
+				textColor: "#EDE8DA",
+				opacity: 1.0,
 				containerStyle: {
 					borderRadius: 99,
+					paddingHorizontal: 16,
 				},
 			});
 

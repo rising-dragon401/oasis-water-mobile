@@ -1,17 +1,20 @@
-import { Input } from "@/components/ui/input";
-import { P } from "@/components/ui/typography";
-import { useColorScheme } from "@/lib/useColorScheme";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import axios from "axios";
 import React, { useCallback, useEffect, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
+import { Input } from "@/components/ui/input";
+import { P } from "@/components/ui/typography";
+import { useColorScheme } from "@/lib/useColorScheme";
+
 const LocationSelector = ({
 	address,
 	setAddress,
+	initialAddress,
 }: {
 	address: any;
 	setAddress: any;
+	initialAddress?: any;
 }) => {
 	const { iconColor } = useColorScheme();
 
@@ -25,7 +28,7 @@ const LocationSelector = ({
 	const handleLocationSearch = useCallback(async () => {
 		try {
 			// Google Places Autocomplete API URL
-			const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${input}&key=${API_KEY}&types=geocode`;
+			const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${input}&key=${API_KEY}&types=address`;
 
 			const response = await axios.get(url);
 			const data = response.data;
@@ -99,6 +102,8 @@ const LocationSelector = ({
 				city,
 				state,
 				country,
+				latitude: result.geometry.location.lat,
+				longitude: result.geometry.location.lng,
 			});
 
 			// Set input field to the formatted address
@@ -110,11 +115,11 @@ const LocationSelector = ({
 	};
 
 	return (
-		<View className="flex p-5 justify-center">
+		<View className="flex p-5 justify-center w-full ">
 			<View className="relative">
 				<Input
-					className="border border-gray-300 p-3 mb-0 rounded-lg w-full pr-10"
-					placeholder="Enter zip code, city, or country"
+					className="border border-gray-300 p-3 mb-0 rounded-xl  pr-10 !h-16 w-96"
+					placeholder={initialAddress || "Enter address"}
 					value={input}
 					onChangeText={setInput}
 				/>

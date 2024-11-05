@@ -7,18 +7,28 @@ import { Circle, Svg } from "react-native-svg";
 import Typography from "../typography";
 
 import { Muted, P } from "@/components/ui/typography";
+import { useToast } from "@/context/toast-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 type Props = {
 	score: number;
 	size?: "xs" | "sm" | "md" | "lg" | "xl";
 	showScore?: boolean;
+	showTooltip?: boolean;
+	tooltipContent?: string;
 };
 
-export default function Score({ score, size, showScore = false }: Props) {
+export default function Score({
+	score,
+	size,
+	showScore = false,
+	showTooltip = false,
+	tooltipContent = "",
+}: Props) {
 	const router = useRouter();
 	const { subscription } = useUserProvider();
 	const { textColor, secondaryColor } = useColorScheme();
+	const showToast = useToast();
 
 	const radius =
 		size === "xl"
@@ -37,8 +47,6 @@ export default function Score({ score, size, showScore = false }: Props) {
 	const svgSize = 2 * (radius + strokeWidth); // Adjust SVG size to accommodate stroke
 	const circumference = 2 * Math.PI * radius;
 	const offset = circumference - (score / 100) * circumference;
-
-	console.log(score);
 
 	const fontSize =
 		size === "xl"
@@ -64,7 +72,9 @@ export default function Score({ score, size, showScore = false }: Props) {
 			return "Poor";
 			// @ts-ignore
 		} else if (score === "?" || score === undefined || score === null) {
-			return "Unknown";
+			return "Untested";
+		} else if (score === 0) {
+			return "Missing";
 		} else {
 			return "Bad";
 		}
@@ -72,6 +82,10 @@ export default function Score({ score, size, showScore = false }: Props) {
 
 	const handleOpenSubscribeModal = () => {
 		router.push("/subscribeModal");
+	};
+
+	const handleShowTooltip = () => {
+		showToast(tooltipContent);
 	};
 
 	// Unindexed items have a score of 0
@@ -138,8 +152,12 @@ export default function Score({ score, size, showScore = false }: Props) {
 					cy={svgSize / 2}
 				/>
 			</Svg>
-			<View className="absolute flex flex-col justify-center items-center">
-				{score ? (
+			<TouchableOpacity
+				onPress={handleShowTooltip}
+				disabled={!showTooltip}
+				className="absolute flex flex-col justify-center items-center"
+			>
+				{score !== null ? (
 					<P style={{ fontSize }}>{score} / 100</P>
 				) : (
 					<View className="flex flex-row gap-1">
@@ -158,7 +176,7 @@ export default function Score({ score, size, showScore = false }: Props) {
 						{grade()}
 					</Typography>
 				)}
-			</View>
+			</TouchableOpacity>
 		</View>
 	);
 }

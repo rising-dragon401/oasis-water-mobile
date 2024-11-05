@@ -18,6 +18,8 @@ export const determineLink = (item: any) => {
 		basePath = `/search/filter/${item?.id}`;
 	} else if (item?.type === "user") {
 		basePath = `/search/oasis/${item?.id}`;
+	} else if (item?.type === "category") {
+		basePath = `/search/top-rated/${item?.typeId}?tags=${item?.tags?.join(",")}&catId=${item.id}`;
 	} else {
 		basePath = `/search/item/${item?.id}`;
 	}

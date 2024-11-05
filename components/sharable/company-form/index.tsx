@@ -1,33 +1,34 @@
+import { Image } from "expo-image";
 import { useEffect, useState } from "react";
-import { FlatList, Image, ScrollView, View } from "react-native";
+import { FlatList, ScrollView, View } from "react-native";
 
 import { getCompanyAndProducts } from "@/actions/companies";
 import ItemPreviewCard from "@/components/sharable/item-preview-card";
 import Skeleton from "@/components/sharable/skeleton";
-import { H1, P } from "@/components/ui/typography";
+import { H2, P } from "@/components/ui/typography";
 import { BLUR_IMAGE_PLACEHOLDER } from "@/lib/constants/images";
 
-export function CompanyForm({ companyName }: { companyName: string }) {
+export function CompanyForm({ id }: { id: string }) {
 	const [company, setCompany] = useState<any>(null);
 	const [products, setProducts] = useState<any>(null);
+	const [brands, setBrands] = useState<any>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
 		const fetchCompany = async () => {
-			const company = await getCompanyAndProducts(companyName);
+			const company = await getCompanyAndProducts(id);
 			if (company && company.length > 0) {
 				setCompany(company[0]);
 				setProducts(company[0].products);
+				setBrands(company[0].brands);
 			} else {
 				setError("No company found");
 			}
 			setLoading(false);
 		};
 		fetchCompany();
-	}, [companyName]);
-
-	console.log("company: ", company);
+	}, [id]);
 
 	if (loading) {
 		return (
@@ -56,18 +57,46 @@ export function CompanyForm({ companyName }: { companyName: string }) {
 	}
 
 	if (error) {
-		return <H1>Error: {error}</H1>;
+		return (
+			<View className="flex items-center justify-center h-full">
+				<H2>Error: {error}</H2>
+			</View>
+		);
 	}
 
 	return (
 		<ScrollView contentContainerStyle={{ flexGrow: 1 }}>
 			<View className="p-5 rounded-lg flex flex-col items-center justify-start w-full">
+				{/* <Image
+					source={{ uri: company.image || BLUR_IMAGE_PLACEHOLDER }}
+					style={{
+						width: 72,
+						height: 72,
+						borderRadius: 10,
+						marginRight: 10,
+					}}
+					contentFit="cover"
+					className="rounded-md"
+					transition={1000}
+				/> */}
+
 				<Image
 					source={{ uri: company.image || BLUR_IMAGE_PLACEHOLDER }}
 					className="w-40 h-40 rounded-lg mb-4 shadow-md"
+					// style={{ borderRadius: 8 }}
+					// width
+					contentFit="contain"
 				/>
 
-				<H1>{company.name}</H1>
+				<H2>{company?.name}</H2>
+				<View className="flex flex-row flex-wrap">
+					{brands?.map((brand: any) => (
+						<View className="bg-gray-100 rounded-md p-2 m-1">
+							<P>{brand.name}</P>
+						</View>
+					))}
+				</View>
+				{/* <Muted>{company?.brand}</Muted> */}
 
 				<P className="mb-4">{company.description}</P>
 

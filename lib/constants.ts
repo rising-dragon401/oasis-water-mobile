@@ -33,7 +33,7 @@ export const theme = {
 };
 
 export const IngredientCategories: string[] = [
-	// 'Chemical Disinfectants',
+	"Chemical Disinfectants",
 	"Heavy Metals",
 	"Haloacetic Acids",
 	"Fluoride",

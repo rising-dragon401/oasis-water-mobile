@@ -26,10 +26,8 @@ export default function TopRatedScreen() {
 			className="flex-1 justify-between px-4 mt-6"
 			style={{ backgroundColor }}
 		>
-			<H1>Top rated</H1>
-			<Muted>
-				Discover the best bottled waters and filters based on lab tested data.
-			</Muted>
+			<H1>All categories</H1>
+			<Muted>Browse all categories of bottled waters and filters</Muted>
 
 			<View className="flex-1 flex-col mt-4">
 				<FlatList

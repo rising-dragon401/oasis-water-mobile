@@ -7,7 +7,6 @@ import { FlatList, TouchableOpacity, View } from "react-native";
 
 import { getResearch } from "@/actions/admin";
 import Skeleton from "@/components/sharable/skeleton";
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { H1, Muted, P } from "@/components/ui/typography";
 import { BlogContext } from "@/context/blogs-provider";
@@ -60,7 +59,7 @@ export default function ResearchScreen() {
 			<Muted>
 				Stay current with scientific advances in product health and safety
 			</Muted>
-
+			{/* 
 			<Button
 				label="Ask Oasis AI"
 				onPress={handleAskOasisAI}
@@ -76,15 +75,31 @@ export default function ResearchScreen() {
 					)
 				}
 				className="mt-2"
-			/>
+			/> */}
 
 			<Tabs value={tabValue} onValueChange={setTabValue} className="mt-4">
 				<TabsList className="mb-1">
 					<TabsTrigger value="articles">
-						<P>Articles</P>
+						<P
+							className={`${
+								tabValue === "articles"
+									? "text-secondary-foreground"
+									: "text-primary"
+							}`}
+						>
+							Articles
+						</P>
 					</TabsTrigger>
 					<TabsTrigger value="research">
-						<P>Research</P>
+						<P
+							className={`${
+								tabValue === "research"
+									? "text-secondary-foreground"
+									: "text-primary"
+							}`}
+						>
+							Studies
+						</P>
 					</TabsTrigger>
 				</TabsList>
 

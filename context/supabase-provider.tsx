@@ -229,6 +229,8 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 		const fetchData = async () => {
 			if (!initialized) return;
 
+			console.log("fetching data");
+
 			const inProtectedGroup = segments[0] === "(protected)";
 
 			if (session && !inProtectedGroup) {
@@ -257,11 +259,6 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 					router.replace("/(public)/welcome");
 				}
 			}
-
-			/* HACK: Something must be rendered when determining the initial auth state... 
-			instead of creating a loading screen, we use the SplashScreen and hide it after
-			a small delay (500 ms)
-			*/
 		};
 
 		fetchData();

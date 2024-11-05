@@ -1,33 +1,57 @@
 import { Image } from "expo-image";
 import { Stack } from "expo-router";
+import { View, useWindowDimensions } from "react-native";
 
 import OasisLogo from "@/assets/oasis-word.png";
+import LocationBadge from "@/components/sharable/location-badge";
+import ScoreBadge from "@/components/sharable/score-badge";
+import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 function CustomHeader() {
 	return <Image source={OasisLogo} style={{ width: 85, height: 24 }} />;
 }
 
-// function UpgradeHeader({ onCrownPress }: { onCrownPress: () => void }) {
-// 	return (
-// 		<>
-// 			<Image source={OasisLogo} style={{ width: 85, height: 24 }} />
-// 			<TouchableOpacity
-// 				onPress={onCrownPress}
-// 				style={{ position: "absolute", right: 10 }}
-// 			>
-// 				<Image source={CrownIcon} style={{ width: 24, height: 24 }} />
-// 			</TouchableOpacity>
-// 		</>
-// 	);
-// }
+function HomeHeader({
+	screenWidth,
+	location,
+	score,
+}: {
+	screenWidth: number;
+	location: any;
+	score: number | null;
+}) {
+	return (
+		<View
+			className="flex flex-1 flex-row items-center"
+			style={{ maxWidth: screenWidth * 0.9 }}
+		>
+			<View className="flex-1 flex-col">
+				<LocationBadge location={location} />
+			</View>
+			<View className="flex-row items-center justify-center w-44">
+				<Image source={OasisLogo} style={{ width: 85, height: 24 }} />
+			</View>
+			<View className="flex-1 justify-end">
+				<View className="flex-row items-center justify-end">
+					<ScoreBadge score={score} />
+				</View>
+			</View>
+		</View>
+	);
+}
 
 export default function SearchLayout() {
 	const { backgroundColor, textColor } = useColorScheme();
+	const { width } = useWindowDimensions();
 
-	// const openSubscribeModal = () => {
-	// 	setSubscribeModalVisible(true);
-	// };
+	const { userData } = useUserProvider();
+
+	const { score } = userData ?? {};
+
+	const locationName = userData?.location?.city
+		? `${userData?.location?.city}, ${userData?.location?.state}`
+		: "Unknown";
 
 	return (
 		<Stack
@@ -50,11 +74,16 @@ export default function SearchLayout() {
 		>
 			<Stack.Screen
 				name="index"
-				// options={{
-				// 	headerTitle: () => (
-				// 		<UpgradeHeader onCrownPress={openSubscribeModal} />
-				// 	),
-				// }}
+				options={{
+					headerTitle: () => (
+						<HomeHeader
+							screenWidth={width}
+							location={locationName}
+							score={score}
+						/>
+						// <CustomHeader />
+					),
+				}}
 			/>
 			<Stack.Screen name="item/[id]" />
 			<Stack.Screen name="location/[id]" />

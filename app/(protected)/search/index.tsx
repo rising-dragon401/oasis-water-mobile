@@ -1,20 +1,30 @@
-import Feather from "@expo/vector-icons/Feather";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { getFeaturedUsers } from "actions/admin";
 import { Image } from "expo-image";
 import { Link, usePathname, useRouter } from "expo-router";
 import { useContext, useEffect, useState } from "react";
-import { FlatList, ScrollView, TouchableOpacity, View } from "react-native";
+import {
+	FlatList,
+	ImageBackground,
+	TouchableOpacity,
+	View,
+} from "react-native";
 
+import {
+	getCategoryCounts,
+	getMostRecentlyUpdatedItems,
+} from "@/actions/admin";
+import RecsBg from "@/assets/recs-bg.png";
+import ItemPreviewCard from "@/components/sharable/item-preview-card";
 import LocationCard from "@/components/sharable/location-card";
+import ScoreCard from "@/components/sharable/score-card";
 import Search from "@/components/sharable/search";
 import Skeleton from "@/components/sharable/skeleton";
-import { H2, H4, Muted, P } from "@/components/ui/typography";
+import { H4, Muted, P, Small } from "@/components/ui/typography";
 import { BlogContext } from "@/context/blogs-provider";
 import { useUserProvider } from "@/context/user-provider";
 import { CATEGORIES } from "@/lib/constants/categories";
 import { useColorScheme } from "@/lib/useColorScheme";
-
 const FEATURED_LOCATIONS = [
 	{
 		id: "California",
@@ -54,20 +64,37 @@ const FEATURED_LOCATIONS = [
 ];
 
 export default function TabOneScreen() {
-	const { userData, subscription, uid, refreshUserData } = useUserProvider();
+	const { userData, subscription, uid, refreshUserData, tapScore, userScores } =
+		useUserProvider();
 	const router = useRouter();
 	const pathname = usePathname();
-	const { textSecondaryColor } = useColorScheme();
+	const { textSecondaryColor, mutedForegroundColor } = useColorScheme();
 	const { blogs } = useContext(BlogContext);
 
 	const [people, setPeople] = useState<any[]>([]);
 	const [loadingPeople, setLoadingPeople] = useState(false);
 	const [searchInputActive, setSearchInputActive] = useState(false);
+	const [loadingCategoryData, setLoadingCategoryData] = useState(true);
+	const [categoryData, setCategoryData] = useState<any[]>([]);
+	const [recentlyUpdatedItems, setRecentlyUpdatedItems] = useState<any[]>([]);
 
 	useEffect(() => {
-		getPeople();
-		// manually refresh user data to be safe
-		refreshUserData();
+		const fetchData = async () => {
+			getRecentlyUpdatedItems();
+
+			getPeople();
+			// manually refresh user data to be safe
+			refreshUserData();
+
+			const categoryCounts = await getCategoryCounts();
+			if (categoryCounts) {
+				setCategoryData(categoryCounts);
+			} else {
+				setCategoryData(CATEGORIES);
+			}
+			setLoadingCategoryData(false);
+		};
+		fetchData();
 	}, []);
 
 	// show review modal if user has not reviewed the app
@@ -92,6 +119,11 @@ export default function TabOneScreen() {
 		setLoadingPeople(false);
 	}
 
+	async function getRecentlyUpdatedItems() {
+		const data = await getMostRecentlyUpdatedItems();
+		setRecentlyUpdatedItems(data || []);
+	}
+
 	function handleCreateYourOwn() {
 		if (userData) {
 			router.push(`/search/oasis/${userData.id}`);
@@ -100,74 +132,134 @@ export default function TabOneScreen() {
 		}
 	}
 
+	const handleTapWaterPress = () => {
+		if (uid && userData?.tap_location_id) {
+			router.push(`/search/location/${userData?.location?.city}`);
+		} else if (uid) {
+			router.push("/locationModal");
+		} else {
+			router.push("/(public)/sign-up");
+		}
+	};
+
 	const sections = [
 		{
-			key: "topWaters",
+			key: "scores",
+			show: false,
 			render: () => (
-				<View className="flex-col w-full mb-10 z-10">
-					<View className="flex flex-row justify-between w-full items-center">
-						<H4 className="text-left">Top waters and filters</H4>
-						<Link
-							href="/(protected)/search/top-rated-all"
-							className="flex flex-row items-center gap-2"
-						>
-							<View className="flex flex-row items-center gap-2">
-								<Muted className="text-center m-0 p-0">all categories</Muted>
-								<Ionicons
-									name="arrow-forward"
-									size={16}
-									color={textSecondaryColor}
-								/>
-							</View>
-						</Link>
-					</View>
-					<FlatList
-						data={CATEGORIES.sort(
-							(a, b) => (b.is_new ? 1 : 0) - (a.is_new ? 1 : 0),
-						)}
-						horizontal
-						showsHorizontalScrollIndicator={false}
-						contentContainerStyle={{
-							paddingTop: 8,
-							height: "100%",
+				<View className="flex  gap-x-4 w-full justify-between flex-row mt-6">
+					{/* <View className="max-h-28 w-full flex-1 my-6"> */}
+					<ScoreCard
+						title="Tap Water"
+						description="Quality in your area"
+						score={tapScore?.score || 0}
+						onPress={handleTapWaterPress}
+						type="square"
+					/>
+					<ScoreCard
+						title="Overall score"
+						description="based on your water usage"
+						score={userScores?.overallScore || 0}
+						onPress={() => {
+							router.push("/oasis");
 						}}
-						className="overflow-x-scroll flex"
-						renderItem={({ item: category, index }) => (
-							<View className="mr-3 w-[120px] py-1 rounded-xl">
-								<Link
-									key={category.id + index.toString()}
-									href={`/search/top-rated/${category.typeId}?tags=${category.tags}`}
-									className="flex flex-col"
-								>
-									<View className="relative w-[120px] h-[120px] flex items-center justify-center rounded-xl bg-card">
-										<Image
-											source={{ uri: category.image }}
-											alt={category.title}
-											style={{
-												width: "60%",
-												height: "60%",
-												borderRadius: 4,
-											}}
-											className="mb-4"
-										/>
-										<View className="absolute bottom-0 left-0 w-full p-2 pb-2 mt-4">
-											<P className="text-center text-base">{category.title}</P>
-										</View>
-									</View>
-								</Link>
-							</View>
-						)}
-						keyExtractor={(item) => item.id}
+						type="square"
 					/>
 				</View>
 			),
 		},
 		{
-			key: "featuredLocations",
+			key: "recommended",
+			show: false,
 			render: () => (
-				<View className=" flex-col w-full mb-10">
+				<ImageBackground
+					source={RecsBg}
+					style={{
+						width: "100%",
+						height: 120,
+						borderRadius: 12,
+						overflow: "hidden",
+					}}
+					className="mt-6"
+					resizeMode="cover"
+				>
+					<TouchableOpacity
+						className="flex flex-row items-center justify-between border border-accent rounded-xl px-6 py-2 overflow-hidden h-36 w-full bg-accent/20"
+						onPress={() => {
+							// @ts-ignore
+							router.push(`/oasis?tab=for_you`);
+						}}
+						style={{
+							width: "100%",
+							height: "100%",
+						}}
+					>
+						<View className="flex flex-col items-start gap-1 z-10">
+							<P className="text-xl text-background">Recommended for you</P>
+							<Muted className="text-stone-300 max-w-[60vw]">
+								Waters and filters for you based on your location and
+								preferences
+							</Muted>
+						</View>
+
+						<View className="flex flex-col justify-end items-end h-full pb-4">
+							<Ionicons
+								name="arrow-forward"
+								size={18}
+								color="rgb(214 211 209)"
+							/>
+						</View>
+					</TouchableOpacity>
+				</ImageBackground>
+			),
+		},
+		{
+			key: "mostRecent",
+			show: true,
+			render: () => (
+				<View className="flex-col w-full z-10 mt-6">
+					<View className="flex flex-row justify-between w-full items-center ">
+						<H4 className="text-left mb-1">Recently tested</H4>
+						{/* <Link
+							href="/(protected)/search/top-rated-all"
+							className="flex flex-row items-center gap-2"
+						>
+							<Muted className="text-center m-0 p-0">explore all</Muted>
+						</Link> */}
+					</View>
+					<View className="flex flex-col gap-4">
+						<FlatList
+							data={recentlyUpdatedItems}
+							horizontal
+							showsHorizontalScrollIndicator={false}
+							contentContainerStyle={{
+								paddingTop: 8,
+								height: "100%",
+							}}
+							className="overflow-x-scroll flex"
+							renderItem={({ item }) => (
+								<View className="mr-4 w-40 h-full">
+									<ItemPreviewCard
+										item={item}
+										showFavorite={false}
+										isAuthUser={false}
+										isGeneralListing
+									/>
+								</View>
+							)}
+							keyExtractor={(item) => item.id}
+						/>
+					</View>
+				</View>
+			),
+		},
+		{
+			key: "featuredLocations",
+			show: true,
+			render: () => (
+				<View className=" flex-col w-full mt-6">
 					<View className="flex flex-row justify-between w-full items-center">
-						<H4 className="text-left">Tap water ratings</H4>
+						<H4 className="text-left mb-1">Tap water</H4>
 						<Link
 							href="/(protected)/search/locations"
 							className="flex flex-row items-center gap-2"
@@ -183,7 +275,16 @@ export default function TabOneScreen() {
 						</Link>
 					</View>
 					<FlatList
-						data={FEATURED_LOCATIONS}
+						data={[
+							// {
+							// 	id: tapScore.id,
+							// 	name: "My tap water",
+							// 	score: tapScore.score,
+							// 	image: tapScore.image,
+							// 	isMyTap: true,
+							// },
+							...FEATURED_LOCATIONS,
+						]}
 						horizontal
 						showsHorizontalScrollIndicator={false}
 						contentContainerStyle={{
@@ -206,17 +307,17 @@ export default function TabOneScreen() {
 		{
 			key: "whatOthersAreDrinking",
 			render: () => (
-				<View className=" w-full justify-start mb-6">
-					<View className="flex flex-row justify-between w-full items-center">
-						<H4 className="text-left">What others are drinking</H4>
-						{/* <Link href="/(protected)/search/users">
+				<View className="flex-1 w-full justify-start mt-6 min-w-full">
+					{/* <View className="flex flex-row justify-between w-full items-center mb-4">
+						<H4 className="text-lef">What others are drinking</H4> */}
+					{/* <Link href="/(protected)/search/users">
 							<Ionicons
 								name="arrow-forward"
 								size={16}
 								color={textSecondaryColor}
 							/>
 						</Link> */}
-					</View>
+					{/* </View> */}
 					{loadingPeople ? (
 						<FlatList
 							data={[1, 2, 3]} // Placeholder items
@@ -224,9 +325,9 @@ export default function TabOneScreen() {
 							renderItem={() => (
 								<View className="mr-4">
 									<Skeleton
-										width={180}
-										height={60}
-										style={{ borderRadius: 30 }}
+										width={80}
+										height={80}
+										style={{ borderRadius: 99 }}
 									/>
 								</View>
 							)}
@@ -234,77 +335,43 @@ export default function TabOneScreen() {
 						/>
 					) : (
 						<FlatList
-							data={[
-								...people,
-								{
-									id: "create_yours",
-									full_name: "Create yours",
-									favorites: [],
-									avatar_url: "",
-								},
-							]}
+							data={[...people]}
 							horizontal
 							showsHorizontalScrollIndicator={false}
 							contentContainerStyle={{
 								paddingTop: 8,
+								paddingLeft: 0,
 							}}
-							style={{ height: 80 }}
+							style={{ height: 120 }}
 							className="overflow-x-scroll"
-							renderItem={({ item: user }) =>
-								user.id !== "create_yours" ? (
-									<Link
-										key={user.id}
-										href={`/search/oasis/${user.id}`}
-										className="mr-4"
-									>
-										<View className="flex-row items-center bg-card rounded-full p-3 pr-5">
-											<View className="relative w-[40px] h-[40px] rounded-full overflow-hidden mr-4">
-												<Image
-													source={{
-														uri: user.avatar_url,
-													}}
-													alt={user.full_name}
-													style={{
-														width: "100%",
-														height: "100%",
-													}}
-													className="w-14 h-14"
-												/>
-											</View>
-											<View>
-												<P className="text-base font-medium">
-													{user.full_name}
-												</P>
-												<P className="text-sm text-secondary">
-													{user.favorites.length} products
-												</P>
-											</View>
+							renderItem={({ item: user }) => (
+								<Link
+									key={user.id}
+									href={`/search/oasis/${user.id}`}
+									className="mr-10"
+								>
+									<View className="flex-col items-center justify-center rounded-full gap-2">
+										<View className="w-20 h-20 rounded-full overflow-hidden">
+											<Image
+												source={{
+													uri: user.avatar_url,
+												}}
+												alt={user.full_name}
+												style={{
+													width: "100%",
+													height: "100%",
+												}}
+												className="w-14 h-14 rounded-full"
+											/>
 										</View>
-									</Link>
-								) : (
-									<TouchableOpacity
-										key={user.id}
-										onPress={handleCreateYourOwn}
-										className="mr-4"
-									>
-										<View className="flex-row items-center bg-card rounded-full p-3 pr-5">
-											<View className="relative w-[40px] h-[40px] rounded-full overflow-hidden mr-4 bg-gray-200 flex items-center justify-center rounded-full">
-												<Feather
-													name="arrow-up-right"
-													size={24}
-													color="black"
-												/>
-											</View>
-											<View>
-												<P className="text-base font-medium">Create yours</P>
-												<P className="text-sm text-secondary">
-													Share what you drink
-												</P>
-											</View>
+										<View>
+											<Small className="max-w-20 text-center">
+												{user.full_name}
+											</Small>
 										</View>
-									</TouchableOpacity>
-								)
-							}
+									</View>
+								</Link>
+							)}
 							keyExtractor={(item) => item.id}
 						/>
 					)}
@@ -313,8 +380,9 @@ export default function TabOneScreen() {
 		},
 		{
 			key: "newsAndResearch",
+			show: false,
 			render: () => (
-				<View className="w-full justify-start mb-6">
+				<View className="w-full justify-start">
 					<View className="flex flex-row justify-between w-full items-center">
 						<H4 className="text-left">News and research</H4>
 						<Link
@@ -418,24 +486,113 @@ export default function TabOneScreen() {
 				</View>
 			),
 		},
+		{
+			key: "categories",
+			render: () => (
+				<View className="flex-1 flex-col w-full mt-4 z-10 min-w-full">
+					<View className="flex flex-row justify-between w-full items-center mb-4">
+						<H4 className="text-left ">Categories</H4>
+						{/* <Link
+							href="/(protected)/search/top-rated-all"
+							className="flex flex-row items-center gap-2"
+						>
+							<Muted className="text-center m-0 p-0">more</Muted>
+						</Link> */}
+					</View>
+					<View className="flex flex-col gap-4 w-full">
+						{loadingCategoryData ? (
+							<FlatList
+								data={[1, 2, 3, 4, 5, 6]}
+								renderItem={() => (
+									<View className="mb-3 w-full ">
+										<Skeleton
+											width="100%"
+											height={56}
+											style={{ borderRadius: 12 }}
+										/>
+									</View>
+								)}
+								keyExtractor={(item) => item.toString()}
+							/>
+						) : (
+							<>
+								<FlatList
+									data={categoryData.sort(
+										(a, b) => (b.is_new ? 1 : 0) - (a.is_new ? 1 : 0),
+									)}
+									keyExtractor={(item, index) => item.id + index.toString()}
+									renderItem={({ item: category }) => (
+										<View
+											className="flex justify-center rounded-2xl bg-card mb-4"
+											style={{ maxHeight: 80, width: "100%" }}
+										>
+											<Link
+												href={`/search/top-rated/${category.typeId}?tags=${category.tags?.join(",")}`}
+											>
+												<View className="flex flex-row items-center  px-2 justify-between w-full">
+													<View className="flex flex-row items-center gap-2 py-2">
+														<View className="rounded-full overflow-hidden ">
+															<Image
+																source={{ uri: category.image }}
+																alt={category.title}
+																style={{
+																	width: 56,
+																	height: 56,
+																}}
+																contentFit="cover"
+															/>
+														</View>
+														<View className="flex flex-col gap-1 h-full">
+															<P className="font-medium text-xl">
+																{category.title}
+															</P>
+															<Muted className="text-base">
+																{category.count}
+															</Muted>
+														</View>
+													</View>
+													<View className="flex flex-col justify-start gap-2  mr-2">
+														<Ionicons
+															name="arrow-forward"
+															size={18}
+															color={mutedForegroundColor}
+														/>
+														<View className="h-2" />
+													</View>
+												</View>
+											</Link>
+										</View>
+									)}
+								/>
+							</>
+						)}
+					</View>
+				</View>
+			),
+		},
 	];
 
+	const renderSection = ({ item: section }: { item: any }) =>
+		section.show !== false && (
+			<View key={section.key} style={{ marginBottom: 10 }}>
+				{section.render()}
+			</View>
+		);
+
 	return (
-		<View>
-			<View className="flex justify-center items-center mt-4 z-10">
-				<H2 className="text-center max-w-xs border-none pb-0">
-					What's in your water?
-				</H2>
+		<View className="px-6">
+			<View className="flex justify-center items-center mt-6 mb-2 z-10">
+				{/* <View className="w-full flex justify-start">
+					<H3 className="text-left max-w-xs border-none pb-0">
+						What are you drinking?
+					</H3>
+				</View> */}
 
-				<Muted className="text-center mb-4 max-w-md">
-					90% of water contains toxins most filters don't remove them
-				</Muted>
-
-				<View className="w-[90%] z-50">
+				<View className="z-50 mt-2">
 					<Search setActive={setSearchInputActive} />
 				</View>
 			</View>
-
+			{/* 
 			<ScrollView
 				contentContainerStyle={{
 					alignItems: "center",
@@ -444,12 +601,36 @@ export default function TabOneScreen() {
 				}}
 				showsVerticalScrollIndicator={false}
 				keyboardShouldPersistTaps="handled"
-				className="flex flex-col p-4 px-4 mt-4 z-0"
+				className="flex flex-col z-0"
 			>
-				{sections.map((section) => (
-					<View key={section.key}>{section.render()}</View>
-				))}
-			</ScrollView>
+				{sections.map(
+					(section) =>
+						section.show !== false && (
+							<View key={section.key} style={{ marginBottom: 10 }}>
+								{section.render()}
+							</View>
+						),
+				)}
+			</ScrollView> */}
+			<FlatList
+				data={sections}
+				renderItem={({ item: section }) =>
+					section.show !== false ? (
+						<View key={section.key} style={{ marginBottom: 10 }}>
+							{section.render()}
+						</View>
+					) : null
+				}
+				keyExtractor={(item) => item.key}
+				contentContainerStyle={{
+					alignItems: "center",
+					paddingBottom: 180,
+					zIndex: 0,
+				}}
+				showsVerticalScrollIndicator={false}
+				keyboardShouldPersistTaps="handled"
+				className="flex flex-col z-0"
+			/>
 		</View>
 	);
 }

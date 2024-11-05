@@ -49,7 +49,8 @@ export function LocationForm({ id }: Props) {
 		});
 
 		// manually update score if not already set
-		if (!location.score) {
+		console.log("location", JSON.stringify(location, null, 2));
+		if (!location.score || location.score > 45) {
 			const score =
 				location.utilities?.length > 0 ? location.utilities[0].score : null;
 

@@ -1,6 +1,9 @@
+import axios from "axios";
+
 import { getFilterDetails } from "@/actions/filters";
 import { getItemDetails } from "@/actions/items";
 import { supabase } from "@/config/supabase";
+import { CATEGORIES } from "@/lib/constants/categories";
 
 export const handleDeleteUser = async (uid: string) => {
 	try {
@@ -275,4 +278,251 @@ export const getResearch = async () => {
 	}
 
 	return data;
+};
+
+export const getCategoryCounts = async () => {
+	const categoryData = [];
+
+	const categoryCounts: Record<string, number> = {};
+
+	for (const category of CATEGORIES) {
+		const allTypes = category.dbTypes;
+
+		const { data, error } = await supabase
+			.from(category.typeId === "filter" ? "water_filters" : "items")
+			.select("id, tags")
+			.in("type", allTypes);
+
+		if (error) {
+			console.error("error", error);
+			return [];
+		}
+
+		// Convert tags to an array and filter
+		const filteredData = data.filter((item) => {
+			return category?.tags?.some((tag: string) => item.tags?.includes(tag));
+		});
+
+		categoryCounts[category.id] = filteredData.length;
+
+		categoryData.push({
+			id: category.id,
+			title: category.title,
+			typeId: category.typeId,
+			image: category.image,
+			count: filteredData.length,
+		});
+	}
+
+	return categoryData;
+};
+
+export const getMostRecentlyUpdatedItems = async () => {
+	const { data: itemsData, error: itemsError } = await supabase
+		.from("items")
+		.select("*")
+		.eq("is_indexed", true)
+		.order("created_at", { ascending: false })
+		.limit(5);
+
+	const { data: filtersData, error: filtersError } = await supabase
+		.from("water_filters")
+		.select("*")
+		.eq("is_indexed", true)
+		.order("created_at", { ascending: false })
+		.limit(5);
+
+	if (itemsError || filtersError) {
+		console.error(
+			"Error fetching most recently updated items:",
+			itemsError || filtersError,
+		);
+		return [];
+	}
+
+	const combinedData = [...itemsData, ...filtersData];
+
+	// Sort combined data by created_at
+	combinedData.sort(
+		(a, b) =>
+			new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+	);
+
+	return combinedData;
+};
+
+const getZipCodeLatLng = async (zipCode: string) => {
+	const API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY;
+	const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${zipCode}&key=${API_KEY}`;
+
+	try {
+		const response = await axios.get(url);
+		const data = response.data;
+
+		if (data.status === "OK") {
+			const location = data.results[0].geometry.location;
+			return {
+				latitude: location.lat,
+				longitude: location.lng,
+			};
+		} else {
+			throw new Error(`Geocoding API error: ${data.status}`);
+		}
+	} catch (error) {
+		console.error("Error fetching lat/lng for ZIP code:", error);
+		return null;
+	}
+};
+
+type LatLong = {
+	lat: number;
+	long: number;
+};
+
+type Location = {
+	name: string;
+	lat_long: LatLong;
+};
+
+// Haversine formula to calculate the distance between two latitude/longitude points
+function calculateDistance(
+	lat1: number,
+	long1: number,
+	lat2: number,
+	long2: number,
+): number {
+	const R = 6371; // Radius of Earth in kilometers
+	const dLat = (lat2 - lat1) * (Math.PI / 180);
+	const dLong = (long2 - long1) * (Math.PI / 180);
+
+	const a =
+		Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+		Math.cos(lat1 * (Math.PI / 180)) *
+			Math.cos(lat2 * (Math.PI / 180)) *
+			Math.sin(dLong / 2) *
+			Math.sin(dLong / 2);
+
+	const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+	return R * c; // Distance in kilometers
+}
+
+export const getNearestLocation = async (
+	userCoords: {
+		latitude: number;
+		longitude: number;
+	},
+	userId: string,
+) => {
+	try {
+		if (
+			!userCoords ||
+			!userId ||
+			userCoords.latitude === undefined ||
+			userCoords.longitude === undefined
+		) {
+			console.error("Invalid user coords or userId");
+			return null;
+		}
+
+		console.log("userCoords: ", userCoords);
+
+		const { data, error } = await supabase
+			.from("tap_water_locations")
+			.select("id, lat_long, score");
+
+		if (error) {
+			console.error("Error fetching tap water locations:", error);
+			return [];
+		}
+
+		const tapWaterLocations = data.filter(
+			(location: any) => location.score !== null && location.lat_long !== null,
+		);
+
+		let nearestLocation: any = null;
+		let shortestDistance = Infinity;
+
+		for (const location of tapWaterLocations) {
+			const distance = await calculateDistance(
+				userCoords.latitude,
+				userCoords.longitude,
+				location.lat_long.latitude,
+				location.lat_long.longitude,
+			);
+
+			// console.log("distance: ", distance);
+
+			if (distance < shortestDistance) {
+				shortestDistance = distance;
+				nearestLocation = location;
+			}
+		}
+
+		console.log("nearestLocation: ", nearestLocation);
+
+		// update user's nearest location
+		if (nearestLocation) {
+			const { error: updateError } = await supabase
+				.from("users")
+				.update({ tap_location_id: nearestLocation.id })
+				.eq("id", userId);
+
+			if (updateError) {
+				console.error("Error updating user's nearest location:", updateError);
+				return false;
+			} else {
+				console.log("User's nearest location updated successfully.");
+			}
+		}
+
+		return true;
+	} catch (error) {
+		console.error("Error fetching nearest location:", error);
+		return null;
+	}
+};
+
+// Add lat/long to each location
+// MANUALLY RUN THIS
+export const addLatLongToEachLocation = async () => {
+	const { data, error } = await supabase
+		.from("tap_water_locations")
+		.select("*")
+		.is("lat_long", null);
+
+	if (error) {
+		console.error("Error fetching tap water locations:", error);
+		return [];
+	}
+
+	for (const location of data) {
+		// console.log("location: ", JSON.stringify(location, null, 2));
+		const utilities = location.utilities;
+
+		if (utilities && utilities.length > 0) {
+			const zipCode = utilities[0].zip_codes.substring(0, 5);
+
+			if (zipCode) {
+				const latLng = await getZipCodeLatLng(zipCode);
+
+				if (latLng) {
+					const { latitude, longitude } = latLng;
+
+					const { error: updateError } = await supabase
+						.from("tap_water_locations")
+						.update({ lat_long: { latitude, longitude } })
+						.eq("id", location.id);
+
+					if (updateError) {
+						console.error(
+							`Error updating location ${location.id}:`,
+							updateError,
+						);
+					} else {
+						console.log(`Updated location ${location.id} with lat/long.`);
+					}
+				}
+			}
+		}
+	}
 };

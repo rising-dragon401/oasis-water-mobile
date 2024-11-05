@@ -1,4 +1,4 @@
-import { Ionicons } from "@expo/vector-icons";
+import Feather from "@expo/vector-icons/Feather";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Alert, GestureResponderEvent, TouchableOpacity } from "react-native";
@@ -76,11 +76,14 @@ export default function FavoriteButton({ item, size = 18 }: Props) {
 	};
 
 	return (
-		<TouchableOpacity onPress={handleFavoriteClick}>
+		<TouchableOpacity
+			onPress={handleFavoriteClick}
+			className="w-8 h-8 rounded-full bg-muted flex items-center justify-center"
+		>
 			{isItemInFavorites ? (
-				<Ionicons name="heart" size={22} color={mutedForegroundColor} />
+				<Feather name="check" size={18} color={iconColor} />
 			) : (
-				<Ionicons name="heart-outline" size={22} color={iconColor} />
+				<Feather name="plus" size={18} color={iconColor} />
 			)}
 		</TouchableOpacity>
 	);

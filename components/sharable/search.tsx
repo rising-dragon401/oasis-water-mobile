@@ -77,6 +77,14 @@ export default function Search({
 		} else {
 			queries = [
 				{
+					indexName: "categories",
+					query,
+					params: {
+						restrictSearchableAttributes: ["name"],
+						hitsPerPage: numResults || 5,
+					},
+				},
+				{
 					indexName: "items",
 					query,
 					params: {
@@ -85,19 +93,19 @@ export default function Search({
 					},
 				},
 				{
-					indexName: "tap_water_locations",
-					query,
-					params: {
-						restrictSearchableAttributes: ["name", "state", "zip_codes"],
-						hitsPerPage: numResults || 5,
-					},
-				},
-				{
 					indexName: "water_filters",
 					query,
 					params: {
 						restrictSearchableAttributes: ["name"],
 						hitsPerPage: numResults || 3,
+					},
+				},
+				{
+					indexName: "tap_water_locations",
+					query,
+					params: {
+						restrictSearchableAttributes: ["name", "state", "zip_codes"],
+						hitsPerPage: numResults || 5,
 					},
 				},
 				{
@@ -113,6 +121,7 @@ export default function Search({
 
 		posthog?.capture("search", {
 			query,
+			has_results: results?.length > 0,
 		});
 
 		try {
@@ -161,7 +170,7 @@ export default function Search({
 			<View className="flex flex-row gap-2 items-center relative z-10">
 				<Input
 					ref={inputRef}
-					placeholder="Search your water, filter or location"
+					placeholder="What are you drinking?"
 					value={value}
 					onChangeText={onChangeText}
 					aria-labelledbyledBy="inputLabel"

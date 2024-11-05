@@ -40,6 +40,11 @@ module.exports = {
 					foreground: "hsl(var(--popover-foreground))",
 				},
 			},
+			aspectRatio: {
+				"4/3": "4 / 3",
+				"3/2": "3 / 2",
+				"4/5": "4 / 5",
+			},
 		},
 	},
 	plugins: [],

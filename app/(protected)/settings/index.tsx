@@ -27,7 +27,6 @@ import UpgradeButton from "@/components/sharable/upgrade-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { H1, Large, Muted, P } from "@/components/ui/typography";
 import { useRevenueCat } from "@/context/revenue-cat-provider";
@@ -205,16 +204,13 @@ export default function TabTwoScreen() {
 	};
 
 	const handleManageSubscription = () => {
-		console.log(
-			"subscriptionData.metadata?.managementURL",
-			subscriptionData.metadata?.managementURL,
-		);
 		Linking.openURL(subscriptionData.metadata?.managementURL || "");
 	};
 
 	const handleRestorePurchases = async () => {
-		await restorePurchases();
-		alert("Any applicable purchases have been restored.");
+		const res = await restorePurchases();
+		console.log("handleRestorePurchases res", res);
+		showToast("Any applicable purchases have been restored.");
 	};
 
 	const handleLoadInviteModal = () => {
@@ -316,8 +312,6 @@ export default function TabTwoScreen() {
 
 									{!userData?.has_redeemed_free_month && (
 										<>
-											<Separator />
-
 											<Button
 												className="w-full"
 												variant="outline"
@@ -538,14 +532,13 @@ export default function TabTwoScreen() {
 						</View>
 					</View>
 
-					<View className="flex flex-col mt-10 pb-8">
-						<View className="mt-8">
-							<Button
-								variant="ghost"
-								label="Restore purchases"
-								onPress={handleRestorePurchases}
-							/>
-						</View>
+					<View className="flex flex-col mt-10 pb-8 gap-y-2">
+						<Button
+							className="w-full"
+							variant="ghost"
+							label="Restore purchases"
+							onPress={handleRestorePurchases}
+						/>
 						<Link
 							className="w-full mt-2 text-red-500 text-center"
 							// @ts-ignore

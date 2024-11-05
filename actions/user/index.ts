@@ -1,4 +1,5 @@
 import { supabase } from "@/config/supabase";
+import { HEALTH_EFFECTS } from "@/lib/constants/health-effects";
 
 export async function getCurrentUserData(uid?: string) {
 	const userId = uid;
@@ -285,6 +286,7 @@ export async function manageSubscriptionStatusChange(
 		// check for any active subscriptions
 		// if no active subscriptions, then return
 		const purchases = rcVustomerInfo?.allPurchasedProductIdentifiers;
+
 		if (!purchases || purchases.length === 0) {
 			await markSubscriptionAsInactive(uid);
 			throw new Error("No rev cat purchases found");
@@ -757,4 +759,211 @@ export const isUserLoggedIn = async () => {
 	}
 
 	return true;
+};
+
+export const getRecommendedProducts = async (uid: string) => {
+	const recommendedProducts: any = {
+		BottledWater: [],
+		WaterDelivery: [],
+		DrinkingWaterFilter: [],
+		ShowerFilter: [],
+		BottleFilter: [],
+	};
+
+	return recommendedProducts;
+
+	// try {
+	// 	// Bottled waters
+	// 	const { data: bottledWaters, error } = await supabase
+	// 		.from("items")
+	// 		.select("*")
+	// 		.eq("type", "bottled_water")
+	// 		.in("tags", ["still", "sparkling"])
+	// 		.not("score", "is", null)
+	// 		.order("score", { ascending: false })
+	// 		.limit(5);
+
+	// 	if (error) {
+	// 		throw new Error(error.message);
+	// 	}
+
+	// 	recommendedProducts.BottledWater = bottledWaters || [];
+
+	// 	// Delivery services
+	// 	const { data: deliveryServices, error: deliveryError } = await supabase
+	// 		.from("items")
+	// 		.select("*")
+	// 		.eq("type", "water_gallon")
+	// 		.not("score", "is", null)
+	// 		.order("score", { ascending: false })
+	// 		.limit(5);
+
+	// 	// if (deliveryError) {
+	// 	// 	throw new Error(deliveryError.message);
+	// 	// }
+
+	// 	recommendedProducts.WaterDelivery = deliveryServices || [];
+
+	// 	// Drinking water filter
+	// 	const { data: drinkingWaterFilters, error: drinkingWaterError } =
+	// 		await supabase
+	// 			.from("water_filters")
+	// 			.select("*")
+	// 			.in("tags", ["counter", "under_sink", "pitcher", "sink"])
+	// 			.not("score", "is", null)
+	// 			.order("score", { ascending: false })
+	// 			.limit(5);
+
+	// 	// if (drinkingWaterError) {
+	// 	// 	throw new Error(drinkingWaterError.message);
+	// 	// }
+
+	// 	recommendedProducts.DrinkingWaterFilter = drinkingWaterFilters || [];
+
+	// 	// Shower filters
+	// 	const { data: showerFilters, error: showerError } = await supabase
+	// 		.from("water_filters")
+	// 		.select("*")
+	// 		.in("tags", ["shower", "bath"])
+	// 		.not("score", "is", null)
+	// 		.order("score", { ascending: false })
+	// 		.limit(5);
+
+	// 	// if (showerError) {
+	// 	// 	throw new Error(showerError.message);
+	// 	// }
+
+	// 	recommendedProducts.ShowerFilter = showerFilters || [];
+
+	// 	// Water bottle filter
+	// 	const { data: waterBottleFilters, error: waterBottleError } = await supabase
+	// 		.from("water_filters")
+	// 		.select("*")
+	// 		.in("tags", ["bottle"])
+	// 		.not("score", "is", null)
+	// 		.order("score", { ascending: false })
+	// 		.limit(5);
+
+	// 	// if (waterBottleError) {
+	// 	// 	throw new Error(waterBottleError.message);
+	// 	// }
+
+	// 	recommendedProducts.BottleFilter = waterBottleFilters || [];
+
+	// 	// console.log("recommendedProducts", recommendedProducts);
+
+	// 	return recommendedProducts;
+	// } catch (error) {
+	// 	console.error("Error getting recommended products:", error);
+	// 	return null;
+	// }
+};
+
+export const getUserTapScore = async (tapWaterLocationId: string) => {
+	if (!tapWaterLocationId) {
+		return null;
+	}
+
+	const id = parseInt(tapWaterLocationId);
+
+	const { data, error } = await supabase
+		.from("tap_water_locations")
+		.select("name, score, utilities, image")
+		.eq("id", id);
+
+	if (error) {
+		console.error("Error getting user tap score:", error);
+		return null;
+	}
+
+	const contaminants = data?.[0]?.utilities[0]?.contaminants;
+
+	const healthEffects = contaminants.map((contaminant: any) => {
+		const ingredientId = contaminant.ingredient_id;
+		return HEALTH_EFFECTS.find((effect) =>
+			effect.dbRowIds.includes(ingredientId),
+		);
+	});
+
+	const details = {
+		id,
+		image: data?.[0]?.image,
+		name: data?.[0]?.name,
+		score: data?.[0]?.score,
+		health_effects: [
+			...new Set(healthEffects.map((effect: any) => effect?.harms).flat()),
+		].filter(Boolean),
+		contaminants: contaminants.map(
+			(contaminant: any) => contaminant.ingredient_id,
+		),
+	};
+
+	return details;
+};
+
+export const calculateUserScores = async (
+	uid: string,
+	favorites: any,
+	tapScore: any,
+) => {
+	const calculateShowersScore = () => {
+		const showerFilters = (favorites ?? []).filter((favorite: any) =>
+			favorite.tags.includes("shower"),
+		);
+
+		const topShowerScore =
+			showerFilters.length > 0
+				? Math.max(...showerFilters.map((filter: any) => filter.score))
+				: 0;
+
+		return topShowerScore > 0 ? topShowerScore : tapScore?.score;
+	};
+
+	const calculateWaterFilterScore = () => {
+		const drinkingFilters = (favorites ?? []).filter(
+			(favorite: any) => favorite.type === "filter",
+		);
+
+		const drinkingFilterScore =
+			drinkingFilters.length > 0
+				? Math.max(...drinkingFilters.map((filter: any) => filter.score))
+				: 0;
+
+		return drinkingFilterScore > 0 ? drinkingFilterScore : tapScore?.score;
+	};
+
+	const calculateBottledWaterScore = () => {
+		const bottledWater = (favorites ?? []).filter(
+			(favorite: any) => favorite.type === "bottled_water",
+		);
+
+		if (bottledWater.length === 0) {
+			return 0;
+		}
+
+		const totalBottledWaterScore = bottledWater.reduce(
+			(acc: number, water: any) => acc + water.score,
+			0,
+		);
+		return totalBottledWaterScore / bottledWater.length;
+	};
+
+	const overallScore =
+		(favorites ?? []).reduce(
+			(acc: number, favorite: any) => acc + favorite.score,
+			0,
+		) / (favorites?.length || 1);
+
+	console.log("overallScore", overallScore);
+
+	const showersScore = calculateShowersScore();
+	const waterFilterScore = calculateWaterFilterScore();
+	const bottledWaterScore = calculateBottledWaterScore();
+
+	return {
+		showersScore,
+		waterFilterScore,
+		bottledWaterScore,
+		overallScore,
+	};
 };

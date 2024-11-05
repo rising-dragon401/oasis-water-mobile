@@ -1,9 +1,10 @@
 import { Image } from "expo-image";
 import { Link } from "expo-router";
 import React from "react";
-import { FlatList, View } from "react-native";
+import { FlatList, TouchableOpacity, View } from "react-native";
 
 import { Muted, P } from "@/components/ui/typography";
+import { useToast } from "@/context/toast-provider";
 import { placeHolderImageBlurHash } from "@/lib/constants/images";
 import { useColorScheme } from "@/lib/useColorScheme";
 import { determineLink } from "@/lib/utils";
@@ -15,6 +16,7 @@ type Props = {
 
 export default function ResultsRow({ results, noResults }: Props) {
 	const { colorScheme } = useColorScheme();
+	const showToast = useToast();
 
 	const borderColor = colorScheme === "dark" ? "#333" : "#ddd";
 
@@ -29,9 +31,15 @@ export default function ResultsRow({ results, noResults }: Props) {
 			return "Bottled water";
 		} else if (type === "bottle_filter") {
 			return "Filter";
+		} else if (type === "category") {
+			return "Category";
 		} else {
 			return "Bottled water";
 		}
+	};
+
+	const handleRequestItem = () => {
+		showToast("Noted. We'll add it soon", 3000, "top");
 	};
 
 	return (
@@ -60,7 +68,14 @@ export default function ResultsRow({ results, noResults }: Props) {
 			>
 				{noResults ? (
 					<View className="flex justify-center pl-4 h-12">
-						<Muted>No results found</Muted>
+						<TouchableOpacity onPress={handleRequestItem}>
+							<Muted>
+								No results.{" "}
+								<Muted style={{ textDecorationLine: "underline" }}>
+									Request this item
+								</Muted>
+							</Muted>
+						</TouchableOpacity>
 					</View>
 				) : (
 					<FlatList
@@ -90,7 +105,7 @@ export default function ResultsRow({ results, noResults }: Props) {
 											/>
 											<View className="flex flex-col">
 												<P
-													className="max-w-72 font-medium"
+													className="max-w-80 font-medium"
 													numberOfLines={1}
 													ellipsizeMode="tail"
 												>

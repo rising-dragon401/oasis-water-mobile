@@ -10,7 +10,10 @@ type ItemImageProps = {
 
 export default function ItemImage({ src, alt, thing }: ItemImageProps) {
 	return (
-		<View style={{ position: "relative", width: "100%", height: "100%" }}>
+		<View
+			style={{ position: "relative", width: "100%", height: "100%" }}
+			className="rounded-xl shadow-lg shadow-muted/80 "
+		>
 			<Image
 				source={src}
 				accessibilityLabel={alt}

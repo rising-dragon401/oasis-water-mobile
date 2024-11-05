@@ -25,7 +25,7 @@ export default function WelcomeScreen() {
 					style={{ width: "100%", height: 32 }}
 					contentFit="contain"
 				/>
-				<H1 className="text-center text-primary mt-8">
+				<H1 className="text-center text-primary mt-8 max-w-sm">
 					Discover the best water based on science
 				</H1>
 

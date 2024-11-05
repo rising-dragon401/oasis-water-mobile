@@ -6,7 +6,11 @@ import { FlatList, TouchableOpacity, View } from "react-native";
 import ItemPreviewCard from "./item-preview-card";
 import Loader from "./loader";
 
-import { getFilters } from "@/actions/filters";
+import {
+	getFilters,
+	getRecommendedFilter,
+	getTapContaminants,
+} from "@/actions/filters";
 import { getItems } from "@/actions/items";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,6 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { H2, Muted, P } from "@/components/ui/typography";
 import { useUserProvider } from "@/context/user-provider";
+import { ITEM_TYPES } from "@/lib/constants/categories";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 const CATEOGRIES = [
@@ -44,17 +49,6 @@ const TAG_CATEGORY_MAP = {
 	sink: ["sink", "under sink"],
 	home: ["home", "house"],
 };
-
-const ITEM_TYPES = [
-	{
-		id: "water",
-		types: ["bottled_water", "water_gallon", "gallon"],
-	},
-	{
-		id: "filter",
-		types: ["filter", "shower_filter", "bottle_filter", "sink"],
-	},
-];
 
 const CONTAMINANTS = [
 	{
@@ -163,12 +157,12 @@ const categorizeItems = (items: any[]) => {
 };
 
 export default function RankingList({ categoryId }: { categoryId: string }) {
-	const { subscription, uid, user } = useUserProvider();
+	const { subscription, uid, user, userData } = useUserProvider();
 	const router = useRouter();
 	const navigation = useNavigation();
 	const { backgroundColor } = useColorScheme();
-	const params = useLocalSearchParams<{ tags?: string }>();
-	const { tags: defaultTags } = params;
+	const params = useLocalSearchParams<{ tags?: string; catId?: string }>();
+	const { tags: defaultTags, catId } = params;
 
 	const [loading, setLoading] = useState(true);
 	const [allItems, setAllItems] = useState<any[]>([]);
@@ -181,6 +175,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 		[],
 	);
 	const [productType, setProductType] = useState<string>("");
+	const [byLocation, setByLocation] = useState(false);
 
 	const isAuthUser = uid === user?.uid;
 
@@ -213,8 +208,9 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 		setLoading(false);
 	};
 
+	// Fetch items based on categoryId
 	useEffect(() => {
-		const type = ITEM_TYPES.find((item) => item.types.includes(categoryId));
+		const type = ITEM_TYPES.find((item) => item.tags.includes(categoryId));
 
 		const productType_ = type?.id || "";
 
@@ -226,7 +222,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 					getItems({
 						limit: 500,
 						sortMethod: "name",
-						type: ["bottled_water", "water_gallon"],
+						type: type?.dbTypes,
 					}),
 				);
 				navigation.setOptions({
@@ -239,7 +235,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 					getFilters({
 						limit: 250,
 						sortMethod: "name",
-						type: ["filter", "shower_filter", "bottle_filter"],
+						type: type?.dbTypes,
 					}),
 				);
 				navigation.setOptions({
@@ -258,7 +254,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 			).split(", "),
 		);
 
-		if (defaultTags) {
+		if (defaultTags && defaultTags?.length > 0 && defaultTags !== "undefined") {
 			setSelectedTags(defaultTags.split(", "));
 		}
 
@@ -350,6 +346,31 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 
 		return itemsFilteredByContaminants;
 	}, [selectedTags, selectedContaminants, allItems]);
+
+	const handleSelectLocationFilter = async () => {
+		if (!userData?.tap_location_id) {
+			// TODO show must select location modal
+			return;
+		}
+
+		if (!byLocation) {
+			console.log("fetching contaminants");
+			setByLocation(true);
+
+			const contaminants = await getTapContaminants(userData.tap_location_id);
+
+			// console.log("contaminants", JSON.stringify(contaminants, null, 2));
+
+			if (contaminants.length > 0) {
+				console.log("fetching recommended filters");
+				const recommendedFilters = await getRecommendedFilter(contaminants);
+			} else {
+				setByLocation(false);
+			}
+		} else {
+			setByLocation(false);
+		}
+	};
 
 	const renderFilters = useCallback(() => {
 		return (
@@ -461,6 +482,25 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 						))}
 					</DropdownMenuContent>
 				</DropdownMenu>
+
+				{productType === "filter" && (
+					<TouchableOpacity
+						key="location"
+						className={`border rounded-full border-muted text-primary px-2 py-1 my-2 ${
+							byLocation ? "border-muted border-2" : ""
+						}`}
+						style={{ alignSelf: "flex-start" }}
+						onPress={handleSelectLocationFilter}
+					>
+						<View className="flex flex-row items-center gap-2 px-2">
+							<P
+								className={byLocation ? "text-muted font-bold" : "text-primary"}
+							>
+								Your location
+							</P>
+						</View>
+					</TouchableOpacity>
+				)}
 			</View>
 		);
 	}, [
@@ -488,7 +528,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 		<View className="flex-1 md:mt-4 mt-0 w-screen px-4">
 			{!subscription ? (
 				<View className="px-4">
-					<H2>All {title.charAt(0).toLowerCase() + title.slice(1)}</H2>
+					<H2>{title.charAt(0) + title.slice(1)}</H2>
 					<Muted>
 						Want to know the best{" "}
 						{title.charAt(0).toLowerCase() + title.slice(1)} based on science?
@@ -508,7 +548,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 				</View>
 			) : (
 				<View className="pb-4 max-w-sm">
-					<H2>All {title.charAt(0).toLowerCase() + title.slice(1)}</H2>
+					<H2>{title.charAt(0) + title.slice(1)}</H2>
 					<Muted>
 						Browse and find the best{" "}
 						{title.charAt(0).toLowerCase() + title.slice(1)} based on science

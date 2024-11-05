@@ -1,10 +1,12 @@
 "use client";
 
 import {
+	calculateUserScores,
 	createUsername,
 	getCurrentUserData,
 	getSubscription,
 	getUserFavorites,
+	getUserTapScore,
 } from "actions/user";
 import React, {
 	ReactNode,
@@ -25,11 +27,16 @@ interface UserContextType {
 	provider: string | null | undefined;
 	user: any;
 	userData: any;
+	tapScore: any;
+	userScores: any;
 	userFavorites: any[] | null | undefined;
 	subscription: boolean;
 	subscriptionData: any | null | undefined;
 	subscriptionProvider: SubscriptionProviderType;
-	refreshUserData: () => void;
+	refreshUserData: (
+		user_id?: string | null,
+		type?: "all" | "favorites" | "scores" | "subscription",
+	) => Promise<void>;
 	fetchUserFavorites: (uid: string | null) => Promise<void>;
 	fetchSubscription: (uid: string | null) => Promise<any | null>;
 	setSubscription: (value: boolean) => void;
@@ -60,6 +67,18 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 	const [subscriptionProvider, setSubscriptionProvider] =
 		useState<SubscriptionProviderType>(null);
 	const [userData, setUserData] = useState<any>(null);
+	const [tapScore, setTapScore] = useState<any>({
+		id: null,
+		score: null,
+		healthEffects: [],
+		contaminants: [],
+	});
+	const [userScores, setUserScores] = useState<any>({
+		showersScore: 0,
+		waterFilterScore: 0,
+		bottledWaterScore: 0,
+		overallScore: 0,
+	});
 	const [userFavorites, setUserFavorites] = useState<any[] | null | undefined>(
 		null,
 	);
@@ -100,6 +119,15 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 		}
 	}, [userData, userId]);
 
+	useEffect(() => {
+		if (userData && userData?.tap_location_id) {
+			// addLatLongToEachLocation();
+
+			const tapLocationId = userData?.tap_location_id;
+			fetchUserScores(tapLocationId);
+		}
+	}, [userData, userId, userFavorites]);
+
 	const handleGenerateUsername = async (data: any, uid: string) => {
 		// check for username, create if none exists
 		if (!data?.username) {
@@ -137,39 +165,60 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 		const data = await getSubscription(uid);
 
 		if (data && data?.success) {
+			setSubscription(true);
+			setSubscriptionData(data);
+
 			const provider =
 				data?.data?.metadata && data?.data?.metadata?.provider === "revenue_cat"
 					? "revenue_cat"
 					: "stripe";
 
 			setSubscriptionProvider(provider);
-
-			if (provider === "revenue_cat") {
-				setSubscription(true);
-			} else {
-				setSubscription(false);
-			}
-
-			// setSubscription(true);
-			setSubscriptionData(data);
 		} else {
 			setSubscription(false);
 		}
 		return data;
 	};
 
+	const fetchUserScores = async (userTapId: any) => {
+		const data = await getUserTapScore(userTapId);
+
+		setTapScore(data);
+
+		if (userFavorites && data && userId) {
+			const scores = await calculateUserScores(userId, userFavorites, data);
+
+			setUserScores(scores);
+		}
+	};
+
 	const refreshUserData = useCallback(
-		async (uid?: string | null) => {
-			if (!uid) {
+		async (
+			user_id?: string | null,
+			type: "all" | "favorites" | "scores" | "subscription" = "all",
+		) => {
+			if (!user) {
 				return;
 			}
-			const userId = uid ?? null;
 
-			await Promise.all([
-				fetchSubscription(userId),
-				fetchUserData(userId),
-				fetchUserFavorites(userId),
-			]);
+			const userId = user_id ?? user.id;
+
+			const promises = [];
+
+			if (type === "all" || type === "subscription") {
+				promises.push(fetchSubscription(userId));
+			}
+			if (type === "all" || type === "favorites") {
+				promises.push(fetchUserFavorites(userId));
+			}
+			if (type === "all" || type === "scores") {
+				promises.push(fetchUserScores(userId));
+			}
+			if (type === "all") {
+				promises.push(fetchUserData(userId));
+			}
+
+			await Promise.all(promises);
 		},
 		[user?.id],
 	);
@@ -186,6 +235,13 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 		setUserFavorites(null);
 		setActiveSession(null);
 		setSubscription(false);
+		setUserScores({
+			showersScore: 0,
+			waterFilterScore: 0,
+			bottledWaterScore: 0,
+			overallScore: 0,
+		});
+		setTapScore(null);
 	};
 
 	const context = useMemo(
@@ -198,6 +254,8 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 			userData,
 			userFavorites,
 			subscriptionProvider,
+			tapScore,
+			userScores,
 			refreshUserData,
 			fetchUserFavorites,
 			fetchSubscription,
@@ -214,6 +272,8 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 			userData,
 			userFavorites,
 			subscriptionProvider,
+			tapScore,
+			userScores,
 			refreshUserData,
 			fetchUserFavorites,
 			fetchSubscription,

@@ -150,6 +150,7 @@ export const RevenueCatProvider = ({ children }: any) => {
 	const updateCustomerInfo = useCallback(
 		async (customerInfo: CustomerInfo, uid: string) => {
 			const userData = await getUserData(uid);
+
 			// for admin use and testing
 			if (userData?.do_not_override_sub === true) {
 				return;

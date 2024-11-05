@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import { ScrollView, View } from "react-native";
 
 import { getCurrentUserData, getUserFavorites } from "@/actions/user";
-import FavoritesList from "@/components/sharable/favorites-list";
+import OasisPage from "@/components/sharable/oasis-page";
 import { Button } from "@/components/ui/button";
 import { H1, Muted } from "@/components/ui/typography";
 import { theme } from "@/lib/constants";
@@ -18,7 +18,7 @@ import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function OasisScreen() {
 	const navigation = useNavigation();
-	const { uid, userData, subscription, userFavorites } = useUserProvider();
+	const { uid, userData, subscription } = useUserProvider();
 	const router = useRouter();
 	const { colorScheme } = useColorScheme();
 	const local = useLocalSearchParams();
@@ -81,7 +81,7 @@ export default function OasisScreen() {
 				{favorites ? (
 					<>
 						<View style={{ flex: 0, width: "100%" }}>
-							<FavoritesList userId={userId} />
+							<OasisPage userId={userId} />
 						</View>
 					</>
 				) : (

@@ -7,14 +7,13 @@ import { ActivityIndicator, ScrollView, View } from "react-native";
 import ItemImage from "./item-image";
 import Score from "./score";
 import Sources from "./sources";
-import Typography from "./typography";
 
 import { getFilterDetails } from "@/actions/filters";
 import ContaminantTable from "@/components/sharable/contaminant-table";
 import FilterMetadata from "@/components/sharable/filter-metadata";
 import Skeleton from "@/components/sharable/skeleton";
 import { Button } from "@/components/ui/button";
-import { Muted } from "@/components/ui/typography";
+import { Large, Muted } from "@/components/ui/typography";
 import { useUserProvider } from "@/context/user-provider";
 import { IngredientCategories } from "@/lib/constants";
 
@@ -158,14 +157,10 @@ export function FilterForm({ id }: Props) {
 
 					<View className="flex flex-row justify-between gap-2 w-full">
 						<View className="flex flex-col gap-2 w-2/3">
-							<Typography size="3xl" fontWeight="normal">
-								{filter.name}
-							</Typography>
+							<Large>{filter.name}</Large>
 							{/* <Link href={`/search/company/${filter.company?.name}`}> */}
-							<Link href={`/search/company/${filter.company}`}>
-								<Muted>
-									{filter.brand} - {filter.company}
-								</Muted>
+							<Link href={`/search/company/${filter.company_id}`}>
+								<Muted>{filter.brand}</Muted>
 							</Link>
 
 							{filter.affiliate_url && (

@@ -1,10 +1,12 @@
 import { View } from "react-native";
+
 import BlurredLineItem from "./blurred-line-item";
 
 const contaminants = [
-	{ label: "Chlorine", value: "Chlorine", type: "single_contaminant" },
-	{ label: "Chloramine", value: "Chloramine", type: "single_contaminant" },
-	{ label: "Fluoride", value: "Fluoride", type: "single_contaminant" },
+	// { label: "Chlorine", value: "Chlorine", type: "single_contaminant" },
+	// { label: "Chloramine", value: "Chloramine", type: "single_contaminant" },
+	{ label: "Disinfectants", value: "Chemical Disinfectants", type: "category" },
+	{ label: "Fluoride", value: "Fluoride", type: "category" },
 	{ label: "Heavy Metals", value: "Heavy Metals", type: "category" },
 	{
 		label: "VOCs",
@@ -13,7 +15,7 @@ const contaminants = [
 	},
 	{ label: "Haloacetic Acids", value: "Haloacetic Acids", type: "category" },
 	{ label: "Microplastics", value: "Microplastics", type: "category" },
-	{ label: "PFAS", value: "Perfluorinated compounds (PFAS)", type: "category" },
+	{ label: "PFAS", value: "Perfluorinated Chemicals (PFAS)", type: "category" },
 	{ label: "sVOCs", value: "Semi-Volatile Compounds", type: "category" },
 	{ label: "Pesticides", value: "Pesticides", type: "category" },
 	{ label: "Pharmaceuticals", value: "Pharmaceuticals", type: "category" },
@@ -32,6 +34,12 @@ export default function FilterMetadata({
 	contaminantsByCategory: Record<string, { percentageFiltered: number }>;
 	isPaywalled?: boolean;
 }) {
+	// console.log("filteredContaminants", JSON.stringify(filteredContaminants, null, 2));
+	// console.log(
+	// 	"contaminantsByCategory",
+	// 	JSON.stringify(contaminantsByCategory, null, 2),
+	// );
+
 	return (
 		<View className="flex flex-row w-full md:mt-2 mt-4">
 			<View className="flex-1 pr-2 w-full">

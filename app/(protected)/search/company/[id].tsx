@@ -6,12 +6,10 @@ export default function Page() {
 	const glob = useGlobalSearchParams();
 	const local = useLocalSearchParams();
 
-	const name =
+	const id =
 		(Array.isArray(local?.id) ? local?.id[0] : local?.id) ||
 		(Array.isArray(glob?.id) ? glob?.id[0] : glob?.id) ||
 		"";
 
-	console.log("name: ", name);
-
-	return <CompanyForm companyName={name} />;
+	return <CompanyForm id={id} />;
 }
