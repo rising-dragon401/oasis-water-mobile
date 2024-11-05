@@ -288,8 +288,17 @@ export const getCategoryCounts = async () => {
 	for (const category of CATEGORIES) {
 		const allTypes = category.dbTypes;
 
+		let table = "items";
+		if (
+			category.typeId === "filter" ||
+			category.typeId === "shower_filter" ||
+			category.typeId === "bottle_filter"
+		) {
+			table = "water_filters";
+		}
+
 		const { data, error } = await supabase
-			.from(category.typeId === "filter" ? "water_filters" : "items")
+			.from(table)
 			.select("id, tags")
 			.in("type", allTypes);
 

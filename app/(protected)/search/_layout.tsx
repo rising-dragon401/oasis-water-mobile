@@ -61,6 +61,9 @@ export default function SearchLayout() {
 				contentStyle: {
 					backgroundColor,
 				},
+				// headerLeft: () => (
+				// 	<Ionicons name="arrow-back" size={24} color={iconColor} />
+				// ),
 				headerStyle: {
 					backgroundColor,
 				},
@@ -81,7 +84,6 @@ export default function SearchLayout() {
 							location={locationName}
 							score={score}
 						/>
-						// <CustomHeader />
 					),
 				}}
 			/>

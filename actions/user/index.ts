@@ -901,11 +901,7 @@ export const getUserTapScore = async (tapWaterLocationId: string) => {
 	return details;
 };
 
-export const calculateUserScores = async (
-	uid: string,
-	favorites: any,
-	tapScore: any,
-) => {
+export const calculateUserScores = async (favorites: any, tapScore: any) => {
 	const calculateShowersScore = () => {
 		const showerFilters = (favorites ?? []).filter((favorite: any) =>
 			favorite.tags.includes("shower"),

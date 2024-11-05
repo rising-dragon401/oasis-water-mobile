@@ -43,18 +43,48 @@ export default function Score({
 							? 34
 							: 40;
 
-	const strokeWidth = 6;
+	const strokeWidth =
+		size === "xl"
+			? 14
+			: size === "lg"
+				? 12
+				: size === "md"
+					? 10
+					: size === "sm"
+						? 8
+						: size === "xs"
+							? 4
+							: 6;
+
 	const svgSize = 2 * (radius + strokeWidth); // Adjust SVG size to accommodate stroke
 	const circumference = 2 * Math.PI * radius;
 	const offset = circumference - (score / 100) * circumference;
 
+	const gradeColor =
+		score >= 90
+			? "#6fbf75" // darker green
+			: score >= 70
+				? "#d1b86a" // darker yellow
+				: score >= 50
+					? "#d5976f" // darker orange
+					: "#d56f6f"; // darker red
+
+	const gradeBackground =
+		score >= 90
+			? "#a3d9a5" // pastel green
+			: score >= 70
+				? "#f3e5ab" // pastel yellow
+				: score >= 50
+					? "#f5c6a5" // pastel orange
+					: "#f5a5a5"; // pastel red
+
 	const fontSize =
 		size === "xl"
-			? 18
+			? 28
 			: size === "lg"
-				? 16
+				? 24
 				: size === "md"
-					? 10
+					? 18
 					: size === "sm"
 						? 12
 						: size === "xs"
@@ -79,6 +109,19 @@ export default function Score({
 			return "Bad";
 		}
 	};
+
+	const gradeTextSize =
+		size === "xl"
+			? "base"
+			: size === "lg"
+				? "sm"
+				: size === "md"
+					? "xs"
+					: size === "sm"
+						? "xs"
+						: size === "xs"
+							? "xs"
+							: "xs";
 
 	const handleOpenSubscribeModal = () => {
 		router.push("/subscribeModal");
@@ -132,7 +175,7 @@ export default function Score({
 		>
 			<Svg width={svgSize} height={svgSize}>
 				<Circle
-					stroke={textColor}
+					stroke={gradeBackground}
 					strokeWidth={strokeWidth}
 					fill="transparent"
 					r={radius}
@@ -141,7 +184,7 @@ export default function Score({
 					strokeOpacity={0.3}
 				/>
 				<Circle
-					stroke={textColor}
+					stroke={gradeColor}
 					strokeWidth={strokeWidth}
 					strokeDasharray={`${circumference} ${circumference}`}
 					strokeDashoffset={offset}
@@ -158,7 +201,12 @@ export default function Score({
 				className="absolute flex flex-col justify-center items-center"
 			>
 				{score !== null ? (
-					<P style={{ fontSize }}>{score} / 100</P>
+					<P
+						style={{ fontSize }}
+						className={size === "xl" || size === "lg" ? "pt-2" : ""}
+					>
+						{score} / 100
+					</P>
 				) : (
 					<View className="flex flex-row gap-1">
 						<Feather name="alert-triangle" size={18} color={secondaryColor} />
@@ -168,10 +216,9 @@ export default function Score({
 
 				{size !== "xs" && (
 					<Typography
-						size="xs"
+						size={gradeTextSize}
 						fontWeight="normal"
 						className="text-primary"
-						style={{ fontSize }}
 					>
 						{grade()}
 					</Typography>

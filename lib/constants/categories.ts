@@ -1,7 +1,7 @@
 export type TabKeys =
 	| "bottled_water"
 	| "flavored_water"
-	| "gallons"
+	| "water_gallon"
 	| "tap_water"
 	| "filter"
 	| "shower_filter"
@@ -96,7 +96,7 @@ export const CATEGORIES: CategoryType[] = [
 	},
 	{
 		id: "gallons",
-		typeId: "gallons",
+		typeId: "water_gallon",
 		dbTypes: ["water_gallon"],
 		tags: ["gallon"],
 		selectedTags: ["gallon"],
@@ -132,7 +132,7 @@ export const CATEGORIES: CategoryType[] = [
 		typeId: "filter",
 		dbTypes: ["filter"],
 		tags: ["home", "house"],
-		selectedTags: ["home", "house"],
+		selectedTags: ["home"],
 		title: "Home filters",
 		image:
 			"https://connect.live-oasis.com/storage/v1/object/public/website/images/categories/home_filter_cover.png",

@@ -186,7 +186,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 		setTapScore(data);
 
 		if (userFavorites && data && userId) {
-			const scores = await calculateUserScores(userId, userFavorites, data);
+			const scores = await calculateUserScores(userFavorites, data);
 
 			setUserScores(scores);
 		}

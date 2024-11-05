@@ -52,4 +52,4 @@ export const IngredientCategories: string[] = [
 ];
 
 export const PROFILE_AVATAR =
-	"https://inruqrymqosbfeygykdx.supabase.co/storage/v1/object/public/website/auth/user-profile-icon.png?t=2023-12-29T18%3A13%3A21.171Z";
+	"https://connect.live-oasis.com/storage/v1/object/public/website/avatars/user-icon-outline.png?t=2024-11-05T17%3A08%3A14.075Z";

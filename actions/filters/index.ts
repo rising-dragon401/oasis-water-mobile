@@ -71,77 +71,69 @@ export const getTapContaminants = async (tapLocationId: number) => {
 };
 
 export const getRecommendedFilter = async (contaminants: any[]) => {
-	const filters = await getFilters();
+	const { data: indexedFilters, error } = await supabase
+		.from("water_filters")
+		.select(
+			"id, name, type, image, brand, score, filtered_contaminant_categories",
+		)
+		.eq("is_indexed", true)
+		.gt("score", 50);
 
-	console.log("getting recommended filter");
+	if (error) {
+		console.error("Error fetching filters:", error);
+		return [];
+	}
 
-	const filterTypes = [
-		"tap",
-		"pitcher",
-		"sink",
-		"bottle",
-		"home",
-		"counter",
-		"shower",
-	];
-
-	const topFiltersByType: { [key: string]: any[] } = {};
-
-	filterTypes.forEach((type) => {
-		topFiltersByType[type] = [];
-	});
-
-	console.log("topFiltersByType", JSON.stringify(filters, null, 2));
-
-	await filters.forEach((filter) => {
-		const filteredContaminantsCount = contaminants.reduce(
-			(acc, contaminant) => {
-				if (!filter.contaminants_filtered) {
-					return acc;
-				}
-
-				if (filter.contaminants_filtered.includes(contaminant.id)) {
-					return acc + 1;
-				}
-				return acc;
-			},
-			0,
-		);
-
-		filterTypes.forEach((type) => {
-			if (filter.tags.includes(type)) {
-				if (topFiltersByType[type].length < 2) {
-					topFiltersByType[type].push({
-						filter,
-						score: filteredContaminantsCount,
-					});
-				} else {
-					const lowestScoreFilter = topFiltersByType[type].reduce(
-						(prev, current) => (prev.score < current.score ? prev : current),
-					);
-
-					if (filteredContaminantsCount > lowestScoreFilter.score) {
-						const index = topFiltersByType[type].indexOf(lowestScoreFilter);
-						topFiltersByType[type][index] = {
-							filter,
-							score: filteredContaminantsCount,
-						};
-					}
-				}
-			}
-		});
-	});
-
-	console.log("topFiltersByType", JSON.stringify(topFiltersByType, null, 2));
-
-	const recommendedFilters = Object.values(topFiltersByType).flat();
-
-	console.log(
-		"recommendedFilters",
-		JSON.stringify(recommendedFilters, null, 2),
+	const contaminantCategories = contaminants.map(
+		(contaminant) => contaminant.category,
 	);
 
-	return recommendedFilters;
+	// For each filter go through each category
+	// Then check the percentage removed for each Contaminatn in contaminant Categories (i.e. Heayv MEtals)
+	// Add up the average percentage for each filter
+	// Sort the filters by effectiveness score in descending order and take the top 10
+	const filtersWithScores = indexedFilters.map((filter) => {
+		const filteredCategories = filter.filtered_contaminant_categories;
+
+		let totalPercentageRemoved = 0;
+		const categoryCount = contaminantCategories.length;
+
+		contaminantCategories.forEach((category) => {
+			const filteredCategory = filteredCategories.find(
+				(filtered: { category: string; percentage: number }) =>
+					filtered.category === category,
+			);
+
+			if (filteredCategory) {
+				totalPercentageRemoved += filteredCategory.percentage;
+				// categoryCount++;
+			}
+		});
+
+		const effectivenessScore =
+			categoryCount > 0 ? totalPercentageRemoved / categoryCount : 0;
+
+		return {
+			...filter,
+			effectivenessScore,
+		};
+	});
+
+	// Sort filters by effectiveness score in descending order and take the top 10
+	const sortedFilters = filtersWithScores
+		.sort((a, b) => b.effectivenessScore - a.effectivenessScore)
+		.slice(0, 10);
+
+	// Map to extract only the required properties
+	const simplifiedFilters = sortedFilters.map((filter) => ({
+		id: filter.id,
+		name: filter.name,
+		type: filter.type,
+		image: filter.image,
+		score: filter.score,
+	}));
+
+	return simplifiedFilters;
 };
 
 export const getRandomFilters = async () => {

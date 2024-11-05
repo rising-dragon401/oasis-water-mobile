@@ -1,10 +1,8 @@
-import { getBlogs } from "actions/blogs";
 import { Image } from "expo-image";
 import { Link } from "expo-router";
-import { useEffect, useState } from "react";
 import { FlatList, View } from "react-native";
 
-import { H1, Muted, P } from "@/components/ui/typography";
+import { H1, H4 } from "@/components/ui/typography";
 import { theme } from "@/lib/constants";
 import { CATEGORIES } from "@/lib/constants/categories";
 import { useColorScheme } from "@/lib/useColorScheme";
@@ -15,19 +13,12 @@ export default function TopRatedScreen() {
 	const backgroundColor =
 		colorScheme === "dark" ? theme.dark.background : theme.light.background;
 
-	const [blogs, setBlogs] = useState<any[]>([]);
-
-	useEffect(() => {
-		getBlogs().then(setBlogs);
-	}, []);
-
 	return (
 		<View
-			className="flex-1 justify-between px-4 mt-6"
+			className="flex-1 justify-between px-4 mt-6 pb-10"
 			style={{ backgroundColor }}
 		>
-			<H1>All categories</H1>
-			<Muted>Browse all categories of bottled waters and filters</Muted>
+			<H1>Categories</H1>
 
 			<View className="flex-1 flex-col mt-4">
 				<FlatList
@@ -45,10 +36,10 @@ export default function TopRatedScreen() {
 						<View className="mb-4 w-[48%] py-2 rounded-xl">
 							<Link
 								key={category.id + index.toString()}
-								href={`/search/top-rated/${category.typeId}?tags=${category.tags}`}
+								href={`/search/top-rated/${category.typeId}?tags=${category.selectedTags}`}
 								className=""
 							>
-								<View className="relative w-full aspect-square flex items-center justify-center rounded-xl bg-card">
+								<View className="relative w-full aspect-square flex items-center justify-center rounded-2xl bg-card">
 									<Image
 										source={{ uri: category.image }}
 										alt={category.title}
@@ -60,7 +51,7 @@ export default function TopRatedScreen() {
 									/>
 								</View>
 							</Link>
-							<P className="text-left text-lg font-medium">{category.title}</P>
+							<H4 className="text-left">{category.title}</H4>
 						</View>
 					)}
 					keyExtractor={(item) => item.id}

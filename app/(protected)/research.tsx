@@ -54,7 +54,7 @@ export default function ResearchScreen() {
 	};
 
 	return (
-		<View className="flex-1  justify-between px-4" style={{ backgroundColor }}>
+		<View className="flex-1 justify-between px-4" style={{ backgroundColor }}>
 			<H1 className="mt-24">Research</H1>
 			<Muted>
 				Stay current with scientific advances in product health and safety

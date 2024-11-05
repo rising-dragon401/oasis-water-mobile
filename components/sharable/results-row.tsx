@@ -39,7 +39,7 @@ export default function ResultsRow({ results, noResults }: Props) {
 	};
 
 	const handleRequestItem = () => {
-		showToast("Noted. We'll add it soon", 3000, "top");
+		showToast("Noted. Added to the list ✅", 2000, "top");
 	};
 
 	return (
@@ -82,13 +82,22 @@ export default function ResultsRow({ results, noResults }: Props) {
 						data={results}
 						keyExtractor={(item) => item.id.toString()}
 						renderItem={({ item: result }) => (
-							<View className="p-2">
+							<View>
 								<Link
 									// @ts-ignore
 									href={determineLink(result)}
 								>
-									<View className="flex flex-row items-center justify-between w-full py-1">
-										<View className="flex flex-row gap-2 items-start justify-center pl-2 h-12">
+									<View
+										className={`flex flex-row items-center justify-between w-full p-2
+											${result.type === "category" && ""}
+										`}
+									>
+										<View
+											className={`flex flex-row gap-2 items-start justify-center pl-2 h-12
+											
+											
+											`}
+										>
 											<Image
 												source={{
 													uri:

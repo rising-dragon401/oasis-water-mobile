@@ -5,40 +5,58 @@ import { TouchableOpacity, View } from "react-native";
 import Score from "@/components/sharable/score";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { H3, Muted, P } from "@/components/ui/typography";
+import { useUserProvider } from "@/context/user-provider";
 import { PROFILE_AVATAR } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function ProfileHeader({
 	profileData,
 	showSocials,
+	showScore = true,
+	showBio = true,
 }: {
 	profileData: any;
 	showSocials?: boolean;
+	showScore?: boolean;
+	showBio?: boolean;
 }) {
 	const { iconColor } = useColorScheme();
+	const { uid, userFavorites } = useUserProvider();
+
+	const scoreTooltipContent = () => {
+		if (!uid) {
+			return "Login to see your score";
+		} else if (profileData?.score > 0) {
+			return "Based on average of all saved items";
+		} else {
+			return "Save items to see your score";
+		}
+	};
+
+	const scoreSize =
+		!uid || userFavorites?.length === 0 || !userFavorites ? "xs" : "sm";
 
 	return (
 		<View className="mb-2 gap-4 flex w-full flex-row justify-between items-start">
 			<View className="flex flex-col">
-				<View className="flex flex-col">
-					<Avatar className="h-20 w-20" alt="oasis pfp">
+				<View className="flex flex-row gap-x-4 items-start">
+					<Avatar className="h-16 w-16" alt="oasis pfp">
 						<AvatarImage src={profileData?.avatar_url || PROFILE_AVATAR} />
 					</Avatar>
 
 					<View className="flex flex-col">
-						<H3 className="mb-0 pb-0 mt-2">{`${profileData?.full_name || profileData?.email || "Not logged in"}`}</H3>
+						{profileData?.full_name && (
+							<H3 className="mb-0 pb-0">{profileData?.full_name}</H3>
+						)}
 
 						{profileData?.username && (
 							<Muted className="py-0 my-0">@{profileData?.username}</Muted>
 						)}
-						{/* {profileData?.location?.city && (
-							<LocationBadge location={profileData?.location?.city} />
-						)} */}
 					</View>
 				</View>
 
-				{profileData?.bio && (
-					<P className="py-0 my-0 max-w-72 mt-1">{profileData?.bio}</P>
+				{profileData?.bio && showBio && (
+					<P className="py-0 my-0 max-w-72 mt-2">{profileData?.bio}</P>
 				)}
 
 				{profileData?.socials && showSocials !== false && (
@@ -74,17 +92,15 @@ export default function ProfileHeader({
 			</View>
 
 			<View>
-				<Score
-					score={profileData?.score || 0}
-					size="sm"
-					showScore
-					showTooltip
-					tooltipContent={
-						profileData?.score > 0
-							? "Based on average of all saved items"
-							: "Save items to see your score"
-					}
-				/>
+				{showScore && (
+					<Score
+						score={profileData?.score || 0}
+						size={scoreSize}
+						showScore
+						showTooltip
+						tooltipContent={scoreTooltipContent()}
+					/>
+				)}
 				{/* <TouchableOpacity onPress={() => shareProfile()}>
 						<Octicons name="share" size={24} color={iconColor} />
 					</TouchableOpacity> */}

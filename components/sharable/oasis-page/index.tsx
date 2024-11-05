@@ -1,6 +1,6 @@
 import { useUserProvider } from "context/user-provider";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FlatList, View } from "react-native";
 import useSWR from "swr";
 
@@ -8,12 +8,13 @@ import ItemPreviewCard from "../item-preview-card";
 import ProfileHeader from "./components/profile-header";
 
 import {
-	getCurrentUserData,
 	getRecommendedProducts,
+	getUserData,
 	getUserFavorites,
 } from "@/actions/user";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { P } from "@/components/ui/typography";
+import { Large, Muted, P } from "@/components/ui/typography";
 
 // const ITEM_CATEGORIES = [
 // 	{
@@ -74,7 +75,12 @@ export default function OasisPage({
 	}, [userId]);
 
 	const fetchThisUserData = async (userId: string) => {
-		const profileData = await getCurrentUserData(userId);
+		const profileData = await getUserData(userId);
+
+		// console.log("userId", userId);
+		// const score = await calculateUserScore(userId);
+		// console.log("score", score);
+
 		setProfileData(profileData);
 		setLoading(false);
 	};
@@ -104,6 +110,50 @@ export default function OasisPage({
 		}
 	}, [defaultTab]);
 
+	const filterFavorites = useMemo(() => {
+		return favorites?.filter((item) => FILTER_TYPES.includes(item.type));
+	}, [favorites]);
+
+	const waterFavorites = useMemo(() => {
+		return favorites?.filter((item) => WATER_TYPES.includes(item.type));
+	}, [favorites]);
+
+	const renderNoAccount = ({
+		title,
+		description,
+	}: {
+		title?: string;
+		description?: string;
+	}) => {
+		if (!uid) {
+			return (
+				<View className="flex flex-col justify-center pt-4 gap-y-1">
+					<Large>{title}</Large>
+					<Muted className="max-w-sm">{description}</Muted>
+
+					<Button
+						onPress={() => router.push("/(public)/sign-in")}
+						label="Login"
+						className="mt-4"
+					/>
+				</View>
+			);
+		} else {
+			return (
+				<View className="flex flex-col justify-center pt-4 gap-y-1">
+					<Large>{title}</Large>
+					<Muted className="max-w-sm">{description}</Muted>
+
+					<Button
+						onPress={() => router.push("/(protected)/search")}
+						label="Explore products"
+						className="mt-4"
+					/>
+				</View>
+			);
+		}
+	};
+
 	return (
 		<View>
 			<ProfileHeader profileData={profileData} />
@@ -119,7 +169,10 @@ export default function OasisPage({
 							</P>
 						</TabsTrigger>
 
-						<TabsTrigger value="waters">
+						<TabsTrigger
+							value="waters"
+							className={`${(waterFavorites && waterFavorites.length > 0) || isAuthUser ? "" : "!hidden"}`}
+						>
 							<P
 								className={`${tabValue === "waters" ? "text-secondary-foreground font-medium" : ""}`}
 							>
@@ -127,7 +180,14 @@ export default function OasisPage({
 							</P>
 						</TabsTrigger>
 
-						<TabsTrigger value="filters">
+						<TabsTrigger
+							value="filters"
+							className={`${
+								(filterFavorites && filterFavorites.length > 0) || isAuthUser
+									? ""
+									: "!hidden"
+							}`}
+						>
 							<P
 								className={`${tabValue === "filters" ? "text-secondary-foreground font-medium" : ""}`}
 							>
@@ -136,92 +196,111 @@ export default function OasisPage({
 						</TabsTrigger>
 					</TabsList>
 					<TabsContent value="all">
-						<FlatList
-							data={favorites}
-							renderItem={({ item, index }) => (
-								<View
-									key={item?.id}
-									style={{ width: "48%" }}
-									className={`mb-2 ${index < 2 ? "mt-2" : ""}`}
-								>
-									<ItemPreviewCard
-										item={item}
-										showFavorite
-										isAuthUser={isAuthUser}
-									/>
-								</View>
-							)}
-							keyExtractor={(item) => item?.id}
-							numColumns={2}
-							showsVerticalScrollIndicator={false}
-							columnWrapperStyle={{ justifyContent: "space-between" }}
-							contentContainerStyle={{
-								flexGrow: 0,
-								paddingBottom: 0,
-								marginBottom: 0,
-							}}
-							scrollEnabled={false}
-						/>
+						{favorites && favorites.length > 0 ? (
+							<FlatList
+								data={favorites}
+								renderItem={({ item, index }) => (
+									<View
+										key={item?.id}
+										style={{ width: "48%" }}
+										className={`mb-2 ${index < 2 ? "mt-2" : ""}`}
+									>
+										<ItemPreviewCard
+											item={item}
+											showFavorite
+											isAuthUser={isAuthUser}
+										/>
+									</View>
+								)}
+								keyExtractor={(item) => item?.id}
+								numColumns={2}
+								showsVerticalScrollIndicator={false}
+								columnWrapperStyle={{ justifyContent: "space-between" }}
+								contentContainerStyle={{
+									flexGrow: 0,
+									paddingBottom: 0,
+									marginBottom: 0,
+								}}
+								scrollEnabled={false}
+							/>
+						) : (
+							renderNoAccount({
+								title: "No favorites saved",
+								description:
+									"Save your favorite waters and filters to see them here.",
+							})
+						)}
 					</TabsContent>
+
 					<TabsContent value="waters">
-						<FlatList
-							data={favorites?.filter((item) =>
-								WATER_TYPES.includes(item.type),
-							)}
-							renderItem={({ item, index }) => (
-								<View
-									key={item?.id}
-									style={{ width: "48%" }}
-									className={`mb-2 ${index < 2 ? "mt-2" : ""}`}
-								>
-									<ItemPreviewCard
-										item={item}
-										showFavorite
-										isAuthUser={isAuthUser}
-									/>
-								</View>
-							)}
-							keyExtractor={(item) => item?.id}
-							numColumns={2}
-							showsVerticalScrollIndicator={false}
-							columnWrapperStyle={{ justifyContent: "space-between" }}
-							contentContainerStyle={{
-								flexGrow: 0,
-								paddingBottom: 0,
-								marginBottom: 0,
-							}}
-							scrollEnabled={false}
-						/>
+						{waterFavorites && waterFavorites.length > 0 ? (
+							<FlatList
+								data={waterFavorites}
+								renderItem={({ item, index }) => (
+									<View
+										key={item?.id}
+										style={{ width: "48%" }}
+										className={`mb-2 ${index < 2 ? "mt-2" : ""}`}
+									>
+										<ItemPreviewCard
+											item={item}
+											showFavorite
+											isAuthUser={isAuthUser}
+										/>
+									</View>
+								)}
+								keyExtractor={(item) => item?.id}
+								numColumns={2}
+								showsVerticalScrollIndicator={false}
+								columnWrapperStyle={{ justifyContent: "space-between" }}
+								contentContainerStyle={{
+									flexGrow: 0,
+									paddingBottom: 0,
+									marginBottom: 0,
+								}}
+								scrollEnabled={false}
+							/>
+						) : (
+							renderNoAccount({
+								title: "No waters saved",
+								description: "Save your favorite waters to see them here.",
+							})
+						)}
 					</TabsContent>
 					<TabsContent value="filters">
-						<FlatList
-							data={favorites?.filter((item) =>
-								FILTER_TYPES.includes(item.type),
-							)}
-							renderItem={({ item, index }) => (
-								<View
-									key={item?.id}
-									style={{ width: "48%" }}
-									className={`mb-2 ${index < 2 ? "mt-2" : ""}`}
-								>
-									<ItemPreviewCard
-										item={item}
-										showFavorite
-										isAuthUser={isAuthUser}
-									/>
-								</View>
-							)}
-							keyExtractor={(item) => item?.id}
-							numColumns={2}
-							showsVerticalScrollIndicator={false}
-							columnWrapperStyle={{ justifyContent: "space-between" }}
-							contentContainerStyle={{
-								flexGrow: 0,
-								paddingBottom: 0,
-								marginBottom: 0,
-							}}
-							scrollEnabled={false}
-						/>
+						{filterFavorites && filterFavorites.length > 0 ? (
+							<FlatList
+								data={filterFavorites}
+								renderItem={({ item, index }) => (
+									<View
+										key={item?.id}
+										style={{ width: "48%" }}
+										className={`mb-2 ${index < 2 ? "mt-2" : ""}`}
+									>
+										<ItemPreviewCard
+											item={item}
+											showFavorite
+											isAuthUser={isAuthUser}
+										/>
+									</View>
+								)}
+								keyExtractor={(item) => item?.id}
+								numColumns={2}
+								showsVerticalScrollIndicator={false}
+								columnWrapperStyle={{ justifyContent: "space-between" }}
+								contentContainerStyle={{
+									flexGrow: 0,
+									paddingBottom: 0,
+									marginBottom: 0,
+								}}
+								scrollEnabled={false}
+							/>
+						) : (
+							renderNoAccount({
+								title: "No filters saved",
+								description: "Save your favorite filters to see them here.",
+							})
+						)}
 					</TabsContent>
 				</Tabs>
 			</View>

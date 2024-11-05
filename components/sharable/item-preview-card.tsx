@@ -27,7 +27,7 @@ const ItemPreviewCard = ({
 	isGeneralListing = false,
 }: Props) => {
 	const { subscription } = useUserProvider();
-	const { iconColor, mutedForegroundColor } = useColorScheme();
+	const { mutedForegroundColor } = useColorScheme();
 
 	// show if listed in top-rate or preview list but not on favorites page
 	// unless subscribed or is the auth user
@@ -50,40 +50,29 @@ const ItemPreviewCard = ({
 			borderRadius: 10,
 		};
 
-		return (
-			<Image
-				source={{ uri: item.image }}
-				style={imageStyle}
-				className="rounded-xl"
-				transition={100}
-				cachePolicy="memory-disk"
-				placeholder={{ blurhash: placeHolderImageBlurHash }}
-			/>
-		);
-
-		// if (!showData) {
-		// 	return (
-		// 		<Image
-		// 			source={{ uri: randomBlurImage }}
-		// 			style={imageStyle}
-		// 			className="rounded-xl"
-		// 			transition={100}
-		// 			cachePolicy="memory-disk"
-		// 			placeholder={{ blurhash: placeHolderImageBlurHash }}
-		// 		/>
-		// 	);
-		// } else {
-		// 	return (
-		// 		<Image
-		// 			source={{ uri: item.image }}
-		// 			style={imageStyle}
-		// 			className="rounded-xl"
-		// 			transition={100}
-		// 			cachePolicy="memory-disk"
-		// 			placeholder={{ blurhash: placeHolderImageBlurHash }}
-		// 		/>
-		// 	);
-		// }
+		if (!showData) {
+			return (
+				<Image
+					source={{ uri: randomBlurImage }}
+					style={imageStyle}
+					className="rounded-xl bg-white px-2 pt-0 pb-8 "
+					transition={100}
+					cachePolicy="memory-disk"
+					placeholder={{ blurhash: placeHolderImageBlurHash }}
+				/>
+			);
+		} else {
+			return (
+				<Image
+					source={{ uri: item.image }}
+					style={imageStyle}
+					className="rounded-xl bg-white px-2 pt-0 pb-8 "
+					transition={100}
+					cachePolicy="memory-disk"
+					placeholder={{ blurhash: placeHolderImageBlurHash }}
+				/>
+			);
+		}
 	};
 
 	const renderScore = () => {
@@ -119,14 +108,14 @@ const ItemPreviewCard = ({
 	return (
 		// @ts-ignore
 		<Link href={showData ? determineLink(item) : "/subscribeModal"}>
-			<View className="relative w-full aspect-square rounded-xl overflow-hidden">
-				<View className="flex justify-center items-center w-full h-full bg-white px-2 pt-0 pb-8 ">
+			<View className="relative w-full aspect-square rounded-2xl overflow-hidden">
+				<View className="flex justify-center items-center w-full h-full ">
 					{renderImage()}
 				</View>
 
 				{showData ? (
 					<P
-						className="absolute bottom-2 left-2 bg-opacity-50 px-2 text-base flex-wrap"
+						className="absolute bottom-2 left-2 bg-opacity-50 px-2 flex-wrap"
 						numberOfLines={2}
 					>
 						{item.name}
@@ -153,7 +142,7 @@ const ItemPreviewCard = ({
 					</>
 				)}
 
-				<View className="absolute top-2 right-2 z-10">
+				<View className="absolute top-2 right-4 z-10">
 					{subscription ? (
 						item.score ? (
 							renderScore()
@@ -168,7 +157,7 @@ const ItemPreviewCard = ({
 							</View>
 						)
 					) : (
-						<View className="flex flex-row items-center gap-2">
+						<View className="flex flex-row items-center gap-1">
 							<Octicons name="lock" size={14} color={mutedForegroundColor} />
 							<Muted>/ 100</Muted>
 						</View>

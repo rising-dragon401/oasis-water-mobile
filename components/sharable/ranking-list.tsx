@@ -6,11 +6,7 @@ import { FlatList, TouchableOpacity, View } from "react-native";
 import ItemPreviewCard from "./item-preview-card";
 import Loader from "./loader";
 
-import {
-	getFilters,
-	getRecommendedFilter,
-	getTapContaminants,
-} from "@/actions/filters";
+import { getFilters } from "@/actions/filters";
 import { getItems } from "@/actions/items";
 import { Button } from "@/components/ui/button";
 import {
@@ -162,7 +158,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 	const navigation = useNavigation();
 	const { backgroundColor } = useColorScheme();
 	const params = useLocalSearchParams<{ tags?: string; catId?: string }>();
-	const { tags: defaultTags, catId } = params;
+	const { tags: defaultTags } = params;
 
 	const [loading, setLoading] = useState(true);
 	const [allItems, setAllItems] = useState<any[]>([]);
@@ -207,6 +203,9 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 
 		setLoading(false);
 	};
+
+	console.log("categoryId", categoryId);
+	console.log("defaultTags", defaultTags);
 
 	// Fetch items based on categoryId
 	useEffect(() => {
@@ -347,31 +346,6 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 		return itemsFilteredByContaminants;
 	}, [selectedTags, selectedContaminants, allItems]);
 
-	const handleSelectLocationFilter = async () => {
-		if (!userData?.tap_location_id) {
-			// TODO show must select location modal
-			return;
-		}
-
-		if (!byLocation) {
-			console.log("fetching contaminants");
-			setByLocation(true);
-
-			const contaminants = await getTapContaminants(userData.tap_location_id);
-
-			// console.log("contaminants", JSON.stringify(contaminants, null, 2));
-
-			if (contaminants.length > 0) {
-				console.log("fetching recommended filters");
-				const recommendedFilters = await getRecommendedFilter(contaminants);
-			} else {
-				setByLocation(false);
-			}
-		} else {
-			setByLocation(false);
-		}
-	};
-
 	const renderFilters = useCallback(() => {
 		return (
 			<View className="flex flex-row flex-wrap w-full justify-start pb-2 px-0 ml-0 gap-2">
@@ -482,25 +456,6 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 						))}
 					</DropdownMenuContent>
 				</DropdownMenu>
-
-				{productType === "filter" && (
-					<TouchableOpacity
-						key="location"
-						className={`border rounded-full border-muted text-primary px-2 py-1 my-2 ${
-							byLocation ? "border-muted border-2" : ""
-						}`}
-						style={{ alignSelf: "flex-start" }}
-						onPress={handleSelectLocationFilter}
-					>
-						<View className="flex flex-row items-center gap-2 px-2">
-							<P
-								className={byLocation ? "text-muted font-bold" : "text-primary"}
-							>
-								Your location
-							</P>
-						</View>
-					</TouchableOpacity>
-				)}
 			</View>
 		);
 	}, [
@@ -547,13 +502,13 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 					</View>
 				</View>
 			) : (
-				<View className="pb-4 max-w-sm">
+				<View className="pb-2 max-w-sm">
 					<H2>{title.charAt(0) + title.slice(1)}</H2>
-					<Muted>
+					{/* <Muted>
 						Browse and find the best{" "}
 						{title.charAt(0).toLowerCase() + title.slice(1)} based on science
 						and lab reports. Default sorted by score.
-					</Muted>
+					</Muted> */}
 				</View>
 			)}
 

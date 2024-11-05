@@ -1,12 +1,6 @@
 import { getLocationDetails, updateLocationScore } from "actions/locations";
-import {
-	Accordion,
-	AccordionContent,
-	AccordionItem,
-	AccordionTrigger,
-} from "components/ui/accordion";
 import { useNavigation } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ScrollView, View } from "react-native";
 
 import BlurredLineItem from "./blurred-line-item";
@@ -14,12 +8,10 @@ import HorizontalContaminantCard from "./contamintant-card-hz";
 import ItemImage from "./item-image";
 import RecommendedFilterRow from "./recommended-filter-row";
 import Score from "./score";
-import Sources from "./sources";
-import Typography from "./typography";
 
 import { incrementItemsViewed } from "@/actions/user";
 import Skeleton from "@/components/sharable/skeleton";
-import { H2, Large, P } from "@/components/ui/typography";
+import { H2, Large } from "@/components/ui/typography";
 import { useUserProvider } from "@/context/user-provider";
 
 type Props = {
@@ -49,7 +41,6 @@ export function LocationForm({ id }: Props) {
 		});
 
 		// manually update score if not already set
-		console.log("location", JSON.stringify(location, null, 2));
 		if (!location.score || location.score > 45) {
 			const score =
 				location.utilities?.length > 0 ? location.utilities[0].score : null;
@@ -73,6 +64,10 @@ export function LocationForm({ id }: Props) {
 	const contaminantsAboveLimit = contaminants.filter(
 		(contaminant: any) => contaminant.exceedingLimit > 0,
 	);
+
+	const lowestScoringUtility = useMemo(() => {
+		return location?.utilities?.length > 0 ? location?.utilities[0] : null;
+	}, [location?.utilities]);
 
 	if (isLoading)
 		return (
@@ -136,7 +131,7 @@ export function LocationForm({ id }: Props) {
 								<H2>{location.name}</H2>
 
 								<BlurredLineItem
-									label="Contaminants"
+									label="Total contaminants"
 									value={contaminants.length}
 									score={contaminants.length > 2 ? "bad" : "good"}
 								/>
@@ -155,46 +150,27 @@ export function LocationForm({ id }: Props) {
 											? location?.utilities[0]?.score
 											: 0
 									}
-									size="md"
+									size="sm"
 									showScore
 								/>
 							</View>
 						</View>
 					</View>
 
-					{location?.utilities && (
-						<View className="flex flex-col mt-4">
-							<Large className="mb-0 pb-0">Contaminants found</Large>
-							<Accordion
-								type="single"
-								collapsible
-								defaultValue={openUtility}
-								className="mt-0 pt-0"
-							>
-								{location.utilities.map((utility: any, index: number) => (
-									<AccordionItem key={index} value={index.toString()}>
-										<AccordionTrigger className="w-full flex flex-row justify-start pb-0 mt-0 py-0">
-											<View className="w-full">
-												<P className="text-left">{utility.name} utility</P>
-											</View>
-										</AccordionTrigger>
-										<AccordionContent>
-											<View className="flex flex-wrap gap-4 w-full pt-2">
-												{utility.contaminants.map((contaminant: any) => (
-													<HorizontalContaminantCard
-														key={contaminant.id}
-														data={contaminant}
-													/>
-												))}
-											</View>
-										</AccordionContent>
-									</AccordionItem>
-								))}
-							</Accordion>
-						</View>
-					)}
+					<View className="flex flex-col mt-2">
+						<Large className="mb-0 pb-0">Contaminants detected</Large>
 
-					{location?.sources && (
+						<View className="flex flex-wrap gap-4 w-full pt-2">
+							{lowestScoringUtility?.contaminants.map((contaminant: any) => (
+								<HorizontalContaminantCard
+									key={contaminant.id}
+									data={contaminant}
+								/>
+							))}
+						</View>
+					</View>
+
+					{/* {location?.sources && (
 						<View className="flex flex-col gap-6 my-10">
 							<Typography size="2xl" fontWeight="normal">
 								Sources
@@ -203,7 +179,7 @@ export function LocationForm({ id }: Props) {
 								<Sources data={location.sources} />
 							)}
 						</View>
-					)}
+					)} */}
 				</View>
 
 				{/* Recommended filter based on contaminants */}

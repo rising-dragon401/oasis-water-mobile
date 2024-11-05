@@ -2,13 +2,19 @@ import Feather from "@expo/vector-icons/Feather";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { TouchableOpacity, View } from "react-native";
+import {
+	KeyboardAvoidingView,
+	Platform,
+	TouchableOpacity,
+	View,
+} from "react-native";
 
 import { getNearestLocation } from "@/actions/admin";
 import { updateUserData } from "@/actions/user";
 import LocationSelector from "@/components/sharable/location-selector";
+import Score from "@/components/sharable/score";
 import { Button } from "@/components/ui/button";
-import { H2, Muted, P } from "@/components/ui/typography";
+import { H1, Muted, P } from "@/components/ui/typography";
 import { useToast } from "@/context/toast-provider";
 import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
@@ -16,17 +22,21 @@ import { useColorScheme } from "@/lib/useColorScheme";
 export default function LocationModal() {
 	const router = useRouter();
 	const { iconColor } = useColorScheme();
-	const { uid, refreshUserData, userData } = useUserProvider();
+	const { uid, refreshUserData, userData, tapScore } = useUserProvider();
 
 	const showToast = useToast();
 
 	const [selectedAddress, setSelectedAddress] = useState<any>(null);
 	const [loading, setLoading] = useState(false);
 	const [refetched, setRefetched] = useState(false);
+	const [showUpdateLocation, setShowUpdateLocation] = useState(true);
 
 	useEffect(() => {
-		if (userData?.location) {
+		if (userData?.tap_location_id) {
 			setSelectedAddress(userData.location.formattedAddress);
+			setShowUpdateLocation(false);
+		} else {
+			setShowUpdateLocation(true);
 		}
 	}, [userData]);
 
@@ -72,6 +82,12 @@ export default function LocationModal() {
 	};
 
 	const handleUpdateLocation = async (address: any) => {
+		if (!uid) {
+			router.back();
+			router.push("/(public)/sign-in");
+			return;
+		}
+
 		if (!uid || !address) {
 			throw new Error("Unable to update location: uid or address is null");
 		}
@@ -96,73 +112,133 @@ export default function LocationModal() {
 			if (res) {
 				showToast("Location updated");
 				refreshUserData();
-				router.back();
+				setShowUpdateLocation(false);
+				// router.back();
 			} else {
 				throw new Error("Unable to update location: updateUserData failed");
 			}
 
 			setLoading(false);
 		} catch (error) {
+			setShowUpdateLocation(false);
+			router.back();
 			showToast("Unable to update location");
 			setLoading(false);
 		}
 	};
 
 	return (
-		<View className="flex-1">
-			<View className="flex-1 py-14 justify-center items-center max-w-md mx-auto pb-20">
-				<View>
-					<View className="flex flex-col justify-center items-center mb-4">
-						<Feather
-							name="map-pin"
-							size={32}
-							color={iconColor}
-							className="mb-4"
-						/>
-						<H2>Sync your location</H2>
-						<P className="text-center max-w-sm">
-							Enter your address to see the tap water quality in your area.
-						</P>
-					</View>
-					<LocationSelector
-						address={selectedAddress}
-						setAddress={setSelectedAddress}
-						initialAddress={userData?.location?.formattedAddress}
-					/>
+		<KeyboardAvoidingView
+			style={{ flex: 1 }}
+			behavior={Platform.OS === "ios" ? "padding" : "height"}
+		>
+			<View className=" pt-8 px-8">
+				<View className="flex flex-col justify-center items-center">
+					<H1>Location</H1>
 				</View>
 
-				<Button
-					onPress={handleUpdateLocation}
-					disabled={!selectedAddress}
-					label="Select location"
-					loading={loading}
-					className="w-80 !h-16"
-				/>
+				{!showUpdateLocation && (
+					<View className="flex flex-col items-center justify-between h-full">
+						<View className="flex flex-col items-center flex-grow flex-shrink  p-4 rounded-full mt-4 w-full">
+							<View className="flex flex-row items-center px-4 py-2 bg-muted rounded-full gap-2">
+								<Feather name="map-pin" size={14} color={iconColor} />
+								<P className="text-center">
+									{userData.location.formattedAddress}
+								</P>
+							</View>
+						</View>
+
+						<View className="flex flex-col items-center flex-grow flex-shrink">
+							<Score score={tapScore?.score || 0} size="lg" />
+							<Button
+								label={tapScore?.name}
+								variant="outline"
+								className="mb-0"
+								onPress={() => {
+									router.back();
+									router.push(`/search/location/${userData?.tap_location_id}`);
+								}}
+								icon={
+									<Ionicons name="arrow-forward" size={16} color={iconColor} />
+								}
+							/>
+							<Muted className="mt-2">
+								(This is the tested tap water to your address)
+							</Muted>
+						</View>
+
+						<View className="flex flex-grow flex-shrink">
+							<Button
+								label="Change location"
+								variant="default"
+								className="w-80 !h-16"
+								onPress={() => setShowUpdateLocation(true)}
+							/>
+						</View>
+					</View>
+				)}
+
+				{showUpdateLocation && (
+					<View className="flex flex-col items-center justify-between h-full">
+						<View className="flex flex-grow flex-shrink items-center" />
+						<View className="flex flex-grow flex-shrink items-center">
+							<Feather
+								name="map-pin"
+								size={32}
+								color={iconColor}
+								className="mb-4"
+							/>
+							<H1>Update address</H1>
+							<Muted>Connect your address to see your tap water score</Muted>
+							<LocationSelector
+								address={selectedAddress}
+								setAddress={setSelectedAddress}
+								initialAddress={userData?.location?.formattedAddress}
+							/>
+						</View>
+
+						<View className="flex flex-grow flex-shrink items-center">
+							<Button
+								onPress={handleUpdateLocation}
+								disabled={!selectedAddress}
+								label="Select location"
+								loading={loading}
+								className="w-80 !h-16"
+							/>
+							{userData?.location?.formattedAddress && (
+								<Button
+									label="Cancel"
+									variant="ghost"
+									className="w-80 !h-16"
+									onPress={() => setShowUpdateLocation(false)}
+								/>
+							)}
+						</View>
+					</View>
+				)}
 
 				<View className="absolute bottom-10 ">
-					{refetched && (
-						<Muted className="mt-8">Refetched location data!</Muted>
-					)}
+					{refetched && <Muted className="">Refetched location data!</Muted>}
+				</View>
+
+				<View className="absolute top-10 left-8">
+					<TouchableOpacity
+						style={{
+							justifyContent: "center",
+							alignItems: "center",
+						}}
+						onPress={updateNearestLocation}
+					>
+						<Ionicons
+							name="refresh"
+							size={24}
+							color={iconColor}
+							className="mb-2"
+							style={{ transform: [{ rotate: "45deg" }] }}
+						/>
+					</TouchableOpacity>
 				</View>
 			</View>
-
-			<View className="absolute top-8 left-8">
-				<TouchableOpacity
-					style={{
-						justifyContent: "center",
-						alignItems: "center",
-					}}
-					onPress={updateNearestLocation}
-				>
-					<Ionicons
-						name="refresh"
-						size={24}
-						color={iconColor}
-						className="mb-2"
-						style={{ transform: [{ rotate: "45deg" }] }}
-					/>
-				</TouchableOpacity>
-			</View>
-		</View>
+		</KeyboardAvoidingView>
 	);
 }

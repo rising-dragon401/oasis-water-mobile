@@ -77,14 +77,15 @@ export default function TabOneScreen() {
 	const [loadingCategoryData, setLoadingCategoryData] = useState(true);
 	const [categoryData, setCategoryData] = useState<any[]>([]);
 	const [recentlyUpdatedItems, setRecentlyUpdatedItems] = useState<any[]>([]);
+	const [loadingRecents, setLoadingRecents] = useState(true);
 
 	useEffect(() => {
 		const fetchData = async () => {
-			getRecentlyUpdatedItems();
-
-			getPeople();
-			// manually refresh user data to be safe
-			refreshUserData();
+			await Promise.all([
+				getRecentlyUpdatedItems(),
+				getPeople(),
+				refreshUserData(),
+			]);
 
 			const categoryCounts = await getCategoryCounts();
 			if (categoryCounts) {
@@ -93,6 +94,8 @@ export default function TabOneScreen() {
 				setCategoryData(CATEGORIES);
 			}
 			setLoadingCategoryData(false);
+
+			setLoadingRecents(false);
 		};
 		fetchData();
 	}, []);
@@ -218,8 +221,8 @@ export default function TabOneScreen() {
 			show: true,
 			render: () => (
 				<View className="flex-col w-full z-10 mt-6">
-					<View className="flex flex-row justify-between w-full items-center ">
-						<H4 className="text-left mb-1">Recently tested</H4>
+					<View className="flex flex-row justify-between w-full items-center mb-2">
+						<H4 className="text-left font-medium">Recently tested</H4>
 						{/* <Link
 							href="/(protected)/search/top-rated-all"
 							className="flex flex-row items-center gap-2"
@@ -228,27 +231,44 @@ export default function TabOneScreen() {
 						</Link> */}
 					</View>
 					<View className="flex flex-col gap-4">
-						<FlatList
-							data={recentlyUpdatedItems}
-							horizontal
-							showsHorizontalScrollIndicator={false}
-							contentContainerStyle={{
-								paddingTop: 8,
-								height: "100%",
-							}}
-							className="overflow-x-scroll flex"
-							renderItem={({ item }) => (
-								<View className="mr-4 w-40 h-full">
-									<ItemPreviewCard
-										item={item}
-										showFavorite={false}
-										isAuthUser={false}
-										isGeneralListing
-									/>
-								</View>
-							)}
-							keyExtractor={(item) => item.id}
-						/>
+						{loadingRecents ? (
+							<FlatList
+								data={[1, 2, 3, 4, 5, 6]} // Placeholder items
+								horizontal
+								renderItem={() => (
+									<View className="mr-4">
+										<Skeleton
+											width={80}
+											height={80}
+											style={{ borderRadius: 12 }}
+										/>
+									</View>
+								)}
+								keyExtractor={(item) => item.toString()}
+							/>
+						) : (
+							<FlatList
+								data={recentlyUpdatedItems}
+								horizontal
+								showsHorizontalScrollIndicator={false}
+								contentContainerStyle={{
+									paddingTop: 8,
+									height: "100%",
+								}}
+								className="overflow-x-scroll flex"
+								renderItem={({ item }) => (
+									<View className="mr-4 w-40 h-full">
+										<ItemPreviewCard
+											item={item}
+											showFavorite={false}
+											isAuthUser={false}
+											isGeneralListing
+										/>
+									</View>
+								)}
+								keyExtractor={(item) => item.id}
+							/>
+						)}
 					</View>
 				</View>
 			),
@@ -258,33 +278,17 @@ export default function TabOneScreen() {
 			show: true,
 			render: () => (
 				<View className=" flex-col w-full mt-6">
-					<View className="flex flex-row justify-between w-full items-center">
-						<H4 className="text-left mb-1">Tap water</H4>
+					<View className="flex flex-row justify-between w-full items-end mb-2">
+						<H4 className="text-left font-medium">Tap water</H4>
 						<Link
 							href="/(protected)/search/locations"
 							className="flex flex-row items-center gap-2"
 						>
-							<View className="flex flex-row items-center gap-2">
-								<Muted className="text-center m-0 p-0">all locations</Muted>
-								<Ionicons
-									name="arrow-forward"
-									size={16}
-									color={textSecondaryColor}
-								/>
-							</View>
+							<Muted className="text-right m-0 p-0">see all</Muted>
 						</Link>
 					</View>
 					<FlatList
-						data={[
-							// {
-							// 	id: tapScore.id,
-							// 	name: "My tap water",
-							// 	score: tapScore.score,
-							// 	image: tapScore.image,
-							// 	isMyTap: true,
-							// },
-							...FEATURED_LOCATIONS,
-						]}
+						data={[...FEATURED_LOCATIONS]}
 						horizontal
 						showsHorizontalScrollIndicator={false}
 						contentContainerStyle={{
@@ -307,17 +311,17 @@ export default function TabOneScreen() {
 		{
 			key: "whatOthersAreDrinking",
 			render: () => (
-				<View className="flex-1 w-full justify-start mt-6 min-w-full">
-					{/* <View className="flex flex-row justify-between w-full items-center mb-4">
-						<H4 className="text-lef">What others are drinking</H4> */}
-					{/* <Link href="/(protected)/search/users">
+				<View className="flex w-full justify-start mt-6 min-w-full">
+					<View className="flex flex-row justify-between w-full items-center mb-2">
+						<H4 className="text-left font-medium">What others are drinking</H4>
+						{/* <Link href="/(protected)/search/users">
 							<Ionicons
 								name="arrow-forward"
 								size={16}
 								color={textSecondaryColor}
 							/>
 						</Link> */}
-					{/* </View> */}
+					</View>
 					{loadingPeople ? (
 						<FlatList
 							data={[1, 2, 3]} // Placeholder items
@@ -490,21 +494,21 @@ export default function TabOneScreen() {
 			key: "categories",
 			render: () => (
 				<View className="flex-1 flex-col w-full mt-4 z-10 min-w-full">
-					<View className="flex flex-row justify-between w-full items-center mb-4">
-						<H4 className="text-left ">Categories</H4>
-						{/* <Link
+					<View className="flex flex-row justify-between w-full items-center mb-2">
+						<H4 className="text-left font-medium">Categories</H4>
+						<Link
 							href="/(protected)/search/top-rated-all"
 							className="flex flex-row items-center gap-2"
 						>
-							<Muted className="text-center m-0 p-0">more</Muted>
-						</Link> */}
+							<Muted className="m-0 p-0">see all</Muted>
+						</Link>
 					</View>
 					<View className="flex flex-col gap-4 w-full">
 						{loadingCategoryData ? (
 							<FlatList
 								data={[1, 2, 3, 4, 5, 6]}
 								renderItem={() => (
-									<View className="mb-3 w-full ">
+									<View className="mb-3 w-full">
 										<Skeleton
 											width="100%"
 											height={56}
@@ -551,7 +555,7 @@ export default function TabOneScreen() {
 															</Muted>
 														</View>
 													</View>
-													<View className="flex flex-col justify-start gap-2  mr-2">
+													<View className="flex flex-col justify-end gap-2 h-full  mr-2">
 														<Ionicons
 															name="arrow-forward"
 															size={18}
@@ -571,13 +575,6 @@ export default function TabOneScreen() {
 			),
 		},
 	];
-
-	const renderSection = ({ item: section }: { item: any }) =>
-		section.show !== false && (
-			<View key={section.key} style={{ marginBottom: 10 }}>
-				{section.render()}
-			</View>
-		);
 
 	return (
 		<View className="px-6">
