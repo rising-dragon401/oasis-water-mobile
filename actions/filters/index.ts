@@ -22,8 +22,6 @@ export const getFilters = async ({
 		query = query.limit(limit);
 	}
 
-	console.log("limit: ", limit);
-
 	const { data } = await query;
 
 	filters = data;

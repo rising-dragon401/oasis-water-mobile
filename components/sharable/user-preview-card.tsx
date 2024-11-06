@@ -1,11 +1,12 @@
 import { Octicons } from "@expo/vector-icons";
+import { useUserProvider } from "context/user-provider";
 import { Link } from "expo-router";
 import React from "react";
 import { Image, Text, View } from "react-native";
 
-import { H4, Muted, P } from "@/components/ui/typography";
-import { useUserProvider } from "context/user-provider";
 import FavoriteButton from "./favorite-button";
+
+import { H4, Muted, P } from "@/components/ui/typography";
 
 type Props = {
 	item: any;

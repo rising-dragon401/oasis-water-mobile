@@ -68,7 +68,7 @@ export default function LocationModal() {
 		if (nearestLocation) {
 			setRefetched(true);
 			showToast("Location updated");
-			refreshUserData(uid, "scores");
+			refreshUserData("scores");
 			// router.back();
 		} else {
 			showToast("Unable to update location");

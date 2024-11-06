@@ -153,7 +153,7 @@ const categorizeItems = (items: any[]) => {
 };
 
 export default function RankingList({ categoryId }: { categoryId: string }) {
-	const { subscription, uid, user, userData } = useUserProvider();
+	const { subscription, uid, user } = useUserProvider();
 	const router = useRouter();
 	const navigation = useNavigation();
 	const { backgroundColor } = useColorScheme();

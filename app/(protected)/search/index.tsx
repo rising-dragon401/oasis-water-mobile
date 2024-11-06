@@ -238,8 +238,8 @@ export default function TabOneScreen() {
 								renderItem={() => (
 									<View className="mr-4">
 										<Skeleton
-											width={100}
-											height={100}
+											width={120}
+											height={120}
 											style={{ borderRadius: 14 }}
 										/>
 									</View>
@@ -346,7 +346,7 @@ export default function TabOneScreen() {
 								paddingTop: 8,
 								paddingLeft: 0,
 							}}
-							style={{ height: 120 }}
+							style={{ height: 100 }}
 							className="overflow-x-scroll"
 							renderItem={({ item: user }) => (
 								<Link
@@ -493,7 +493,7 @@ export default function TabOneScreen() {
 		{
 			key: "categories",
 			render: () => (
-				<View className="flex-1 flex-col w-full mt-4 z-10 min-w-full">
+				<View className="flex-1 flex-col w-full mt-6 z-10 min-w-full">
 					<View className="flex flex-row justify-between w-full items-center mb-2">
 						<H4 className="text-left font-medium">Categories</H4>
 						<Link

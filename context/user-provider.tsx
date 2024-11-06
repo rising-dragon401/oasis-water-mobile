@@ -34,7 +34,6 @@ interface UserContextType {
 	subscriptionData: any | null | undefined;
 	subscriptionProvider: SubscriptionProviderType;
 	refreshUserData: (
-		user_id?: string | null,
 		type?: "all" | "favorites" | "scores" | "subscription",
 	) => Promise<void>;
 	fetchUserFavorites: (uid: string | null) => Promise<void>;
@@ -90,7 +89,6 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
 		if (session && session !== activeSession) {
 			initUser(session);
-			refreshUserData(session.user.id);
 		} else if (session === null) {
 			clearUserData();
 		}
@@ -140,9 +138,18 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 		}
 	};
 
+	useEffect(() => {
+		console.log("subscription", subscription);
+	}, [subscription]);
+
 	const initUser = async (session: any) => {
 		setUserId(session.user?.id);
+
 		fetchUserData(session.user?.id);
+		fetchSubscription(session.user?.id);
+		fetchUserFavorites(session.user?.id);
+		fetchUserScores(session.user?.id);
+
 		setProvider(session.user?.app_metadata?.provider);
 	};
 
@@ -205,15 +212,12 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 	};
 
 	const refreshUserData = useCallback(
-		async (
-			user_id?: string | null,
-			type: "all" | "favorites" | "scores" | "subscription" = "all",
-		) => {
-			if (!user) {
+		async (type: "all" | "favorites" | "scores" | "subscription" = "all") => {
+			const userId = user?.id;
+
+			if (!userId) {
 				return;
 			}
-
-			const userId = user_id ?? user.id;
 
 			const promises = [];
 

@@ -1,5 +1,4 @@
 import { useUserProvider } from "context/user-provider";
-import { useRouter } from "expo-router";
 import { ScrollView, View } from "react-native";
 
 import OasisPage from "@/components/sharable/oasis-page";
@@ -7,9 +6,8 @@ import { theme } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function OasisScreen() {
-	const { uid, userFavorites } = useUserProvider();
+	const { uid } = useUserProvider();
 	const { colorScheme } = useColorScheme();
-	const router = useRouter();
 
 	const backgroundColor =
 		colorScheme === "dark" ? theme.dark.background : theme.light.background;

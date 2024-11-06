@@ -3,7 +3,7 @@ import { useUserProvider } from "context/user-provider";
 import { Image } from "expo-image";
 import { Link } from "expo-router";
 import React, { useMemo } from "react";
-import { ImageStyle, View } from "react-native";
+import { View } from "react-native";
 
 import { H4, Muted, P } from "@/components/ui/typography";
 import {
@@ -42,11 +42,11 @@ const ItemPreviewCard = ({
 	);
 
 	const renderImage = () => {
-		const imageStyle: ImageStyle = {
-			width: "100%",
-			height: "100%",
+		const imageStyle = {
+			width: 100,
+			height: 100,
 			aspectRatio: 1,
-			resizeMode: "cover" as const,
+			contentFit: "contain",
 			borderRadius: 10,
 		};
 
@@ -55,10 +55,11 @@ const ItemPreviewCard = ({
 				<Image
 					source={{ uri: randomBlurImage }}
 					style={imageStyle}
-					className="rounded-xl bg-white px-2 pt-0 pb-8"
+					className="rounded-xl bg-white"
 					transition={100}
 					cachePolicy="memory-disk"
 					placeholder={{ blurhash: placeHolderImageBlurHash }}
+					placeholderContentFit="contain"
 				/>
 			);
 		} else {
@@ -66,10 +67,11 @@ const ItemPreviewCard = ({
 				<Image
 					source={{ uri: item.image }}
 					style={imageStyle}
-					className="rounded-xl bg-white px-2 pt-0 pb-8"
+					className="rounded-xl bg-white "
 					transition={100}
 					cachePolicy="memory-disk"
 					placeholder={{ blurhash: placeHolderImageBlurHash }}
+					placeholderContentFit="contain"
 				/>
 			);
 		}

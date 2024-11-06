@@ -57,39 +57,50 @@ export async function getSubscription(uid: string | null) {
 	}
 
 	try {
+		// const { data: subscription } = await supabase
+		// 	.from("subscriptions")
+		// 	.select("*, prices(*, products(*)), metadata")
+		// 	.in("status", ["trialing", "active"])
+		// 	.eq("user_id", uid);
+
 		// fetch all subscriptions including metadata
 		const { data: subscription } = await supabase
 			.from("subscriptions")
-			.select("*, prices(*, products(*)), metadata")
-			.in("status", ["trialing", "active"])
+			.select("*")
+			.in("status", ["active"])
 			.eq("user_id", uid);
 
-		if (!subscription) {
+		if (!subscription || subscription.length === 0) {
 			console.log("no subscription found");
 			return null;
 		}
 
 		// use most recent subscription
-		const activePlan = subscription[0]?.prices?.products?.name;
+		// const activePlan = subscription[0]?.prices?.products?.name;
 
-		let planPlan = "Free";
-		if (!activePlan) {
-			planPlan = "Free";
-			return {
-				success: false,
-				data: null,
-			};
-		} else if (
-			activePlan?.toLowerCase() === "pro (test)" ||
-			activePlan?.toLowerCase() === "pro (beta)" ||
-			activePlan?.toLowerCase() === "oasis pro"
-		) {
-			planPlan = "Pro";
-		}
+		// console.log("activePlan", activePlan);
 
+		// let planPlan = "Free";
+
+		// if (!activePlan) {
+		// 	planPlan = "Free";
+		// 	return {
+		// 		success: false,
+		// 		data: null,
+		// 	};
+		// } else if (
+		// 	// Dont think this is accurate
+		// 	activePlan?.toLowerCase() === "pro (test)" ||
+		// 	activePlan?.toLowerCase() === "pro (beta)" ||
+		// 	activePlan?.toLowerCase() === "oasis pro"
+		// ) {
+		// 	planPlan = "Pro";
+		// }
+
+		// Default to Pro
 		const subscriptionDetails = {
 			...subscription[0],
-			plan: planPlan,
+			plan: "Pro",
 		};
 
 		// only return subscription details if user is subscribed
@@ -220,7 +231,7 @@ const handleReferral = async (subscriptionData: any, uuid: string) => {
 			.eq("subscription_id", subscriptionData.id)
 			.single();
 
-		console.log("existingReferral", existingReferral);
+		// console.log("existingReferral", existingReferral);
 
 		const referralData = {
 			referring_user_id: referralCode,
@@ -299,35 +310,82 @@ export async function manageSubscriptionStatusChange(
 		const provider = "revenue_cat";
 		const entitlements = rcVustomerInfo.entitlements;
 
+		console.log("entitlements", JSON.stringify(entitlements, null, 2));
+
 		const proEntitlement = entitlements?.all?.pro;
 		const proIsActive = proEntitlement?.isActive === true || false;
+		const productIdentifier = proEntitlement?.productIdentifier || null;
 		const proExpiresDate = proEntitlement?.expirationDate || null;
 		const proCreatedAt = proEntitlement?.originalPurchaseDate || null;
 		const proPriceId = proEntitlement?.productIdentifier || null;
 		const proWillRenew = proEntitlement?.willRenew || false;
 		const pastExpirationDate = proExpiresDate < new Date();
 
-		// Mark subscription as expired if trial has ended or pro is not active
-		const status = proIsActive && !pastExpirationDate ? "active" : "expired";
+		const status = proIsActive ? "active" : "expired";
 
-		const subscriptionId = "sub_rc_" + proCreatedAt?.toString() + proPriceId;
+		// THIS IS NOT UNIQUE... FUUUUDGE
+		// so basically there will be duplicate sub ids for rev cat but never the same sub id for the same user, unless they purchase at the same exact time
+		const oldSubId = "sub_rc_" + proCreatedAt?.toString() + proPriceId;
+		const newSubId = "sub_rc_" + proCreatedAt?.toString() + uid + proPriceId;
+
+		// Unknown amount
+		let amount = 0;
+
+		if (productIdentifier === "rc_pro_weekly_499") {
+			amount = 499;
+		} else if (productIdentifier === "rc_pro_annual_47") {
+			amount = 4700;
+		} else if (productIdentifier === "rc_pro_monthly_799") {
+			amount = 799;
+		}
 
 		// check if required fields are present
-		if (!subscriptionId || !proCreatedAt || !proPriceId) {
-			// console.log(
-			// 	"No rev cat subscription  found – missing required fields:",
-			// 	subscriptionId,
-			// 	":",
-			// 	proCreatedAt,
-			// 	":",
-			// 	proPriceId,
-			// );
-
+		if (!oldSubId || !newSubId || !proCreatedAt || !proPriceId) {
+			console.log("Missing !subscriptionId || !proCreatedAt || !proPriceId");
 			await markSubscriptionAsInactive(uid);
 			throw new Error(
 				"Rev cat sub details not found - Missing required fields",
 			);
 		}
+
+		let hasExistingSubscription = false;
+		let hasActiveSubId = false;
+		let hasArchivedSubId = false;
+		let identifiedSubId = null;
+
+		// First check for existing subscription with the new sub id
+		const { data: newSubIdData, error: fetchError } = await supabase
+			.from("subscriptions")
+			.select("*")
+			.eq("id", newSubId)
+			.eq("user_id", uid);
+
+		if (newSubIdData && newSubIdData?.length > 0) {
+			identifiedSubId = newSubId;
+			hasActiveSubId = true;
+		}
+
+		// If no active sub id, check for old id
+		if (!hasActiveSubId) {
+			const { data: oldSubIdData, error: fetchError } = await supabase
+				.from("subscriptions")
+				.select("*")
+				.eq("id", oldSubId)
+				.eq("user_id", uid);
+
+			if (oldSubIdData && oldSubIdData?.length > 0) {
+				identifiedSubId = oldSubId;
+				hasArchivedSubId = true;
+			}
+		}
+
+		hasExistingSubscription = hasArchivedSubId || hasActiveSubId;
+
+		const subscriptionId = identifiedSubId ? identifiedSubId : newSubId;
+
+		console.log("subscriptionId", subscriptionId);
+		console.log("hasExistingSubscription", hasExistingSubscription);
+		console.log("status", status);
 
 		// Latest data from rev cat
 		const subscriptionData = {
@@ -337,7 +395,7 @@ export async function manageSubscriptionStatusChange(
 				provider,
 				...rcVustomerInfo,
 			},
-			amount: 4700,
+			amount,
 			status,
 			price_id: proPriceId,
 			quantity: 1,
@@ -346,52 +404,36 @@ export async function manageSubscriptionStatusChange(
 			cancel_at_period_end: !proWillRenew,
 		};
 
-		// Check if the existing data matches the new data
-		const { data: existingSubscription, error: fetchError } = await supabase
-			.from("subscriptions")
-			.select("*")
-			.eq("id", subscriptionId)
-			.single();
+		// if existing, update status
+		if (hasExistingSubscription) {
+			console.log("updating existing subscription");
 
-		// Compare existing data with new data
-		let hasChanged = false;
-		// only update if status has changed
-		if (
-			existingSubscription &&
-			subscriptionData?.status !== existingSubscription?.status
-		) {
-			hasChanged = true;
-		}
-
-		// console.log("hasChanged", hasChanged);
-
-		if (hasChanged || !existingSubscription) {
-			console.log("upserting subscription");
 			const { error } = await supabase
 				.from("subscriptions")
-				.upsert([subscriptionData]);
-			// handle referral
-			// only reward referral if subscription is active
+				.update({ status })
+				.eq("id", subscriptionId);
+		} else {
+			console.log("inserting new subscription");
+
+			// console.log(
+			// 	"subscriptionData",
+			// 	JSON.stringify(subscriptionData, null, 2),
+			// );
+
+			// Insert new subscription
+			const { error } = await supabase
+				.from("subscriptions")
+				.insert(subscriptionData);
+
+			if (error) {
+				console.log("inserting new subscription error", error);
+				throw new Error(error.message);
+			}
+
+			// only reward referral if subscription is active and new sub
 			if (status === "active") {
 				await handleReferral(subscriptionData, uid);
 			}
-
-			if (error) throw error;
-			console.log(
-				`Inserted/updated subscription [${subscriptionId}] for user [${uid}]`,
-			);
-		} else {
-			// console.log(
-			// 	`No changes detected for subscription [${subscriptionId}]. No update performed.`,
-			// );
-		}
-
-		// redundant update subscription
-		// definitely paranoia lol
-		if (status === "active") {
-			await markSubscriptionAsActive(uid);
-		} else {
-			await markSubscriptionAsInactive(uid);
 		}
 
 		return {

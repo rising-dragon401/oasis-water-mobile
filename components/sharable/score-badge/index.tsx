@@ -13,14 +13,17 @@ export default function ScoreBadge() {
 
 	const score = userScores?.overallScore || 0;
 
-	const bgColor =
-		score === null
-			? "bg-zinc-300"
-			: score > 70
-				? "bg-emerald-300"
-				: score > 50
-					? "bg-amber-300"
-					: "bg-rose-300";
+	const getBgColor = (score: number) => {
+		if (score === null) {
+			return "bg-zinc-300";
+		} else if (score > 70) {
+			return "bg-emerald-300";
+		} else if (score > 50) {
+			return "bg-amber-300";
+		} else {
+			return "bg-rose-300";
+		}
+	};
 
 	return (
 		<TouchableOpacity
@@ -29,7 +32,7 @@ export default function ScoreBadge() {
 		>
 			{subscription && (
 				<View className="flex-row items-center gap-x-1">
-					<View className={`w-4 h-4 rounded-full ${bgColor}`} />
+					<View className={`w-3 h-3 rounded-full ${getBgColor(score)}`} />
 					<Small>{score ? `${score}/100` : "0/100"}</Small>
 				</View>
 			)}

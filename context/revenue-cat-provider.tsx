@@ -61,6 +61,8 @@ export const RevenueCatProvider = ({ children }: any) => {
 	const [customerInfo, setCustomerInfo] = useState<CustomerInfo | null>(null);
 	const [, setIsReady] = useState(false);
 
+	// Configure Revenue Cat
+	// Setup subscription listener
 	useEffect(() => {
 		const setup = async () => {
 			if (Platform.OS === "ios") {
@@ -102,6 +104,7 @@ export const RevenueCatProvider = ({ children }: any) => {
 		}
 	}, [customerInfo, uid]);
 
+	// Get offerings from Revenue Cat
 	const loadOfferings = async () => {
 		const offerings = await Purchases.getOfferings();
 
@@ -153,29 +156,51 @@ export const RevenueCatProvider = ({ children }: any) => {
 	// get latest sub data from revenue cat
 	const updateCustomerInfo = useCallback(
 		async (customerInfo: CustomerInfo, uid: string) => {
-			// Else user must have an active revenue cat sub
+			// Check if manually don't want to override sub
+			// helpful for admin use and testing
 			const userData = await getUserData(uid);
-
-			// for admin use and testing
 			if (userData?.do_not_override_sub === true) {
-				// return;
+				console.log("do not override sub");
+				return;
 			}
+
+			// Cases
+			// User has no subscription
+			// User has an active Stripe (web) sub
+			// - will be handled by fetchSubscription in user-provider
+			// User has an active Revenue Cat sub
+			// - need to handle this here
+			// User has an expired Revenue Cat sub
+			// - need to check this here
+			// User has an expired Stripe (web) sub
+			// - website webhook listens for this
 
 			// check if user has an active Stripe (web) sub
 			const subscriptionData = await getSubscription(uid);
 
-			const provider =
-				subscriptionData?.data?.metadata &&
-				subscriptionData?.data?.metadata?.provider === "revenue_cat"
-					? "revenue_cat"
-					: "stripe";
+			let provider = null;
 
+			// Active subscription row found
+			if (subscriptionData && subscriptionData?.success) {
+				// check the provider of this active subscription
+				provider =
+					subscriptionData?.data?.metadata &&
+					subscriptionData?.data?.metadata?.provider === "revenue_cat"
+						? "revenue_cat"
+						: "stripe";
+			}
+
+			// If user has an active Stripe (web) sub
+			// Don't check and override with Revenue Cat
+			// TODO: query Stripe to ensure the subscription is still active
 			if (provider === "stripe") {
-				// TODO: query Stripe to ensure the subscription is still active
 				return;
 			}
 
-			// manually override subscription
+			// Else user must have an active revenue cat sub
+			// and we need to check and update the subscription row
+
+			//  No info so returning but not overriding
 			if (!customerInfo || !uid) {
 				console.error("No customer info or uid");
 				setSubscription(false);
@@ -186,17 +211,19 @@ export const RevenueCatProvider = ({ children }: any) => {
 			// 	pro: customerInfo.entitlements.active.pro?.isActive || false,
 			// });
 
+			// Check Revenue Cat Subscription
+			// and update subscription row
 			const updatedSubscription = await manageSubscriptionStatusChange(
 				uid,
 				customerInfo,
 			);
 
-			// manually override subscription if there is an error with revenue cat
+			// manually set local subscription if there is an error with revenue cat
 			if (!updatedSubscription?.success) {
 				setSubscription(false);
 			}
 
-			// update user provider subscription
+			// Refetch the subscription data from supabase and update
 			fetchSubscription(uid);
 		},
 		[uid, customerInfo],
