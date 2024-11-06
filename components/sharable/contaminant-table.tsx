@@ -1,19 +1,19 @@
-import { useMemo } from "react";
-import { View } from "react-native";
-import useSWR from "swr";
-
-import { getContaminants } from "@/actions/ingredients";
-import { P } from "@/components/ui/typography";
 import {
 	Accordion,
 	AccordionContent,
 	AccordionItem,
 	AccordionTrigger,
 } from "components/ui/accordion";
+import { useMemo } from "react";
+import { View } from "react-native";
+import useSWR from "swr";
+
 import PaywallContent from "./paywall-content";
 import Typography from "./typography";
 
-import { IngredientCategories } from "@/lib/constants";
+import { getContaminants } from "@/actions/ingredients";
+import { H3, P } from "@/components/ui/typography";
+import { FEATURES, IngredientCategories } from "@/lib/constants";
 
 type Props = {
 	filteredContaminants: any[];
@@ -94,18 +94,11 @@ export default function ContaminantTable({
 
 	return (
 		<>
-			<Typography size="xl" fontWeight="bold">
-				Contaminants filtered
-			</Typography>
+			<H3>Contaminants filtered</H3>
 
 			<PaywallContent
-				label="See what contaminants this filter removes"
-				items={[
-					"Rating and scores 🌟",
-					"Research reports and data 🔬",
-					"Latest lab results 💧",
-					"Request new products 🌿",
-				]}
+				label="See what this filter removes"
+				items={FEATURES.map((item) => item.label)}
 			>
 				{contaminantsByCategory.map((item) => (
 					<Accordion

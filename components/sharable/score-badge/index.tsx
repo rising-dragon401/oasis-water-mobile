@@ -6,19 +6,21 @@ import { Small } from "@/components/ui/typography";
 import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
 
-export default function ScoreBadge({ score }: { score: number | null }) {
+export default function ScoreBadge() {
 	const router = useRouter();
 	const { iconColor } = useColorScheme();
-	const { subscription } = useUserProvider();
+	const { subscription, userScores } = useUserProvider();
+
+	const score = userScores?.overallScore || 0;
 
 	const bgColor =
 		score === null
-			? "bg-gray-300"
+			? "bg-zinc-300"
 			: score > 70
-				? "bg-green-300"
+				? "bg-emerald-300"
 				: score > 50
-					? "bg-yellow-300"
-					: "bg-red-300";
+					? "bg-amber-300"
+					: "bg-rose-300";
 
 	return (
 		<TouchableOpacity

@@ -34,7 +34,7 @@ function HomeHeader({
 			</View>
 			<View className="flex-1 justify-end">
 				<View className="flex-row items-center justify-end">
-					<ScoreBadge score={score} />
+					<ScoreBadge />
 				</View>
 			</View>
 		</View>

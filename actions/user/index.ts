@@ -285,6 +285,8 @@ export async function manageSubscriptionStatusChange(
 		// if no active subscriptions, then return
 		const purchases = rcVustomerInfo?.allPurchasedProductIdentifiers;
 
+		// console.log("purchases", JSON.stringify(purchases, null, 2));
+
 		if (!purchases || purchases.length === 0) {
 			await markSubscriptionAsInactive(uid);
 			throw new Error("No rev cat purchases found");

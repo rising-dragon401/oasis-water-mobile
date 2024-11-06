@@ -24,7 +24,7 @@ export default function ItemImage({
 				source={src}
 				accessibilityLabel={alt}
 				style={{ width: "100%", height: "100%", borderRadius: 8 }}
-				transition={1000}
+				transition={500}
 			/>
 			{showFavorite && (
 				<View style={{ position: "absolute", top: 10, right: 10, zIndex: 99 }}>

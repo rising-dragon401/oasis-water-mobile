@@ -15,7 +15,11 @@ import Purchases, {
 
 import { useUserProvider } from "./user-provider";
 
-import { getUserData, manageSubscriptionStatusChange } from "@/actions/user";
+import {
+	getSubscription,
+	getUserData,
+	manageSubscriptionStatusChange,
+} from "@/actions/user";
 
 const APIKeys = {
 	apple: "appl_OIAHthcBxHjpVWGXmtLvBKRTtrR",
@@ -149,10 +153,25 @@ export const RevenueCatProvider = ({ children }: any) => {
 	// get latest sub data from revenue cat
 	const updateCustomerInfo = useCallback(
 		async (customerInfo: CustomerInfo, uid: string) => {
+			// Else user must have an active revenue cat sub
 			const userData = await getUserData(uid);
 
 			// for admin use and testing
 			if (userData?.do_not_override_sub === true) {
+				// return;
+			}
+
+			// check if user has an active Stripe (web) sub
+			const subscriptionData = await getSubscription(uid);
+
+			const provider =
+				subscriptionData?.data?.metadata &&
+				subscriptionData?.data?.metadata?.provider === "revenue_cat"
+					? "revenue_cat"
+					: "stripe";
+
+			if (provider === "stripe") {
+				// TODO: query Stripe to ensure the subscription is still active
 				return;
 			}
 

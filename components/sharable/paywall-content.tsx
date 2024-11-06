@@ -1,14 +1,16 @@
+import { Octicons } from "@expo/vector-icons";
 import cn from "classnames";
+import { Button } from "components/ui/button";
+import { useUserProvider } from "context/user-provider";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 
+import Typography from "./typography";
+
 import { theme } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
-import { Octicons } from "@expo/vector-icons";
-import { Button } from "components/ui/button";
-import { useUserProvider } from "context/user-provider";
-import Typography from "./typography";
+
 type PaywallContentProps = {
 	children: React.ReactNode;
 	className?: string;
@@ -29,7 +31,7 @@ const PaywallContent: React.FC<PaywallContentProps> = ({
 	buttonLabel,
 }) => {
 	const router = useRouter();
-	const { colorScheme } = useColorScheme();
+	const { colorScheme, accentColor } = useColorScheme();
 
 	const iconColor =
 		colorScheme === "dark" ? theme.light.primary : theme.dark.primary;
@@ -58,7 +60,7 @@ const PaywallContent: React.FC<PaywallContentProps> = ({
 				</Typography>
 			)}
 			<TouchableOpacity onPress={handleUpgradeClick}>
-				<View className="flex hover:cursor-pointer w-[90vw] bg-secondary p-4 py-6 rounded-lg gap-x-4 items-center gap-y-4">
+				<View className="flex hover:cursor-pointer w-[90vw] bg-muted p-4 py-6 rounded-lg gap-x-4 items-center gap-y-4">
 					{label && (
 						<Typography
 							size="2xl"
@@ -69,17 +71,23 @@ const PaywallContent: React.FC<PaywallContentProps> = ({
 						</Typography>
 					)}
 
-					{items && (
-						<View className="flex flex-col gap-4 text-center">
+					{items && items.length > 0 && (
+						<View className="flex flex-col gap-4 text-center justify-center">
 							{items.map((item, index) => (
-								<Typography
+								<View
 									key={index}
-									size="base"
-									fontWeight="normal"
-									className="text-primary text-center"
+									className="flex flex-row items-center gap-2 w-96 justify-center"
 								>
-									{item}
-								</Typography>
+									<Octicons name="check" size={20} color={accentColor} />
+									<Typography
+										key={index}
+										size="base"
+										fontWeight="normal"
+										className="text-primary text-center"
+									>
+										{item}
+									</Typography>
+								</View>
 							))}
 						</View>
 					)}
@@ -90,6 +98,7 @@ const PaywallContent: React.FC<PaywallContentProps> = ({
 						onPress={handleUpgradeClick}
 						iconPosition="right"
 						icon={<Octicons name="lock" size={16} color={iconColor} />}
+						className="mt-4 w-72"
 					/>
 				</View>
 			</TouchableOpacity>

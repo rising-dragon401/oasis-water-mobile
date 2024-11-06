@@ -49,7 +49,7 @@ export default function Score({
 			: size === "lg"
 				? 12
 				: size === "md"
-					? 10
+					? 8
 					: size === "sm"
 						? 6
 						: size === "xs"

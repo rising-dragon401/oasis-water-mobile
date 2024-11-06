@@ -53,3 +53,24 @@ export const IngredientCategories: string[] = [
 
 export const PROFILE_AVATAR =
 	"https://connect.live-oasis.com/storage/v1/object/public/website/avatars/user-icon-outline.png?t=2024-11-05T17%3A08%3A14.075Z";
+
+export const FEATURES = [
+	{
+		label: "Access to all scores and ratings",
+	},
+	{
+		label: "Unlimited scans and searches",
+	},
+	{
+		label: "Full contaminant breakdowns",
+	},
+	{
+		label: "Personalized filter recommendations",
+	},
+	// {
+	// 	label: "Oasis Research AI",
+	// },
+	{
+		label: "Support independent lab testing",
+	},
+];

@@ -1,6 +1,5 @@
 import Feather from "@expo/vector-icons/Feather";
 import * as Linking from "expo-linking";
-import { useRouter } from "expo-router";
 import { TouchableOpacity, View } from "react-native";
 
 import Score from "@/components/sharable/score";
@@ -25,7 +24,7 @@ export default function ProfileHeader({
 }) {
 	const { iconColor } = useColorScheme();
 	const { uid, userFavorites, userScores, subscription } = useUserProvider();
-	const router = useRouter();
+
 	const scoreTooltipContent = () => {
 		if (!uid) {
 			return "Login to see your score";
@@ -37,7 +36,7 @@ export default function ProfileHeader({
 	};
 
 	const scoreSize =
-		!uid || userFavorites?.length === 0 || !userFavorites ? "xs" : "sm";
+		!uid || userFavorites?.length === 0 || !userFavorites ? "sm" : "sm";
 
 	return (
 		<View className="mb-2 gap-4 flex w-full flex-row justify-between items-start">
@@ -48,9 +47,7 @@ export default function ProfileHeader({
 					</Avatar>
 
 					<View className="flex flex-col">
-						{profileData?.full_name && (
-							<H3 className="mb-0 pb-0">{profileData?.full_name}</H3>
-						)}
+						<H3 className="mb-0 pb-0">{profileData?.full_name || "Name"}</H3>
 
 						{profileData?.username && (
 							<Muted className="py-0 my-0">@{profileData?.username}</Muted>

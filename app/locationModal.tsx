@@ -28,7 +28,7 @@ export default function LocationModal() {
 
 	useEffect(() => {
 		if (userData?.tap_location_id) {
-			setSelectedAddress(userData.location.formattedAddress);
+			setSelectedAddress(userData.location?.formattedAddress);
 			setShowUpdateLocation(false);
 		} else {
 			setShowUpdateLocation(true);
@@ -138,7 +138,7 @@ export default function LocationModal() {
 							<View className="flex flex-row items-center px-4 py-2 bg-muted rounded-full gap-2">
 								<Feather name="map-pin" size={14} color={iconColor} />
 								<P className="text-center" numberOfLines={1}>
-									{userData.location.formattedAddress}
+									{userData?.location?.formattedAddress || "Address"}
 								</P>
 							</View>
 						</View>

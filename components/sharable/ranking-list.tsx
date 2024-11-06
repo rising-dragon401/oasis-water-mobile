@@ -174,10 +174,6 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 
 	const isAuthUser = uid === user?.uid;
 
-	console.log("categoryId", categoryId);
-	console.log("productType", productType);
-	console.log("defaultTags", defaultTags);
-
 	const fetchAndSetData = async (
 		key: string,
 		fetchFunction: () => Promise<any>,

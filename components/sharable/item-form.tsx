@@ -21,6 +21,7 @@ import { incrementItemsViewed } from "@/actions/user";
 import { Button } from "@/components/ui/button";
 import { H2, Muted } from "@/components/ui/typography";
 import { useUserProvider } from "@/context/user-provider";
+import { FEATURES } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 type Props = {
@@ -281,13 +282,8 @@ export function ItemForm({ id }: Props) {
 								Contaminants ☠️
 							</Typography>
 							<PaywallContent
-								label="See what contaminants this filter removes"
-								items={[
-									"Rating and scores 🌟",
-									"Research reports and data 🔬",
-									"Latest lab results 💧",
-									"Request new products 🌿",
-								]}
+								label="See the contaminants in this water"
+								items={FEATURES.map((item) => item.label)}
 							>
 								<View className="grid md:grid-cols-2 grid-cols-1 gap-6">
 									{sortedContaminants.map((contaminant: any, index: number) => (
@@ -323,11 +319,11 @@ export function ItemForm({ id }: Props) {
 
 					<>
 						{item?.ingredients?.length > 0 && (
-							<View className="flex flex-col gap-6 my-10">
+							<View className="flex flex-col gap-4 my-10">
 								<Typography size="2xl" fontWeight="normal">
 									Other Ingredients
 								</Typography>
-								<PaywallContent label="View all minerals and ingredients">
+								<PaywallContent label="View mineral and ingredients breakdowns">
 									<IngredientsCard ingredients={item.ingredients} />
 								</PaywallContent>
 							</View>
