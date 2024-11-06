@@ -118,25 +118,23 @@ export async function getUserFavorites(uid: string) {
 		throw new Error(error.message);
 	}
 
+	// Filter out duplicates by item_id
+	const uniqueFavorites = data.filter(
+		(favorite, index, self) =>
+			index === self.findIndex((f) => f.item_id === favorite.item_id),
+	);
+
+	if (error) {
+		throw new Error("Error fetching unique favorites");
+	}
+
 	// go through each favorite and get the data for the favorite. If type is 'bottled_water' search items table. If type is 'tap_water_locations'. If type is 'filter' search water_filters table.
 	const favorites = await Promise.all(
-		data.map(async (favorite) => {
+		uniqueFavorites.map(async (favorite) => {
 			let result;
 			if (favorite.type === "bottled_water") {
 				const { data, error } = await supabase
 					.from("items")
-					.select("*")
-					.eq("id", favorite.item_id)
-					.single();
-
-				if (error) {
-					throw new Error(error.message);
-				}
-
-				result = data;
-			} else if (favorite.type === "tap_water") {
-				const { data, error } = await supabase
-					.from("tap_water_locations")
 					.select("*")
 					.eq("id", favorite.item_id)
 					.single();
@@ -399,7 +397,7 @@ export async function manageSubscriptionStatusChange(
 		};
 	} catch (error) {
 		await markSubscriptionAsInactive(uid);
-		console.error("Error inserting/updating subscription:", error);
+		// console.error("Error inserting/updating subscription:", error);
 		return {
 			success: false,
 			data: error,
@@ -408,16 +406,17 @@ export async function manageSubscriptionStatusChange(
 }
 
 export async function addFavorite(uid: string, type: any, itemId: number) {
+	// Insert the new favorite
 	const { data, error } = await supabase
 		.from("favorites")
-		.insert({ uid, type, item_id: itemId })
-		.single();
+		.insert({ uid, type, item_id: itemId });
 
 	if (error) {
-		throw new Error(error.message);
+		console.error("Error adding favorite:", error);
+		return false;
 	}
 
-	return data;
+	return true;
 }
 
 export async function removeFavorite(
@@ -859,17 +858,15 @@ export const getRecommendedProducts = async (uid: string) => {
 	// }
 };
 
-export const getUserTapScore = async (tapWaterLocationId: string) => {
+export const getUserTapScore = async (tapWaterLocationId: number) => {
 	if (!tapWaterLocationId) {
 		return null;
 	}
 
-	const id = parseInt(tapWaterLocationId);
-
 	const { data, error } = await supabase
 		.from("tap_water_locations")
 		.select("name, score, utilities, image")
-		.eq("id", id);
+		.eq("id", tapWaterLocationId);
 
 	if (error) {
 		console.error("Error getting user tap score:", error);
@@ -886,7 +883,7 @@ export const getUserTapScore = async (tapWaterLocationId: string) => {
 	});
 
 	const details = {
-		id,
+		id: tapWaterLocationId,
 		image: data?.[0]?.image,
 		name: data?.[0]?.name,
 		score: data?.[0]?.score,
@@ -902,10 +899,18 @@ export const getUserTapScore = async (tapWaterLocationId: string) => {
 };
 
 export const calculateUserScores = async (favorites: any, tapScore: any) => {
+	let totalContaminants = 0;
+
 	const calculateShowersScore = () => {
 		const showerFilters = (favorites ?? []).filter((favorite: any) =>
 			favorite.tags.includes("shower"),
 		);
+
+		const showerFilterContaminants = showerFilters.map(
+			(filter: any) => filter.contaminants,
+		);
+
+		totalContaminants += showerFilterContaminants.length;
 
 		const topShowerScore =
 			showerFilters.length > 0
@@ -920,6 +925,12 @@ export const calculateUserScores = async (favorites: any, tapScore: any) => {
 			(favorite: any) => favorite.type === "filter",
 		);
 
+		const drinkingFilterContaminants = drinkingFilters.map(
+			(filter: any) => filter.contaminants,
+		);
+
+		totalContaminants += drinkingFilterContaminants.length;
+
 		const drinkingFilterScore =
 			drinkingFilters.length > 0
 				? Math.max(...drinkingFilters.map((filter: any) => filter.score))
@@ -930,8 +941,14 @@ export const calculateUserScores = async (favorites: any, tapScore: any) => {
 
 	const calculateBottledWaterScore = () => {
 		const bottledWater = (favorites ?? []).filter(
-			(favorite: any) => favorite.type === "bottled_water",
+			(favorite: any) => favorite.type === "bottled_water" || "gallon",
 		);
+
+		const bottledWaterContaminants = bottledWater.map(
+			(water: any) => water.contaminants,
+		);
+
+		totalContaminants += bottledWaterContaminants.length;
 
 		if (bottledWater.length === 0) {
 			return 0;
@@ -941,6 +958,7 @@ export const calculateUserScores = async (favorites: any, tapScore: any) => {
 			(acc: number, water: any) => acc + water.score,
 			0,
 		);
+
 		return totalBottledWaterScore / bottledWater.length;
 	};
 
@@ -950,7 +968,11 @@ export const calculateUserScores = async (favorites: any, tapScore: any) => {
 			0,
 		) / (favorites?.length || 1);
 
-	console.log("overallScore", overallScore);
+	// Calculate total contaminants
+	totalContaminants = (favorites ?? []).reduce(
+		(acc: number, favorite: any) => acc + (favorite.contaminants?.length || 0),
+		0,
+	);
 
 	const showersScore = calculateShowersScore();
 	const waterFilterScore = calculateWaterFilterScore();
@@ -961,5 +983,26 @@ export const calculateUserScores = async (favorites: any, tapScore: any) => {
 		waterFilterScore,
 		bottledWaterScore,
 		overallScore,
+		totalContaminants,
 	};
+};
+
+export const addWatersAndFiltersToUserFavorites = async (
+	uid: string,
+	favorites: any,
+) => {
+	for (const favorite of favorites) {
+		// translate type
+		let type = favorite.type;
+		if (type === "item") {
+			type = "bottled_water";
+		}
+
+		const added = await addFavorite(uid, type, favorite.id);
+		if (!added) {
+			return false;
+		}
+	}
+
+	return true;
 };

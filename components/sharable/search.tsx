@@ -24,9 +24,17 @@ const searchClient = algoliasearch(
 export default function Search({
 	indices,
 	setActive,
+	placeholder,
+	overridePress,
+	hideScan,
+	showSearchIcon = false,
 }: {
 	indices?: string[];
 	setActive: (active: boolean) => void;
+	placeholder?: string;
+	overridePress?: (item: any) => void;
+	hideScan?: boolean;
+	showSearchIcon?: boolean;
 }) {
 	const [results, setResults] = useState<any[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
@@ -170,18 +178,29 @@ export default function Search({
 			<View className="flex flex-row gap-2 items-center relative z-10">
 				<Input
 					ref={inputRef}
-					placeholder="What are you drinking?"
+					placeholder={placeholder || "What are you drinking?"}
 					value={value}
 					onChangeText={onChangeText}
 					aria-labelledbyledBy="inputLabel"
 					aria-errormessage="inputError"
-					className="w-full pl-6 z-20 !h-16 !rounded-full"
+					className={`w-full pl-6 z-20 !h-16 !rounded-full `}
 					onFocus={() => setActive(true)}
 					onBlur={() => setActive(false)}
 				/>
 
+				{/* {showSearchIcon && (
+					<View
+						className="flex flex-row gap-4 z-20 items-center"
+						style={{ position: "absolute", left: 16 }}
+					>
+						<Feather name="search" size={20} color={mutedForegroundColor} />
+					</View>
+				)} */}
+
 				<View
-					className="flex flex-row gap-4 z-20 items-center"
+					className={`flex flex-row gap-4 z-20 items-center ${
+						showSearchIcon && "pr-4"
+					}`}
 					style={{ position: "absolute", right: 10 }}
 				>
 					{value && !isLoading && (
@@ -194,13 +213,20 @@ export default function Search({
 						<ActivityIndicator size="small" color={mutedForegroundColor} />
 					)}
 
-					<TouchableOpacity onPress={handleScan} className="mr-4">
-						<Feather name="camera" size={20} color={iconColor} />
-					</TouchableOpacity>
+					{!hideScan && (
+						<TouchableOpacity onPress={handleScan} className="mr-4">
+							<Feather name="camera" size={20} color={iconColor} />
+						</TouchableOpacity>
+					)}
 				</View>
 			</View>
 			{(results.length > 0 || (noResults && value.length > 0)) && (
-				<ResultsRow results={results} noResults={noResults} />
+				<ResultsRow
+					results={results}
+					noResults={noResults}
+					overridePress={overridePress}
+					setResults={setResults}
+				/>
 			)}
 		</>
 	);

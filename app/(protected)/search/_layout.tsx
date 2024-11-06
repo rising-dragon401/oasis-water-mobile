@@ -47,7 +47,7 @@ export default function SearchLayout() {
 
 	const { userData } = useUserProvider();
 
-	const { score } = userData ?? {};
+	const { userScores } = userData ?? {};
 
 	const locationName = userData?.location?.city
 		? `${userData?.location?.city}, ${userData?.location?.state}`
@@ -82,7 +82,7 @@ export default function SearchLayout() {
 						<HomeHeader
 							screenWidth={width}
 							location={locationName}
-							score={score}
+							score={userScores?.overallScore}
 						/>
 					),
 				}}

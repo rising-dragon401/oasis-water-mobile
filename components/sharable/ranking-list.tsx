@@ -171,9 +171,12 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 		[],
 	);
 	const [productType, setProductType] = useState<string>("");
-	const [byLocation, setByLocation] = useState(false);
 
 	const isAuthUser = uid === user?.uid;
+
+	console.log("categoryId", categoryId);
+	console.log("productType", productType);
+	console.log("defaultTags", defaultTags);
 
 	const fetchAndSetData = async (
 		key: string,
@@ -203,9 +206,6 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 
 		setLoading(false);
 	};
-
-	console.log("categoryId", categoryId);
-	console.log("defaultTags", defaultTags);
 
 	// Fetch items based on categoryId
 	useEffect(() => {
@@ -347,11 +347,26 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 	}, [selectedTags, selectedContaminants, allItems]);
 
 	const renderFilters = useCallback(() => {
+		const handleDropdownOpenChange = (
+			setOpenFunction: (open: boolean) => void,
+			isOpen: boolean,
+		) => {
+			if (!subscription) {
+				router.push("/subscribeModal");
+			} else {
+				setOpenFunction(isOpen);
+			}
+		};
+
 		return (
-			<View className="flex flex-row flex-wrap w-full justify-start pb-2 px-0 ml-0 gap-2">
+			<View
+				className={`flex flex-row flex-wrap w-full justify-start pb-2 px-0 ml-0 gap-2 `}
+			>
 				<DropdownMenu
 					open={openContaminantDropdown}
-					onOpenChange={setOpenContaminantDropdown}
+					onOpenChange={(isOpen) =>
+						handleDropdownOpenChange(setOpenContaminantDropdown, isOpen)
+					}
 					className=" rounded-xl "
 				>
 					<DropdownMenuTrigger asChild>
@@ -413,7 +428,9 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 
 				<DropdownMenu
 					open={openTypeDropdown}
-					onOpenChange={setOpenTypeDropdown}
+					onOpenChange={(isOpen) =>
+						handleDropdownOpenChange(setOpenTypeDropdown, isOpen)
+					}
 					className="rounded-xl "
 				>
 					<DropdownMenuTrigger asChild>
@@ -488,17 +505,19 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 						Want to know the best{" "}
 						{title.charAt(0).toLowerCase() + title.slice(1)} based on science?
 					</Muted>
-					<View className="flex flex-row items-center gap-2">
+					<View className="flex flex-row items-end justify-between w-full gap-6">
 						<Button
-							className="w-56 mt-2"
+							className="w-44 mt-2"
 							variant="default"
-							label="Show me the ratings"
+							label="Unlock ratings"
 							icon={<Octicons name="lock" size={16} color={backgroundColor} />}
 							iconPosition="left"
 							onPress={() => {
 								router.push("/subscribeModal");
 							}}
 						/>
+
+						{renderFilters()}
 					</View>
 				</View>
 			) : (

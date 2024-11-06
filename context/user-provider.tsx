@@ -38,6 +38,7 @@ interface UserContextType {
 		type?: "all" | "favorites" | "scores" | "subscription",
 	) => Promise<void>;
 	fetchUserFavorites: (uid: string | null) => Promise<void>;
+	fetchUserScores: (userTapId?: any) => Promise<void>;
 	fetchSubscription: (uid: string | null) => Promise<any | null>;
 	setSubscription: (value: boolean) => void;
 	fetchUserData: (uid: string | null) => Promise<any | null>;
@@ -121,6 +122,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
 	useEffect(() => {
 		if (userData && userData?.tap_location_id) {
+			// Each location needs lat/long to get nearest location
 			// addLatLongToEachLocation();
 
 			const tapLocationId = userData?.tap_location_id;
@@ -140,16 +142,20 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
 	const initUser = async (session: any) => {
 		setUserId(session.user?.id);
+		fetchUserData(session.user?.id);
 		setProvider(session.user?.app_metadata?.provider);
 	};
 
 	const fetchUserData = async (uid?: string | null) => {
+		console.log("fetching user data");
 		if (!uid) {
 			return;
 		}
 
 		const data = await getCurrentUserData(uid);
 		setUserData(data);
+
+		fetchUserFavorites(uid);
 	};
 
 	const fetchUserFavorites = async (uid: string | null) => {
@@ -180,8 +186,14 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 		return data;
 	};
 
-	const fetchUserScores = async (userTapId: any) => {
-		const data = await getUserTapScore(userTapId);
+	const fetchUserScores = async (userTapId?: any) => {
+		const tapId = userData?.tap_location_id;
+
+		if (!tapId) {
+			return;
+		}
+
+		const data = await getUserTapScore(tapId);
 
 		setTapScore(data);
 
@@ -241,6 +253,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 			bottledWaterScore: 0,
 			overallScore: 0,
 		});
+
 		setTapScore(null);
 	};
 
@@ -258,6 +271,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 			userScores,
 			refreshUserData,
 			fetchUserFavorites,
+			fetchUserScores,
 			fetchSubscription,
 			setSubscription,
 			fetchUserData,
@@ -276,6 +290,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 			userScores,
 			refreshUserData,
 			fetchUserFavorites,
+			fetchUserScores,
 			fetchSubscription,
 			setSubscription,
 			fetchUserData,

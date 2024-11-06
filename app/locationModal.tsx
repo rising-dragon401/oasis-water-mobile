@@ -2,12 +2,7 @@ import Feather from "@expo/vector-icons/Feather";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import {
-	KeyboardAvoidingView,
-	Platform,
-	TouchableOpacity,
-	View,
-} from "react-native";
+import { KeyboardAvoidingView, Platform, View } from "react-native";
 
 import { getNearestLocation } from "@/actions/admin";
 import { updateUserData } from "@/actions/user";
@@ -65,7 +60,7 @@ export default function LocationModal() {
 			latLong.latitude === undefined ||
 			latLong.longitude === undefined
 		) {
-			showToast("Unable to sync location");
+			// showToast("Unable to sync location");
 			return;
 		}
 
@@ -142,18 +137,18 @@ export default function LocationModal() {
 						<View className="flex flex-col items-center flex-grow flex-shrink  p-4 rounded-full mt-4 w-full">
 							<View className="flex flex-row items-center px-4 py-2 bg-muted rounded-full gap-2">
 								<Feather name="map-pin" size={14} color={iconColor} />
-								<P className="text-center">
+								<P className="text-center" numberOfLines={1}>
 									{userData.location.formattedAddress}
 								</P>
 							</View>
 						</View>
 
 						<View className="flex flex-col items-center flex-grow flex-shrink">
-							<Score score={tapScore?.score || 0} size="lg" />
+							<Score score={tapScore?.score || 0} size="xl" showScore />
 							<Button
 								label={tapScore?.name}
 								variant="outline"
-								className="mb-0"
+								className="mb-0 mt-4"
 								onPress={() => {
 									router.back();
 									router.push(`/search/location/${userData?.tap_location_id}`);
@@ -163,7 +158,7 @@ export default function LocationModal() {
 								}
 							/>
 							<Muted className="mt-2">
-								(This is the tested tap water to your address)
+								Tap water test results closest to your location
 							</Muted>
 						</View>
 
@@ -221,7 +216,7 @@ export default function LocationModal() {
 					{refetched && <Muted className="">Refetched location data!</Muted>}
 				</View>
 
-				<View className="absolute top-10 left-8">
+				{/* <View className="absolute top-10 left-8">
 					<TouchableOpacity
 						style={{
 							justifyContent: "center",
@@ -237,7 +232,7 @@ export default function LocationModal() {
 							style={{ transform: [{ rotate: "45deg" }] }}
 						/>
 					</TouchableOpacity>
-				</View>
+				</View> */}
 			</View>
 		</KeyboardAvoidingView>
 	);

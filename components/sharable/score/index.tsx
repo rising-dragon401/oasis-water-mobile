@@ -51,7 +51,7 @@ export default function Score({
 				: size === "md"
 					? 10
 					: size === "sm"
-						? 8
+						? 6
 						: size === "xs"
 							? 4
 							: 6;
@@ -203,7 +203,7 @@ export default function Score({
 				{score !== null ? (
 					<P
 						style={{ fontSize }}
-						className={size === "xl" || size === "lg" ? "pt-2" : ""}
+						className={size === "xl" || size === "lg" ? "pt-8" : ""}
 					>
 						{score} / 100
 					</P>
@@ -218,7 +218,7 @@ export default function Score({
 					<Typography
 						size={gradeTextSize}
 						fontWeight="normal"
-						className="text-primary"
+						className="text-muted "
 					>
 						{grade()}
 					</Typography>

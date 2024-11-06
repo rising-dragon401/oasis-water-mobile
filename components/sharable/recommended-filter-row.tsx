@@ -3,14 +3,14 @@ import { getRecommendedFilter } from "actions/filters";
 import { H3, Muted } from "components/ui/typography";
 import { Image } from "expo-image";
 import { Link, useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { FlatList, TouchableOpacity, View } from "react-native";
 
 import ItemPreviewCard from "./item-preview-card";
 
 import { Button } from "@/components/ui/button";
 import { useUserProvider } from "@/context/user-provider";
-import { BLUR_IMAGE_PLACEHOLDER } from "@/lib/constants/images";
+import { RANDOM_BLUR_IMAGES } from "@/lib/constants/images";
 
 type RecommendedFilterRowProps = {
 	contaminants: any[];
@@ -34,6 +34,16 @@ export default function RecommendedFilterRow({
 	useEffect(() => {
 		fetchRecommendedFilter();
 	}, [subscription]);
+
+	const randomBlurs = useMemo(() => {
+		return Array.from(
+			{ length: 5 },
+			() =>
+				RANDOM_BLUR_IMAGES[
+					Math.floor(Math.random() * RANDOM_BLUR_IMAGES.length)
+				],
+		);
+	}, []);
 
 	return (
 		<View className="mb-10 mt-6 ml-2">
@@ -66,7 +76,7 @@ export default function RecommendedFilterRow({
 							height: "100%",
 						}}
 						className="overflow-x-scroll w-full"
-						renderItem={() => (
+						renderItem={({ item, index }) => (
 							<TouchableOpacity
 								className="mr-4 w-44 h-44 "
 								onPress={() => {
@@ -74,13 +84,13 @@ export default function RecommendedFilterRow({
 								}}
 							>
 								<Image
-									source={BLUR_IMAGE_PLACEHOLDER}
+									source={randomBlurs[index]}
 									style={{
-										borderRadius: 18,
+										borderRadius: 14,
 										width: "100%",
 										height: "100%",
 									}}
-									contentFit="cover"
+									contentFit="contain"
 									transition={1000}
 								/>
 							</TouchableOpacity>

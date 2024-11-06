@@ -6,9 +6,15 @@ type ItemImageProps = {
 	src: string;
 	alt: string;
 	thing: any;
+	showFavorite?: boolean;
 };
 
-export default function ItemImage({ src, alt, thing }: ItemImageProps) {
+export default function ItemImage({
+	src,
+	alt,
+	thing,
+	showFavorite = true,
+}: ItemImageProps) {
 	return (
 		<View
 			style={{ position: "relative", width: "100%", height: "100%" }}
@@ -20,9 +26,11 @@ export default function ItemImage({ src, alt, thing }: ItemImageProps) {
 				style={{ width: "100%", height: "100%", borderRadius: 8 }}
 				transition={1000}
 			/>
-			<View style={{ position: "absolute", top: 10, right: 10, zIndex: 99 }}>
-				<FavoriteButton item={thing} />
-			</View>
+			{showFavorite && (
+				<View style={{ position: "absolute", top: 10, right: 10, zIndex: 99 }}>
+					<FavoriteButton item={thing} />
+				</View>
+			)}
 		</View>
 	);
 }

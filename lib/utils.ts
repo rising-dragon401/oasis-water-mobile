@@ -26,3 +26,21 @@ export const determineLink = (item: any) => {
 
 	return basePath;
 };
+
+export const readableType = (type: string) => {
+	if (type === "tap_water") {
+		return "Tap water";
+	} else if (type === "filter") {
+		return "Filter";
+	} else if (type === "company") {
+		return "Company";
+	} else if (type === "item") {
+		return "Bottled water";
+	} else if (type === "bottle_filter") {
+		return "Filter";
+	} else if (type === "category") {
+		return "Category";
+	} else {
+		return "Bottled water";
+	}
+};

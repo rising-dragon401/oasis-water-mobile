@@ -238,9 +238,9 @@ export default function TabOneScreen() {
 								renderItem={() => (
 									<View className="mr-4">
 										<Skeleton
-											width={80}
-											height={80}
-											style={{ borderRadius: 12 }}
+											width={100}
+											height={100}
+											style={{ borderRadius: 14 }}
 										/>
 									</View>
 								)}
@@ -531,7 +531,7 @@ export default function TabOneScreen() {
 											style={{ maxHeight: 80, width: "100%" }}
 										>
 											<Link
-												href={`/search/top-rated/${category.typeId}?tags=${category.tags?.join(",")}`}
+												href={`/search/top-rated/${category.typeId}?tags=${category.selectedTags}`}
 											>
 												<View className="flex flex-row items-center  px-2 justify-between w-full">
 													<View className="flex flex-row items-center gap-2 py-2">

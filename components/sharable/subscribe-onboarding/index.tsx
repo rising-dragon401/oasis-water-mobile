@@ -1,25 +1,28 @@
 import Feather from "@expo/vector-icons/Feather";
 import { ScrollView, TouchableOpacity, View } from "react-native";
 
+import ScoreCard from "@/components/sharable/score-card";
 import { Muted, P } from "@/components/ui/typography";
+import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 const FEATURES = [
 	{
-		label: "Access to all scores and rankings",
+		label: "Access to all scores",
 	},
 	{
 		label: "Unlimited scans and searches",
 	},
+	// {
+	// 	label: "Highest rated waters",
+	// },
 	{
 		label: "Filter recommendations",
 	},
 	{
 		label: "Contaminant breakdowns and analysis",
 	},
-	{
-		label: "Oasis Research AI",
-	},
+
 	// {
 	// 	label: "Support further testing",
 	// },
@@ -33,6 +36,7 @@ export function SubscribeOnboarding({
 	selectedPlan: string;
 }) {
 	const { accentColor } = useColorScheme();
+	const { tapScore } = useUserProvider();
 
 	return (
 		<ScrollView
@@ -44,13 +48,23 @@ export function SubscribeOnboarding({
 			}}
 		>
 			<View className="w-full items-center flex flex-co mt-6">
+				<View className="flex flex-row w-full gap-4 mb-4">
+					<ScoreCard
+						score={tapScore?.score || 0}
+						title="Your water score"
+						description="Contaminants, microplastics, and minerals found in your water"
+						onPress={() => {}}
+						type="small_row"
+						scoreLocked
+					/>
+				</View>
 				<View className="gap-y-6 w-full rounded-lg border border-border px-4 py-4">
 					{FEATURES.map((feature, index) => (
 						<View
 							key={index}
 							className="flex flex-row gap-5 w-full items-center"
 						>
-							<Feather name="check" size={28} color={accentColor} />
+							<Feather name="check" size={32} color={accentColor} />
 							<P className="text-center text-lg">{feature.label}</P>
 						</View>
 					))}

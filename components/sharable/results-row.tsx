@@ -1,5 +1,5 @@
 import { Image } from "expo-image";
-import { Link } from "expo-router";
+import { useRouter } from "expo-router";
 import React from "react";
 import { FlatList, TouchableOpacity, View } from "react-native";
 
@@ -7,39 +7,41 @@ import { Muted, P } from "@/components/ui/typography";
 import { useToast } from "@/context/toast-provider";
 import { placeHolderImageBlurHash } from "@/lib/constants/images";
 import { useColorScheme } from "@/lib/useColorScheme";
-import { determineLink } from "@/lib/utils";
+import { determineLink, readableType } from "@/lib/utils";
 
 type Props = {
 	results: any[];
 	noResults?: boolean;
+	overridePress?: (item: any) => void;
+	setResults?: (results: any[]) => void;
 };
 
-export default function ResultsRow({ results, noResults }: Props) {
+export default function ResultsRow({
+	results,
+	noResults,
+	overridePress,
+	setResults,
+}: Props) {
 	const { colorScheme } = useColorScheme();
 	const showToast = useToast();
-
+	const router = useRouter();
 	const borderColor = colorScheme === "dark" ? "#333" : "#ddd";
 
-	const readableType = (type: string) => {
-		if (type === "tap_water") {
-			return "Tap water";
-		} else if (type === "filter") {
-			return "Filter";
-		} else if (type === "company") {
-			return "Company";
-		} else if (type === "item") {
-			return "Bottled water";
-		} else if (type === "bottle_filter") {
-			return "Filter";
-		} else if (type === "category") {
-			return "Category";
-		} else {
-			return "Bottled water";
-		}
+	const handleRequestItem = () => {
+		showToast("Added to our testing list. Thanks!", 2000, "top");
 	};
 
-	const handleRequestItem = () => {
-		showToast("Noted. Added to the list ✅", 2000, "top");
+	const handleItemPress = async (item: any) => {
+		if (overridePress) {
+			overridePress(item);
+			if (setResults) {
+				setResults([]);
+			}
+		} else {
+			const link = await determineLink(item);
+			// @ts-ignore
+			router.push(link);
+		}
 	};
 
 	return (
@@ -83,10 +85,7 @@ export default function ResultsRow({ results, noResults }: Props) {
 						keyExtractor={(item) => item.id.toString()}
 						renderItem={({ item: result }) => (
 							<View>
-								<Link
-									// @ts-ignore
-									href={determineLink(result)}
-								>
+								<TouchableOpacity onPress={() => handleItemPress(result)}>
 									<View
 										className={`flex flex-row items-center justify-between w-full p-2
 											${result.type === "category" && ""}
@@ -124,7 +123,7 @@ export default function ResultsRow({ results, noResults }: Props) {
 											</View>
 										</View>
 									</View>
-								</Link>
+								</TouchableOpacity>
 							</View>
 						)}
 						nestedScrollEnabled

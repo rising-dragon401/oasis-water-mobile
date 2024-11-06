@@ -320,6 +320,7 @@ export const getCategoryCounts = async () => {
 			typeId: category.typeId,
 			image: category.image,
 			count: filteredData.length,
+			selectedTags: category.selectedTags,
 		});
 	}
 

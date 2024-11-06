@@ -1,6 +1,7 @@
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { getLocationDetails, updateLocationScore } from "actions/locations";
 import { useNavigation } from "expo-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ScrollView, View } from "react-native";
 
 import BlurredLineItem from "./blurred-line-item";
@@ -11,8 +12,10 @@ import Score from "./score";
 
 import { incrementItemsViewed } from "@/actions/user";
 import Skeleton from "@/components/sharable/skeleton";
+import { Button } from "@/components/ui/button";
 import { H2, Large } from "@/components/ui/typography";
 import { useUserProvider } from "@/context/user-provider";
+import { useColorScheme } from "@/lib/useColorScheme";
 
 type Props = {
 	id: string;
@@ -21,6 +24,8 @@ type Props = {
 export function LocationForm({ id }: Props) {
 	const navigation = useNavigation();
 	const { uid } = useUserProvider();
+	const { iconColor } = useColorScheme();
+	const scrollViewRef = useRef<ScrollView>(null);
 
 	const [location, setLocation] = useState<any>({});
 	const [isLoading, setIsLoading] = useState(true);
@@ -69,6 +74,13 @@ export function LocationForm({ id }: Props) {
 		return location?.utilities?.length > 0 ? location?.utilities[0] : null;
 	}, [location?.utilities]);
 
+	const handleRecommendedFilterPress = () => {
+		scrollViewRef.current?.scrollTo({
+			y: 1000, // Adjust this value to the correct position of the RecommendedFilterRow
+			animated: true,
+		});
+	};
+
 	if (isLoading)
 		return (
 			<View className="flex-1 px-4 py-4">
@@ -114,19 +126,21 @@ export function LocationForm({ id }: Props) {
 			contentContainerStyle={{
 				paddingBottom: 80,
 			}}
+			ref={scrollViewRef}
 		>
 			<View className="flex-col flex w-full px-4">
 				<View className="pb pt-2 -6 px-2">
-					<View className="flex flex-col items-center gap-6 w-full">
+					<View className="flex flex-col items-center justify-center gap-6 w-full">
 						<View className="flex justify-center items-center h-48 w-48">
 							<ItemImage
 								src={location.image}
 								alt={location.name}
 								thing={location}
+								showFavorite={false}
 							/>
 						</View>
 
-						<View className="flex flex-row w-full justify-between gap-6">
+						<View className="flex flex-row w-full justify-between items-start gap-6">
 							<View className="flex flex-col !w-3/5">
 								<H2>{location.name}</H2>
 
@@ -140,6 +154,16 @@ export function LocationForm({ id }: Props) {
 									label="Above guidelines"
 									value={contaminantsAboveLimit.length}
 									score={contaminantsAboveLimit.length > 1 ? "bad" : "good"}
+								/>
+
+								<Button
+									variant="outline"
+									onPress={handleRecommendedFilterPress}
+									className="w-56 !h-10 !py-0 my-4"
+									icon={
+										<Ionicons name="arrow-down" size={16} color={iconColor} />
+									}
+									label="Recommended filter"
 								/>
 							</View>
 

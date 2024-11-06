@@ -55,7 +55,7 @@ const ItemPreviewCard = ({
 				<Image
 					source={{ uri: randomBlurImage }}
 					style={imageStyle}
-					className="rounded-xl bg-white px-2 pt-0 pb-8 "
+					className="rounded-xl bg-white px-2 pt-0 pb-8"
 					transition={100}
 					cachePolicy="memory-disk"
 					placeholder={{ blurhash: placeHolderImageBlurHash }}
@@ -66,7 +66,7 @@ const ItemPreviewCard = ({
 				<Image
 					source={{ uri: item.image }}
 					style={imageStyle}
-					className="rounded-xl bg-white px-2 pt-0 pb-8 "
+					className="rounded-xl bg-white px-2 pt-0 pb-8"
 					transition={100}
 					cachePolicy="memory-disk"
 					placeholder={{ blurhash: placeHolderImageBlurHash }}
@@ -109,13 +109,17 @@ const ItemPreviewCard = ({
 		// @ts-ignore
 		<Link href={showData ? determineLink(item) : "/subscribeModal"}>
 			<View className="relative w-full aspect-square rounded-2xl overflow-hidden">
-				<View className="flex justify-center items-center w-full h-full ">
+				<View
+					className={`flex justify-center items-center w-full h-full 
+						${showData && "p-4 pb-6 bg-white rounded-xl"}
+					`}
+				>
 					{renderImage()}
 				</View>
 
 				{showData ? (
 					<P
-						className="absolute bottom-2 left-2 bg-opacity-50 px-2 flex-wrap"
+						className="absolute bottom-2 left-2 bg-opacity-50 px-2 flex-wrap leading-tight"
 						numberOfLines={2}
 					>
 						{item.name}
@@ -142,7 +146,7 @@ const ItemPreviewCard = ({
 					</>
 				)}
 
-				<View className="absolute top-2 right-4 z-10">
+				<View className="absolute top-2 right-4 z-10 mt-1">
 					{subscription ? (
 						item.score ? (
 							renderScore()

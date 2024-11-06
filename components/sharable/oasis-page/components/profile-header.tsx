@@ -1,5 +1,6 @@
 import Feather from "@expo/vector-icons/Feather";
 import * as Linking from "expo-linking";
+import { useRouter } from "expo-router";
 import { TouchableOpacity, View } from "react-native";
 
 import Score from "@/components/sharable/score";
@@ -14,15 +15,17 @@ export default function ProfileHeader({
 	showSocials,
 	showScore = true,
 	showBio = true,
+	isAuthUser = false,
 }: {
 	profileData: any;
 	showSocials?: boolean;
 	showScore?: boolean;
 	showBio?: boolean;
+	isAuthUser?: boolean;
 }) {
 	const { iconColor } = useColorScheme();
-	const { uid, userFavorites } = useUserProvider();
-
+	const { uid, userFavorites, userScores, subscription } = useUserProvider();
+	const router = useRouter();
 	const scoreTooltipContent = () => {
 		if (!uid) {
 			return "Login to see your score";
@@ -94,9 +97,9 @@ export default function ProfileHeader({
 			<View>
 				{showScore && (
 					<Score
-						score={profileData?.score || 0}
+						score={profileData?.score || userScores?.overallScore || 0}
 						size={scoreSize}
-						showScore
+						showScore={subscription}
 						showTooltip
 						tooltipContent={scoreTooltipContent()}
 					/>

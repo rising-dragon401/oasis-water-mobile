@@ -34,7 +34,7 @@ const LocationSelector = ({
 			const data = response.data;
 
 			if (data.status === "OK") {
-				setResults(data.predictions.slice(0, 5)); // Limit to top 5 results
+				setResults(data.predictions.slice(0, 4));
 				setError(null);
 			} else {
 				setResults([]);
@@ -119,7 +119,9 @@ const LocationSelector = ({
 			<View className="relative">
 				<Input
 					className="border border-gray-300 p-3 mb-0 rounded-xl  pr-10 !h-16 w-96"
-					placeholder={initialAddress || "Enter address"}
+					placeholder={
+						initialAddress || address?.formattedAddress || "Enter address"
+					}
 					value={input}
 					onChangeText={setInput}
 				/>
@@ -131,7 +133,7 @@ const LocationSelector = ({
 			</View>
 
 			{results.length > 0 && !address && (
-				<View className="border border-gray-300 rounded-lg mb-5 max-h-60 overflow-y-auto">
+				<View className="border border-gray-300 rounded-lg mb-5 max-h-60 overflow-y-scroll">
 					{results.map((result, index) => (
 						<TouchableOpacity
 							key={result.place_id}

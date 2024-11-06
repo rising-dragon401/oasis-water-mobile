@@ -1,8 +1,9 @@
+import Octicons from "@expo/vector-icons/Octicons";
 import React from "react";
 import { TouchableOpacity, View } from "react-native";
 
-import Score from "@/components/sharable/score";
-import { H3, Muted, P } from "@/components/ui/typography";
+import { Muted, P } from "@/components/ui/typography";
+import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function ScoreCard({
 	title,
@@ -12,6 +13,10 @@ export default function ScoreCard({
 	type = "large_row",
 	healthEffects,
 	icon,
+	scoreLocked = false,
+	totalContaminants = 0,
+	totalContaminantsAboveLimit = 0,
+	totalHealthRisks = 0,
 }: {
 	title: string;
 	description: string;
@@ -20,7 +25,13 @@ export default function ScoreCard({
 	type?: "square" | "large_row" | "small_row";
 	healthEffects?: any[];
 	icon?: React.ReactNode;
+	scoreLocked?: boolean;
+	totalContaminants?: number;
+	totalContaminantsAboveLimit?: number;
+	totalHealthRisks?: number;
 }) {
+	const { iconColor } = useColorScheme();
+
 	const ratingColor =
 		score > 70
 			? "text-green-300"
@@ -30,8 +41,6 @@ export default function ScoreCard({
 
 	const textColor = "text-stone-800";
 
-	const circle = <View className="w-4 h-4 bg-red-200 rounded-full" />;
-
 	if (type === "square") {
 		return (
 			<TouchableOpacity
@@ -40,8 +49,19 @@ export default function ScoreCard({
 			>
 				<P className="text-lg">{title}</P>
 
+				{totalContaminants > 0 && (
+					<View className="flex-row gap-2">
+						<View className="w-4 h-4 bg-red-400 rounded-full" />
+						<P>{totalContaminants} contaminants detected</P>
+					</View>
+				)}
+
 				<View className="flex-row justify-between items-end">
-					<P className="text-5xl">{score}</P>
+					{scoreLocked ? (
+						<Octicons name="lock" size={24} color={iconColor} />
+					) : (
+						<P className="text-5xl">{score}</P>
+					)}
 					<Muted>/ 100</Muted>
 				</View>
 			</TouchableOpacity>
@@ -52,14 +72,19 @@ export default function ScoreCard({
 				onPress={onPress}
 				className="flex-1 w-full h-24 flex-row bg-card rounded-xl pl-4 pr-2 pt-4 pb-2  justify-between items-end border border-border"
 			>
-				<View className="flex flex-col h-full justify-between">
+				<View className="flex flex-col h-full justify-between flex-wrap">
 					{icon}
 					<P className="text-lg">{title}</P>
+					<Muted className="flex-wrap w-64">{description}</Muted>
 				</View>
 
 				<View className="flex flex-col justify-end pr-4">
 					<View className="flex-row items-end justify-end gap-1">
-						<P className="text-5xl !mb-0 !pb-0">{score}</P>
+						{scoreLocked ? (
+							<Octicons name="lock" size={28} color={iconColor} />
+						) : (
+							<P className="text-5xl">{score}</P>
+						)}
 
 						<Muted>/ 100</Muted>
 					</View>
@@ -71,14 +96,41 @@ export default function ScoreCard({
 	return (
 		<TouchableOpacity
 			onPress={onPress}
-			className="flex-1 w-full h-40 items-center justify-center rounded-xl px-4 py-4 bg-card"
+			className="flex-1 w-full h-44 flex-row bg-card rounded-xl pl-4 pr-2 pt-4 pb-4  justify-between items-end border border-border"
 		>
-			<View className="flex-row justify-between items-start px-4 py-4 w-full">
-				<View>
-					<H3 className="font-bold mb-2">{title}</H3>
-					<P className="text-sm opacity-80">{description}</P>
+			<View className="flex flex-col h-full justify-between">
+				{icon}
+				<P className="text-lg">{title}</P>
+
+				{scoreLocked && (
+					<View className="flex-col gap-2">
+						<View className="flex-row gap-2 items-center">
+							<View className="w-4 h-4 bg-red-400 rounded-full" />
+							<P>contaminants detected</P>
+						</View>
+						<View className="flex-row gap-2 items-center">
+							<View className="w-4 h-4 bg-red-400 rounded-full" />
+							<P>above guidelines</P>
+						</View>
+
+						<View className="flex-row gap-2 items-center">
+							<View className="w-4 h-4 bg-red-400 rounded-full" />
+							<P>health risks</P>
+						</View>
+					</View>
+				)}
+			</View>
+
+			<View className="flex flex-col justify-end pr-4">
+				<View className="flex-row items-end justify-end gap-1">
+					{scoreLocked ? (
+						<Octicons name="lock" size={36} color={iconColor} />
+					) : (
+						<P className="text-5xl">{score}</P>
+					)}
+
+					<Muted>/ 100</Muted>
 				</View>
-				<Score score={score} size="xs" />
 			</View>
 		</TouchableOpacity>
 	);

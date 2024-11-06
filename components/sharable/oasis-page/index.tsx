@@ -14,7 +14,7 @@ import {
 } from "@/actions/user";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Large, Muted, P } from "@/components/ui/typography";
+import { H1, Large, Muted, P } from "@/components/ui/typography";
 
 // const ITEM_CATEGORIES = [
 // 	{
@@ -156,7 +156,9 @@ export default function OasisPage({
 
 	return (
 		<View>
-			<ProfileHeader profileData={profileData} />
+			{isAuthUser && <H1 className="mt-24 mb-4">Products</H1>}
+
+			<ProfileHeader profileData={profileData} isAuthUser={isAuthUser} />
 
 			<View className="flex flex-col mt-4">
 				<Tabs value={tabValue} onValueChange={setTabValue}>

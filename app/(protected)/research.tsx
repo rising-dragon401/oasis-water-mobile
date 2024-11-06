@@ -8,7 +8,7 @@ import { FlatList, TouchableOpacity, View } from "react-native";
 import { getResearch } from "@/actions/admin";
 import Skeleton from "@/components/sharable/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { H1, Muted, P } from "@/components/ui/typography";
+import { H1, Large, Muted, P } from "@/components/ui/typography";
 import { BlogContext } from "@/context/blogs-provider";
 import { useUserProvider } from "@/context/user-provider";
 import { theme } from "@/lib/constants";
@@ -20,7 +20,7 @@ export default function ResearchScreen() {
 	const { blogs } = useContext(BlogContext);
 	const router = useRouter();
 
-	const [tabValue, setTabValue] = useState("articles");
+	const [tabValue, setTabValue] = useState("labTesting");
 	const [research, setResearch] = useState<any[]>([]);
 
 	const backgroundColor =
@@ -54,11 +54,9 @@ export default function ResearchScreen() {
 	};
 
 	return (
-		<View className="flex-1 justify-between px-4" style={{ backgroundColor }}>
+		<View className="flex-1 justify-between px-8" style={{ backgroundColor }}>
 			<H1 className="mt-24">Research</H1>
-			<Muted>
-				Stay current with scientific advances in product health and safety
-			</Muted>
+			<Muted>Stay current with product testing and research</Muted>
 			{/* 
 			<Button
 				label="Ask Oasis AI"
@@ -79,6 +77,17 @@ export default function ResearchScreen() {
 
 			<Tabs value={tabValue} onValueChange={setTabValue} className="mt-4">
 				<TabsList className="mb-1">
+					<TabsTrigger value="labTesting">
+						<P
+							className={`${
+								tabValue === "labTesting"
+									? "text-secondary-foreground"
+									: "text-primary"
+							}`}
+						>
+							Lab Testing
+						</P>
+					</TabsTrigger>
 					<TabsTrigger value="articles">
 						<P
 							className={`${
@@ -102,6 +111,23 @@ export default function ResearchScreen() {
 						</P>
 					</TabsTrigger>
 				</TabsList>
+
+				<TabsContent value="labTesting">
+					<View className="flex-col justify-start h-full mt-2">
+						<Large>🚧 Coming Soon 🚧 </Large>
+						<P className="mt-2">
+							Track the progress of our current lab testing and vote on the
+							products we should test next.
+						</P>
+						{/* <Large>In Progress</Large>
+						<Muted>
+							Our lab testing is currently in development. Check back soon!
+						</Muted>
+
+						<Large>Funding</Large>
+						<Muted>Contribute to future lab testing and research.</Muted> */}
+					</View>
+				</TabsContent>
 
 				<TabsContent value="articles">
 					<View className="flex-col">
