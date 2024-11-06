@@ -2,7 +2,6 @@ import Feather from "@expo/vector-icons/Feather";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Alert, GestureResponderEvent, TouchableOpacity } from "react-native";
-import { mutate } from "swr";
 
 import {
 	addFavorite,
@@ -18,10 +17,9 @@ type Props = {
 };
 
 export default function FavoriteButton({ item, size = 18 }: Props) {
-	const { userFavorites, uid, userData, fetchUserFavorites } =
-		useUserProvider();
+	const { userFavorites, uid, userData, refreshUserData } = useUserProvider();
 	const router = useRouter();
-	const { iconColor, mutedForegroundColor } = useColorScheme();
+	const { iconColor } = useColorScheme();
 
 	const [loadingFavorite, setLoadingFavorite] = useState(false);
 	const [isItemInFavorites, setIsItemInFavorites] = useState(false);
@@ -65,9 +63,10 @@ export default function FavoriteButton({ item, size = 18 }: Props) {
 				await addFavorite(uid, item.type, item.id);
 			}
 
-			await calculateUserScore(uid);
-			mutate(`userFavorites-${uid}`);
-			fetchUserFavorites(uid);
+			refreshUserData("favorites");
+			calculateUserScore(uid);
+			// mutate(`userFavorites-${uid}`);
+			// fetchUserFavorites(uid);
 		} catch (error) {
 			console.error("Error updating favorites", error);
 		}

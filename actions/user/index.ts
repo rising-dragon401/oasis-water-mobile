@@ -1,4 +1,5 @@
 import { supabase } from "@/config/supabase";
+import { ITEM_TYPES } from "@/lib/constants/categories";
 import { HEALTH_EFFECTS } from "@/lib/constants/health-effects";
 
 export async function getCurrentUserData(uid?: string) {
@@ -139,11 +140,19 @@ export async function getUserFavorites(uid: string) {
 		throw new Error("Error fetching unique favorites");
 	}
 
+	const bottledWaterTypes = ITEM_TYPES.filter(
+		(item) => item.id === "water",
+	).flatMap((item) => item.dbTypes);
+
+	const filterTypes = ITEM_TYPES.filter((item) => item.id === "filter").flatMap(
+		(item) => item.dbTypes,
+	);
+
 	// go through each favorite and get the data for the favorite. If type is 'bottled_water' search items table. If type is 'tap_water_locations'. If type is 'filter' search water_filters table.
 	const favorites = await Promise.all(
 		uniqueFavorites.map(async (favorite) => {
 			let result;
-			if (favorite.type === "bottled_water") {
+			if (bottledWaterTypes.includes(favorite.type)) {
 				const { data, error } = await supabase
 					.from("items")
 					.select("*")
@@ -155,7 +164,7 @@ export async function getUserFavorites(uid: string) {
 				}
 
 				result = data;
-			} else if (favorite.type === "filter") {
+			} else if (filterTypes.includes(favorite.type)) {
 				const { data, error } = await supabase
 					.from("water_filters")
 					.select("*")
@@ -310,8 +319,6 @@ export async function manageSubscriptionStatusChange(
 		const provider = "revenue_cat";
 		const entitlements = rcVustomerInfo.entitlements;
 
-		console.log("entitlements", JSON.stringify(entitlements, null, 2));
-
 		const proEntitlement = entitlements?.all?.pro;
 		const proIsActive = proEntitlement?.isActive === true || false;
 		const productIdentifier = proEntitlement?.productIdentifier || null;
@@ -383,7 +390,7 @@ export async function manageSubscriptionStatusChange(
 
 		const subscriptionId = identifiedSubId ? identifiedSubId : newSubId;
 
-		console.log("subscriptionId", subscriptionId);
+		// console.log("subscriptionId", subscriptionId);
 		console.log("hasExistingSubscription", hasExistingSubscription);
 		console.log("status", status);
 
@@ -450,6 +457,7 @@ export async function manageSubscriptionStatusChange(
 }
 
 export async function addFavorite(uid: string, type: any, itemId: number) {
+	console.log("addFavorite", uid, type, itemId);
 	// Insert the new favorite
 	const { data, error } = await supabase
 		.from("favorites")

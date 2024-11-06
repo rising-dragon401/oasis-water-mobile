@@ -47,7 +47,11 @@ export default function ProfileHeader({
 					</Avatar>
 
 					<View className="flex flex-col">
-						<H3 className="mb-0 pb-0">{profileData?.full_name || "Name"}</H3>
+						{uid && (
+							<H3 className="mb-0 pb-0">
+								{profileData?.full_name || "Unknown"}
+							</H3>
+						)}
 
 						{profileData?.username && (
 							<Muted className="py-0 my-0">@{profileData?.username}</Muted>

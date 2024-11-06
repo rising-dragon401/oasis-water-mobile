@@ -23,11 +23,11 @@ export default function ItemImage({
 			<Image
 				source={src}
 				accessibilityLabel={alt}
-				style={{ width: "100%", height: "100%", borderRadius: 8 }}
+				style={{ width: "100%", height: "100%", borderRadius: 14 }}
 				transition={500}
 			/>
 			{showFavorite && (
-				<View style={{ position: "absolute", top: 10, right: 10, zIndex: 99 }}>
+				<View style={{ position: "absolute", top: 12, right: 12, zIndex: 99 }}>
 					<FavoriteButton item={thing} />
 				</View>
 			)}

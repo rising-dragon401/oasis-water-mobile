@@ -43,10 +43,10 @@ const ItemPreviewCard = ({
 
 	const renderImage = () => {
 		const imageStyle = {
-			width: 100,
-			height: 100,
+			width: "100%",
+			height: "100%",
 			aspectRatio: 1,
-			contentFit: "contain",
+			contentFit: "cover",
 			borderRadius: 10,
 		};
 
@@ -54,8 +54,9 @@ const ItemPreviewCard = ({
 			return (
 				<Image
 					source={{ uri: randomBlurImage }}
+					// @ts-ignore
 					style={imageStyle}
-					className="rounded-xl bg-white"
+					className="rounded-xl "
 					transition={100}
 					cachePolicy="memory-disk"
 					placeholder={{ blurhash: placeHolderImageBlurHash }}
@@ -66,8 +67,9 @@ const ItemPreviewCard = ({
 			return (
 				<Image
 					source={{ uri: item.image }}
+					// @ts-ignore
 					style={imageStyle}
-					className="rounded-xl bg-white "
+					className="rounded-xl pb-2"
 					transition={100}
 					cachePolicy="memory-disk"
 					placeholder={{ blurhash: placeHolderImageBlurHash }}
@@ -112,8 +114,8 @@ const ItemPreviewCard = ({
 		<Link href={showData ? determineLink(item) : "/subscribeModal"}>
 			<View className="relative w-full aspect-square rounded-2xl overflow-hidden">
 				<View
-					className={`flex justify-center items-center w-full h-full 
-						${showData && "p-4 pb-6 bg-white rounded-xl"}
+					className={`flex justify-center items-center w-full h-full bg-white
+						${showData && "p-4 pb-6 rounded-xl"}
 					`}
 				>
 					{renderImage()}

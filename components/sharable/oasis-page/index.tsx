@@ -2,7 +2,6 @@ import { useUserProvider } from "context/user-provider";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { FlatList, View } from "react-native";
-import useSWR from "swr";
 
 import ItemPreviewCard from "../item-preview-card";
 import ProfileHeader from "./components/profile-header";
@@ -54,23 +53,25 @@ export default function OasisPage({
 	const [profileData, setProfileData] = useState<any>(null);
 	const [tabValue, setTabValue] = useState(defaultTab || "all");
 	const [recommendedProducts, setRecommendedProducts] = useState<any>(null);
+	const [favorites, setFavorites] = useState<any>([]);
 
 	const isAuthUser = userId === uid;
 
 	const fetchUserFavorites = async () => {
 		const favorites = await getUserFavorites(userId || "");
-		return favorites;
+		setFavorites(favorites);
 	};
 
-	const { data: favorites } = useSWR(
-		`userFavorites-${userId}`,
-		fetchUserFavorites,
-	);
+	// const { data: favorites } = useSWR(
+	// 	`userFavorites-${userId}`,
+	// 	fetchUserFavorites,
+	// );
 
 	// load user favorites
 	useEffect(() => {
 		if (userId) {
 			fetchThisUserData(userId);
+			fetchUserFavorites();
 		}
 	}, [userId]);
 
@@ -111,11 +112,11 @@ export default function OasisPage({
 	}, [defaultTab]);
 
 	const filterFavorites = useMemo(() => {
-		return favorites?.filter((item) => FILTER_TYPES.includes(item.type));
+		return favorites?.filter((item: any) => FILTER_TYPES.includes(item.type));
 	}, [favorites]);
 
 	const waterFavorites = useMemo(() => {
-		return favorites?.filter((item) => WATER_TYPES.includes(item.type));
+		return favorites?.filter((item: any) => WATER_TYPES.includes(item.type));
 	}, [favorites]);
 
 	const renderNoAccount = ({
@@ -156,7 +157,7 @@ export default function OasisPage({
 
 	return (
 		<View>
-			{isAuthUser && <H1 className="mt-24 mb-4">Products</H1>}
+			{isAuthUser && <H1 className="mt-24 mb-6">Products</H1>}
 
 			<ProfileHeader profileData={profileData} isAuthUser={isAuthUser} />
 
