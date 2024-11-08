@@ -130,9 +130,12 @@ export function ItemForm({ id }: Props) {
 							<H2 className="pb-1">{item.name}</H2>
 
 							{/* @ts-ignore */}
-							<Link href={`/search/company/${item.company?.name}`}>
+							<Link href={`/search/company/${item.company?.id}`}>
 								<Muted>{item.company?.name}</Muted>
 							</Link>
+							{/* <Link href={`/search/company/${item.company?.id}`}>
+								<Muted>{item.brand?.name}</Muted>
+							</Link> */}
 						</View>
 
 						<View className="flex w-1/3 flex-col-reverse justify-end items-end -mt-2">
@@ -310,8 +313,8 @@ export function ItemForm({ id }: Props) {
 									item.filtration_methods.length > 0
 										? item.filtration_methods.join(", ") +
 											". " +
-											item.metadata?.treatment_process
-										: item.metadata?.treatment_process
+											(item.metadata?.treatment_process || "Unknown")
+										: item.metadata?.treatment_process || "Unknown"
 								}
 							/>
 						</View>

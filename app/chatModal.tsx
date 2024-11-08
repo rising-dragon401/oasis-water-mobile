@@ -18,7 +18,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { H3, Muted } from "@/components/ui/typography";
 import { useUserProvider } from "@/context/user-provider";
-import useSessionStorage from "@/lib/hooks/session-storage";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 interface Message {
@@ -46,9 +45,12 @@ export default function ChatModal() {
 	const [isLoading, setIsLoading] = useState(false);
 	const [abortController, setAbortController] = useState<AbortController>();
 	const [starterPrompts, setStarterPrompts] = useState<string[]>([]);
-	const [assistantId, setAssistantId] = useSessionStorage("assistantId", "");
-	const [threadId, setThreadId] = useSessionStorage("threadId", "");
-	const [messages, setMessages] = useSessionStorage<Message[]>("messages", []);
+	// const [assistantId, setAssistantId] = useSessionStorage("assistantId", "");
+	// const [threadId, setThreadId] = useSessionStorage("threadId", "");
+	// const [messages, setMessages] = useSessionStorage<Message[]>("messages", []);
+	const [assistantId, setAssistantId] = useState("");
+	const [threadId, setThreadId] = useState("");
+	const [messages, setMessages] = useState<Message[]>([]);
 
 	useEffect(() => {
 		scrollViewRef.current?.scrollToEnd({ animated: true });

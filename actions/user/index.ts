@@ -49,6 +49,7 @@ export const getUserData = async (uid: string) => {
 	return user;
 };
 
+// gets active subscription
 export async function getSubscription(uid: string | null) {
 	if (!uid) {
 		return {
@@ -71,9 +72,13 @@ export async function getSubscription(uid: string | null) {
 			.in("status", ["active"])
 			.eq("user_id", uid);
 
-		if (!subscription || subscription.length === 0) {
-			console.log("no subscription found");
-			return null;
+		// console.log("subscription", JSON.stringify(subscription, null, 2));
+
+		if (!subscription || subscription?.length === 0) {
+			return {
+				success: false,
+				data: null,
+			};
 		}
 
 		// use most recent subscription
@@ -292,169 +297,20 @@ const markSubscriptionAsActive = async (uid: string) => {
 	}
 };
 
-export async function manageSubscriptionStatusChange(
-	uid: string,
-	rcVustomerInfo: any,
-) {
-	// console.log(
-	// 	"manageSubscriptionStatusChange rcVustomerInfo: ",
-	// 	JSON.stringify(rcVustomerInfo, null, 2),
-	// );
-	try {
-		// check for any active subscriptions
-		// if no active subscriptions, then return
-		const purchases = rcVustomerInfo?.allPurchasedProductIdentifiers;
+export const getMostRecentUserSub = async (uid: string) => {
+	const { data, error } = await supabase
+		.from("subscriptions")
+		.select("*")
+		.eq("user_id", uid)
+		.order("created", { ascending: false });
 
-		// console.log("purchases", JSON.stringify(purchases, null, 2));
-
-		if (!purchases || purchases.length === 0) {
-			await markSubscriptionAsInactive(uid);
-			throw new Error("No rev cat purchases found");
-			// console.log("no purchases found");
-			// return {
-			// 	data: "no purchases found",
-			// 	success: true,
-			// };
-		}
-		const provider = "revenue_cat";
-		const entitlements = rcVustomerInfo.entitlements;
-
-		const proEntitlement = entitlements?.all?.pro;
-		const proIsActive = proEntitlement?.isActive === true || false;
-		const productIdentifier = proEntitlement?.productIdentifier || null;
-		const proExpiresDate = proEntitlement?.expirationDate || null;
-		const proCreatedAt = proEntitlement?.originalPurchaseDate || null;
-		const proPriceId = proEntitlement?.productIdentifier || null;
-		const proWillRenew = proEntitlement?.willRenew || false;
-		const pastExpirationDate = proExpiresDate < new Date();
-
-		const status = proIsActive ? "active" : "expired";
-
-		// THIS IS NOT UNIQUE... FUUUUDGE
-		// so basically there will be duplicate sub ids for rev cat but never the same sub id for the same user, unless they purchase at the same exact time
-		const oldSubId = "sub_rc_" + proCreatedAt?.toString() + proPriceId;
-		const newSubId = "sub_rc_" + proCreatedAt?.toString() + uid + proPriceId;
-
-		// Unknown amount
-		let amount = 0;
-
-		if (productIdentifier === "rc_pro_weekly_499") {
-			amount = 499;
-		} else if (productIdentifier === "rc_pro_annual_47") {
-			amount = 4700;
-		} else if (productIdentifier === "rc_pro_monthly_799") {
-			amount = 799;
-		}
-
-		// check if required fields are present
-		if (!oldSubId || !newSubId || !proCreatedAt || !proPriceId) {
-			console.log("Missing !subscriptionId || !proCreatedAt || !proPriceId");
-			await markSubscriptionAsInactive(uid);
-			throw new Error(
-				"Rev cat sub details not found - Missing required fields",
-			);
-		}
-
-		let hasExistingSubscription = false;
-		let hasActiveSubId = false;
-		let hasArchivedSubId = false;
-		let identifiedSubId = null;
-
-		// First check for existing subscription with the new sub id
-		const { data: newSubIdData, error: fetchError } = await supabase
-			.from("subscriptions")
-			.select("*")
-			.eq("id", newSubId)
-			.eq("user_id", uid);
-
-		if (newSubIdData && newSubIdData?.length > 0) {
-			identifiedSubId = newSubId;
-			hasActiveSubId = true;
-		}
-
-		// If no active sub id, check for old id
-		if (!hasActiveSubId) {
-			const { data: oldSubIdData, error: fetchError } = await supabase
-				.from("subscriptions")
-				.select("*")
-				.eq("id", oldSubId)
-				.eq("user_id", uid);
-
-			if (oldSubIdData && oldSubIdData?.length > 0) {
-				identifiedSubId = oldSubId;
-				hasArchivedSubId = true;
-			}
-		}
-
-		hasExistingSubscription = hasArchivedSubId || hasActiveSubId;
-
-		const subscriptionId = identifiedSubId ? identifiedSubId : newSubId;
-
-		// console.log("subscriptionId", subscriptionId);
-		console.log("hasExistingSubscription", hasExistingSubscription);
-		console.log("status", status);
-
-		// Latest data from rev cat
-		const subscriptionData = {
-			id: subscriptionId,
-			user_id: uid,
-			metadata: {
-				provider,
-				...rcVustomerInfo,
-			},
-			amount,
-			status,
-			price_id: proPriceId,
-			quantity: 1,
-			created: proCreatedAt,
-			current_period_end: proExpiresDate,
-			cancel_at_period_end: !proWillRenew,
-		};
-
-		// if existing, update status
-		if (hasExistingSubscription) {
-			console.log("updating existing subscription");
-
-			const { error } = await supabase
-				.from("subscriptions")
-				.update({ status })
-				.eq("id", subscriptionId);
-		} else {
-			console.log("inserting new subscription");
-
-			// console.log(
-			// 	"subscriptionData",
-			// 	JSON.stringify(subscriptionData, null, 2),
-			// );
-
-			// Insert new subscription
-			const { error } = await supabase
-				.from("subscriptions")
-				.insert(subscriptionData);
-
-			if (error) {
-				console.log("inserting new subscription error", error);
-				throw new Error(error.message);
-			}
-
-			// only reward referral if subscription is active and new sub
-			if (status === "active") {
-				await handleReferral(subscriptionData, uid);
-			}
-		}
-
-		return {
-			success: true,
-		};
-	} catch (error) {
-		await markSubscriptionAsInactive(uid);
-		// console.error("Error inserting/updating subscription:", error);
-		return {
-			success: false,
-			data: error,
-		};
+	if (error) {
+		console.error("Error fetching most recent user sub:", error);
+		return null;
 	}
-}
+
+	return data[0];
+};
 
 export async function addFavorite(uid: string, type: any, itemId: number) {
 	console.log("addFavorite", uid, type, itemId);
@@ -1025,16 +881,16 @@ export const calculateUserScores = async (favorites: any, tapScore: any) => {
 		(acc: number, favorite: any) => acc + (favorite.contaminants?.length || 0),
 		0,
 	);
-
-	const showersScore = calculateShowersScore();
-	const waterFilterScore = calculateWaterFilterScore();
-	const bottledWaterScore = calculateBottledWaterScore();
+	const showersScore = Math.round(calculateShowersScore());
+	const waterFilterScore = Math.round(calculateWaterFilterScore());
+	const bottledWaterScore = Math.round(calculateBottledWaterScore());
+	const roundedOverallScore = Math.round(overallScore);
 
 	return {
 		showersScore,
 		waterFilterScore,
 		bottledWaterScore,
-		overallScore,
+		overallScore: roundedOverallScore,
 		totalContaminants,
 	};
 };

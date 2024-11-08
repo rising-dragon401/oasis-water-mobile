@@ -1,11 +1,5 @@
 import { usePostHog } from "posthog-react-native";
-import {
-	createContext,
-	useCallback,
-	useContext,
-	useEffect,
-	useState,
-} from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { Platform } from "react-native";
 import Purchases, {
 	CustomerInfo,
@@ -15,11 +9,7 @@ import Purchases, {
 
 import { useUserProvider } from "./user-provider";
 
-import {
-	getSubscription,
-	getUserData,
-	manageSubscriptionStatusChange,
-} from "@/actions/user";
+import { updateUserData } from "@/actions/user";
 
 const APIKeys = {
 	apple: "appl_OIAHthcBxHjpVWGXmtLvBKRTtrR",
@@ -29,7 +19,6 @@ const APIKeys = {
 interface RevenueCatProps {
 	purchasePackage: (pack: PurchasesPackage) => Promise<boolean>;
 	restorePurchases: () => Promise<CustomerInfo>;
-	refetchCustomerAndSubscription: (uid: string) => Promise<void>;
 	userSubscription: UserState;
 	packages: PurchasesPackage[];
 }
@@ -50,7 +39,7 @@ export const useRevenueCat = () => {
 };
 
 export const RevenueCatProvider = ({ children }: any) => {
-	const { subscription, uid, fetchSubscription, setSubscription } =
+	const { subscription, uid, userData, setSubscription, fetchSubscription } =
 		useUserProvider();
 	const [userSubscription, setUserSubscription] = useState<UserState>({
 		pro: false,
@@ -76,9 +65,21 @@ export const RevenueCatProvider = ({ children }: any) => {
 			Purchases.setLogLevel(LOG_LEVEL.DEBUG);
 
 			// listen for customer info updates
+			// Need for restoring purchases
+			// And new subscriptions
 			Purchases.addCustomerInfoUpdateListener(async (customerInfo) => {
 				setCustomerInfo(customerInfo);
-				updateCustomerInfo(customerInfo, uid || "");
+
+				// associate revenue cat customer id with user
+				// originalAppUserId is assigned to one device
+				// Therefor a device can't have multiple subscriptions across different users
+				if (uid && !userData?.rc_customer_id) {
+					updateUserData(uid, "rc_customer_id", customerInfo.originalAppUserId);
+				}
+				// const rcCustomerId = customerInfo.originalAppUserId;
+				// if (rcCustomerId && uid) {
+				// 	// fetchSubscription(rcCustomerId);
+				// }
 			});
 
 			await loadOfferings();
@@ -124,10 +125,9 @@ export const RevenueCatProvider = ({ children }: any) => {
 			await Purchases.purchasePackage(pack);
 
 			if (pack.identifier === "pro") {
-				setUserSubscription({ ...userSubscription, pro: true });
 				setSubscription(true);
 
-				refetchCustomerAndSubscription(uid || "");
+				fetchSubscription({ rcCustomerId: customerInfo?.originalAppUserId });
 
 				posthog?.capture("purchase", {
 					type: "subscription",
@@ -144,100 +144,21 @@ export const RevenueCatProvider = ({ children }: any) => {
 		}
 	};
 
-	const refetchCustomerAndSubscription = useCallback(
-		async (uid: string) => {
-			if (customerInfo) {
-				updateCustomerInfo(customerInfo, uid);
-			}
-		},
-		[customerInfo],
-	);
-
-	// get latest sub data from revenue cat
-	const updateCustomerInfo = useCallback(
-		async (customerInfo: CustomerInfo, uid: string) => {
-			// Check if manually don't want to override sub
-			// helpful for admin use and testing
-			const userData = await getUserData(uid);
-			if (userData?.do_not_override_sub === true) {
-				console.log("do not override sub");
-				return;
-			}
-
-			// Cases
-			// User has no subscription
-			// User has an active Stripe (web) sub
-			// - will be handled by fetchSubscription in user-provider
-			// User has an active Revenue Cat sub
-			// - need to handle this here
-			// User has an expired Revenue Cat sub
-			// - need to check this here
-			// User has an expired Stripe (web) sub
-			// - website webhook listens for this
-
-			// check if user has an active Stripe (web) sub
-			const subscriptionData = await getSubscription(uid);
-
-			let provider = null;
-
-			// Active subscription row found
-			if (subscriptionData && subscriptionData?.success) {
-				// check the provider of this active subscription
-				provider =
-					subscriptionData?.data?.metadata &&
-					subscriptionData?.data?.metadata?.provider === "revenue_cat"
-						? "revenue_cat"
-						: "stripe";
-			}
-
-			// If user has an active Stripe (web) sub
-			// Don't check and override with Revenue Cat
-			// TODO: query Stripe to ensure the subscription is still active
-			if (provider === "stripe") {
-				return;
-			}
-
-			// Else user must have an active revenue cat sub
-			// and we need to check and update the subscription row
-
-			//  No info so returning but not overriding
-			if (!customerInfo || !uid) {
-				console.error("No customer info or uid");
-				setSubscription(false);
-				return;
-			}
-
-			// setUserSubscription({
-			// 	pro: customerInfo.entitlements.active.pro?.isActive || false,
-			// });
-
-			// Check Revenue Cat Subscription
-			// and update subscription row
-			const updatedSubscription = await manageSubscriptionStatusChange(
-				uid,
-				customerInfo,
-			);
-
-			// manually set local subscription if there is an error with revenue cat
-			if (!updatedSubscription?.success) {
-				setSubscription(false);
-			}
-
-			// Refetch the subscription data from supabase and update
-			fetchSubscription(uid);
-		},
-		[uid, customerInfo],
-	);
-
 	const restorePurchases = async () => {
+		// Reload stripe?
+		// Nah it checks stripe on app launch
+
+		// reloads customer info
+		// Triggers Purchases.addCustomerInfoUpdateListener
 		const customerInfo = await Purchases.restorePurchases();
+		fetchSubscription({ rcCustomerId: customerInfo.originalAppUserId });
+
 		return customerInfo;
 	};
 
 	const value = {
 		purchasePackage,
 		restorePurchases,
-		refetchCustomerAndSubscription,
 		userSubscription,
 		packages,
 	};

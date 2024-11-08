@@ -123,6 +123,19 @@ export default function Score({
 							? "xs"
 							: "xs";
 
+	const paddingTop =
+		size === "xl"
+			? 8
+			: size === "lg"
+				? 6
+				: size === "md"
+					? 2
+					: size === "sm"
+						? 0
+						: size === "xs"
+							? 0
+							: 0;
+
 	const handleOpenSubscribeModal = () => {
 		router.push("/subscribeModal");
 	};
@@ -201,10 +214,7 @@ export default function Score({
 				className="absolute flex flex-col justify-center items-center"
 			>
 				{score !== null ? (
-					<P
-						style={{ fontSize }}
-						className={size === "xl" || size === "lg" ? "pt-8" : ""}
-					>
+					<P style={{ fontSize }} className={`pt-${paddingTop}`}>
 						{score} / 100
 					</P>
 				) : (

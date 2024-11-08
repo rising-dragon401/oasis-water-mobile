@@ -84,7 +84,7 @@ export default function TabOneScreen() {
 			await Promise.all([
 				getRecentlyUpdatedItems(),
 				getPeople(),
-				refreshUserData(),
+				// refreshUserData(),
 			]);
 
 			const categoryCounts = await getCategoryCounts();

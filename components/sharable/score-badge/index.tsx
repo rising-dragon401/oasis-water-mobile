@@ -13,7 +13,7 @@ export default function ScoreBadge() {
 
 	const score = userScores?.overallScore || 0;
 
-	const getBgColor = (score: number) => {
+	const getBgColor = () => {
 		if (score === null) {
 			return "bg-zinc-300";
 		} else if (score > 70) {
@@ -32,7 +32,7 @@ export default function ScoreBadge() {
 		>
 			{subscription && (
 				<View className="flex-row items-center gap-x-1">
-					<View className={`w-3 h-3 rounded-full ${getBgColor(score)}`} />
+					<View className={`w-4 h-4 rounded-full ${getBgColor()}`} />
 					<Small>{score ? `${score}/100` : "0/100"}</Small>
 				</View>
 			)}

@@ -209,7 +209,7 @@ export default function OnboardingScreen() {
 			skipButtonLabel: "Skip",
 		},
 		{
-			title: "What's in your water?",
+			title: "See your water scores",
 			// subtitle:
 			// 	"Discovery what's actually in your water and find the best waters/filters",
 			subtitle: null,

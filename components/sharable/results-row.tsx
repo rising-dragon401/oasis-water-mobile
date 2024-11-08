@@ -106,7 +106,12 @@ export default function ResultsRow({
 												}}
 												alt={result.name || ""}
 												allowDownscaling
-												style={{ width: 40, height: "100%", borderRadius: 5 }}
+												style={{
+													width: 40,
+													height: "100%",
+													borderRadius: 5,
+													backgroundColor: "white",
+												}}
 												placeholder={{ blurhash: placeHolderImageBlurHash }}
 												transition={300}
 												cachePolicy="disk"

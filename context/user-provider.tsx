@@ -4,7 +4,6 @@ import {
 	calculateUserScores,
 	createUsername,
 	getCurrentUserData,
-	getSubscription,
 	getUserFavorites,
 	getUserTapScore,
 } from "actions/user";
@@ -20,6 +19,7 @@ import React, {
 
 import { useSupabase } from "./supabase-provider";
 
+import { checkSubscription } from "@/actions/subscription";
 import { supabase } from "@/config/supabase";
 
 interface UserContextType {
@@ -34,17 +34,32 @@ interface UserContextType {
 	subscriptionData: any | null | undefined;
 	subscriptionProvider: SubscriptionProviderType;
 	refreshUserData: (
-		type?: "all" | "favorites" | "scores" | "subscription",
+		type?: "all" | "favorites" | "scores" | "subscription" | "userData",
 	) => Promise<void>;
 	fetchUserFavorites: (uid: string | null) => Promise<void>;
 	fetchUserScores: (userTapId?: any) => Promise<void>;
-	fetchSubscription: (uid: string | null) => Promise<any | null>;
+	fetchSubscription: ({
+		userId,
+		rcCustomerId,
+	}: {
+		userId?: string;
+		rcCustomerId?: string;
+	}) => Promise<any | null>;
 	setSubscription: (value: boolean) => void;
 	fetchUserData: (uid: string | null) => Promise<any | null>;
 	logout: () => void;
 }
 
 type SubscriptionProviderType = null | "revenue_cat" | "stripe";
+
+interface SubscriptionResponse {
+	apiStatus: number;
+	message?: string;
+	data?: {
+		status?: string;
+		[key: string]: any;
+	} | null; // Allow data to be null
+}
 
 const UserContext = createContext<UserContextType | null>(null);
 
@@ -59,7 +74,6 @@ export const useUserProvider = () => {
 const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 	const { session, user } = useSupabase();
 
-	const [activeSession, setActiveSession] = useState<any>(null);
 	const [userId, setUserId] = useState<string | null | undefined>(null);
 	const [provider, setProvider] = useState<any>(null);
 	const [subscription, setSubscription] = useState<boolean>(false);
@@ -83,41 +97,32 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 		null,
 	);
 
+	// manually fetch session bc keeps getting outdated user
+	// useEffect(() => {
+	// 	supabase.auth.getSession().then(({ data: { session } }) => {
+	// 		console.log("session updated: ", session);
+	// 		setSession(session);
+	// 	});
+	// }, []);
+
 	// set active session and refresh user data
 	useEffect(() => {
-		setActiveSession(session);
-
-		if (session && session !== activeSession) {
+		if (session) {
 			initUser(session);
-		} else if (session === null) {
+		} else {
 			clearUserData();
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [session]);
 
-	// subscription listener
-	useEffect(() => {
-		supabase
-			.channel("subscriptions")
-			.on(
-				"postgres_changes",
-				{ event: "*", schema: "public", table: "subscriptions" },
-				(payload) => {
-					if (userId) {
-						fetchSubscription(userId);
-					}
-				},
-			)
-			.subscribe();
-	}, [userId]);
-
 	// handle generate username for all users
 	useEffect(() => {
-		if (userData && userId) {
+		if (userData && userId && !userData?.username) {
 			handleGenerateUsername(userData, userId);
 		}
 	}, [userData, userId]);
 
+	// Refetch user scores when favorites change
 	useEffect(() => {
 		if (userData && userData?.tap_location_id) {
 			// Each location needs lat/long to get nearest location
@@ -126,7 +131,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 			const tapLocationId = userData?.tap_location_id;
 			fetchUserScores(tapLocationId);
 		}
-	}, [userData, userId, userFavorites]);
+	}, [userId, userFavorites]);
 
 	const handleGenerateUsername = async (data: any, uid: string) => {
 		// check for username, create if none exists
@@ -143,14 +148,14 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 	}, [subscription]);
 
 	const initUser = async (session: any) => {
-		setUserId(session.user?.id);
+		setUserId(session?.user?.id);
 
-		fetchUserData(session.user?.id);
-		fetchSubscription(session.user?.id);
-		fetchUserFavorites(session.user?.id);
-		fetchUserScores(session.user?.id);
+		fetchUserData(session?.user?.id);
+		fetchSubscription({ userId: session.user?.id });
+		fetchUserFavorites(session?.user?.id);
+		fetchUserScores(session?.user?.id);
 
-		setProvider(session.user?.app_metadata?.provider);
+		setProvider(session?.user?.app_metadata?.provider);
 	};
 
 	const fetchUserData = async (uid?: string | null) => {
@@ -161,8 +166,6 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
 		const data = await getCurrentUserData(uid);
 		setUserData(data);
-
-		fetchUserFavorites(uid);
 	};
 
 	const fetchUserFavorites = async (uid: string | null) => {
@@ -174,23 +177,44 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 		setUserFavorites(favs);
 	};
 
-	const fetchSubscription = async (uid: string | null) => {
-		const data = await getSubscription(uid);
+	const fetchSubscription = async ({
+		userId,
+		rcCustomerId,
+	}: {
+		userId?: string;
+		rcCustomerId?: string;
+	}) => {
+		try {
+			const thisUserId = userId || session?.user?.id || null;
+			const thisRcCustomerId = rcCustomerId || userData?.rc_customer_id || null;
 
-		if (data && data?.success) {
-			setSubscription(true);
-			setSubscriptionData(data);
+			// if (!thisUserId) {
+			// 	throw new Error("fetchSubscription failed: No user ID provided");
+			// }
 
-			const provider =
-				data?.data?.metadata && data?.data?.metadata?.provider === "revenue_cat"
-					? "revenue_cat"
-					: "stripe";
+			console.log("fetchSubscription", userId, rcCustomerId);
 
-			setSubscriptionProvider(provider);
-		} else {
-			setSubscription(false);
+			const response: SubscriptionResponse = await checkSubscription(
+				thisUserId,
+				thisRcCustomerId,
+			);
+
+			console.log("response", JSON.stringify(response.data, null, 2));
+
+			if (response && response?.apiStatus === 200) {
+				const status = response.data?.status;
+				if (status === "active" || status === "trialing") {
+					setSubscription(true);
+				} else {
+					setSubscription(false);
+				}
+			} else {
+				// mark as false if cannot fetch subscription data
+				setSubscription(false);
+			}
+		} catch (error) {
+			// console.error("Error fetching subscription:", error);
 		}
-		return data;
 	};
 
 	const fetchUserScores = async (userTapId?: any) => {
@@ -212,7 +236,14 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 	};
 
 	const refreshUserData = useCallback(
-		async (type: "all" | "favorites" | "scores" | "subscription" = "all") => {
+		async (
+			type:
+				| "all"
+				| "favorites"
+				| "scores"
+				| "subscription"
+				| "userData" = "all",
+		) => {
 			const userId = user?.id;
 
 			if (!userId) {
@@ -222,7 +253,11 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 			const promises = [];
 
 			if (type === "all" || type === "subscription") {
-				promises.push(fetchSubscription(userId));
+				promises.push(
+					fetchSubscription({
+						userId,
+					}),
+				);
 			}
 			if (type === "all" || type === "favorites") {
 				promises.push(fetchUserFavorites(userId));
@@ -230,7 +265,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 			if (type === "all" || type === "scores") {
 				promises.push(fetchUserScores(userId));
 			}
-			if (type === "all") {
+			if (type === "all" || type === "userData") {
 				promises.push(fetchUserData(userId));
 			}
 
@@ -249,7 +284,6 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 		setUserData(null);
 		setUserId(null);
 		setUserFavorites(null);
-		setActiveSession(null);
 		setSubscription(false);
 		setUserScores({
 			showersScore: 0,
@@ -257,7 +291,6 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 			bottledWaterScore: 0,
 			overallScore: 0,
 		});
-
 		setTapScore(null);
 	};
 

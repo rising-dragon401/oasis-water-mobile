@@ -3,7 +3,7 @@
 		"name": "Oasis",
 		"slug": "Oasis",
 		"scheme": "oasisapp",
-		"version": "1.1.8",
+		"version": "1.1.9",
 		"orientation": "portrait",
 		"icon": "./assets/icon.png",
 		"userInterfaceStyle": "light",
@@ -68,7 +68,8 @@
 					"cameraPermission": "Allow Oasis to access your camera to scan your water bottle or filter.",
 					"recordAudioAndroid": true
 				}
-			]
+			],
+			"sentry-expo"
 		],
 		"extra": {
 			"router": {

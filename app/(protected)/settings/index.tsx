@@ -41,10 +41,10 @@ export default function TabTwoScreen() {
 		subscription,
 		subscriptionData,
 		subscriptionProvider,
-		fetchUserData,
+		refreshUserData,
 		logout,
 	} = useUserProvider();
-	const { restorePurchases, refetchCustomerAndSubscription } = useRevenueCat();
+	const { restorePurchases } = useRevenueCat();
 	const { backgroundColor, iconColor } = useColorScheme();
 	const showToast = useToast();
 	const router = useRouter();
@@ -67,12 +67,14 @@ export default function TabTwoScreen() {
 	});
 	const [loadingSocials, setLoadingSocials] = useState(false);
 	const [refreshing, setRefreshing] = useState(false);
+	const [loadingRestorePurchases, setLoadingRestorePurchases] = useState(false);
 
 	const handleRefresh = async () => {
 		setRefreshing(true);
 		// Add your refresh logic here, e.g., refetch user data
-		await fetchUserData(uid || "");
-		await refetchCustomerAndSubscription(uid || "");
+
+		await refreshUserData("all");
+
 		setRefreshing(false);
 		showToast("Refreshed data");
 	};
@@ -160,7 +162,7 @@ export default function TabTwoScreen() {
 			showToast("Failed to update profile");
 		}
 
-		fetchUserData(userData.id);
+		refreshUserData("userData");
 
 		const userObject = {
 			id: userData.id,
@@ -191,7 +193,7 @@ export default function TabTwoScreen() {
 
 			if (res) {
 				showToast("Socials updated");
-				fetchUserData(userData.id);
+				refreshUserData("userData");
 			} else {
 				showToast("Error updating socials");
 			}
@@ -208,9 +210,10 @@ export default function TabTwoScreen() {
 	};
 
 	const handleRestorePurchases = async () => {
+		setLoadingRestorePurchases(true);
 		const res = await restorePurchases();
-		console.log("handleRestorePurchases res", res);
-		showToast("Any applicable purchases have been restored.");
+		showToast("Any applicable purchases have been restored");
+		setLoadingRestorePurchases(false);
 	};
 
 	const handleLoadInviteModal = () => {
@@ -266,7 +269,6 @@ export default function TabTwoScreen() {
 						</View>
 
 						<View className="flex flex-col gap-y-2 mt-6">
-							<P className="text-muted-foreground">Subscription</P>
 							<View className="bg-muted p-4 rounded-xl border border-accent shadow-sm shadow-blue-500/50">
 								{subscription ? (
 									<>
@@ -331,6 +333,16 @@ export default function TabTwoScreen() {
 									</View>
 								)}
 							</View>
+
+							{!subscription && (
+								<Button
+									className="w-full"
+									variant="ghost"
+									label="Restore purchases"
+									loading={loadingRestorePurchases}
+									onPress={handleRestorePurchases}
+								/>
+							)}
 						</View>
 
 						<View className="flex flex-col gap-y-2 mt-6">
@@ -534,12 +546,6 @@ export default function TabTwoScreen() {
 						</View>
 
 						<View className="flex flex-col mt-10 pb-8 gap-y-2">
-							<Button
-								className="w-full"
-								variant="ghost"
-								label="Restore purchases"
-								onPress={handleRestorePurchases}
-							/>
 							<Link
 								className="w-full mt-2 text-red-500 text-center"
 								// @ts-ignore

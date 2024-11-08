@@ -23,6 +23,7 @@ type SupabaseContextProps = {
 	signOut: () => Promise<void>;
 	signInWithApple: () => Promise<void>;
 	getGoogleOAuthUrl: () => Promise<string | null>;
+	setSession: (session: Session | null) => void;
 	setOAuthSession: (tokens: {
 		access_token: string;
 		refresh_token: string;
@@ -44,6 +45,7 @@ export const SupabaseContext = createContext<SupabaseContextProps>({
 	signOut: async () => {},
 	getGoogleOAuthUrl: async () => "",
 	setOAuthSession: async () => {},
+	setSession: () => {},
 });
 
 export const useSupabase = () => useContext(SupabaseContext);
@@ -223,7 +225,7 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 		return () => {
 			data.subscription.unsubscribe();
 		};
-	}, [posthog]);
+	}, []);
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -277,6 +279,7 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 				signOut,
 				getGoogleOAuthUrl,
 				setOAuthSession,
+				setSession,
 			}}
 		>
 			{children}

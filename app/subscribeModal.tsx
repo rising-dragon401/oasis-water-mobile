@@ -35,10 +35,11 @@ const FEATURES = [
 export default function SubscribeModal() {
 	const { subscription, user } = useUserProvider();
 	const router = useRouter();
-	const { packages, purchasePackage } = useRevenueCat();
+	const { packages, purchasePackage, restorePurchases } = useRevenueCat();
 	const { accentColor, backgroundColor } = useColorScheme();
 
 	const [loading, setLoading] = useState(false);
+	const [loadingRestore, setLoadingRestore] = useState(false);
 	const [selectedPlan, setSelectedPlan] = useState<"annual" | "weekly">(
 		"weekly",
 	);
@@ -102,7 +103,7 @@ export default function SubscribeModal() {
 				{/* Content Section */}
 				<View className="items-center flex-1 max-w-md">
 					<Logo />
-					<H2 className="text-center pt-4">Unlock healthy hydration</H2>
+					<H2 className="text-center pt-4">See your water scores</H2>
 					{/* <Muted className="text-center max-w-sm">
 						Your membership funds independent lab testing (which is expensive!)
 						and helps keep Oasis unbiased.
