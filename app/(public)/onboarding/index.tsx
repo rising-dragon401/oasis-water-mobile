@@ -219,7 +219,7 @@ export default function OnboardingScreen() {
 			// image: null,
 			imageStyle: {
 				width: "60%",
-				height: windowHeight * 0.1,
+				height: windowHeight * 0.12,
 				resizeMode: "contain",
 			},
 			component: (

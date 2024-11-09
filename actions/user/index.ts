@@ -200,11 +200,12 @@ export async function updateUserData(id: string, column: string, value: any) {
 			throw new Error("No user found");
 		}
 
+		console.log("updateUserData", id, column, value);
+
 		const { error } = await supabase
 			.from("users")
 			.update({ [column]: value })
-			.eq("id", id)
-			.single();
+			.eq("id", id);
 
 		if (error) {
 			throw new Error(error.message);
@@ -216,6 +217,28 @@ export async function updateUserData(id: string, column: string, value: any) {
 		return false;
 	}
 }
+
+export const updateUserRcId = async (uid: string, rcId: string) => {
+	const { data, error: fetchError } = await supabase
+		.from("users")
+		.select("rc_customer_id")
+		.eq("id", uid);
+
+	if (fetchError) {
+		throw new Error(fetchError.message);
+	}
+
+	if (!data[0].rc_customer_id) {
+		const { error } = await supabase
+			.from("users")
+			.update({ rc_customer_id: rcId })
+			.eq("id", uid);
+
+		if (error) {
+			throw new Error(error.message);
+		}
+	}
+};
 
 const getUserByUUID = async (uuid: string) => {
 	const { data, error } = await supabase

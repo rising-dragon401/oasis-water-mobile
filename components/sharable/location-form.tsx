@@ -22,6 +22,8 @@ type Props = {
 };
 
 export function LocationForm({ id }: Props) {
+	const recommendedFilterRowRef = useRef<View>(null);
+
 	const navigation = useNavigation();
 	const { uid } = useUserProvider();
 	const { iconColor } = useColorScheme();
@@ -75,10 +77,16 @@ export function LocationForm({ id }: Props) {
 	}, [location?.utilities]);
 
 	const handleRecommendedFilterPress = () => {
-		scrollViewRef.current?.scrollTo({
-			y: 1000, // Adjust this value to the correct position of the RecommendedFilterRow
-			animated: true,
-		});
+		if (recommendedFilterRowRef.current) {
+			recommendedFilterRowRef.current.measure(
+				(fx, fy, width, height, px, py) => {
+					scrollViewRef.current?.scrollTo({
+						y: py,
+						animated: true,
+					});
+				},
+			);
+		}
 	};
 
 	if (isLoading)
@@ -207,11 +215,13 @@ export function LocationForm({ id }: Props) {
 				</View>
 
 				{/* Recommended filter based on contaminants */}
-				{location?.utilities?.[0]?.contaminants ? (
-					<RecommendedFilterRow
-						contaminants={location.utilities[0].contaminants || []}
-					/>
-				) : null}
+				<View ref={recommendedFilterRowRef}>
+					{location?.utilities?.[0]?.contaminants ? (
+						<RecommendedFilterRow
+							contaminants={location.utilities[0].contaminants || []}
+						/>
+					) : null}
+				</View>
 			</View>
 		</ScrollView>
 	);

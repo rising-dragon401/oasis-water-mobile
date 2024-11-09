@@ -263,6 +263,7 @@ export default function TabOneScreen() {
 											showFavorite={false}
 											isAuthUser={false}
 											isGeneralListing
+											imageHeight={80}
 										/>
 									</View>
 								)}
@@ -277,7 +278,7 @@ export default function TabOneScreen() {
 			key: "featuredLocations",
 			show: true,
 			render: () => (
-				<View className=" flex-col w-full mt-6">
+				<View className=" flex-col w-full mt-4">
 					<View className="flex flex-row justify-between w-full items-end mb-2">
 						<H4 className="text-left font-medium">Tap water</H4>
 						<Link

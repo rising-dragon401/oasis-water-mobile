@@ -18,6 +18,7 @@ type Props = {
 	showFavorite?: boolean;
 	isAuthUser?: boolean;
 	isGeneralListing?: boolean;
+	imageHeight?: number;
 };
 
 const ItemPreviewCard = ({
@@ -25,6 +26,7 @@ const ItemPreviewCard = ({
 	showFavorite = false,
 	isAuthUser = false,
 	isGeneralListing = false,
+	imageHeight = 100,
 }: Props) => {
 	const { subscription } = useUserProvider();
 	const { mutedForegroundColor } = useColorScheme();
@@ -44,7 +46,7 @@ const ItemPreviewCard = ({
 	const renderImage = () => {
 		const imageStyle = {
 			width: "100%",
-			height: "100%",
+			height: imageHeight || 100,
 			aspectRatio: 1,
 			contentFit: "cover",
 			borderRadius: 10,
@@ -69,7 +71,7 @@ const ItemPreviewCard = ({
 					source={{ uri: item.image }}
 					// @ts-ignore
 					style={imageStyle}
-					className="rounded-xl pb-2"
+					className="rounded-xl"
 					transition={100}
 					cachePolicy="memory-disk"
 					placeholder={{ blurhash: placeHolderImageBlurHash }}
@@ -112,43 +114,42 @@ const ItemPreviewCard = ({
 	return (
 		// @ts-ignore
 		<Link href={showData ? determineLink(item) : "/subscribeModal"}>
-			<View className="relative w-full aspect-square rounded-2xl overflow-hidden">
+			<View className="relative flex-col w-full rounded-2xl overflow-hidden bg-white px-4">
 				<View
-					className={`flex justify-center items-center w-full h-full bg-white
-						${showData && "p-4 pb-6 rounded-xl"}
+					className={`flex justify-center items-center w-full px-6 pb-0 pt-4
+						${showData && " rounded-xl"}
 					`}
 				>
 					{renderImage()}
 				</View>
 
-				{showData ? (
-					<P
-						className="absolute bottom-2 left-2 bg-opacity-50 px-2 flex-wrap leading-tight"
-						numberOfLines={2}
-					>
-						{item.name}
-					</P>
-				) : (
-					<>
-						<View
-							style={{
-								width: "100%",
-								height: 10,
-								backgroundColor: "rgba(224, 224, 224, 0.5)",
-								borderRadius: 2,
-								marginBottom: 4,
-							}}
-						/>
-						<View
-							style={{
-								width: "80%",
-								height: 10,
-								backgroundColor: "rgba(224, 224, 224, 0.5)",
-								borderRadius: 2,
-							}}
-						/>
-					</>
-				)}
+				<View className="flex h-16 justify-center">
+					{showData ? (
+						<P className="text-base pb-2" numberOfLines={2}>
+							{item.name}
+						</P>
+					) : (
+						<>
+							<View
+								style={{
+									width: "100%",
+									height: 10,
+									backgroundColor: "rgba(224, 224, 224, 0.5)",
+									borderRadius: 2,
+									marginBottom: 4,
+								}}
+							/>
+							<View
+								style={{
+									width: "80%",
+									height: 10,
+									backgroundColor: "rgba(224, 224, 224, 0.5)",
+									borderRadius: 2,
+								}}
+							/>
+						</>
+					)}
+				</View>
 
 				<View className="absolute top-2 right-4 z-10 mt-1">
 					{subscription ? (

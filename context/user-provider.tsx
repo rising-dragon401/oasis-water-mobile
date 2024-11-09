@@ -97,14 +97,6 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 		null,
 	);
 
-	// manually fetch session bc keeps getting outdated user
-	// useEffect(() => {
-	// 	supabase.auth.getSession().then(({ data: { session } }) => {
-	// 		console.log("session updated: ", session);
-	// 		setSession(session);
-	// 	});
-	// }, []);
-
 	// set active session and refresh user data
 	useEffect(() => {
 		if (session) {
@@ -121,6 +113,10 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 			handleGenerateUsername(userData, userId);
 		}
 	}, [userData, userId]);
+
+	useEffect(() => {
+		console.log("userData", userData);
+	}, [userData]);
 
 	// Refetch user scores when favorites change
 	useEffect(() => {
@@ -143,19 +139,18 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 		}
 	};
 
-	useEffect(() => {
-		console.log("subscription", subscription);
-	}, [subscription]);
-
 	const initUser = async (session: any) => {
 		setUserId(session?.user?.id);
+		setProvider(session?.user?.app_metadata?.provider);
 
-		fetchUserData(session?.user?.id);
-		fetchSubscription({ userId: session.user?.id });
+		const userData = await fetchUserData(session?.user?.id);
+		fetchSubscription({
+			userId: session.user?.id,
+			rcCustomerId: userData?.rc_customer_id,
+		});
+
 		fetchUserFavorites(session?.user?.id);
 		fetchUserScores(session?.user?.id);
-
-		setProvider(session?.user?.app_metadata?.provider);
 	};
 
 	const fetchUserData = async (uid?: string | null) => {
@@ -166,6 +161,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
 		const data = await getCurrentUserData(uid);
 		setUserData(data);
+		return data;
 	};
 
 	const fetchUserFavorites = async (uid: string | null) => {
@@ -187,6 +183,10 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 		try {
 			const thisUserId = userId || session?.user?.id || null;
 			const thisRcCustomerId = rcCustomerId || userData?.rc_customer_id || null;
+
+			console.log("thisUserId:", thisUserId);
+			console.log("userData:", userData);
+			console.log("thisRcCustomerId:", thisRcCustomerId);
 
 			// if (!thisUserId) {
 			// 	throw new Error("fetchSubscription failed: No user ID provided");

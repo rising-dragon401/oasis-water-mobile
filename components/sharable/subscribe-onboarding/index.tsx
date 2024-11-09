@@ -1,31 +1,31 @@
-import Feather from "@expo/vector-icons/Feather";
+import Octicons from "@expo/vector-icons/Octicons";
 import { ScrollView, TouchableOpacity, View } from "react-native";
 
-import ScoreCard from "@/components/sharable/score-card";
 import { Muted, P } from "@/components/ui/typography";
 import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 const FEATURES = [
 	{
-		label: "Access to all scores",
+		icon: "check",
+		label: "Best waters and filters",
 	},
 	{
-		label: "Unlimited scans and searches",
-	},
-	// {
-	// 	label: "Highest rated waters",
-	// },
-	{
-		label: "Filter recommendations",
+		icon: "check",
+		label: "Full contaminant breakdowns",
 	},
 	{
-		label: "Contaminant breakdowns and analysis",
+		icon: "check",
+		label: "Get notified of new lab results",
 	},
-
-	// {
-	// 	label: "Support further testing",
-	// },
+	{
+		icon: "check",
+		label: "Access all ratings",
+	},
+	{
+		icon: "check",
+		label: "Support further lab testing",
+	},
 ];
 
 export function SubscribeOnboarding({
@@ -35,7 +35,7 @@ export function SubscribeOnboarding({
 	setSelectedPlan: (plan: string) => void;
 	selectedPlan: string;
 }) {
-	const { accentColor } = useColorScheme();
+	const { accentColor, iconColor } = useColorScheme();
 	const { tapScore } = useUserProvider();
 
 	return (
@@ -47,25 +47,19 @@ export function SubscribeOnboarding({
 				justifyContent: "space-between",
 			}}
 		>
-			<View className="w-full items-center flex flex-co mt-6">
-				<View className="flex flex-row w-full gap-4 mb-4">
-					<ScoreCard
-						score={tapScore?.score || 0}
-						title="Your water score"
-						description="Contaminants, microplastics, and minerals found in your water"
-						onPress={() => {}}
-						type="small_row"
-						scoreLocked
-					/>
-				</View>
-				<View className="gap-y-6 w-full rounded-lg border border-border px-4 py-4">
+			<View className="w-full items-center flex flex-col mt-4">
+				<View className="gap-y-8 rounded-lg px-8 py-8  w-full">
 					{FEATURES.map((feature, index) => (
 						<View
 							key={index}
 							className="flex flex-row gap-5 w-full items-center"
 						>
-							<Feather name="check" size={32} color={accentColor} />
-							<P className="text-center text-lg">{feature.label}</P>
+							<Octicons
+								name="check-circle-fill"
+								size={24}
+								color={accentColor}
+							/>
+							<P className="text-center text-xl">{feature.label}</P>
 						</View>
 					))}
 				</View>

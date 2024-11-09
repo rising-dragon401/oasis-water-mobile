@@ -9,7 +9,7 @@ import Purchases, {
 
 import { useUserProvider } from "./user-provider";
 
-import { updateUserData } from "@/actions/user";
+import { updateUserRcId } from "@/actions/user";
 
 const APIKeys = {
 	apple: "appl_OIAHthcBxHjpVWGXmtLvBKRTtrR",
@@ -69,12 +69,13 @@ export const RevenueCatProvider = ({ children }: any) => {
 			// And new subscriptions
 			Purchases.addCustomerInfoUpdateListener(async (customerInfo) => {
 				setCustomerInfo(customerInfo);
+				const rcCustomerId = customerInfo.originalAppUserId;
 
 				// associate revenue cat customer id with user
 				// originalAppUserId is assigned to one device
 				// Therefor a device can't have multiple subscriptions across different users
-				if (uid && !userData?.rc_customer_id) {
-					updateUserData(uid, "rc_customer_id", customerInfo.originalAppUserId);
+				if (uid && !userData?.rc_customer_id && rcCustomerId) {
+					updateUserRcId(uid, rcCustomerId);
 				}
 				// const rcCustomerId = customerInfo.originalAppUserId;
 				// if (rcCustomerId && uid) {
@@ -124,16 +125,18 @@ export const RevenueCatProvider = ({ children }: any) => {
 		try {
 			await Purchases.purchasePackage(pack);
 
-			if (pack.identifier === "pro") {
-				setSubscription(true);
+			console.log("purchasePackage", pack);
 
-				fetchSubscription({ rcCustomerId: customerInfo?.originalAppUserId });
+			setSubscription(true);
 
-				posthog?.capture("purchase", {
-					type: "subscription",
-					package: pack.identifier,
-				});
-			}
+			console.log("customerInfo", customerInfo);
+
+			fetchSubscription({ rcCustomerId: customerInfo?.originalAppUserId });
+
+			posthog?.capture("purchase", {
+				type: "subscription",
+				package: pack.identifier,
+			});
 
 			return true;
 		} catch (error) {

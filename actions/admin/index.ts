@@ -494,45 +494,45 @@ export const getNearestLocation = async (
 
 // Add lat/long to each location
 // MANUALLY RUN THIS
-export const addLatLongToEachLocation = async () => {
-	const { data, error } = await supabase
-		.from("tap_water_locations")
-		.select("*")
-		.is("lat_long", null);
+// export const addLatLongToEachLocation = async () => {
+// 	const { data, error } = await supabase
+// 		.from("tap_water_locations")
+// 		.select("*")
+// 		.is("lat_long", null);
 
-	if (error) {
-		console.error("Error fetching tap water locations:", error);
-		return [];
-	}
+// 	if (error) {
+// 		console.error("Error fetching tap water locations:", error);
+// 		return [];
+// 	}
 
-	for (const location of data) {
-		// console.log("location: ", JSON.stringify(location, null, 2));
-		const utilities = location.utilities;
+// 	for (const location of data) {
+// 		// console.log("location: ", JSON.stringify(location, null, 2));
+// 		const utilities = location.utilities;
 
-		if (utilities && utilities.length > 0) {
-			const zipCode = utilities[0].zip_codes.substring(0, 5);
+// 		if (utilities && utilities.length > 0) {
+// 			const zipCode = utilities[0].zip_codes.substring(0, 5);
 
-			if (zipCode) {
-				const latLng = await getZipCodeLatLng(zipCode);
+// 			if (zipCode) {
+// 				const latLng = await getZipCodeLatLng(zipCode);
 
-				if (latLng) {
-					const { latitude, longitude } = latLng;
+// 				if (latLng) {
+// 					const { latitude, longitude } = latLng;
 
-					const { error: updateError } = await supabase
-						.from("tap_water_locations")
-						.update({ lat_long: { latitude, longitude } })
-						.eq("id", location.id);
+// 					const { error: updateError } = await supabase
+// 						.from("tap_water_locations")
+// 						.update({ lat_long: { latitude, longitude } })
+// 						.eq("id", location.id);
 
-					if (updateError) {
-						console.error(
-							`Error updating location ${location.id}:`,
-							updateError,
-						);
-					} else {
-						console.log(`Updated location ${location.id} with lat/long.`);
-					}
-				}
-			}
-		}
-	}
-};
+// 					if (updateError) {
+// 						console.error(
+// 							`Error updating location ${location.id}:`,
+// 							updateError,
+// 						);
+// 					} else {
+// 						console.log(`Updated location ${location.id} with lat/long.`);
+// 					}
+// 				}
+// 			}
+// 		}
+// 	}
+// };

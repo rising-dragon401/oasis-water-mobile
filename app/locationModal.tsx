@@ -106,7 +106,7 @@ export default function LocationModal() {
 
 			if (res) {
 				showToast("Location updated");
-				refreshUserData("userData");
+				refreshUserData("all");
 				setShowUpdateLocation(false);
 				// router.back();
 			} else {
