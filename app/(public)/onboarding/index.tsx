@@ -17,18 +17,18 @@ import {
 	addWatersAndFiltersToUserFavorites,
 	updateUserData,
 } from "@/actions/user";
-import ItemSelector from "@/components/sharable/item-selector";
-import LocationSelector from "@/components/sharable/location-selector";
+// import ItemSelector from "@/components/sharable/item-selector";
+// import LocationSelector from "@/components/sharable/location-selector";
 import { SubscribeOnboarding } from "@/components/sharable/subscribe-onboarding";
 import { Button } from "@/components/ui/button";
 import * as ProgressPrimitive from "@/components/ui/progress";
 import { Switch } from "@/components/ui/switch";
-import { H1, Muted, P } from "@/components/ui/typography";
+import { H1, Large, Muted, P } from "@/components/ui/typography";
 import { useRevenueCat } from "@/context/revenue-cat-provider";
 import { useToast } from "@/context/toast-provider";
 import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
-import { readableType } from "@/lib/utils";
+// import { readableType } from "@/lib/utils";
 
 export default function OnboardingScreen() {
 	const router = useRouter();
@@ -116,110 +116,109 @@ export default function OnboardingScreen() {
 			onSkip: null,
 			canSkip: false,
 		},
+		// {
+		// 	title: "Where are you based?",
+		// 	subtitle:
+		// 		"This is used to locate your nearest tap water report and find available brands",
+		// 	image: null,
+		// 	imageStyle: {
+		// 		width: "100%",
+		// 		height: windowHeight * 0.44,
+		// 		resizeMode: "contain",
+		// 	},
+		// 	component: (
+		// 		<View className="flex mt-8">
+		// 			<LocationSelector
+		// 				address={selectedAddress}
+		// 				setAddress={setSelectedAddress}
+		// 				initialAddress={userData?.location?.formattedAddress || null}
+		// 			/>
+		// 		</View>
+		// 	),
+		// 	onSubmit: () => {
+		// 		handleUpdateLocation();
+		// 	},
+		// 	loading: loadingLocation,
+		// 	submitButtonLabel: "Continue",
+		// 	onSkip: () => {
+		// 		setCurrentStep((prev) => Math.min(totalSteps - 1, prev + 1));
+		// 	},
+		// 	canSkip: true,
+		// 	skipButtonLabel: "Skip",
+		// },
+		// {
+		// 	title: "What do you drink?",
+		// 	subtitle: "Enter all the bottled waters and filters you use",
+		// 	image: null,
+		// 	imageStyle: {
+		// 		width: "100%",
+		// 		height: windowHeight * 0.44,
+		// 		resizeMode: "contain",
+		// 	},
+		// 	component: (
+		// 		<View className="flex mt-6">
+		// 			<ItemSelector
+		// 				items={favs}
+		// 				setItems={setFavs}
+		// 				initialItems={userFavorites || []} // Pass in initial items
+		// 			/>
+
+		// 			{favs.length > 0 && (
+		// 				<View className="flex flex-col items-center gap-4 mt-4 ">
+		// 					{favs.map((fav) => (
+		// 						<View
+		// 							key={fav.id}
+		// 							className="flex flex-row items-center gap-2 bg-card p-2 rounded-xl border border-border w-full py-2 px-4 justify-between"
+		// 						>
+		// 							<View className="flex flex-row items-center gap-2">
+		// 								<Image
+		// 									source={{ uri: fav.image }}
+		// 									style={{ width: 36, height: 36 }}
+		// 									className="rounded-lg"
+		// 								/>
+		// 								<View className="flex flex-col gap-0  flex-wrap">
+		// 									<P className="max-w-64 font-medium" numberOfLines={1}>
+		// 										{fav.name}
+		// 									</P>
+		// 									<Muted>{readableType(fav.type)}</Muted>
+		// 								</View>
+		// 							</View>
+
+		// 							<TouchableOpacity onPress={() => handleRemoveFav(fav)}>
+		// 								<Ionicons
+		// 									name="close"
+		// 									size={24}
+		// 									color={mutedForegroundColor}
+		// 								/>
+		// 							</TouchableOpacity>
+		// 						</View>
+		// 					))}
+		// 				</View>
+		// 			)}
+		// 		</View>
+		// 	),
+		// 	onSubmit: () => {
+		// 		handleUpdateFavs();
+		// 	},
+		// 	loading: loadingFavs,
+		// 	submitButtonLabel: "Continue",
+		// 	onSkip: () => {
+		// 		setCurrentStep((prev) => Math.min(totalSteps - 1, prev + 1));
+		// 	},
+		// 	canSkip: true,
+		// 	skipButtonLabel: "Skip",
+		// },
 		{
-			title: "Where are you based?",
+			title: "Oasis Member",
 			subtitle:
-				"This is used to locate your nearest tap water report and find available brands",
-			image: null,
-			imageStyle: {
-				width: "100%",
-				height: windowHeight * 0.44,
-				resizeMode: "contain",
-			},
-			component: (
-				<View className="flex mt-8">
-					<LocationSelector
-						address={selectedAddress}
-						setAddress={setSelectedAddress}
-						initialAddress={userData?.location?.formattedAddress || null}
-					/>
-				</View>
-			),
-			onSubmit: () => {
-				handleUpdateLocation();
-			},
-			loading: loadingLocation,
-			submitButtonLabel: "Continue",
-			onSkip: () => {
-				setCurrentStep((prev) => Math.min(totalSteps - 1, prev + 1));
-			},
-			canSkip: true,
-			skipButtonLabel: "Skip",
-		},
-		{
-			title: "What do you drink?",
-			subtitle: "Enter all the bottled waters and filters you use",
-			image: null,
-			imageStyle: {
-				width: "100%",
-				height: windowHeight * 0.44,
-				resizeMode: "contain",
-			},
-			component: (
-				<View className="flex mt-6">
-					<ItemSelector
-						items={favs}
-						setItems={setFavs}
-						initialItems={userFavorites || []} // Pass in initial items
-					/>
-
-					{favs.length > 0 && (
-						<View className="flex flex-col items-center gap-4 mt-4 ">
-							{favs.map((fav) => (
-								<View
-									key={fav.id}
-									className="flex flex-row items-center gap-2 bg-card p-2 rounded-xl border border-border w-full py-2 px-4 justify-between"
-								>
-									<View className="flex flex-row items-center gap-2">
-										<Image
-											source={{ uri: fav.image }}
-											style={{ width: 36, height: 36 }}
-											className="rounded-lg"
-										/>
-										<View className="flex flex-col gap-0  flex-wrap">
-											<P className="max-w-64 font-medium" numberOfLines={1}>
-												{fav.name}
-											</P>
-											<Muted>{readableType(fav.type)}</Muted>
-										</View>
-									</View>
-
-									<TouchableOpacity onPress={() => handleRemoveFav(fav)}>
-										<Ionicons
-											name="close"
-											size={24}
-											color={mutedForegroundColor}
-										/>
-									</TouchableOpacity>
-								</View>
-							))}
-						</View>
-					)}
-				</View>
-			),
-			onSubmit: () => {
-				handleUpdateFavs();
-			},
-			loading: loadingFavs,
-			submitButtonLabel: "Continue",
-			onSkip: () => {
-				setCurrentStep((prev) => Math.min(totalSteps - 1, prev + 1));
-			},
-			canSkip: true,
-			skipButtonLabel: "Skip",
-		},
-		{
-			title: "See your water scores",
-			// subtitle:
-			// 	"Discovery what's actually in your water and find the best waters/filters",
-			subtitle: null,
+				"Join 10,000+ members transforming their water habits and supporting unbiased ratings.",
 			titleStyle: "text-center",
 			image:
 				"https://connect.live-oasis.com/storage/v1/object/public/website/images/onboarding/paywall%20cards.jpg",
 			// image: null,
 			imageStyle: {
-				width: "60%",
-				height: windowHeight * 0.12,
+				width: "70%",
+				height: windowHeight * 0.16,
 				resizeMode: "contain",
 			},
 			component: (
@@ -232,7 +231,7 @@ export default function OnboardingScreen() {
 				handleSubscribe();
 			},
 			loading: loadingPurchase,
-			submitButtonLabel: "Unlock 💧",
+			submitButtonLabel: "Try for free 💧",
 			submitButtonStyles: "shadow-lg shadow-blue-500/50 bg-primary",
 			onSkip: null,
 			skipButtonLabel: "No thanks, continue with basic and view limited data",
@@ -388,7 +387,7 @@ export default function OnboardingScreen() {
 			const annualPackage = packages.find((p) => p.packageType === "ANNUAL");
 			const weeklyPackage = packages.find((p) => p.packageType === "WEEKLY");
 
-			const pack = selectedPlan === "annual" ? annualPackage : weeklyPackage;
+			const pack = annualPackage;
 
 			if (!pack) {
 				console.log("No package found");
@@ -474,7 +473,7 @@ export default function OnboardingScreen() {
 						<View key={index} style={{ width: windowWidth }} className="px-8">
 							<View className="flex flex-col gap-2 mt-4 px-4 tex">
 								<H1 className={step.titleStyle}>{step.title}</H1>
-								<P>{step.subtitle}</P>
+								<P className={step.titleStyle}>{step.subtitle}</P>
 							</View>
 							<View className="flex flex-col justify-center items-center  w-full ">
 								{step.image && (
@@ -500,6 +499,11 @@ export default function OnboardingScreen() {
 
 			{/* Continue Button pinned to bottom */}
 			<View className="px-8">
+				{currentStep === steps.length - 1 && (
+					<Large className="text-center font-semibold mb-6">
+						No payment due now
+					</Large>
+				)}
 				<Button
 					onPress={() => handleNextStep(true)}
 					variant="default"
@@ -510,7 +514,7 @@ export default function OnboardingScreen() {
 				<View className="text-center mt-2 h-8 flex flex-col items-center">
 					{currentStep === steps.length - 1 && (
 						<Muted className="text-center max-w-sm">
-							Your membership helps fund independent lab testing
+							3 Day free trial then $0.90 a week (billed annually)
 						</Muted>
 					)}
 

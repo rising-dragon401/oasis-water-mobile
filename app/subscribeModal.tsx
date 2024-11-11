@@ -12,7 +12,7 @@ import { useRevenueCat } from "@/context/revenue-cat-provider";
 import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
 
-const FEATURES = [
+export const FEATURES = [
 	{
 		icon: "check",
 		label: "Access all scores and ratings",
@@ -80,7 +80,7 @@ export default function SubscribeModal() {
 			const annualPackage = packages.find((p) => p.packageType === "ANNUAL");
 			const weeklyPackage = packages.find((p) => p.packageType === "WEEKLY");
 
-			const pack = selectedPlan === "annual" ? annualPackage : weeklyPackage;
+			const pack = annualPackage;
 
 			if (!pack) {
 				console.log("No package found");

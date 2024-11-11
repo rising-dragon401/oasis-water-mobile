@@ -3,7 +3,6 @@ import { Stack } from "expo-router";
 import { View, useWindowDimensions } from "react-native";
 
 import OasisLogo from "@/assets/oasis-word.png";
-import ScoreBadge from "@/components/sharable/score-badge";
 import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
 
@@ -26,9 +25,7 @@ function HomeHeader({
 				<Image source={OasisLogo} style={{ width: 85, height: 24 }} />
 			</View>
 
-			<View className="">
-				<ScoreBadge />
-			</View>
+			<View className="w-10">{/* <ScoreBadge /> */}</View>
 		</View>
 	);
 }

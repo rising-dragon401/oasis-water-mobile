@@ -4,10 +4,12 @@ export const getFilters = async ({
 	limit,
 	sortMethod,
 	type,
+	tags,
 }: {
 	limit?: number;
 	sortMethod?: "name" | "score";
 	type?: string[] | null;
+	tags?: string[] | null;
 } = {}) => {
 	let filters;
 	const orderBy = sortMethod || "name";
@@ -16,6 +18,10 @@ export const getFilters = async ({
 
 	if (type && type.length > 0) {
 		query = query.in("type", type);
+	}
+
+	if (tags && tags.length > 0) {
+		query = query.or(tags.map((tag) => `tags.ilike.%${tag}%`).join(","));
 	}
 
 	if (limit) {

@@ -485,7 +485,7 @@ export default function TabOneScreen() {
 							<Muted className="m-0 p-0">see all</Muted>
 						</Link>
 					</View>
-					<View className="flex flex-col gap-4 w-full">
+					<View className="flex flex-col gap-4 w-full bg-white rounded-xl">
 						{loadingCategoryData ? (
 							<FlatList
 								data={[1, 2, 3, 4, 5, 6]}
@@ -509,21 +509,19 @@ export default function TabOneScreen() {
 									keyExtractor={(item, index) => item.id + index.toString()}
 									renderItem={({ item: category }) => (
 										<View
-											className="flex justify-center rounded-2xl mb-2 border-b border-muted"
+											className="flex justify-center rounded-2xl border-b border-muted"
 											style={{ maxHeight: 60, width: "100%" }}
 										>
-											<Link
-												href={`/search/top-rated/${category.typeId}?tags=${category.selectedTags}`}
-											>
-												<View className="flex flex-row items-center  px-2 justify-between w-full">
-													<View className="flex flex-row items-center gap-2 py-2">
+											<Link href={`/search/top-rated/${category.id}`}>
+												<View className="flex flex-row items-center px-4 justify-between w-full">
+													<View className="flex flex-row items-center gap-4">
 														<View className="rounded-full overflow-hidden ">
 															<Image
 																source={{ uri: category.image }}
 																alt={category.title}
 																style={{
-																	width: 40,
-																	height: 40,
+																	width: 36,
+																	height: 36,
 																}}
 																contentFit="cover"
 															/>
@@ -532,9 +530,9 @@ export default function TabOneScreen() {
 															<P className=" text-xl">{category.title}</P>
 														</View>
 													</View>
-													<View className="flex flex-col justify-end gap-2 h-full  mr-2">
+													<View className="flex flex-col justify-end items-center gap-2 h-full mr-2">
 														<Ionicons
-															name="arrow-forward"
+															name="chevron-forward"
 															size={18}
 															color={mutedForegroundColor}
 														/>
@@ -544,6 +542,13 @@ export default function TabOneScreen() {
 											</Link>
 										</View>
 									)}
+									// contentContainerStyle={{
+									// 	borderWidth: 1,
+									// 	borderColor: "red",
+									// 	borderRadius: 12,
+									// 	paddingVertical: 10, // Example style
+									// 	backgroundColor: "#f0f0f0", // Example style
+									// }}
 								/>
 							</>
 						)}

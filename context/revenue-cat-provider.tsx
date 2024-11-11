@@ -110,9 +110,13 @@ export const RevenueCatProvider = ({ children }: any) => {
 	const loadOfferings = async () => {
 		const offerings = await Purchases.getOfferings();
 
+		console.log("offerings", JSON.stringify(offerings, null, 2));
+
 		const annualPackage = offerings.current?.annual
 			? [offerings.current.annual]
 			: [];
+
+		console.log("annualPackage", JSON.stringify(annualPackage, null, 2));
 
 		const weeklyPackage = offerings.current?.weekly
 			? [offerings.current.weekly]

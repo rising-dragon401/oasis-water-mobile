@@ -4,7 +4,13 @@ export const getItems = async ({
 	limit,
 	sortMethod,
 	type,
-}: { limit?: number; sortMethod?: "name" | "score"; type?: any[] } = {}) => {
+	tags,
+}: {
+	limit?: number;
+	sortMethod?: "name" | "score";
+	type?: any[];
+	tags?: string[];
+} = {}) => {
 	const orderBy = sortMethod || "name";
 
 	let query = supabase
@@ -14,6 +20,10 @@ export const getItems = async ({
 
 	if (type && type.length > 0) {
 		query = query.in("type", type);
+	}
+
+	if (tags && tags.length > 0) {
+		query = query.or(tags.map((tag) => `tags.ilike.%${tag}%`).join(","));
 	}
 
 	if (limit !== undefined) {

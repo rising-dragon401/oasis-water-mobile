@@ -114,14 +114,14 @@ export default function Search({
 						hitsPerPage: numResults || 5,
 					},
 				},
-				{
-					indexName: "users",
-					query,
-					params: {
-						restrictSearchableAttributes: ["name"],
-						hitsPerPage: numResults || 3,
-					},
-				},
+				// {
+				// 	indexName: "users",
+				// 	query,
+				// 	params: {
+				// 		restrictSearchableAttributes: ["name"],
+				// 		hitsPerPage: numResults || 3,
+				// 	},
+				// },
 			];
 		}
 
@@ -180,8 +180,6 @@ export default function Search({
 		setShowSearchIcon(true);
 		setActive(false);
 	};
-
-	console.log("showSearchIcon: ", showSearchIcon);
 
 	const getSearchPadding = () => (showSearchIcon ? "!pl-12" : "!pl-6");
 

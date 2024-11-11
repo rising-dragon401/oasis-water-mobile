@@ -16,7 +16,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { H2, Muted, P } from "@/components/ui/typography";
 import { useUserProvider } from "@/context/user-provider";
-import { ITEM_TYPES } from "@/lib/constants/categories";
+import {
+	CATEGORIES as CATEGORIES_CONST,
+	ITEM_TYPES,
+} from "@/lib/constants/categories";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 const CATEOGRIES = [
@@ -174,6 +177,8 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 
 	const isAuthUser = uid === user?.uid;
 
+	console.log("categoryId", categoryId);
+
 	const fetchAndSetData = async (
 		key: string,
 		fetchFunction: () => Promise<any>,
@@ -205,9 +210,23 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 
 	// Fetch items based on categoryId
 	useEffect(() => {
-		const type = ITEM_TYPES.find((item) => item.tags.includes(categoryId));
+		const type = ITEM_TYPES.find((item) => item.dbTypes.includes(categoryId));
 
-		const productType_ = type?.id || "";
+		const category = CATEGORIES_CONST.find((item) => item.id === categoryId);
+
+		console.log("category", category);
+		console.log("type", type);
+		console.log("type.dbTypes", category?.dbTypes);
+		console.log("category.selectedTags", category?.selectedTags);
+
+		const productType_ = category?.productType || "";
+
+		console.log("productType_", productType_);
+
+		setTitle(category?.title || "");
+		navigation.setOptions({
+			title: category?.title || "",
+		});
 
 		setProductType(productType_);
 
@@ -217,26 +236,28 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 					getItems({
 						limit: 500,
 						sortMethod: "name",
-						type: type?.dbTypes,
+						type: category?.dbTypes,
+						tags: category?.tags,
 					}),
 				);
-				navigation.setOptions({
-					title: "Bottled water",
-				});
-				setTitle("Bottled water");
+				// navigation.setOptions({
+				// 	title: "Bottled water",
+				// });
+				// setTitle("Bottled water");
 				break;
 			case "filter":
 				fetchAndSetData("filter", () =>
 					getFilters({
 						limit: 250,
 						sortMethod: "name",
-						type: type?.dbTypes,
+						type: category?.dbTypes,
+						tags: category?.tags,
 					}),
 				);
-				navigation.setOptions({
-					title: "Filters",
-				});
-				setTitle("Water filters");
+				// navigation.setOptions({
+				// 	title: "Filters",
+				// });
+				// setTitle("Water filters");
 				break;
 
 			default:
