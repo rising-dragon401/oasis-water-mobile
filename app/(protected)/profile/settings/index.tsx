@@ -1,18 +1,10 @@
-import { Ionicons } from "@expo/vector-icons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import Octicons from "@expo/vector-icons/Octicons";
 import { useUserProvider } from "context/user-provider";
 import * as Clipboard from "expo-clipboard";
 import * as Linking from "expo-linking";
 import { Link, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import {
-	Alert,
-	RefreshControl,
-	ScrollView,
-	TouchableOpacity,
-	View,
-} from "react-native";
+import { Alert, RefreshControl, ScrollView, View } from "react-native";
 
 import { getUserReferralStats } from "@/actions/admin";
 import { addUserToAlgolia } from "@/actions/algolia";
@@ -28,12 +20,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { H1, Large, Muted, P } from "@/components/ui/typography";
+import { Large, Muted, P } from "@/components/ui/typography";
 import { useRevenueCat } from "@/context/revenue-cat-provider";
 import { useToast } from "@/context/toast-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
 
-export default function TabTwoScreen() {
+export default function SettingsScreen() {
 	const {
 		uid,
 		user,
@@ -243,20 +235,6 @@ export default function TabTwoScreen() {
 					}
 				>
 					<View className="w-full flex flex-col h-full justify-between pb-14 px-8">
-						<View className="flex-row w-full justify-between items-center mt-24">
-							<H1>Settings</H1>
-							<TouchableOpacity
-								onPress={() => router.push("/(protected)/settings/help")}
-								className="!bg-transparent"
-							>
-								<Ionicons
-									name="help-circle-outline"
-									size={24}
-									color={iconColor}
-								/>
-							</TouchableOpacity>
-						</View>
-
 						<View className="flex flex-col mt-6">
 							<ImageUpload
 								itemId={uid}
@@ -313,7 +291,18 @@ export default function TabTwoScreen() {
 									<View className="mt-4 flex flex-col items-center gap-y-2">
 										<UpgradeButton />
 
-										{!userData?.has_redeemed_free_month && (
+										{!subscription && (
+											<Button
+												className="w-full"
+												variant="ghost"
+												label="Restore purchases"
+												loading={loadingRestorePurchases}
+												onPress={handleRestorePurchases}
+											/>
+										)}
+
+										{/* TODO bring this back but users get one unlock per friend invited and joined */}
+										{/* {!userData?.has_redeemed_free_month && (
 											<>
 												<Button
 													className="w-full"
@@ -329,20 +318,10 @@ export default function TabTwoScreen() {
 													onPress={handleLoadRedeemModal}
 												/>
 											</>
-										)}
+										)} */}
 									</View>
 								)}
 							</View>
-
-							{!subscription && (
-								<Button
-									className="w-full"
-									variant="ghost"
-									label="Restore purchases"
-									loading={loadingRestorePurchases}
-									onPress={handleRestorePurchases}
-								/>
-							)}
 						</View>
 
 						<View className="flex flex-col gap-y-2 mt-6">
@@ -357,7 +336,7 @@ export default function TabTwoScreen() {
 											placeholder="Name"
 											value={newName}
 											onChangeText={(text) => setNewName(text)}
-											className="w-full border border-border rounded-md bg-background"
+											className="w-full border border-border  bg-background"
 										/>
 									</View>
 								</View>
@@ -371,7 +350,7 @@ export default function TabTwoScreen() {
 											placeholder="Username"
 											value={newUsername}
 											onChangeText={(text) => setNewUsername(text)}
-											className="w-full border border-border rounded-md bg-background"
+											className="w-full border border-border bg-background"
 										/>
 									</View>
 								</View>
@@ -399,7 +378,7 @@ export default function TabTwoScreen() {
 											placeholder="username (don't include @)"
 											value={newReferralCode}
 											onChangeText={(text) => setNewReferralCode(text)}
-											className="w-full border border-border rounded-md bg-background"
+											className="w-full border border-border bg-background"
 										/>
 									</View>
 								</View>
@@ -414,7 +393,7 @@ export default function TabTwoScreen() {
 							</View>
 						</View>
 
-						<View className="flex flex-col gap-y-2 mt-6">
+						{/* <View className="flex flex-col gap-y-2 mt-6">
 							<P className="text-muted-foreground">Socials</P>
 							<View className="bg-muted p-4 rounded-xl border border-border">
 								<View className="flex flex-col w-full space-y-2 mt-4">
@@ -470,9 +449,9 @@ export default function TabTwoScreen() {
 									label="Update"
 								/>
 							</View>
-						</View>
+						</View> */}
 
-						<View className="flex flex-col gap-y-2 mt-6">
+						{/* <View className="flex flex-col gap-y-2 mt-6">
 							<P className="text-muted-foreground">Referrals and Earnings</P>
 							<View className="bg-muted p-4 rounded-xl border border-border">
 								<View className="flex flex-col gap-y-2">
@@ -528,7 +507,7 @@ export default function TabTwoScreen() {
 									</View>
 								</View>
 							</View>
-						</View>
+						</View> */}
 
 						<View className="flex flex-col gap-y-2 mt-6">
 							<P className="text-muted-foreground">Account</P>
@@ -561,10 +540,10 @@ export default function TabTwoScreen() {
 					className="w-full min-h-screen justify-start gap-y-2 px-4"
 					style={{ backgroundColor }}
 				>
-					<View className="flex-row w-full justify-between items-center mt-24">
+					{/* <View className="flex-row w-full justify-between items-center mt-24">
 						<H1>Settings</H1>
 						<View>
-							<Link href="/(protected)/settings/help">
+							<Link href="/(protected)/profile/settings/help">
 								<Ionicons
 									name="help-circle-outline"
 									size={24}
@@ -572,7 +551,7 @@ export default function TabTwoScreen() {
 								/>
 							</Link>
 						</View>
-					</View>
+					</View> */}
 					<Muted>Looks like you're not logged in</Muted>
 
 					<Button

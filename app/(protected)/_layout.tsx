@@ -1,11 +1,17 @@
-import { Ionicons, Octicons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import React from "react";
 
 import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function ProtectedLayout() {
-	const { backgroundColor, textColor } = useColorScheme();
+	const {
+		backgroundColor,
+		textColor,
+		iconColor,
+		mutedColor,
+		textSecondaryColor,
+	} = useColorScheme();
 
 	return (
 		<Tabs
@@ -17,36 +23,66 @@ export default function ProtectedLayout() {
 				headerStyle: {
 					backgroundColor,
 				},
-				tabBarShowLabel: false,
-				tabBarLabelStyle: {
-					color: textColor,
-				},
-				tabBarIcon: ({ focused, color }) => {
-					const iconColor = focused ? textColor : "rgba(128, 128, 128, 0.5)"; // Faded color for inactive tabs
-					if (route.name === "search") {
-						return <Octicons name="search" size={24} color={iconColor} />;
-					} else if (route.name === "settings") {
-						return <Ionicons name="cog" size={24} color={iconColor} />;
-					} else if (route.name === "research") {
-						return (
-							<Ionicons name="flask-outline" size={24} color={iconColor} />
-						);
-					} else if (route.name === "oasis") {
-						return <Octicons name="person" size={24} color={iconColor} />;
-					}
-
-					// else if (route.name === "locations") {
-					// 	return (
-					// 		<Ionicons name="location-outline" size={24} color={iconColor} />
-					// 	);
-					// }
-				},
+				tabBarActiveTintColor: iconColor,
+				tabBarInactiveTintColor: textSecondaryColor,
+				tabBarShowLabel: true,
+				// tabBarLabelStyle: {
+				// 	color: textColor,
+				// },
 			})}
 		>
-			<Tabs.Screen name="search" />
-			<Tabs.Screen name="oasis" />
-			<Tabs.Screen name="research" />
-			<Tabs.Screen name="settings" />
+			<Tabs.Screen
+				name="search"
+				options={{
+					title: "Search",
+					tabBarIcon: ({ color, focused }) => (
+						<Ionicons
+							name={focused ? "search" : "search-outline"}
+							size={24}
+							color={color}
+						/>
+					),
+				}}
+			/>
+			<Tabs.Screen
+				name="saved"
+				options={{
+					title: "Saved",
+					tabBarIcon: ({ color, focused }) => (
+						<Ionicons
+							name={focused ? "bookmark" : "bookmark-outline"}
+							size={24}
+							color={color}
+						/>
+					),
+				}}
+			/>
+			<Tabs.Screen
+				name="research"
+				options={{
+					title: "Research",
+					tabBarIcon: ({ color, focused }) => (
+						<Ionicons
+							name={focused ? "flask" : "flask-outline"}
+							size={24}
+							color={color}
+						/>
+					),
+				}}
+			/>
+			<Tabs.Screen
+				name="profile"
+				options={{
+					title: "Profile",
+					tabBarIcon: ({ color, focused }) => (
+						<Ionicons
+							name={focused ? "person" : "person-outline"}
+							size={24}
+							color={color}
+						/>
+					),
+				}}
+			/>
 		</Tabs>
 	);
 }

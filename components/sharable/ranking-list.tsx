@@ -493,37 +493,16 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 	);
 
 	return (
-		<View className="flex-1 md:mt-4 mt-0 w-screen px-4">
+		<View className="flex-1 md:mt-4 mt-0 w-screen px-6">
 			{!subscription ? (
-				<View className="px-4">
+				<View className=" pb-2 flex-row gap-4 items-end justify-between w-full">
 					<H2>{title.charAt(0) + title.slice(1)}</H2>
-					<Muted>
-						Want to know the best{" "}
-						{title.charAt(0).toLowerCase() + title.slice(1)} based on science?
-					</Muted>
-					<View className="flex flex-row items-end justify-between w-full gap-6">
-						<Button
-							className="w-44 mt-2"
-							variant="default"
-							label="Unlock ratings"
-							icon={<Octicons name="lock" size={16} color={backgroundColor} />}
-							iconPosition="left"
-							onPress={() => {
-								router.push("/subscribeModal");
-							}}
-						/>
 
-						{renderFilters()}
-					</View>
+					<View className="">{renderFilters()}</View>
 				</View>
 			) : (
 				<View className="pb-2 max-w-sm">
 					<H2>{title.charAt(0) + title.slice(1)}</H2>
-					{/* <Muted>
-						Browse and find the best{" "}
-						{title.charAt(0).toLowerCase() + title.slice(1)} based on science
-						and lab reports. Default sorted by score.
-					</Muted> */}
 				</View>
 			)}
 
@@ -532,35 +511,50 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 			{loading ? renderLoader() : null}
 
 			{filteredItems?.length > 0 ? (
-				<FlatList
-					data={filteredItems}
-					renderItem={({ item, index }) => (
-						<View
-							key={item?.id}
-							style={{ width: "46%" }}
-							className={`mb-2 ${index < 2 ? "mt-2" : ""}`}
-						>
-							<ItemPreviewCard
-								item={item}
-								showFavorite
-								isAuthUser={isAuthUser}
-								isGeneralListing
-							/>
-						</View>
-					)}
-					keyExtractor={(item) => item.id}
-					numColumns={2}
-					columnWrapperStyle={{ justifyContent: "space-around", gap: 8 }}
-					contentContainerStyle={{ paddingTop: 0, paddingBottom: 0, gap: 16 }}
-					showsVerticalScrollIndicator={false}
-					ListEmptyComponent={loading ? renderLoader() : null}
-					ListHeaderComponent={<View style={{ height: 1 }} />}
-					initialNumToRender={8}
-					maxToRenderPerBatch={4}
-					windowSize={5}
-					removeClippedSubviews
-					scrollToOverflowEnabled={false}
-				/>
+				<View className="flex-1 relative">
+					<FlatList
+						data={filteredItems}
+						renderItem={({ item }) => (
+							<View key={item?.id} style={{ width: "100%" }} className="mb-2">
+								<ItemPreviewCard
+									item={item}
+									showFavorite
+									isAuthUser={isAuthUser}
+									isGeneralListing
+									variation="row"
+									imageHeight={80}
+								/>
+							</View>
+						)}
+						keyExtractor={(item) => item.id}
+						numColumns={1}
+						contentContainerStyle={{ paddingTop: 0, paddingBottom: 0, gap: 2 }}
+						showsVerticalScrollIndicator={false}
+						ListEmptyComponent={loading ? renderLoader() : null}
+						ListHeaderComponent={<View style={{ height: 1 }} />}
+						initialNumToRender={8}
+						maxToRenderPerBatch={4}
+						windowSize={5}
+						removeClippedSubviews
+						scrollToOverflowEnabled={false}
+					/>
+
+					<View
+						className="flex-1 relative justify-center items-center"
+						style={{ position: "absolute", bottom: 20, width: "100%" }}
+					>
+						<Button
+							className="w-64 !h-16 mt-2 !py-3 !px-4 shadow-lg"
+							variant="default"
+							label="Unlock ratings"
+							icon={<Octicons name="lock" size={16} color={backgroundColor} />}
+							iconPosition="left"
+							onPress={() => {
+								router.push("/subscribeModal");
+							}}
+						/>
+					</View>
+				</View>
 			) : (
 				<View>
 					{loading ? (

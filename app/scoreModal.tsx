@@ -24,7 +24,7 @@ export default function ScoreModal() {
 	const handleOverallPress = () => {
 		router.back();
 		if (uid) {
-			router.push("/(protected)/oasis");
+			router.push("/(protected)/profile");
 		} else {
 			router.push("/(public)/sign-up");
 		}

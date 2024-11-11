@@ -1,12 +1,13 @@
 import { Octicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
 import * as Linking from "expo-linking";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { Alert, ScrollView, TouchableOpacity, View } from "react-native";
+import { Alert, ScrollView, View } from "react-native";
 
-import Logo from "@/components/sharable/logo";
+import OasisIcon from "@/assets/oasis-icon.png";
 import { Button } from "@/components/ui/button";
-import { H2, Muted, P } from "@/components/ui/typography";
+import { H2, Large, Muted, P } from "@/components/ui/typography";
 import { useRevenueCat } from "@/context/revenue-cat-provider";
 import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
@@ -22,18 +23,16 @@ const FEATURES = [
 	},
 	{
 		icon: "check",
-		label: "Get notified of new lab results",
+		label: "Top rated products",
 	},
 	{
 		icon: "check",
-		label: "Filter recommendations",
+		label: "Get notified of new data",
 	},
-	// {
-	// 	label: "Oasis Research AI",
-	// },
+
 	{
 		icon: "check",
-		label: "Support independent lab testing",
+		label: "Support unbiased lab testing",
 	},
 ];
 
@@ -45,9 +44,7 @@ export default function SubscribeModal() {
 
 	const [loading, setLoading] = useState(false);
 	const [loadingRestore, setLoadingRestore] = useState(false);
-	const [selectedPlan, setSelectedPlan] = useState<"annual" | "weekly">(
-		"weekly",
-	);
+	const [selectedPlan, setSelectedPlan] = useState<"annual">("annual");
 
 	useEffect(() => {
 		if (subscription) {
@@ -106,12 +103,22 @@ export default function SubscribeModal() {
 		<ScrollView contentContainerStyle={{ backgroundColor, height: "100%" }}>
 			<View className="flex-1 justify-between p-4 py-16 h-full items-center ">
 				{/* Content Section */}
-				<View className="items-center flex-1 max-w-lg">
-					<Logo />
-					<H2 className="text-center pt-6">Oasis Member</H2>
+				<View className="items-center  max-w-lg">
+					<View className="relative w-24 h-24 overflow-hidden object-contain">
+						<Image
+							source={OasisIcon}
+							style={{ width: "100%", height: "100%" }}
+							contentFit="contain"
+						/>
+					</View>
+					<H2 className="text-center pt-2">Oasis Member</H2>
+					<Muted className="text-center max-w-sm mt-2 text-base">
+						Join 10,000+ members transforming their water habits and supporting
+						unbiased ratings.
+					</Muted>
 
 					{/* Features */}
-					<View className="flex flex-col mt-4 h-full  min-h-48 gap-8 pt-8">
+					<View className="flex flex-col h-full min-h-48 gap-8 pt-8 mt-4">
 						{FEATURES.map((feature, index) => (
 							<View
 								key={index}
@@ -130,51 +137,30 @@ export default function SubscribeModal() {
 
 				{/* Subscribe Button Section */}
 				<View className="w-full flex-col items-center mt-auto justify-center max-w-md px-4">
-					<View className="flex flex-row gap-4 w-full p-4 mb-4">
-						<TouchableOpacity
-							className={`flex-1 flex flex-col justify-between border border-border rounded-lg py-2 px-4 ${selectedPlan === "annual" ? "border-primary border-2" : ""}`}
-							onPress={() => setSelectedPlan("annual")}
-						>
-							<P className="text-left text-lg font-semibold">Yearly</P>
+					<View className="flex flex-col w-full items-center">
+						<Large className="text-center font-semibold mb-6">
+							No payment due now
+						</Large>
+						{/* mt-auto pushes this section to the bottom */}
+						<Button
+							className="w-full !max-w-sm !h-20 mb-2 0"
+							textClassName="!text-lg"
+							variant="default"
+							label="Try for free 💧"
+							loading={loading}
+							onPress={() => handleSubscribe()}
+						/>
 
-							<View className="flex flex-row justify-between items-end mt-4">
-								<P className="text-xl font-semibold">$47</P>
-								<Muted className="">$0.90 /wk</Muted>
-							</View>
-						</TouchableOpacity>
-
-						<TouchableOpacity
-							className={`flex-1 flex flex-col justify-between border border-border rounded-lg py-2 px-4 ${selectedPlan === "weekly" ? "border-primary border-2" : ""}`}
-							onPress={() => setSelectedPlan("weekly")}
-						>
-							<P className="text-lg font-semibold">Weekly</P>
-							<View className="flex flex-row justify-between mt-4">
-								<P className="text-xl font-semibold">$4.99</P>
-								{/* <Muted className="">$0.90 / week</Muted> */}
-							</View>
-						</TouchableOpacity>
+						<Muted className="text-center">
+							3 Day free trial then $0.90 a week (billed annually)
+						</Muted>
 					</View>
-					{/* mt-auto pushes this section to the bottom */}
-					<Button
-						className="w-full !max-w-sm !h-20 mb-4 !bg-gradient-to-r from-blue-500 to-blue-300 shadow-lg shadow-blue-500/50"
-						textClassName="!text-lg"
-						variant="default"
-						label="Unlock 💧"
-						loading={loading}
-						onPress={() => handleSubscribe()}
-					/>
-
-					<View className="flex flex-col gap-y-2 w-full">
-						{/* <Muted className="text-center">
-							Your membership helps fund independent lab testing.
-						</Muted> */}
-					</View>
-					<View className="mt-6 px-8 flex flex-row gap-x-4">
+					<View className="mt-8 px-8 flex flex-row gap-x-4">
 						<Button
 							label="Terms of Use"
 							size="sm"
 							variant="ghost"
-							textClassName="!text-muted-foreground"
+							textClassName="!text-muted-foreground "
 							onPress={() => {
 								Linking.openURL("https://www.oasiswater.app/terms");
 							}}

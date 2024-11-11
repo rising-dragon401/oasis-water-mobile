@@ -35,15 +35,9 @@ export default function PeoplePage() {
 				paddingHorizontal: 20,
 			}}
 		>
-			<View
-				style={{
-					flexDirection: "row",
-					flexWrap: "wrap",
-					justifyContent: "space-between",
-				}}
-			>
+			<View className="flex flex-col gap-4">
 				{users.map((user) => (
-					<View style={{ width: "48%" }}>
+					<View>
 						<UserPreviewCard key={user.id} item={user} />
 					</View>
 				))}

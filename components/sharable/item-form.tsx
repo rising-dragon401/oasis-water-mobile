@@ -1,11 +1,12 @@
 "use client";
 
-import { Octicons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { getItemDetails } from "actions/items";
 import * as Linking from "expo-linking";
 import { Link, useNavigation } from "expo-router";
 import { useEffect, useState } from "react";
-import { ScrollView, View } from "react-native";
+import { ScrollView, TouchableOpacity, View } from "react-native";
 
 import BlurredLineItem from "./blurred-line-item";
 import ContaminantCard from "./contamintant-card";
@@ -18,8 +19,7 @@ import Sources from "./sources";
 import Typography from "./typography";
 
 import { incrementItemsViewed } from "@/actions/user";
-import { Button } from "@/components/ui/button";
-import { H2, Muted } from "@/components/ui/typography";
+import { H3, Muted } from "@/components/ui/typography";
 import { useUserProvider } from "@/context/user-provider";
 import { FEATURES } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
@@ -59,6 +59,8 @@ export function ItemForm({ id }: Props) {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [id]);
 
+	console.log("item: ", JSON.stringify(item, null, 2));
+
 	const contaminants = item?.contaminants || [];
 
 	const contaminantsAboveLimit = contaminants.filter(
@@ -86,7 +88,7 @@ export function ItemForm({ id }: Props) {
 				  item.packaging === "aluminum (can)" ||
 				  item.packaging === "cardboard"
 				? "Some"
-				: "No";
+				: "Minimal";
 
 	const harmfulIngredients = item.ingredients?.filter(
 		(ingredient: any) => ingredient.severity_score > 0,
@@ -121,13 +123,23 @@ export function ItemForm({ id }: Props) {
 		>
 			<View className="w-full items-center justify-center px-8">
 				<View className="flex flex-col gap-2 justify-center items-center w-full">
-					<View className="flex justify-center items-center h-80 w-80 p-4">
+					<View className="flex justify-center items-center h-64 w-64 p-4">
 						<ItemImage src={item.image} alt={item.name} thing={item} />
 					</View>
 
 					<View className="flex flex-row gap-2 w-full">
 						<View className="flex flex-col w-2/3">
-							<H2 className="pb-1">{item.name}</H2>
+							{item.affiliate_url ? (
+								<TouchableOpacity
+									onPress={() => {
+										Linking.openURL(item.affiliate_url);
+									}}
+								>
+									<H3 className="pb-1">{item.name}</H3>
+								</TouchableOpacity>
+							) : (
+								<H3 className="pb-1">{item.name}</H3>
+							)}
 
 							{/* @ts-ignore */}
 							<Link href={`/search/company/${item.company?.id}`}>
@@ -139,74 +151,57 @@ export function ItemForm({ id }: Props) {
 						</View>
 
 						<View className="flex w-1/3 flex-col-reverse justify-end items-end -mt-2">
-							<Score score={item.score} size="md" />
+							<Score score={item.score} size="sm" />
 						</View>
 					</View>
 
-					<View className="flex flex-col gap-10 gap-y-1 w-full mt-2 ">
-						{item.is_indexed && (
-							<View className="flex flex-col gap-y-1 w-full">
-								<BlurredLineItem
-									label="Contaminants"
-									value={contaminants.length}
-									isPaywalled={false}
-									score={contaminants.length > 0 ? "bad" : "good"}
-								/>
-
-								<BlurredLineItem
-									label="Above guidelines"
-									value={contaminantsAboveLimit.length}
-									isPaywalled={false}
-									score={contaminantsAboveLimit.length > 0 ? "bad" : "good"}
-								/>
-
-								<BlurredLineItem
-									label="pH"
-									value={
-										item.metadata?.ph_level === 0 ||
-										item.metadata?.ph_level == null
-											? "Unknown"
-											: item.metadata.ph_level
-									}
-									isPaywalled={false}
-									score={
-										parseFloat(item.metadata?.ph_level) > 7 ? "good" : "neutral"
-									}
-								/>
-
-								<BlurredLineItem
-									label="TDS"
-									value={item.metadata?.tds || "N/A"}
-									isPaywalled={false}
-									score="neutral"
-								/>
-
-								<BlurredLineItem
-									label="PFAS"
-									value={item.metadata?.pfas || "N/A"}
-									isPaywalled={false}
-									score={item.metadata?.pfas === "Yes" ? "bad" : "good"}
-								/>
-
-								<BlurredLineItem
-									label="Fluoride"
-									value={fluorideValue}
-									isPaywalled={false}
-									score={parseFloat(fluorideValue) > 0 ? "bad" : "good"}
-								/>
-							</View>
-						)}
-
+					<View className="flex flex-col gap-10 gap-y-1 w-full">
 						<View className="flex flex-col gap-y-1 w-full">
 							<BlurredLineItem
-								label="Harmful ingredients"
-								value={harmfulIngredients?.length}
+								label="Contaminants"
+								icon={
+									<MaterialCommunityIcons
+										name="virus-outline"
+										size={18}
+										color={iconColor}
+									/>
+								}
+								value={contaminants.length}
 								isPaywalled={false}
-								score={harmfulIngredients?.length > 0 ? "bad" : "good"}
+								score="bad"
+							/>
+							<BlurredLineItem
+								icon={
+									<Ionicons
+										name="warning-outline"
+										size={18}
+										color={iconColor}
+									/>
+								}
+								label="Above guidelines"
+								value={contaminantsAboveLimit.length}
+								isPaywalled={false}
+								score="bad"
+							/>
+							<BlurredLineItem
+								label="PFAS"
+								icon={
+									<Ionicons name="flame-outline" size={18} color={iconColor} />
+								}
+								value={item.metadata?.pfas || "N/A"}
+								isPaywalled={false}
+								score="bad"
 							/>
 
 							<BlurredLineItem
 								label="Microplastics"
+								icon={
+									<MaterialCommunityIcons
+										name="dots-hexagon"
+										size={18}
+										color={iconColor}
+									/>
+								}
 								value={nanoPlasticsValue}
 								isPaywalled={false}
 								score={nanoPlasticsValue === "Yes" ? "bad" : "good"}
@@ -214,6 +209,9 @@ export function ItemForm({ id }: Props) {
 
 							<BlurredLineItem
 								label="Packaging"
+								icon={
+									<Ionicons name="cube-outline" size={18} color={iconColor} />
+								}
 								value={
 									item?.packaging
 										? item.packaging.charAt(0).toUpperCase() +
@@ -226,6 +224,9 @@ export function ItemForm({ id }: Props) {
 
 							<BlurredLineItem
 								label="Source"
+								icon={
+									<Ionicons name="water-outline" size={18} color={iconColor} />
+								}
 								value={waterSource ? waterSource : "Unknown"}
 								isPaywalled={false}
 								score={
@@ -237,22 +238,6 @@ export function ItemForm({ id }: Props) {
 								}
 							/>
 						</View>
-					</View>
-
-					<View className="flex flex-col md:w-40 w-full md:mt-6 mt-2 gap-2">
-						{item.affiliate_url && (
-							<Button
-								variant={item.score > 70 ? "outline" : "outline"}
-								onPress={() => {
-									Linking.openURL(item.affiliate_url);
-								}}
-								label="Where to buy"
-								icon={
-									<Octicons name="arrow-right" size={12} color={iconColor} />
-								}
-								iconPosition="right"
-							/>
-						)}
 					</View>
 				</View>
 
@@ -280,7 +265,7 @@ export function ItemForm({ id }: Props) {
 
 				<>
 					{sortedContaminants && sortedContaminants.length > 0 && (
-						<View className="flex flex-col gap-6 mt-6">
+						<View className="flex flex-col gap-4 mt-6">
 							<Typography size="2xl" fontWeight="normal">
 								Contaminants ☠️
 							</Typography>
@@ -300,31 +285,11 @@ export function ItemForm({ id }: Props) {
 						</View>
 					)}
 
-					{item.type === "bottled_water" && (
-						<View className="grid md:grid-cols-2 md:grid-rows-1 grid-rows-2 gap-4 mt-6 w-full">
-							<MetaDataCard
-								title="Source"
-								description={item.metadata?.source}
-							/>
-							<MetaDataCard
-								title="Treatment Process"
-								description={
-									Array.isArray(item.filtration_methods) &&
-									item.filtration_methods.length > 0
-										? item.filtration_methods.join(", ") +
-											". " +
-											(item.metadata?.treatment_process || "Unknown")
-										: item.metadata?.treatment_process || "Unknown"
-								}
-							/>
-						</View>
-					)}
-
 					<>
 						{item?.ingredients?.length > 0 && (
 							<View className="flex flex-col gap-4 my-10">
 								<Typography size="2xl" fontWeight="normal">
-									Other Ingredients
+									Minerals
 								</Typography>
 								<PaywallContent label="View mineral and ingredients breakdowns">
 									<IngredientsCard ingredients={item.ingredients} />
@@ -332,6 +297,42 @@ export function ItemForm({ id }: Props) {
 							</View>
 						)}
 					</>
+
+					{item.type === "bottled_water" && (
+						<View className="flex flex-col gap-4">
+							<View className="flex flex-row w-full gap-4">
+								<MetaDataCard
+									title="Water Source"
+									description={item.metadata?.source}
+									className="flex-1"
+								/>
+								<MetaDataCard
+									title="Filtration Method"
+									description={
+										Array.isArray(item.filtration_methods) &&
+										item.filtration_methods.length > 0
+											? item.filtration_methods.join(", ") +
+												". " +
+												(item.metadata?.treatment_process || "Not specified")
+											: item.metadata?.treatment_process || "Not specified"
+									}
+									className="flex-1"
+								/>
+							</View>
+							<View className="flex flex-row gap-4">
+								<MetaDataCard
+									title="pH"
+									description={item.metadata?.ph_level || "Unknown"}
+									className="flex-1"
+								/>
+								<MetaDataCard
+									title="TDS"
+									description={item.metadata?.tds || "Unknown"}
+									className="flex-1"
+								/>
+							</View>
+						</View>
+					)}
 
 					{item && item?.sources?.length > 0 && <Sources data={item.sources} />}
 				</>

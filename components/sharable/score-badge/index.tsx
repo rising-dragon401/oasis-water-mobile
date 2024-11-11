@@ -27,7 +27,7 @@ export default function ScoreBadge() {
 
 	return (
 		<TouchableOpacity
-			onPress={() => router.push("/(protected)/oasis")}
+			onPress={() => router.push("/(protected)/profile")}
 			className={`flex-row items-center justify-end rounded-full px-4 py-2 gap-x-2  `}
 		>
 			{subscription && (

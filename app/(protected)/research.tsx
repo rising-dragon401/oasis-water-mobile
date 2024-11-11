@@ -6,9 +6,11 @@ import { useContext, useEffect, useState } from "react";
 import { FlatList, TouchableOpacity, View } from "react-native";
 
 import { getResearch } from "@/actions/admin";
+import CardRow from "@/components/sharable/card-row";
 import Skeleton from "@/components/sharable/skeleton";
+import StickyHeader from "@/components/sharable/sticky-header";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { H1, Large, Muted, P } from "@/components/ui/typography";
+import { Muted, P } from "@/components/ui/typography";
 import { BlogContext } from "@/context/blogs-provider";
 import { useUserProvider } from "@/context/user-provider";
 import { theme } from "@/lib/constants";
@@ -20,7 +22,7 @@ export default function ResearchScreen() {
 	const { blogs } = useContext(BlogContext);
 	const router = useRouter();
 
-	const [tabValue, setTabValue] = useState("labTesting");
+	const [tabValue, setTabValue] = useState("planned");
 	const [research, setResearch] = useState<any[]>([]);
 
 	const backgroundColor =
@@ -55,77 +57,55 @@ export default function ResearchScreen() {
 
 	return (
 		<View className="flex-1 justify-between px-8" style={{ backgroundColor }}>
-			<H1 className="mt-24">Research</H1>
-			<Muted>Stay current with product testing and research</Muted>
-			{/* 
-			<Button
-				label="Ask Oasis AI"
-				onPress={handleAskOasisAI}
-				icon={
-					subscription ? (
-						<Feather
-							name="message-circle"
-							size={16}
-							className="!text-offwhite"
-						/>
-					) : (
-						<Feather name="lock" size={16} className="!text-offwhite" />
-					)
-				}
-				className="mt-2"
-			/> */}
+			<StickyHeader
+				title="Lab testing"
+				description="Stay updated with the latest research and lab testing"
+			/>
 
 			<Tabs value={tabValue} onValueChange={setTabValue} className="mt-4">
 				<TabsList className="mb-1">
-					<TabsTrigger value="labTesting">
+					<TabsTrigger value="planned">
 						<P
 							className={`${
-								tabValue === "labTesting"
+								tabValue === "planned"
 									? "text-secondary-foreground"
 									: "text-primary"
 							}`}
 						>
-							Lab Testing
+							Planned
 						</P>
 					</TabsTrigger>
-					<TabsTrigger value="articles">
+					<TabsTrigger value="inProgress">
 						<P
 							className={`${
-								tabValue === "articles"
+								tabValue === "inProgress"
 									? "text-secondary-foreground"
 									: "text-primary"
 							}`}
 						>
-							Articles
+							In Progress
 						</P>
 					</TabsTrigger>
-					<TabsTrigger value="research">
+					<TabsTrigger value="completed">
 						<P
 							className={`${
-								tabValue === "research"
+								tabValue === "completed"
 									? "text-secondary-foreground"
 									: "text-primary"
 							}`}
 						>
-							Studies
+							Completed
 						</P>
 					</TabsTrigger>
 				</TabsList>
 
-				<TabsContent value="labTesting">
-					<View className="flex-col justify-start h-full mt-2">
-						<Large>🚧 Coming Soon 🚧 </Large>
-						<P className="mt-2">
-							Track the progress of our current lab testing and vote on the
-							products we should test next.
-						</P>
-						{/* <Large>In Progress</Large>
-						<Muted>
-							Our lab testing is currently in development. Check back soon!
-						</Muted>
-
-						<Large>Funding</Large>
-						<Muted>Contribute to future lab testing and research.</Muted> */}
+				<TabsContent value="planned">
+					<View className="flex-col justify-start mt-2 ">
+						<CardRow
+							image="https://www.oasiswater.app/_next/image?url=https%3A%2F%2Fconnect.live-oasis.com%2Fstorage%2Fv1%2Fobject%2Fpublic%2Fwebsite%2Fitems%2F237%2FFiuggi%2520Still%2520Water%2520.jpg&w=2048&q=75"
+							title="Fiuggi"
+							description="Standard testing"
+						/>
 					</View>
 				</TabsContent>
 

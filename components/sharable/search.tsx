@@ -27,20 +27,19 @@ export default function Search({
 	placeholder,
 	overridePress,
 	hideScan,
-	showSearchIcon = false,
 }: {
 	indices?: string[];
 	setActive: (active: boolean) => void;
 	placeholder?: string;
 	overridePress?: (item: any) => void;
 	hideScan?: boolean;
-	showSearchIcon?: boolean;
 }) {
 	const [results, setResults] = useState<any[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
 	const [, setQueryCompleted] = useState(false);
 	const [value, setValue] = useState("");
 	const [noResults, setNoResults] = useState(false);
+	const [showSearchIcon, setShowSearchIcon] = useState(true);
 
 	const debouncedQuery = useDebounce(value, 400);
 	const { colorScheme, mutedForegroundColor } = useColorScheme();
@@ -63,7 +62,6 @@ export default function Search({
 	};
 
 	const handleClear = () => {
-		console.log("clearing search");
 		setValue("");
 		setResults([]);
 	};
@@ -173,6 +171,20 @@ export default function Search({
 		}
 	}, [debouncedQuery]);
 
+	const handleFocus = () => {
+		setShowSearchIcon(false);
+		setActive(true);
+	};
+
+	const handleBlur = () => {
+		setShowSearchIcon(true);
+		setActive(false);
+	};
+
+	console.log("showSearchIcon: ", showSearchIcon);
+
+	const getSearchPadding = () => (showSearchIcon ? "!pl-12" : "!pl-6");
+
 	return (
 		<>
 			<View className="flex flex-row gap-2 items-center relative z-10">
@@ -183,19 +195,19 @@ export default function Search({
 					onChangeText={onChangeText}
 					aria-labelledbyledBy="inputLabel"
 					aria-errormessage="inputError"
-					className={`w-full pl-6 z-20 !h-16 !rounded-full `}
-					onFocus={() => setActive(true)}
-					onBlur={() => setActive(false)}
+					className={`w-full ${getSearchPadding()} z-20 !h-16 !rounded-full transition-all duration-100`}
+					onFocus={handleFocus}
+					onBlur={handleBlur}
 				/>
 
-				{/* {showSearchIcon && (
+				{showSearchIcon && (
 					<View
 						className="flex flex-row gap-4 z-20 items-center"
 						style={{ position: "absolute", left: 16 }}
 					>
 						<Feather name="search" size={20} color={mutedForegroundColor} />
 					</View>
-				)} */}
+				)}
 
 				<View
 					className={`flex flex-row gap-4 z-20 items-center ${

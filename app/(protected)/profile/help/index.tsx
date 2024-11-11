@@ -9,7 +9,7 @@ import {
 	AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { H1, H3, Large, Muted, P } from "@/components/ui/typography";
+import { H3, Large, Muted, P } from "@/components/ui/typography";
 
 const FAQ_LIST = [
 	{
@@ -74,7 +74,7 @@ const FAQ_LIST = [
 	},
 ];
 
-export default function TabTwoScreen() {
+export default function HelpScreen() {
 	const [copyStatus, setCopyStatus] = useState("Copy email");
 
 	const handleCopyEmail = async () => {
@@ -86,8 +86,6 @@ export default function TabTwoScreen() {
 	return (
 		<ScrollView className="flex-1">
 			<View className="w-full flex flex-col justify-between pb-14 px-8">
-				<H1 className="mt-6">Help</H1>
-
 				<View className="mt-6 w-full h-64 py-4 bg-muted rounded-xl text-left flex flex-col justify-center px-8">
 					<H3 className="text-left">Contact us</H3>
 					<P className="text-left">

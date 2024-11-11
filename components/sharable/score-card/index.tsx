@@ -1,3 +1,4 @@
+import Ionicons from "@expo/vector-icons/Ionicons";
 import Octicons from "@expo/vector-icons/Octicons";
 import React from "react";
 import { TouchableOpacity, View } from "react-native";
@@ -11,12 +12,9 @@ export default function ScoreCard({
 	score,
 	onPress,
 	type = "large_row",
-	healthEffects,
 	icon,
 	scoreLocked = false,
 	totalContaminants = 0,
-	totalContaminantsAboveLimit = 0,
-	totalHealthRisks = 0,
 }: {
 	title: string;
 	description: string;
@@ -27,8 +25,6 @@ export default function ScoreCard({
 	icon?: React.ReactNode;
 	scoreLocked?: boolean;
 	totalContaminants?: number;
-	totalContaminantsAboveLimit?: number;
-	totalHealthRisks?: number;
 }) {
 	const { iconColor } = useColorScheme();
 
@@ -70,12 +66,16 @@ export default function ScoreCard({
 		return (
 			<TouchableOpacity
 				onPress={onPress}
-				className="flex-1 w-full h-24 flex-row bg-card rounded-xl pl-4 pr-2 pt-4 pb-2  justify-between items-end border border-border"
+				className="flex w-full h-36 flex-row bg-card rounded-xl pl-4 pr-2 pt-4 pb-2  justify-between items-end border border-border"
 			>
-				<View className="flex flex-col h-full justify-between flex-wrap">
-					{icon}
-					<P className="text-lg">{title}</P>
-					<Muted className="flex-wrap w-64">{description}</Muted>
+				<View className="flex flex-col gap-1 justify-start flex-wrap h-full">
+					<Ionicons
+						name={icon as keyof typeof Ionicons.glyphMap}
+						size={40}
+						color={iconColor}
+					/>
+					<P className="text-xl">{title}</P>
+					{/* <Muted className="flex-wrap w-64">{description}</Muted> */}
 				</View>
 
 				<View className="flex flex-col justify-end pr-4">

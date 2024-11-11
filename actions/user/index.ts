@@ -160,7 +160,7 @@ export async function getUserFavorites(uid: string) {
 			if (bottledWaterTypes.includes(favorite.type)) {
 				const { data, error } = await supabase
 					.from("items")
-					.select("*")
+					.select("*, brand:brands(name)")
 					.eq("id", favorite.item_id)
 					.single();
 
@@ -172,7 +172,7 @@ export async function getUserFavorites(uid: string) {
 			} else if (filterTypes.includes(favorite.type)) {
 				const { data, error } = await supabase
 					.from("water_filters")
-					.select("*")
+					.select("*, brand:brands(name)")
 					.eq("id", favorite.item_id)
 					.single();
 
@@ -183,9 +183,12 @@ export async function getUserFavorites(uid: string) {
 				result = data;
 			}
 
-			// Only return the result if it has an id and image
+			// Only return the result if it has an id, image, and brandName
 			if (result && result.id && result.image) {
-				return result;
+				return {
+					...result,
+					brandName: result.brand?.name || null,
+				};
 			}
 		}),
 	);
@@ -432,19 +435,22 @@ export const getUsersWithOasis = async () => {
 	const { data, error } = await supabase
 		.from("users")
 		.select("*")
-		.neq("is_oasis_public", false);
+		.not("score", "is", null)
+		.not("full_name", "is", null)
+		.order("created_at", { ascending: false })
+		.limit(50);
 
 	if (error) {
 		console.error("Error fetching users with oasis:", error);
 		return null;
 	}
 
-	const filtered = data.filter((user) => user.score !== null);
-	const sorted = filtered.sort(
-		(a, b) => Number(b.is_featured) - Number(a.is_featured),
-	);
+	// const filtered = data.filter((user) => user.score !== null);
+	// const sorted = filtered.sort(
+	// 	(a, b) => Number(b.is_featured) - Number(a.is_featured),
+	// );
 
-	return sorted;
+	return data;
 };
 
 export const getUserInviteCode = async (uid: string): Promise<any> => {

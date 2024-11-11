@@ -9,7 +9,7 @@ export default function LocationCard({ location }: { location: any }) {
 	const { colorMode } = useColorScheme();
 
 	return (
-		<View className="relative rounded-xl my-2 w-44 h-24 max-h-24 overflow-hidden ">
+		<View className="relative rounded-xl my-2 w-44 h-16 max-h-16 overflow-hidden ">
 			<Image
 				source={{ uri: location.image }}
 				style={{ width: "100%", height: "100%" }}

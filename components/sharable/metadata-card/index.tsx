@@ -1,22 +1,20 @@
-import {
-	Card,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
+import { View } from "react-native";
+
+import { P } from "@/components/ui/typography";
 
 type Props = {
 	title: string;
 	description: string;
+	className?: string;
 };
 
-export default function MetaDataCard({ title, description }: Props) {
+export default function MetaDataCard({ title, description, className }: Props) {
 	return (
-		<Card>
-			<CardHeader>
-				<CardTitle>{title}</CardTitle>
-				<CardDescription>{description}</CardDescription>
-			</CardHeader>
-		</Card>
+		<View
+			className={`flex flex-col justify-between gap-y-1 border border-muted rounded-lg p-4 ${className}`}
+		>
+			<P className="text-muted-foreground flex-wrap">{description}</P>
+			<P className="text-lg">{title}</P>
+		</View>
 	);
 }

@@ -17,7 +17,6 @@ import {
 import RecsBg from "@/assets/recs-bg.png";
 import ItemPreviewCard from "@/components/sharable/item-preview-card";
 import LocationCard from "@/components/sharable/location-card";
-import ScoreCard from "@/components/sharable/score-card";
 import Search from "@/components/sharable/search";
 import Skeleton from "@/components/sharable/skeleton";
 import { H4, Muted, P, Small } from "@/components/ui/typography";
@@ -147,31 +146,6 @@ export default function TabOneScreen() {
 
 	const sections = [
 		{
-			key: "scores",
-			show: false,
-			render: () => (
-				<View className="flex  gap-x-4 w-full justify-between flex-row mt-6">
-					{/* <View className="max-h-28 w-full flex-1 my-6"> */}
-					<ScoreCard
-						title="Tap Water"
-						description="Quality in your area"
-						score={tapScore?.score || 0}
-						onPress={handleTapWaterPress}
-						type="square"
-					/>
-					<ScoreCard
-						title="Overall score"
-						description="based on your water usage"
-						score={userScores?.overallScore || 0}
-						onPress={() => {
-							router.push("/oasis");
-						}}
-						type="square"
-					/>
-				</View>
-			),
-		},
-		{
 			key: "recommended",
 			show: false,
 			render: () => (
@@ -222,7 +196,7 @@ export default function TabOneScreen() {
 			render: () => (
 				<View className="flex-col w-full z-10 mt-6">
 					<View className="flex flex-row justify-between w-full items-center mb-2">
-						<H4 className="text-left font-medium">Recently tested</H4>
+						<H4 className="text-left font-medium">Recently updated</H4>
 						{/* <Link
 							href="/(protected)/search/top-rated-all"
 							className="flex flex-row items-center gap-2"
@@ -257,7 +231,13 @@ export default function TabOneScreen() {
 								}}
 								className="overflow-x-scroll flex"
 								renderItem={({ item }) => (
-									<View className="mr-4 w-40 h-full">
+									<View
+										className="mr-4  h-full"
+										style={{
+											minWidth: 140,
+											width: 140,
+										}}
+									>
 										<ItemPreviewCard
 											item={item}
 											showFavorite={false}
@@ -280,7 +260,7 @@ export default function TabOneScreen() {
 			render: () => (
 				<View className=" flex-col w-full mt-4">
 					<View className="flex flex-row justify-between w-full items-end mb-2">
-						<H4 className="text-left font-medium">Tap water</H4>
+						<H4 className="text-left font-medium">Tap water quality</H4>
 						<Link
 							href="/(protected)/search/locations"
 							className="flex flex-row items-center gap-2"
@@ -311,17 +291,18 @@ export default function TabOneScreen() {
 		},
 		{
 			key: "whatOthersAreDrinking",
+			show: false,
 			render: () => (
 				<View className="flex w-full justify-start mt-6 min-w-full">
 					<View className="flex flex-row justify-between w-full items-center mb-2">
 						<H4 className="text-left font-medium">What others are drinking</H4>
-						{/* <Link href="/(protected)/search/users">
+						<Link href="/(protected)/search/users">
 							<Ionicons
 								name="arrow-forward"
 								size={16}
 								color={textSecondaryColor}
 							/>
-						</Link> */}
+						</Link>
 					</View>
 					{loadingPeople ? (
 						<FlatList
@@ -495,8 +476,8 @@ export default function TabOneScreen() {
 			key: "categories",
 			render: () => (
 				<View className="flex-1 flex-col w-full mt-6 z-10 min-w-full">
-					<View className="flex flex-row justify-between w-full items-center mb-2">
-						<H4 className="text-left font-medium">Categories</H4>
+					<View className="flex flex-row justify-between w-full items-center mb-4">
+						<H4 className="text-left font-medium">Top rated</H4>
 						<Link
 							href="/(protected)/search/top-rated-all"
 							className="flex flex-row items-center gap-2"
@@ -528,8 +509,8 @@ export default function TabOneScreen() {
 									keyExtractor={(item, index) => item.id + index.toString()}
 									renderItem={({ item: category }) => (
 										<View
-											className="flex justify-center rounded-2xl bg-card mb-4"
-											style={{ maxHeight: 80, width: "100%" }}
+											className="flex justify-center rounded-2xl mb-2 border-b border-muted"
+											style={{ maxHeight: 60, width: "100%" }}
 										>
 											<Link
 												href={`/search/top-rated/${category.typeId}?tags=${category.selectedTags}`}
@@ -541,19 +522,14 @@ export default function TabOneScreen() {
 																source={{ uri: category.image }}
 																alt={category.title}
 																style={{
-																	width: 56,
-																	height: 56,
+																	width: 40,
+																	height: 40,
 																}}
 																contentFit="cover"
 															/>
 														</View>
 														<View className="flex flex-col gap-1 h-full">
-															<P className="font-medium text-xl">
-																{category.title}
-															</P>
-															<Muted className="text-base">
-																{category.count}
-															</Muted>
+															<P className=" text-xl">{category.title}</P>
 														</View>
 													</View>
 													<View className="flex flex-col justify-end gap-2 h-full  mr-2">

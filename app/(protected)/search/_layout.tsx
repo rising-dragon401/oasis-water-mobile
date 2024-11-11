@@ -3,7 +3,6 @@ import { Stack } from "expo-router";
 import { View, useWindowDimensions } from "react-native";
 
 import OasisLogo from "@/assets/oasis-word.png";
-import LocationBadge from "@/components/sharable/location-badge";
 import ScoreBadge from "@/components/sharable/score-badge";
 import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
@@ -22,20 +21,13 @@ function HomeHeader({
 	score: number | null;
 }) {
 	return (
-		<View
-			className="flex flex-1 flex-row items-center"
-			style={{ maxWidth: screenWidth * 0.9 }}
-		>
-			<View className="flex-1 flex-col">
-				<LocationBadge location={location} />
-			</View>
-			<View className="flex-row items-center justify-center w-44">
+		<View className="flex flex-row items-center justify-between w-full pr-6">
+			<View className="flex items-start justify-start">
 				<Image source={OasisLogo} style={{ width: 85, height: 24 }} />
 			</View>
-			<View className="flex-1 justify-end">
-				<View className="flex-row items-center justify-end">
-					<ScoreBadge />
-				</View>
+
+			<View className="">
+				<ScoreBadge />
 			</View>
 		</View>
 	);

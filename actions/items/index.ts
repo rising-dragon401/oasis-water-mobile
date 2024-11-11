@@ -9,7 +9,7 @@ export const getItems = async ({
 
 	let query = supabase
 		.from("items")
-		.select()
+		.select(`*, brand:brands(name)`)
 		.order(orderBy, { ascending: true });
 
 	if (type && type.length > 0) {
@@ -31,6 +31,11 @@ export const getItems = async ({
 		if (b.is_indexed === false) return -1;
 		return 0;
 	});
+
+	items = items.map((item: any) => ({
+		...item,
+		brandName: item.brand?.name || null,
+	}));
 
 	return items;
 };
