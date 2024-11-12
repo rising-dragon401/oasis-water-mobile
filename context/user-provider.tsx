@@ -97,6 +97,11 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 		null,
 	);
 
+	// Admin scripts
+	// useEffect(() => {
+	// 	getContaminantData();
+	// }, []);
+
 	// set active session and refresh user data
 	useEffect(() => {
 		if (session) {
@@ -114,16 +119,9 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 		}
 	}, [userData, userId]);
 
-	useEffect(() => {
-		console.log("userData", userData);
-	}, [userData]);
-
 	// Refetch user scores when favorites change
 	useEffect(() => {
-		if (userData && userData?.tap_location_id) {
-			// Each location needs lat/long to get nearest location
-			// addLatLongToEachLocation();
-
+		if (userData) {
 			const tapLocationId = userData?.tap_location_id;
 			fetchUserScores(tapLocationId);
 		}
@@ -150,7 +148,6 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 		});
 
 		fetchUserFavorites(session?.user?.id);
-		fetchUserScores(session?.user?.id);
 	};
 
 	const fetchUserData = async (uid?: string | null) => {
@@ -160,7 +157,9 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 		}
 
 		const data = await getCurrentUserData(uid);
+
 		setUserData(data);
+		fetchUserScores(data?.tap_location_id);
 		return data;
 	};
 
@@ -184,22 +183,20 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 			const thisUserId = userId || session?.user?.id || null;
 			const thisRcCustomerId = rcCustomerId || userData?.rc_customer_id || null;
 
-			console.log("thisUserId:", thisUserId);
-			console.log("userData:", userData);
-			console.log("thisRcCustomerId:", thisRcCustomerId);
+			// console.log("thisUserId:", thisUserId);
+			// console.log("userData:", userData);
+			// console.log("thisRcCustomerId:", thisRcCustomerId);
 
 			// if (!thisUserId) {
 			// 	throw new Error("fetchSubscription failed: No user ID provided");
 			// }
 
-			console.log("fetchSubscription", userId, rcCustomerId);
+			// console.log("fetchSubscription", userId, rcCustomerId);
 
 			const response: SubscriptionResponse = await checkSubscription(
 				thisUserId,
 				thisRcCustomerId,
 			);
-
-			console.log("response", JSON.stringify(response.data, null, 2));
 
 			if (response && response?.apiStatus === 200) {
 				const status = response.data?.status;
@@ -218,21 +215,17 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 	};
 
 	const fetchUserScores = async (userTapId?: any) => {
-		const tapId = userData?.tap_location_id;
+		const tapId = userTapId || userData?.tap_location_id;
 
-		if (!tapId) {
-			return;
-		}
+		const tapData = await getUserTapScore(tapId);
 
-		const data = await getUserTapScore(tapId);
+		setTapScore(tapData);
 
-		setTapScore(data);
+		const scores = await calculateUserScores(userFavorites, tapData);
 
-		if (userFavorites && data && userId) {
-			const scores = await calculateUserScores(userFavorites, data);
+		// console.log("scores", scores);
 
-			setUserScores(scores);
-		}
+		setUserScores(scores);
 	};
 
 	const refreshUserData = useCallback(
@@ -261,9 +254,6 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 			}
 			if (type === "all" || type === "favorites") {
 				promises.push(fetchUserFavorites(userId));
-			}
-			if (type === "all" || type === "scores") {
-				promises.push(fetchUserScores(userId));
 			}
 			if (type === "all" || type === "userData") {
 				promises.push(fetchUserData(userId));

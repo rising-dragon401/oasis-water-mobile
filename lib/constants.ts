@@ -19,6 +19,7 @@ export const theme = {
 	dark: {
 		background: "hsl(330, 6%, 12%)",
 		foreground: "hsl(40 42.86% 96.25%)",
+
 		card: "hsl(20, 7%, 18%)",
 		popover: "hsl(222 24% 18%)",
 		primary: "hsl(44 8% 92%)",

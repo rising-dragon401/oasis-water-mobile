@@ -389,6 +389,8 @@ export default function OnboardingScreen() {
 
 			const pack = annualPackage;
 
+			console.log("pack", JSON.stringify(pack, null, 2));
+
 			if (!pack) {
 				console.log("No package found");
 				throw new Error("No package found");

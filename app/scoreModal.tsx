@@ -3,7 +3,7 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { useRouter } from "expo-router";
 import { ScrollView, View } from "react-native";
 
-import ProfileHeader from "@/components/sharable/oasis-page/components/profile-header";
+import UserHeader from "@/components/sharable/oasis-page/components/user-header";
 import ScoreCard from "@/components/sharable/score-card";
 import { Button } from "@/components/ui/button";
 import { H1, Muted } from "@/components/ui/typography";
@@ -118,7 +118,7 @@ export default function ScoreModal() {
 			<View className="flex flex-col pt-4 pb-10 h-full px-8">
 				{/* <ProfileHeader profileData={userData} showSocials={false} /> */}
 				<View className="flex flex-col items-start mb-4">
-					<ProfileHeader
+					<UserHeader
 						profileData={userData}
 						showSocials={false}
 						showScore={false}

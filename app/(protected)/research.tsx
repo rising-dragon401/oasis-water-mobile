@@ -1,7 +1,7 @@
 import Feather from "@expo/vector-icons/Feather";
 import { Image } from "expo-image";
 import * as Linking from "expo-linking";
-import { Link, useRouter } from "expo-router";
+import { Link, useLocalSearchParams, useRouter } from "expo-router";
 import { useContext, useEffect, useState } from "react";
 import { FlatList, TouchableOpacity, View } from "react-native";
 
@@ -21,7 +21,10 @@ export default function ResearchScreen() {
 	const { blogs } = useContext(BlogContext);
 	const router = useRouter();
 
-	const [tabValue, setTabValue] = useState("labTesting");
+	const params = useLocalSearchParams<{ defaultTab?: string }>();
+	const { defaultTab } = params;
+
+	const [tabValue, setTabValue] = useState(defaultTab || "labTesting");
 	const [research, setResearch] = useState<any[]>([]);
 
 	const backgroundColor =
@@ -38,6 +41,10 @@ export default function ResearchScreen() {
 
 		fetchResearch();
 	}, []);
+
+	useEffect(() => {
+		setTabValue(defaultTab || "labTesting");
+	}, [defaultTab]);
 
 	const handleAskOasisAI = () => {
 		if (subscription) {
@@ -122,7 +129,10 @@ export default function ResearchScreen() {
 								data={[1, 2, 3, 4, 5, 6]}
 								numColumns={2}
 								columnWrapperStyle={{ justifyContent: "space-between" }}
-								contentContainerStyle={{ paddingVertical: 5 }}
+								contentContainerStyle={{
+									paddingVertical: 5,
+									paddingBottom: 44,
+								}}
 								ItemSeparatorComponent={() => <View style={{ height: 6 }} />}
 								renderItem={() => (
 									<View style={{ width: "48%" }}>
@@ -149,7 +159,10 @@ export default function ResearchScreen() {
 								data={blogs}
 								numColumns={2}
 								columnWrapperStyle={{ justifyContent: "space-between" }}
-								contentContainerStyle={{ paddingVertical: 10 }}
+								contentContainerStyle={{
+									paddingBottom: 270,
+								}}
+								showsVerticalScrollIndicator={false}
 								ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
 								renderItem={({ item }) => (
 									<Link
@@ -212,12 +225,11 @@ export default function ResearchScreen() {
 							</TouchableOpacity>
 						)}
 						keyExtractor={(item) => item?.id}
+						showsVerticalScrollIndicator={false}
 						contentContainerStyle={{
-							flexGrow: 0,
-							paddingBottom: 0,
-							marginBottom: 0,
+							paddingBottom: 300,
 						}}
-						scrollEnabled={false}
+						scrollEnabled
 						ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
 					/>
 				</TabsContent>

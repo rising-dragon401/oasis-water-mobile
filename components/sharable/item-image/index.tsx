@@ -26,8 +26,11 @@ export default function ItemImage({
 				style={{ width: "100%", height: "100%", borderRadius: 14 }}
 				transition={500}
 			/>
+
 			{showFavorite && (
-				<View style={{ position: "absolute", top: 12, right: 12, zIndex: 99 }}>
+				<View
+					style={{ position: "absolute", bottom: 12, right: 12, zIndex: 99 }}
+				>
 					<FavoriteButton item={thing} />
 				</View>
 			)}

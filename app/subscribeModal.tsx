@@ -118,7 +118,7 @@ export default function SubscribeModal() {
 					</Muted>
 
 					{/* Features */}
-					<View className="flex flex-col h-full min-h-48 gap-8 pt-8 mt-4">
+					<View className="h-full min-h-48 flex-col gap-y-8 pt-8 mt-4">
 						{FEATURES.map((feature, index) => (
 							<View
 								key={index}

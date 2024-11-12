@@ -1,6 +1,10 @@
 import { supabase } from "@/config/supabase";
 import { ITEM_TYPES } from "@/lib/constants/categories";
-import { HEALTH_EFFECTS } from "@/lib/constants/health-effects";
+import {
+	CATEGORY_HEALTH_EFFECTS,
+	HEALTH_EFFECTS,
+	SCORES,
+} from "@/lib/constants/health-effects";
 
 export async function getCurrentUserData(uid?: string) {
 	const userId = uid;
@@ -224,14 +228,14 @@ export async function updateUserData(id: string, column: string, value: any) {
 export const updateUserRcId = async (uid: string, rcId: string) => {
 	const { data, error: fetchError } = await supabase
 		.from("users")
-		.select("rc_customer_id")
-		.eq("id", uid);
+		.select("*")
+		.eq("rc_customer_id", rcId);
 
 	if (fetchError) {
 		throw new Error(fetchError.message);
 	}
 
-	if (!data[0].rc_customer_id) {
+	if (!data || data.length === 0) {
 		const { error } = await supabase
 			.from("users")
 			.update({ rc_customer_id: rcId })
@@ -812,92 +816,289 @@ export const getUserTapScore = async (tapWaterLocationId: number) => {
 
 	const contaminants = data?.[0]?.utilities[0]?.contaminants;
 
-	const healthEffects = contaminants.map((contaminant: any) => {
-		const ingredientId = contaminant.ingredient_id;
-		return HEALTH_EFFECTS.find((effect) =>
-			effect.dbRowIds.includes(ingredientId),
-		);
-	});
+	const contaminantCategories = await Promise.all(
+		contaminants.map(async (contaminant: any) => {
+			const { data } = await supabase
+				.from("ingredients")
+				.select("category")
+				.eq("id", contaminant.ingredient_id);
+			return data ? data[0].category : null;
+		}),
+	);
 
 	const details = {
 		id: tapWaterLocationId,
 		image: data?.[0]?.image,
 		name: data?.[0]?.name,
 		score: data?.[0]?.score,
-		health_effects: [
-			...new Set(healthEffects.map((effect: any) => effect?.harms).flat()),
-		].filter(Boolean),
-		contaminants: contaminants.map(
-			(contaminant: any) => contaminant.ingredient_id,
-		),
+
+		contaminants: contaminants.map((contaminant: any) => ({
+			id: contaminant.ingredient_id,
+			category: contaminantCategories.find(
+				(category: any, index: number) =>
+					index === contaminants.indexOf(contaminant),
+			),
+		})),
 	};
 
 	return details;
 };
 
-export const calculateUserScores = async (favorites: any, tapScore: any) => {
-	let totalContaminants = 0;
+export const getFilterScores = async (
+	tapWaterContaminants: any[],
+	filterList: any[],
+) => {
+	if (!filterList || filterList.length === 0) {
+		return {
+			topFilter: null,
+			score: 0,
+			exposedContaminants: tapWaterContaminants.map(
+				(contaminant) => contaminant.id,
+			),
+		};
+	}
 
-	const calculateShowersScore = () => {
-		const showerFilters = (favorites ?? []).filter((favorite: any) =>
-			favorite.tags.includes("shower"),
-		);
+	const contaminantCategories = tapWaterContaminants.map(
+		(contaminant) => contaminant.category,
+	);
 
-		const showerFilterContaminants = showerFilters.map(
-			(filter: any) => filter.contaminants,
-		);
+	const filtersWithScores = filterList.map((filter) => {
+		const filteredCategories = filter.filtered_contaminant_categories;
 
-		totalContaminants += showerFilterContaminants.length;
+		let totalPercentageRemoved = 0;
+		const categoryCount = contaminantCategories.length;
 
-		const topShowerScore =
-			showerFilters.length > 0
-				? Math.max(...showerFilters.map((filter: any) => filter.score))
-				: 0;
+		contaminantCategories.forEach((category) => {
+			const filteredCategory = filteredCategories.find(
+				(filtered: { category: string; percentage: number }) =>
+					filtered.category === category && filtered.percentage > 80,
+			);
 
-		return topShowerScore > 0 ? topShowerScore : tapScore?.score;
+			if (filteredCategory) {
+				totalPercentageRemoved += filteredCategory.percentage;
+			}
+		});
+
+		const effectivenessScore =
+			categoryCount > 0 ? totalPercentageRemoved / categoryCount : 0;
+
+		return {
+			...filter,
+			effectivenessScore,
+		};
+	});
+
+	// Sort filters by effectiveness score in descending order
+	const sortedFilters = filtersWithScores.sort(
+		(a, b) => b.effectivenessScore - a.effectivenessScore,
+	);
+
+	// Get the top filter
+	const topFilter = sortedFilters[0];
+
+	// Calculate exposed contaminants for the top filter
+	const exposedContaminants = tapWaterContaminants
+		.filter((contaminant) => {
+			const filteredCategory = topFilter.filtered_contaminant_categories.find(
+				(filtered: { category: string; percentage: number }) =>
+					filtered.category === contaminant.category,
+			);
+			return !filteredCategory || filteredCategory.percentage < 80;
+		})
+		.map((contaminant) => contaminant.id);
+
+	return {
+		topFilter: topFilter.id,
+		score: topFilter.effectivenessScore,
+		exposedContaminants,
 	};
+};
 
-	const calculateWaterFilterScore = () => {
-		const drinkingFilters = (favorites ?? []).filter(
-			(favorite: any) => favorite.type === "filter",
-		);
+const calculateBottledWaterScore = (favorites: any[]) => {
+	const bottledWater = (favorites ?? []).filter(
+		(favorite: any) =>
+			favorite.type === "bottled_water" || favorite.type === "water_gallon",
+	);
 
-		const drinkingFilterContaminants = drinkingFilters.map(
-			(filter: any) => filter.contaminants,
-		);
+	const bottledWaterContaminants = bottledWater.flatMap((water: any) =>
+		water.ingredients.map((ingredient: any) => ingredient.ingredient_id),
+	);
 
-		totalContaminants += drinkingFilterContaminants.length;
+	if (bottledWater.length === 0) {
+		return {
+			score: 0,
+			exposedContaminants: [],
+		};
+	}
 
-		const drinkingFilterScore =
-			drinkingFilters.length > 0
-				? Math.max(...drinkingFilters.map((filter: any) => filter.score))
-				: 0;
+	const totalBottledWaterScore = bottledWater.reduce(
+		(acc: number, water: any) => acc + water.score,
+		0,
+	);
 
-		return drinkingFilterScore > 0 ? drinkingFilterScore : tapScore?.score;
+	const exposedContaminants = bottledWaterContaminants.map(
+		(contaminant: number) => contaminant,
+	);
+
+	// console.log(
+	// 	"exposedContaminants",
+	// 	JSON.stringify(exposedContaminants, null, 2),
+	// );
+
+	return {
+		score: totalBottledWaterScore / bottledWater.length,
+		exposedContaminants,
 	};
+};
 
-	const calculateBottledWaterScore = () => {
-		const bottledWater = (favorites ?? []).filter(
-			(favorite: any) => favorite.type === "bottled_water" || "gallon",
+const getScoreMetadata = async (ingredientsMetadata: any[]) => {
+	// Initialize score metadata array with placeholders for each score
+	const scoreMetadataArray = SCORES.map((score) => ({
+		scoreId: score.id,
+		scoreName: score.name,
+		score: 0, // Placeholder for score calculation
+		scoreIcon: score.icon,
+		harms: [] as {
+			label: string;
+			description: string;
+			source: string;
+			scoreId: string;
+		}[], // Explicitly define the type
+		benefits: [] as {
+			label: string;
+			description: string;
+			source: string;
+			scoreId: string;
+		}[], // Explicitly define the type
+		contaminants: [] as {
+			id: number;
+			name: string;
+			category: string;
+			risks: any[];
+			benefits: any[];
+			is_contaminant: boolean;
+		}[], // Include contaminant metadata
+	}));
+
+	// Process each ingredient
+	ingredientsMetadata.forEach((ingredient) => {
+		const matchedCategory = CATEGORY_HEALTH_EFFECTS.find((category) =>
+			category.dbRowIds.includes(ingredient.id),
 		);
 
-		const bottledWaterContaminants = bottledWater.map(
-			(water: any) => water.contaminants,
-		);
+		if (matchedCategory) {
+			const harms = matchedCategory.harms || [];
+			const benefits = matchedCategory.benefits || [];
 
-		totalContaminants += bottledWaterContaminants.length;
+			harms.forEach((harm) => {
+				const scoreEntry = scoreMetadataArray.find(
+					(entry) => entry.scoreId === harm.scoreId,
+				);
+				if (
+					scoreEntry &&
+					!scoreEntry.harms.some((h) => h.label === harm.label)
+				) {
+					scoreEntry.harms.push(harm);
+				}
+			});
 
-		if (bottledWater.length === 0) {
-			return 0;
+			benefits.forEach((benefit) => {
+				const scoreEntry = scoreMetadataArray.find(
+					(entry) => entry.scoreId === benefit.scoreId,
+				);
+				if (
+					scoreEntry &&
+					!scoreEntry.benefits.some((b) => b.label === benefit.label)
+				) {
+					scoreEntry.benefits.push(benefit);
+				}
+			});
+
+			// Add contaminant metadata to the score entry
+			scoreMetadataArray.forEach((entry) => {
+				if (!entry.contaminants.some((c) => c.id === ingredient.id)) {
+					entry.contaminants.push({
+						id: ingredient.id,
+						name: ingredient.name,
+						category: ingredient.category,
+						risks: ingredient.risks,
+						benefits: ingredient.benefits,
+						is_contaminant: ingredient.is_contaminant,
+					});
+				}
+			});
 		}
+	});
 
-		const totalBottledWaterScore = bottledWater.reduce(
-			(acc: number, water: any) => acc + water.score,
-			0,
+	// Calculate the score for each entry
+	scoreMetadataArray.forEach((entry) => {
+		const numBenefits = entry.benefits.length;
+		const numHarms = entry.harms.length;
+		const sum = numHarms - numBenefits;
+
+		if (sum > 0) {
+			entry.score = 70;
+		} else if (sum < 3) {
+			entry.score = 60;
+		} else {
+			entry.score = 20;
+		}
+	});
+
+	return scoreMetadataArray;
+};
+
+export const getIngredientsMetadata = async (ingredientIds: number[]) => {
+	// Remove duplicate ingredient IDs
+	const uniqueIngredientIds = Array.from(new Set(ingredientIds));
+
+	const ingredientsMetadata = await Promise.all(
+		uniqueIngredientIds.map(async (ingredientId) => {
+			const { data, error } = await supabase
+				.from("ingredients")
+				.select("id, name, category, risks, benefits, is_contaminant")
+				.eq("id", ingredientId)
+				.single();
+
+			if (error) {
+				console.error(
+					`Error fetching ingredient data for ID ${ingredientId}:`,
+					error,
+				);
+				return null;
+			}
+
+			return data;
+		}),
+	);
+
+	return ingredientsMetadata.filter((metadata) => metadata !== null);
+};
+
+export const calculateUserScores = async (favorites: any, tapScore: any) => {
+	const showerFilters = (favorites ?? []).filter((favorite: any) =>
+		favorite.tags.includes("shower"),
+	);
+
+	let showerScore_ = null;
+	if (tapScore) {
+		showerScore_ = await getFilterScores(tapScore.contaminants, showerFilters);
+	}
+
+	const drinkingFilters = (favorites ?? []).filter(
+		(favorite: any) =>
+			favorite.type === "filter" || favorite.type === "bottle_filter",
+	);
+
+	let waterFilterScore_ = null;
+	if (tapScore) {
+		waterFilterScore_ = await getFilterScores(
+			tapScore.contaminants,
+			drinkingFilters,
 		);
+	}
 
-		return totalBottledWaterScore / bottledWater.length;
-	};
+	const bottledWaterScore_ = await calculateBottledWaterScore(favorites);
 
 	const overallScore =
 		(favorites ?? []).reduce(
@@ -905,23 +1106,74 @@ export const calculateUserScores = async (favorites: any, tapScore: any) => {
 			0,
 		) / (favorites?.length || 1);
 
-	// Calculate total contaminants
-	totalContaminants = (favorites ?? []).reduce(
-		(acc: number, favorite: any) => acc + (favorite.contaminants?.length || 0),
-		0,
-	);
-	const showersScore = Math.round(calculateShowersScore());
-	const waterFilterScore = Math.round(calculateWaterFilterScore());
-	const bottledWaterScore = Math.round(calculateBottledWaterScore());
-	const roundedOverallScore = Math.round(overallScore);
+	// Combine exposed contaminants from all scores
+	const allExposedContaminants = [
+		...(showerScore_?.exposedContaminants || []),
+		...(waterFilterScore_?.exposedContaminants || []),
+		...(bottledWaterScore_.exposedContaminants || []),
+	];
 
-	return {
-		showersScore,
-		waterFilterScore,
-		bottledWaterScore,
-		overallScore: roundedOverallScore,
-		totalContaminants,
+	const ingredientsMetadata = await getIngredientsMetadata(
+		allExposedContaminants,
+	);
+
+	// use HEALTH_EFFECTS to associate each ingredient with a list of benefits and harms based on category
+	const allIngredients = ingredientsMetadata.map((ingredient) => {
+		const matchedCategories = HEALTH_EFFECTS.filter((category) =>
+			category.categories.includes(ingredient.category),
+		);
+
+		const harms = matchedCategories
+			.filter((category) => category.type === "harm")
+			.map((category) => category);
+
+		const benefits = matchedCategories
+			.filter((category) => category.type === "benefit")
+			.map((category) => category);
+
+		return {
+			...ingredient,
+			harms,
+			benefits,
+		};
+	});
+
+	const allContaminants = allIngredients.filter(
+		(ingredient) => ingredient.is_contaminant,
+	);
+
+	const allMinerals = allIngredients.filter(
+		(ingredient) => ingredient.category === "Minerals",
+	);
+
+	const uniqueBenefits = new Set();
+	const uniqueHarms = new Set();
+
+	allIngredients.forEach((ingredient) => {
+		((ingredient.benefits as any[]) ?? []).forEach((benefit: any) => {
+			uniqueBenefits.add(benefit);
+		});
+		((ingredient.harms as any[]) ?? []).forEach((harm: any) => {
+			uniqueHarms.add(harm);
+		});
+	});
+
+	const allBenefits = Array.from(uniqueBenefits);
+	const allHarms = Array.from(uniqueHarms);
+
+	const data = {
+		showerScore: showerScore_,
+		waterFilterScore: waterFilterScore_,
+		bottledWaterScore: bottledWaterScore_,
+		overallScore: Math.round(overallScore),
+		allIngredients,
+		allBenefits,
+		allHarms,
+		allContaminants,
+		allMinerals,
 	};
+
+	return data;
 };
 
 export const addWatersAndFiltersToUserFavorites = async (

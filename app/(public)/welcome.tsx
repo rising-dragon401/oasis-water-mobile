@@ -7,7 +7,6 @@ import OasisLogo from "@/assets/oasis-word.png";
 import SplashGraphic from "@/assets/welcome-scan-graphic.png";
 import { SafeAreaView } from "@/components/safe-area-view";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { H1 } from "@/components/ui/typography";
 
 export default function WelcomeScreen() {
@@ -18,7 +17,7 @@ export default function WelcomeScreen() {
 	// };
 
 	return (
-		<SafeAreaView className="flex flex-1 flex-col p-4 justify-between h-full">
+		<SafeAreaView className="flex flex-1 flex-col p-4 justify-between h-full pb-10">
 			<View className="flex flex-1 mt-0 gap-y-2 items-center">
 				<Image
 					source={OasisLogo}
@@ -71,7 +70,7 @@ export default function WelcomeScreen() {
 						textClassName="!text-lg"
 					/>
 				</View>
-
+				{/* 
 				<Separator className="max-w-sm" />
 
 				<Button
@@ -82,7 +81,7 @@ export default function WelcomeScreen() {
 						router.push("/(protected)/search");
 					}}
 					label="or continue without an account"
-				/>
+				/> */}
 			</View>
 		</SafeAreaView>
 	);

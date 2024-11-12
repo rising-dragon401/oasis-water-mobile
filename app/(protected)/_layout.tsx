@@ -1,17 +1,24 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Tabs } from "expo-router";
-import React from "react";
+import { Tabs, useRouter } from "expo-router";
+import React, { useEffect } from "react";
 
+import { useSupabase } from "@/context/supabase-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function ProtectedLayout() {
-	const {
-		backgroundColor,
-		textColor,
-		iconColor,
-		mutedColor,
-		textSecondaryColor,
-	} = useColorScheme();
+	const { backgroundColor, iconColor, textSecondaryColor } = useColorScheme();
+	const { user } = useSupabase();
+	const router = useRouter();
+
+	useEffect(() => {
+		if (!user) {
+			const timer = setTimeout(() => {
+				// router.replace("/welcome");
+			}, 1000);
+
+			return () => clearTimeout(timer); // Cleanup the timer on component unmount
+		}
+	}, [user]);
 
 	return (
 		<Tabs

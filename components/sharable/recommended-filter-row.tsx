@@ -78,7 +78,7 @@ export default function RecommendedFilterRow({
 						className="overflow-x-scroll w-full"
 						renderItem={({ item, index }) => (
 							<TouchableOpacity
-								className="mr-4 w-44 h-44 "
+								className="mr-4  w-44 h-44 "
 								onPress={() => {
 									router.push("/subscribeModal");
 								}}
@@ -109,12 +109,13 @@ export default function RecommendedFilterRow({
 					}}
 					className="overflow-x-scroll flex"
 					renderItem={({ item }: { item: any }) => (
-						<View className="mr-4 w-44 h-full">
+						<View className="mr-4 flex-1 max-w-44 h-full">
 							<ItemPreviewCard
 								item={item}
 								showFavorite={false}
 								isAuthUser={false}
 								isGeneralListing={false}
+								variation="square"
 							/>
 						</View>
 					)}

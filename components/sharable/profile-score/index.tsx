@@ -2,20 +2,22 @@ import React from "react";
 import { View } from "react-native";
 import Svg, { Circle as SvgCircle } from "react-native-svg";
 
-import { P } from "@/components/ui/typography";
+import { Muted, P } from "@/components/ui/typography";
 
 interface CircleProps {
 	value: number;
 	size: number;
 	strokeWidth: number;
+	profileData: any;
 	textClassName?: string;
 }
 
-export function Circle({
+export function ProfileScore({
 	value,
 	size,
 	strokeWidth,
 	textClassName,
+	profileData,
 }: CircleProps) {
 	const radius = (size - strokeWidth) / 2;
 	const circumference = radius * 2 * Math.PI;
@@ -23,7 +25,7 @@ export function Circle({
 
 	let strokeColor;
 	if (value > 70) {
-		strokeColor = "#10b981"; // green
+		strokeColor = "hsl(229 59% 38%)";
 	} else if (value >= 40) {
 		strokeColor = "#fbbf24"; // yellow
 	} else {
@@ -62,10 +64,10 @@ export function Circle({
 					justifyContent: "center",
 					alignItems: "center",
 				}}
+				className="p-8"
 			>
-				<P className={textClassName} style={{ color: "white" }}>
-					{value}
-				</P>
+				<P className="text-3xl font-bold">{value}</P>
+				<Muted>Out of 100</Muted>
 			</View>
 		</View>
 	);

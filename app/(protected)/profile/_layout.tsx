@@ -1,4 +1,6 @@
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { Stack, useRouter } from "expo-router";
+import { TouchableOpacity } from "react-native";
 
 import { useColorScheme } from "@/lib/useColorScheme";
 
@@ -24,23 +26,26 @@ export default function ProfileLayout() {
 			{/* Settings screen */}
 			<Stack.Screen
 				name="settings/index"
-				// options={{
-				// 	headerTitle: "Settings",
-				// 	headerRight: () => (
-				// 		<TouchableOpacity
-				// 			onPress={() => router.push("/(protected)/profile/settings/help")}
-				// 		>
-				// 			<Ionicons
-				// 				name="help-circle-outline"
-				// 				size={24}
-				// 				color={textColor}
-				// 			/>
-				// 		</TouchableOpacity>
-				// 	),
-				// }}
+				options={{
+					headerTitle: "Settings",
+					headerRight: () => (
+						<TouchableOpacity
+							onPress={() => router.push("/(protected)/profile/help")}
+						>
+							<Ionicons
+								name="help-circle-outline"
+								size={24}
+								color={textColor}
+							/>
+						</TouchableOpacity>
+					),
+				}}
 			/>
 
-			<Stack.Screen name="settings/help" options={{ headerTitle: "Help" }} />
+			{/* Score screen */}
+			<Stack.Screen name="score/[id]" options={{ headerShown: true }} />
+
+			{/* <Stack.Screen name="settings/help" options={{ headerTitle: "Help" }} /> */}
 		</Stack>
 	);
 }

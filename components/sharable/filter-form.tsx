@@ -1,8 +1,14 @@
+import Feather from "@expo/vector-icons/Feather";
 import { getContaminants } from "actions/ingredients";
 import * as Linking from "expo-linking";
 import { Link, useNavigation } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, ScrollView, View } from "react-native";
+import {
+	ActivityIndicator,
+	ScrollView,
+	TouchableOpacity,
+	View,
+} from "react-native";
 
 import ItemImage from "./item-image";
 import Score from "./score";
@@ -11,12 +17,10 @@ import Sources from "./sources";
 import { getFilterDetails } from "@/actions/filters";
 import ContaminantTable from "@/components/sharable/contaminant-table";
 import FilterMetadata from "@/components/sharable/filter-metadata";
-import Skeleton from "@/components/sharable/skeleton";
-import { Button } from "@/components/ui/button";
-import { Large, Muted } from "@/components/ui/typography";
+import { H3, Muted } from "@/components/ui/typography";
 import { useUserProvider } from "@/context/user-provider";
 import { IngredientCategories } from "@/lib/constants";
-
+import { useColorScheme } from "@/lib/useColorScheme";
 type Props = {
 	id: string;
 };
@@ -31,6 +35,7 @@ interface ContaminantsByCategory {
 export function FilterForm({ id }: Props) {
 	const navigation = useNavigation();
 	const { subscription } = useUserProvider();
+	const { iconColor } = useColorScheme();
 
 	const [isLoading, setIsLoading] = useState(true);
 	const [filter, setFilter] = useState<any>({});
@@ -147,7 +152,7 @@ export function FilterForm({ id }: Props) {
 		>
 			<View className="w-full items-center justify-center px-8">
 				<View className="flex flex-col gap-2 justify-center items-center w-full">
-					<View className="flex justify-center items-center h-80 w-80 p-4">
+					<View className="flex justify-center items-center h-64 w-64 p-4">
 						{isLoading ? (
 							<ActivityIndicator />
 						) : (
@@ -157,34 +162,34 @@ export function FilterForm({ id }: Props) {
 
 					<View className="flex flex-row justify-between gap-2 w-full">
 						<View className="flex flex-col gap-2 w-2/3">
-							<Large>{filter.name}</Large>
+							{filter.affiliate_url ? (
+								<TouchableOpacity
+									onPress={() => {
+										Linking.openURL(filter.affiliate_url);
+									}}
+								>
+									<H3 className="pb-1 items-start">
+										{filter.name}
+										{` `}
+										<Feather
+											name="arrow-up-right"
+											size={14}
+											color={iconColor}
+										/>
+									</H3>
+								</TouchableOpacity>
+							) : (
+								<H3 className="pb-1">{filter.name}</H3>
+							)}
+
 							{/* <Link href={`/search/company/${filter.company?.name}`}> */}
 							<Link href={`/search/company/${filter.company_id}`}>
 								<Muted>{filter.brand}</Muted>
 							</Link>
-
-							{filter.affiliate_url && (
-								<Button
-									variant={filter.score > 70 ? "outline" : "outline"}
-									onPress={() => {
-										Linking.openURL(filter.affiliate_url);
-									}}
-									className="w-56 !h-10 !py-0"
-									label="Where to buy"
-								/>
-							)}
 						</View>
 
-						<View className="flex w-1/3 justify-end">
-							{isLoading ? (
-								<Skeleton
-									width={100}
-									height={100}
-									style={{ borderRadius: 99 }}
-								/>
-							) : (
-								<Score score={filter.score} size="md" />
-							)}
+						<View className="flex w-1/3 flex-col-reverse justify-end items-end -mt-2">
+							<Score score={filter.score} size="sm" />
 						</View>
 					</View>
 
@@ -206,6 +211,7 @@ export function FilterForm({ id }: Props) {
 						<ContaminantTable
 							filteredContaminants={filter.contaminants_filtered}
 							categories={categoriesFiltered}
+							subscription={subscription}
 						/>
 					</View>
 

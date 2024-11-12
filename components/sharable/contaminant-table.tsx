@@ -4,26 +4,31 @@ import {
 	AccordionItem,
 	AccordionTrigger,
 } from "components/ui/accordion";
+import { BlurView } from "expo-blur";
+import { useRouter } from "expo-router";
 import { useMemo } from "react";
-import { View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import useSWR from "swr";
 
-import PaywallContent from "./paywall-content";
 import Typography from "./typography";
 
 import { getContaminants } from "@/actions/ingredients";
 import { H3, P } from "@/components/ui/typography";
-import { FEATURES, IngredientCategories } from "@/lib/constants";
+import { IngredientCategories } from "@/lib/constants";
 
 type Props = {
 	filteredContaminants: any[];
 	categories?: any[];
+	subscription: boolean;
 };
 
 export default function ContaminantTable({
 	filteredContaminants,
 	categories,
+	subscription,
 }: Props) {
+	const router = useRouter();
+
 	const { data: allContaminants } = useSWR(
 		"water-contaminants",
 		getContaminants,
@@ -96,9 +101,11 @@ export default function ContaminantTable({
 		<>
 			<H3>Contaminants filtered</H3>
 
-			<PaywallContent
-				label="See what this filter removes"
-				items={FEATURES.map((item) => item.label)}
+			<TouchableOpacity
+				onPress={() => {
+					router.push("/subscribeModal");
+				}}
+				disabled={subscription}
 			>
 				{contaminantsByCategory.map((item) => (
 					<Accordion
@@ -113,7 +120,7 @@ export default function ContaminantTable({
 									<Typography size="lg" fontWeight="normal">
 										{item.category}
 									</Typography>
-									<Typography size="base" fontWeight="normal">
+									<Typography size="base" fontWeight="bold">
 										{item.percentageFiltered}%
 									</Typography>
 								</View>
@@ -131,7 +138,25 @@ export default function ContaminantTable({
 						</AccordionItem>
 					</Accordion>
 				))}
-			</PaywallContent>
+
+				{!subscription && (
+					<BlurView
+						intensity={32}
+						tint="regular"
+						style={{
+							position: "absolute",
+							left: 0,
+							top: 0,
+							right: 0,
+							bottom: 20,
+							borderRadius: 16,
+							height: "100%",
+							overflow: "hidden",
+							backgroundColor: "rgba(255, 255, 255, 0.2)",
+						}}
+					/>
+				)}
+			</TouchableOpacity>
 		</>
 	);
 }

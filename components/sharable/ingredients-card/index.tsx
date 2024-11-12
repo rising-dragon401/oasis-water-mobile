@@ -1,16 +1,19 @@
 import Feather from "@expo/vector-icons/Feather";
+import { BlurView } from "expo-blur";
 import { useMemo } from "react";
 import { View } from "react-native";
 
+import Typography from "../typography";
+
 import { P } from "@/components/ui/typography";
 import { useColorScheme } from "@/lib/useColorScheme";
-import Typography from "../typography";
 
 type Props = {
 	ingredients: any[];
+	subscription: boolean;
 };
 
-export default function IngredientsCard({ ingredients }: Props) {
+export default function IngredientsCard({ ingredients, subscription }: Props) {
 	const { iconColor } = useColorScheme();
 
 	const nonContaminantIngredients = useMemo(
@@ -60,6 +63,25 @@ export default function IngredientsCard({ ingredients }: Props) {
 							<P>{ingredient.risks}</P>
 						</View>
 					</View>
+
+					{!subscription && (
+						<BlurView
+							intensity={32}
+							tint="regular"
+							style={{
+								position: "absolute",
+								left: 0,
+								top: 0,
+								right: 0,
+								bottom: 20,
+								borderRadius: 16,
+								height: "100%",
+
+								overflow: "hidden",
+								backgroundColor: "rgba(255, 255, 255, 0.2)",
+							}}
+						/>
+					)}
 				</View>
 			))}
 		</>

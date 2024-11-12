@@ -384,7 +384,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 					onOpenChange={(isOpen) =>
 						handleDropdownOpenChange(setOpenContaminantDropdown, isOpen)
 					}
-					className=" rounded-xl "
+					className="rounded-xl "
 				>
 					<DropdownMenuTrigger asChild>
 						<Button
@@ -443,7 +443,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 					</DropdownMenuContent>
 				</DropdownMenu>
 
-				<DropdownMenu
+				{/* <DropdownMenu
 					open={openTypeDropdown}
 					onOpenChange={(isOpen) =>
 						handleDropdownOpenChange(setOpenTypeDropdown, isOpen)
@@ -489,7 +489,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 							</TouchableOpacity>
 						))}
 					</DropdownMenuContent>
-				</DropdownMenu>
+				</DropdownMenu> */}
 			</View>
 		);
 	}, [
@@ -560,21 +560,25 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 						scrollToOverflowEnabled={false}
 					/>
 
-					<View
-						className="flex-1 relative justify-center items-center"
-						style={{ position: "absolute", bottom: 20, width: "100%" }}
-					>
-						<Button
-							className="w-64 !h-16 mt-2 !py-3 !px-4 shadow-lg"
-							variant="default"
-							label="Unlock ratings"
-							icon={<Octicons name="lock" size={16} color={backgroundColor} />}
-							iconPosition="left"
-							onPress={() => {
-								router.push("/subscribeModal");
-							}}
-						/>
-					</View>
+					{!subscription && (
+						<View
+							className="flex-1 relative justify-center items-center"
+							style={{ position: "absolute", bottom: 20, width: "100%" }}
+						>
+							<Button
+								className="w-64 !h-16 mt-2 !py-3 !px-4 shadow-lg"
+								variant="default"
+								label="Unlock ratings"
+								icon={
+									<Octicons name="lock" size={16} color={backgroundColor} />
+								}
+								iconPosition="left"
+								onPress={() => {
+									router.push("/subscribeModal");
+								}}
+							/>
+						</View>
+					)}
 				</View>
 			) : (
 				<View>

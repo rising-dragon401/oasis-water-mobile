@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { FlatList, View } from "react-native";
 
 import ItemPreviewCard from "../item-preview-card";
-import ProfileHeader from "./components/profile-header";
+import UserHeader from "./components/user-header";
 
 import {
 	getRecommendedProducts,
@@ -159,7 +159,7 @@ export default function OasisPage({
 		<View>
 			{isAuthUser && <H1 className="mt-24 mb-6">Products</H1>}
 
-			<ProfileHeader profileData={profileData} isAuthUser={isAuthUser} />
+			<UserHeader profileData={profileData} isAuthUser={isAuthUser} />
 
 			<View className="flex flex-col mt-4">
 				<Tabs value={tabValue} onValueChange={setTabValue}>

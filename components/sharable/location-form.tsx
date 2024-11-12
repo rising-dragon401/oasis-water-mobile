@@ -155,13 +155,13 @@ export function LocationForm({ id }: Props) {
 								<BlurredLineItem
 									label="Total contaminants"
 									value={contaminants.length}
-									score={contaminants.length > 2 ? "bad" : "good"}
+									score={contaminants.length > 0 ? "bad" : "good"}
 								/>
 
 								<BlurredLineItem
 									label="Above guidelines"
 									value={contaminantsAboveLimit.length}
-									score={contaminantsAboveLimit.length > 1 ? "bad" : "good"}
+									score={contaminantsAboveLimit.length > 0 ? "bad" : "good"}
 								/>
 
 								<Button
@@ -190,7 +190,11 @@ export function LocationForm({ id }: Props) {
 					</View>
 
 					<View className="flex flex-col mt-2">
-						<Large className="mb-0 pb-0">Contaminants detected</Large>
+						<View className="flex flex-row items-center gap-2 mb-2">
+							<Ionicons name="skull-outline" size={16} color={iconColor} />
+
+							<Large className="mb-0 pb-0">Contaminants detected</Large>
+						</View>
 
 						<View className="flex flex-wrap gap-4 w-full pt-2">
 							{lowestScoringUtility?.contaminants.map((contaminant: any) => (

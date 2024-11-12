@@ -22,9 +22,13 @@ export default function Sources({ data }: any) {
 							onPress={() => {
 								Linking.openURL(source.url);
 							}}
-							className="flex flex-row items-center gap-2"
+							className="flex flex-row items-start justify-between w-full gap-2"
 						>
-							<Typography size="base" fontWeight="normal" className="underline">
+							<Typography
+								size="base"
+								fontWeight="normal"
+								className="underline max-w-xs"
+							>
 								{source.label}
 							</Typography>
 							<Feather

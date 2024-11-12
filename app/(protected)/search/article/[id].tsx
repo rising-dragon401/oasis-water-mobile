@@ -7,15 +7,10 @@ import {
 	useNavigation,
 } from "expo-router";
 import { useEffect, useState } from "react";
-import {
-	ScrollView,
-	StyleSheet,
-	View,
-	useWindowDimensions,
-} from "react-native";
+import { ScrollView, View, useWindowDimensions } from "react-native";
 import Markdown from "react-native-markdown-display";
 
-import { H1, H2, P } from "@/components/ui/typography";
+import { H1, H2, H3, P } from "@/components/ui/typography";
 import { placeHolderImageBlurHash } from "@/lib/constants/images";
 
 export default function ArticlePage() {
@@ -53,31 +48,43 @@ export default function ArticlePage() {
 
 	return (
 		<ScrollView className="px-6 py-2 w-full">
-			<View className="flex w-full justify-center py-2 ">
+			<View className="flex w-full justify-center pt-4 pb-2">
 				<Image
 					source={{ uri: entry?.attributes?.cover?.data?.attributes?.url }}
 					style={{ width: "100%", height: 200, borderRadius: 20 }}
-					className="px-8 py-4"
+					className="px-8 py-2"
 					placeholder={placeHolderImageBlurHash}
 					transition={1000}
+					contentFit="cover"
 				/>
 			</View>
-			<H2 className="pt-2 pb-0">{entry?.attributes?.title}</H2>
+			<H2 className="py-4">{entry?.attributes?.title}</H2>
 
 			{entry?.attributes?.blocks.map((block: any, index: number) => {
 				const content = (
 					<Markdown
 						key={block.id}
-						style={markdownStyles}
+						// style={markdownStyles}
 						rules={{
 							heading1: (node, children, parent, styles) => (
-								<H1 key={node.key}>{children}</H1>
+								<H1 key={node.key} className="mb-4">
+									{children}
+								</H1>
 							),
 							heading2: (node, children, parent, styles) => (
-								<H2 key={node.key}>{children}</H2>
+								<H2 key={node.key} className="mb-4">
+									{children}
+								</H2>
+							),
+							heading3: (node, children, parent, styles) => (
+								<H3 key={node.key} className="mb-4">
+									{children}
+								</H3>
 							),
 							paragraph: (node, children, parent, styles) => (
-								<P key={node.key}>{children}</P>
+								<P key={node.key} className="mb-2">
+									{children}
+								</P>
 							),
 							link: (node, children, parent, styles) => (
 								<Link href={node.attributes.href} key={node.key}>
@@ -85,16 +92,18 @@ export default function ArticlePage() {
 								</Link>
 							),
 							image: (node) => (
-								<Image
-									key={node.key}
-									source={{ uri: node.attributes.src }}
-									style={{
-										width: imageWidth,
-										height: imageWidth * 0.75,
-										borderRadius: 8,
-									}}
-									contentFit="cover"
-								/>
+								<View className="flex flex-col py-4 rounded-2xl overflow-hidden">
+									<Image
+										key={node.key}
+										source={{ uri: node.attributes.src }}
+										style={{
+											width: imageWidth,
+											height: imageWidth * 0.75,
+											borderRadius: 8,
+										}}
+										contentFit="cover"
+									/>
+								</View>
 							),
 						}}
 					>
@@ -103,48 +112,9 @@ export default function ArticlePage() {
 				);
 
 				return content;
-
-				// if (index === 0 || index === entry?.attributes?.blocks.length - 1) {
-				// 	return content;
-				// }
-
-				// if (index > 0) {
-				// 	return (
-				// 		<PaywallContent
-				// 			key={block.id}
-				// 			label="Subscribe to access full article"
-				// 			items={[
-				// 				"Detailed analysis and insights 🔬",
-				// 				"Expert opinions and recommendations 💡",
-				// 				"Exclusive content and updates 📰",
-				// 				"Product recommendations 🌿",
-				// 			]}
-				// 		>
-				// 			{content}
-				// 		</PaywallContent>
-				// 	);
-				// }
 			})}
 
 			<View style={{ height: 40 }} />
 		</ScrollView>
 	);
 }
-
-const markdownStyles = StyleSheet.create({
-	heading1: {
-		marginTop: 24,
-		marginBottom: 8,
-		fontSize: 24,
-	},
-	heading2: {
-		marginTop: 20,
-		marginBottom: 8,
-		fontSize: 20,
-	},
-	heading3: {
-		marginTop: 16,
-		marginBottom: 8,
-		fontSize: 16,
-	},
-});

@@ -1,8 +1,15 @@
+import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
-import { Stack } from "expo-router";
-import { View, useWindowDimensions } from "react-native";
+import {
+	Stack,
+	useLocalSearchParams,
+	usePathname,
+	useRouter,
+} from "expo-router";
+import { TouchableOpacity, View, useWindowDimensions } from "react-native";
 
 import OasisLogo from "@/assets/oasis-word.png";
+import { P } from "@/components/ui/typography";
 import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
 
@@ -31,7 +38,7 @@ function HomeHeader({
 }
 
 export default function SearchLayout() {
-	const { backgroundColor, textColor } = useColorScheme();
+	const { backgroundColor, textColor, iconColor } = useColorScheme();
 	const { width } = useWindowDimensions();
 
 	const { userData } = useUserProvider();
@@ -42,17 +49,40 @@ export default function SearchLayout() {
 		? `${userData?.location?.city}, ${userData?.location?.state}`
 		: "Unknown";
 
+	const params = useLocalSearchParams();
+	const router = useRouter();
+
+	// Determine back path
+	const backPath = params?.backPath || "search";
+
+	const isSearchPage = usePathname() === "/search";
+
 	return (
 		<Stack
 			screenOptions={{
 				headerShown: true,
 				headerBackTitle: "Search",
+				headerLeft: ({ canGoBack }) =>
+					canGoBack &&
+					!isSearchPage && (
+						<TouchableOpacity
+							onPress={() => {
+								if (backPath === "saved") {
+									router.push("/saved");
+								} else {
+									router.back();
+								}
+							}}
+							className="flex flex-row items-center gap-1"
+						>
+							<Ionicons name="arrow-back" size={20} color={iconColor} />
+							<P className="text-base">Back</P>
+						</TouchableOpacity>
+					),
 				contentStyle: {
 					backgroundColor,
 				},
-				// headerLeft: () => (
-				// 	<Ionicons name="arrow-back" size={24} color={iconColor} />
-				// ),
+
 				headerStyle: {
 					backgroundColor,
 				},
@@ -74,6 +104,7 @@ export default function SearchLayout() {
 							score={userScores?.overallScore}
 						/>
 					),
+					headerLeft: () => null,
 				}}
 			/>
 			<Stack.Screen name="item/[id]" />

@@ -117,10 +117,9 @@ const ItemPreviewCard = ({
 		// @ts-ignore
 		<Link href={showData ? determineLink(item) : "/subscribeModal"}>
 			<View
-				className={`relative flex w-full ${
+				className={`relative flex w-full rounded-2xl ${
 					variation === "row" ? "flex-row gap-2 px-2 py-3" : "flex-col"
-				} w-full rounded-3xl border border-border overflow-hidden bg-white pt-4 `}
-				style={{ width: variation === "square" ? "100%" : "100%" }}
+				} w-full  border border-border overflow-hidden bg-white pt-4 `}
 			>
 				<View
 					className={`flex justify-center items-center ${
@@ -143,7 +142,7 @@ const ItemPreviewCard = ({
 						<P
 							className={`text-base ${
 								variation === "row"
-									? "text-lg max-w-48 flex-wrap"
+									? "text-lg max-w-48 w-48 flex-wrap"
 									: "px-3 text-sm"
 							}`}
 							numberOfLines={2}
@@ -173,11 +172,13 @@ const ItemPreviewCard = ({
 						</>
 					)}
 
-					{variation === "row" && <Muted>{item.brand?.name} </Muted>}
+					{variation === "row" && item.brandName && (
+						<Muted>{item.brandName} </Muted>
+					)}
 				</View>
 
 				{variation === "row" && (
-					<View className="absolute top-4 right-4 z-10 mt-1 bg-muted rounded-full p-1 px-2">
+					<View className="absolute mt-4 right-4  z-10  rounded-full p-1 px-2">
 						{subscription ? (
 							item.score ? (
 								renderScore()

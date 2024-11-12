@@ -28,13 +28,31 @@ export const getFilters = async ({
 		query = query.limit(limit);
 	}
 
-	const { data } = await query;
+	const { data: filterData } = await query;
 
-	filters = data;
-
-	if (!filters) {
+	if (!filterData) {
 		return [];
 	}
+
+	// Fetch brand names for each filter
+	const filterIds = filterData.map((filter) => filter.id);
+	const { data: brandData } = await supabase
+		.from("brands")
+		.select("id, name")
+		.in("id", filterIds);
+
+	if (!brandData) {
+		return [];
+	}
+
+	// Map brand names to filters
+	filters = filterData.map((filter) => {
+		const brand = brandData.find((b) => b.id === filter.id);
+		return {
+			...filter,
+			brandName: brand ? brand.name : null,
+		};
+	});
 
 	filters = filters.sort((a, b) => {
 		if (a.is_indexed === false) return 1;

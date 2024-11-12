@@ -39,13 +39,13 @@ export default function BlurredLineItem({
 
 	const colorMark =
 		score === "good"
-			? "bg-emerald-400"
+			? "#34D399" // emerald-400
 			: score === "bad"
-				? "bg-rose-400"
-				: "bg-gray-200";
+				? "#FB7185" // rose-400
+				: "#E5E7EB"; // gray-200
 
 	return (
-		<View className="flex flex-row justify-between w-full py-1 border-b border-muted">
+		<View className="flex flex-row justify-between w-full py-1 ">
 			<View className="flex flex-row items-center gap-x-2">
 				{icon}
 				<P className="flex-wrap text-lg">{label}</P>
@@ -58,12 +58,19 @@ export default function BlurredLineItem({
 						className="cursor-pointer flex flex-row items-center"
 					>
 						<Feather name="lock" size={16} color={textColor} />
-						<View className={`min-w-8 h-8 rounded-full ${colorMark} ml-2`} />
+						<View className={`w-4 h-4 rounded-full ${colorMark} ml-2`} />
 					</TouchableOpacity>
 				) : (
 					<>
 						<P className="text-right text-lg text-muted-foreground">{value}</P>
-						<View className={`min-w-4 h-4 rounded-full ${colorMark}`} />
+						<View
+							className="rounded-full"
+							style={{
+								width: 14,
+								height: 14,
+								backgroundColor: colorMark,
+							}}
+						/>
 					</>
 				)}
 			</View>

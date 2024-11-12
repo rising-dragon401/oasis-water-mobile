@@ -1,11 +1,13 @@
 "use client";
 
+import Feather from "@expo/vector-icons/Feather";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { getItemDetails } from "actions/items";
+import { BlurView } from "expo-blur";
 import * as Linking from "expo-linking";
-import { Link, useNavigation } from "expo-router";
-import { useEffect, useState } from "react";
+import { Link, useNavigation, useRouter } from "expo-router";
+import { useEffect, useMemo, useState } from "react";
 import { ScrollView, TouchableOpacity, View } from "react-native";
 
 import BlurredLineItem from "./blurred-line-item";
@@ -13,7 +15,6 @@ import ContaminantCard from "./contamintant-card";
 import IngredientsCard from "./ingredients-card";
 import ItemImage from "./item-image";
 import MetaDataCard from "./metadata-card";
-import PaywallContent from "./paywall-content";
 import Score from "./score";
 import Sources from "./sources";
 import Typography from "./typography";
@@ -21,7 +22,6 @@ import Typography from "./typography";
 import { incrementItemsViewed } from "@/actions/user";
 import { H3, Muted } from "@/components/ui/typography";
 import { useUserProvider } from "@/context/user-provider";
-import { FEATURES } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 type Props = {
@@ -30,8 +30,8 @@ type Props = {
 
 export function ItemForm({ id }: Props) {
 	const navigation = useNavigation();
-
-	const { uid } = useUserProvider();
+	const router = useRouter();
+	const { uid, subscription } = useUserProvider();
 	const { iconColor } = useColorScheme();
 
 	const [item, setItem] = useState<any>({});
@@ -58,8 +58,6 @@ export function ItemForm({ id }: Props) {
 		fetchItem(id);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [id]);
-
-	console.log("item: ", JSON.stringify(item, null, 2));
 
 	const contaminants = item?.contaminants || [];
 
@@ -115,6 +113,76 @@ export function ItemForm({ id }: Props) {
 		}
 	})();
 
+	const blurredLineItems = [
+		{
+			label: "Contaminants",
+			icon: (
+				<MaterialCommunityIcons
+					name="virus-outline"
+					size={18}
+					color={iconColor}
+				/>
+			),
+			value: contaminants.length,
+			score: contaminants.length > 0 ? "bad" : "good",
+		},
+		{
+			label: "Above guidelines",
+			icon: <Ionicons name="warning-outline" size={18} color={iconColor} />,
+			value: contaminantsAboveLimit.length,
+			score: contaminantsAboveLimit.length > 0 ? "bad" : "good",
+		},
+		{
+			label: "PFAS",
+			icon: <Ionicons name="flame-outline" size={18} color={iconColor} />,
+			value: item.metadata?.pfas || "N/A",
+			score: item.metadata?.pfas !== "No" ? "bad" : "good",
+		},
+		{
+			label: "Microplastics",
+			icon: (
+				<MaterialCommunityIcons
+					name="dots-hexagon"
+					size={18}
+					color={iconColor}
+				/>
+			),
+			value: nanoPlasticsValue,
+			score: nanoPlasticsValue === "Yes" ? "bad" : "good",
+		},
+		{
+			label: "Packaging",
+			icon: <Ionicons name="cube-outline" size={18} color={iconColor} />,
+			value: item?.packaging
+				? item.packaging.charAt(0).toUpperCase() + item.packaging.slice(1)
+				: "Unknown",
+			score: item.packaging === "glass" ? "good" : "bad",
+		},
+		{
+			label: "Source",
+			icon: <Ionicons name="water-outline" size={18} color={iconColor} />,
+			value: waterSource ? waterSource : "Unknown",
+			score:
+				item.water_source === "spring" ||
+				item.water_source === "aquifer" ||
+				item.water_source === "mountain_spring"
+					? "good"
+					: "bad",
+		},
+	];
+
+	const sortedBlurredLineItems = blurredLineItems.sort((a, b) => {
+		return a.score === "bad" && b.score !== "bad" ? -1 : 1;
+	});
+
+	const nonContaminantIngredients = useMemo(
+		() =>
+			item?.ingredients
+				?.filter((ingredient: any) => !ingredient.is_contaminant)
+				.sort((a: any, b: any) => b.severity_score - a.severity_score),
+		[item?.ingredients],
+	);
+
 	return (
 		<ScrollView
 			contentContainerStyle={{
@@ -135,7 +203,15 @@ export function ItemForm({ id }: Props) {
 										Linking.openURL(item.affiliate_url);
 									}}
 								>
-									<H3 className="pb-1">{item.name}</H3>
+									<H3 className="pb-1 items-start">
+										{item.name}
+										{` `}
+										<Feather
+											name="arrow-up-right"
+											size={14}
+											color={iconColor}
+										/>
+									</H3>
 								</TouchableOpacity>
 							) : (
 								<H3 className="pb-1">{item.name}</H3>
@@ -157,86 +233,22 @@ export function ItemForm({ id }: Props) {
 
 					<View className="flex flex-col gap-10 gap-y-1 w-full">
 						<View className="flex flex-col gap-y-1 w-full">
-							<BlurredLineItem
-								label="Contaminants"
-								icon={
-									<MaterialCommunityIcons
-										name="virus-outline"
-										size={18}
-										color={iconColor}
-									/>
-								}
-								value={contaminants.length}
-								isPaywalled={false}
-								score="bad"
-							/>
-							<BlurredLineItem
-								icon={
-									<Ionicons
-										name="warning-outline"
-										size={18}
-										color={iconColor}
-									/>
-								}
-								label="Above guidelines"
-								value={contaminantsAboveLimit.length}
-								isPaywalled={false}
-								score="bad"
-							/>
-							<BlurredLineItem
-								label="PFAS"
-								icon={
-									<Ionicons name="flame-outline" size={18} color={iconColor} />
-								}
-								value={item.metadata?.pfas || "N/A"}
-								isPaywalled={false}
-								score="bad"
-							/>
-
-							<BlurredLineItem
-								label="Microplastics"
-								icon={
-									<MaterialCommunityIcons
-										name="dots-hexagon"
-										size={18}
-										color={iconColor}
-									/>
-								}
-								value={nanoPlasticsValue}
-								isPaywalled={false}
-								score={nanoPlasticsValue === "Yes" ? "bad" : "good"}
-							/>
-
-							<BlurredLineItem
-								label="Packaging"
-								icon={
-									<Ionicons name="cube-outline" size={18} color={iconColor} />
-								}
-								value={
-									item?.packaging
-										? item.packaging.charAt(0).toUpperCase() +
-											item.packaging.slice(1)
-										: "Unknown"
-								}
-								isPaywalled={false}
-								score={item.packaging === "glass" ? "good" : "bad"}
-							/>
-
-							<BlurredLineItem
-								label="Source"
-								icon={
-									<Ionicons name="water-outline" size={18} color={iconColor} />
-								}
-								value={waterSource ? waterSource : "Unknown"}
-								isPaywalled={false}
-								score={
-									item.water_source === "spring" ||
-									item.water_source === "aquifer" ||
-									item.water_source === "mountain_spring"
-										? "good"
-										: "bad"
-								}
-							/>
+							{sortedBlurredLineItems.map((item, index) => (
+								<BlurredLineItem
+									key={index}
+									label={item.label}
+									icon={item.icon}
+									value={item.value}
+									isPaywalled={false}
+									score={
+										item.score === "bad" ||
+										item.score === "good" ||
+										item.score === "neutral"
+											? item.score
+											: undefined
+									}
+								/>
+							))}
 						</View>
 					</View>
 				</View>
@@ -265,42 +277,82 @@ export function ItemForm({ id }: Props) {
 
 				<>
 					{sortedContaminants && sortedContaminants.length > 0 && (
-						<View className="flex flex-col gap-4 mt-6">
-							<Typography size="2xl" fontWeight="normal">
-								Contaminants ☠️
-							</Typography>
-							<PaywallContent
+						<View className="flex flex-col gap-4 mt-8">
+							<View className="flex flex-row items-center gap-x-2">
+								<Ionicons name="skull-outline" size={20} color={iconColor} />
+
+								<Typography size="2xl" fontWeight="normal">
+									Contaminants
+								</Typography>
+							</View>
+							{/* <PaywallContent
 								label="See the contaminants in this water"
 								items={FEATURES.map((item) => item.label)}
-							>
-								<View className="grid md:grid-cols-2 grid-cols-1 gap-6">
-									{sortedContaminants.map((contaminant: any, index: number) => (
+							> */}
+							<View className="grid md:grid-cols-2 grid-cols-1 gap-6">
+								{sortedContaminants.map((contaminant: any, index: number) => (
+									<TouchableOpacity
+										key={contaminant.id || index}
+										disabled={subscription}
+										onPress={() => {
+											router.push("/subscribeModal");
+										}}
+									>
 										<ContaminantCard
 											key={contaminant.id || index}
 											data={contaminant}
 										/>
-									))}
-								</View>
-							</PaywallContent>
+
+										{!subscription && (
+											<BlurView
+												intensity={32}
+												tint="regular"
+												style={{
+													position: "absolute",
+													left: 0,
+													top: 0,
+													right: 0,
+													bottom: 20,
+													borderRadius: 16,
+													height: "100%",
+
+													overflow: "hidden",
+													backgroundColor: "rgba(255, 255, 255, 0.2)",
+												}}
+											/>
+										)}
+									</TouchableOpacity>
+								))}
+							</View>
 						</View>
 					)}
 
 					<>
-						{item?.ingredients?.length > 0 && (
-							<View className="flex flex-col gap-4 my-10">
-								<Typography size="2xl" fontWeight="normal">
-									Minerals
-								</Typography>
-								<PaywallContent label="View mineral and ingredients breakdowns">
-									<IngredientsCard ingredients={item.ingredients} />
-								</PaywallContent>
-							</View>
-						)}
+						{nonContaminantIngredients &&
+							nonContaminantIngredients.length > 0 && (
+								<View className="flex flex-col gap-4 my-10">
+									<View className="flex flex-row items-center gap-x-2">
+										<Ionicons
+											name="heart-outline"
+											size={20}
+											color={iconColor}
+										/>
+
+										<Typography size="2xl" fontWeight="normal">
+											Minerals
+										</Typography>
+									</View>
+									<IngredientsCard
+										ingredients={item.ingredients}
+										subscription={subscription}
+									/>
+								</View>
+							)}
 					</>
 
 					{item.type === "bottled_water" && (
-						<View className="flex flex-col gap-4">
-							<View className="flex flex-row w-full gap-4">
+						<View className="flex flex-col gap-4 w-full">
+							<View className="flex flex-col w-full gap-4">
 								<MetaDataCard
 									title="Water Source"
 									description={item.metadata?.source}

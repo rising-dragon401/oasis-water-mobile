@@ -536,3 +536,48 @@ export const getNearestLocation = async (
 // 		}
 // 	}
 // };
+
+// returns row ids for each contaminant
+export const getContaminantData = async () => {
+	const validCategories = [
+		"Chemical Disinfectants",
+		"Fluoride",
+		"Haloacetic Acids",
+		"Heavy Metals",
+		"Herbicides",
+		"Microplastics",
+		"Perfluorinated Chemicals (PFAS)",
+		"Pesticides",
+		"Pharmaceuticals",
+		"Phthalates",
+		"Radiological Elements",
+		"Semi-Volatile Compounds",
+		"Volatile Organic Compounds (VOCs)",
+		"Microbiologicals",
+		"Minerals",
+	];
+
+	const categoryDetails = await Promise.all(
+		validCategories.map(async (category) => {
+			const { data, error } = await supabase
+				.from("ingredients")
+				.select("id")
+				.eq("is_contaminant", true)
+				.eq("category", category);
+
+			if (error) {
+				console.error(
+					`Error fetching contaminants for category ${category}:`,
+					error,
+				);
+				return { name: category, dbRowIds: [] };
+			}
+
+			const dbRowIds = data.map((ingredient) => ingredient.id);
+			return { name: category, dbRowIds };
+		}),
+	);
+
+	console.log("categoryDetails: ", JSON.stringify(categoryDetails, null, 2));
+	return categoryDetails;
+};

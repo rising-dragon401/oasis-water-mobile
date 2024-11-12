@@ -15,8 +15,8 @@ import {
 	getMostRecentlyUpdatedItems,
 } from "@/actions/admin";
 import RecsBg from "@/assets/recs-bg.png";
+import LocationCard from "@/components/cards/location-card";
 import ItemPreviewCard from "@/components/sharable/item-preview-card";
-import LocationCard from "@/components/sharable/location-card";
 import Search from "@/components/sharable/search";
 import Skeleton from "@/components/sharable/skeleton";
 import { H4, Muted, P, Small } from "@/components/ui/typography";
@@ -24,6 +24,7 @@ import { BlogContext } from "@/context/blogs-provider";
 import { useUserProvider } from "@/context/user-provider";
 import { CATEGORIES } from "@/lib/constants/categories";
 import { useColorScheme } from "@/lib/useColorScheme";
+
 const FEATURED_LOCATIONS = [
 	{
 		id: "California",
@@ -196,7 +197,7 @@ export default function TabOneScreen() {
 			render: () => (
 				<View className="flex-col w-full z-10 mt-6">
 					<View className="flex flex-row justify-between w-full items-center mb-2">
-						<H4 className="text-left font-medium">Recently updated</H4>
+						<H4 className="text-left">Recently updated</H4>
 						{/* <Link
 							href="/(protected)/search/top-rated-all"
 							className="flex flex-row items-center gap-2"
@@ -232,10 +233,10 @@ export default function TabOneScreen() {
 								className="overflow-x-scroll flex"
 								renderItem={({ item }) => (
 									<View
-										className="mr-4  h-full"
+										className="mr-4 h-full"
 										style={{
-											minWidth: 140,
-											width: 140,
+											flex: 1,
+											maxWidth: 140,
 										}}
 									>
 										<ItemPreviewCard
@@ -244,6 +245,7 @@ export default function TabOneScreen() {
 											isAuthUser={false}
 											isGeneralListing
 											imageHeight={80}
+											variation="square"
 										/>
 									</View>
 								)}
@@ -256,7 +258,7 @@ export default function TabOneScreen() {
 		},
 		{
 			key: "featuredLocations",
-			show: true,
+			show: false,
 			render: () => (
 				<View className=" flex-col w-full mt-4">
 					<View className="flex flex-row justify-between w-full items-end mb-2">
@@ -278,9 +280,9 @@ export default function TabOneScreen() {
 						}}
 						className="overflow-x-scroll"
 						renderItem={({ item: location }) => (
-							<View className="mr-4">
+							<View className="mr-4 w-44">
 								<Link href={`/search/locations/state/${location.id}`}>
-									<LocationCard location={location} />
+									<LocationCard location={location} size="sm" />
 								</Link>
 							</View>
 						)}
@@ -366,23 +368,17 @@ export default function TabOneScreen() {
 		},
 		{
 			key: "newsAndResearch",
-			show: false,
+			show: true,
 			render: () => (
-				<View className="w-full justify-start">
-					<View className="flex flex-row justify-between w-full items-center">
+				<View className="w-full justify-start mt-2">
+					<View className="flex flex-row justify-between w-full items-center mb-2">
 						<H4 className="text-left">News and research</H4>
 						<Link
-							href="/(protected)/research"
+							// @ts-ignore
+							href="/(protected)/research?defaultTab=articles"
 							className="flex flex-row items-center gap-2"
 						>
-							<View className="flex flex-row items-center gap-2">
-								<Muted className="text-center m-0 p-0">all research</Muted>
-								<Ionicons
-									name="arrow-forward"
-									size={16}
-									color={textSecondaryColor}
-								/>
-							</View>
+							<Muted className="m-0 p-0">see all</Muted>
 						</Link>
 					</View>
 
@@ -423,11 +419,11 @@ export default function TabOneScreen() {
 									href={`/search/article/${item.id}`}
 									className="flex flex-col mr-4"
 								>
-									<View style={{ width: 180 }}>
+									<View style={{ width: 160 }}>
 										<View
 											style={{
-												width: 180,
-												height: 120,
+												width: 160,
+												height: 100,
 												borderRadius: 8,
 												overflow: "hidden",
 												position: "relative",
@@ -455,7 +451,7 @@ export default function TabOneScreen() {
 												}}
 											>
 												<P
-													className="text-left text-white font-bold text-sm"
+													className="text-left text-white  text-sm"
 													numberOfLines={3}
 													ellipsizeMode="tail"
 												>
@@ -477,7 +473,7 @@ export default function TabOneScreen() {
 			render: () => (
 				<View className="flex-1 flex-col w-full mt-6 z-10 min-w-full">
 					<View className="flex flex-row justify-between w-full items-center mb-4">
-						<H4 className="text-left font-medium">Top rated</H4>
+						<H4 className="text-left">Top rated</H4>
 						<Link
 							href="/(protected)/search/top-rated-all"
 							className="flex flex-row items-center gap-2"
@@ -536,7 +532,7 @@ export default function TabOneScreen() {
 															size={18}
 															color={mutedForegroundColor}
 														/>
-														<View className="h-2" />
+														<View className="h-3" />
 													</View>
 												</View>
 											</Link>
@@ -560,7 +556,7 @@ export default function TabOneScreen() {
 
 	return (
 		<View className="px-6">
-			<View className="flex justify-center items-center mt-6 mb-2 z-10">
+			<View className="flex justify-center items-center mt-4 mb-2 z-10">
 				{/* <View className="w-full flex justify-start">
 					<H3 className="text-left max-w-xs border-none pb-0">
 						What are you drinking?

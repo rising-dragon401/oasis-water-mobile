@@ -247,6 +247,8 @@ export default function SettingsScreen() {
 						</View>
 
 						<View className="flex flex-col gap-y-2 mt-6">
+							<P className="text-muted-foreground">Membership</P>
+
 							<View className="bg-muted p-4 rounded-xl border border-accent shadow-sm shadow-blue-500/50">
 								{subscription ? (
 									<>
@@ -270,25 +272,20 @@ export default function SettingsScreen() {
 											</Typography>
 										)}
 
-										{subscriptionProvider === "revenue_cat" ? (
-											<View className="flex flex-col gap-4 text-center mt-2">
-												<Muted>
-													Thank you for supporting Oasis and the independent lab
-													testing of water. You can manage your subscription in
-													your phone settings at any time.
-												</Muted>
-											</View>
-										) : (
+										<View className="flex flex-col gap-4 text-center mt-2">
 											<Muted>
-												{" "}
 												Thank you for supporting Oasis and the independent lab
-												testing of water. Your can manage your subscription on
-												the Oasis website at any time.
+												testing of water.
 											</Muted>
-										)}
+										</View>
 									</>
 								) : (
-									<View className="mt-4 flex flex-col items-center gap-y-2">
+									<View className="mt-2 flex flex-col items-center gap-y-2">
+										<View className="flex flex-row items-center gap-x-1 mb-4">
+											<P className="text-lg">Current plan:</P>
+											<P className="font-bold text-lg">Free</P>
+										</View>
+
 										<UpgradeButton />
 
 										{!subscription && (

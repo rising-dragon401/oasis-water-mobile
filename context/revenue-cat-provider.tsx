@@ -54,15 +54,17 @@ export const RevenueCatProvider = ({ children }: any) => {
 	// Setup subscription listener
 	useEffect(() => {
 		const setup = async () => {
+			Purchases.setLogLevel(LOG_LEVEL.DEBUG);
+
 			if (Platform.OS === "ios") {
 				await Purchases.configure({ apiKey: APIKeys.apple });
 			} else {
 				await Purchases.configure({ apiKey: APIKeys.google });
 			}
 
-			setIsReady(true);
+			console.log("Purchases.configure");
 
-			Purchases.setLogLevel(LOG_LEVEL.DEBUG);
+			setIsReady(true);
 
 			// listen for customer info updates
 			// Need for restoring purchases
@@ -110,13 +112,9 @@ export const RevenueCatProvider = ({ children }: any) => {
 	const loadOfferings = async () => {
 		const offerings = await Purchases.getOfferings();
 
-		console.log("offerings", JSON.stringify(offerings, null, 2));
-
 		const annualPackage = offerings.current?.annual
 			? [offerings.current.annual]
 			: [];
-
-		console.log("annualPackage", JSON.stringify(annualPackage, null, 2));
 
 		const weeklyPackage = offerings.current?.weekly
 			? [offerings.current.weekly]
@@ -129,11 +127,7 @@ export const RevenueCatProvider = ({ children }: any) => {
 		try {
 			await Purchases.purchasePackage(pack);
 
-			console.log("purchasePackage", pack);
-
 			setSubscription(true);
-
-			console.log("customerInfo", customerInfo);
 
 			fetchSubscription({ rcCustomerId: customerInfo?.originalAppUserId });
 
@@ -152,6 +146,7 @@ export const RevenueCatProvider = ({ children }: any) => {
 	};
 
 	const restorePurchases = async () => {
+		console.log("restorePurchases");
 		// Reload stripe?
 		// Nah it checks stripe on app launch
 

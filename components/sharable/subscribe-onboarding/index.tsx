@@ -26,12 +26,11 @@ export function SubscribeOnboarding({
 			}}
 		>
 			<View className="w-full items-center flex flex-col ">
-				{/* Features */}
-				<View className="flex flex-col h-full min-h-48 gap-8 pt-8 mt-4">
+				<View className="h-full min-h-48 flex-col gap-y-8 pt-8 mt-4">
 					{FEATURES.map((feature, index) => (
 						<View
 							key={index}
-							className="flex flex-row gap-5 w-full items-center"
+							className="flex flex-row gap-6 w-full items-center"
 						>
 							<Octicons
 								name="check-circle-fill"

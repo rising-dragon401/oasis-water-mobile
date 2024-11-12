@@ -1,9 +1,9 @@
-import { getItems } from "@/actions/items";
 import { useNavigation } from "expo-router";
-
-import RankingList from "@/components/sharable/ranking-list";
 import { useEffect, useState } from "react";
 import { ScrollView } from "react-native";
+
+import { getItems } from "@/actions/items";
+import RankingList from "@/components/sharable/ranking-list";
 
 export default function Page() {
 	const navigation = useNavigation();

@@ -181,31 +181,31 @@ export default function Search({
 		setActive(false);
 	};
 
-	const getSearchPadding = () => (showSearchIcon ? "!pl-12" : "!pl-6");
+	const getSearchPadding = (show: boolean) => (show ? "pl-12" : "pl-6");
 
 	return (
 		<>
 			<View className="flex flex-row gap-2 items-center relative z-10">
 				<Input
 					ref={inputRef}
-					placeholder={placeholder || "What are you drinking?"}
+					placeholder={placeholder || "Search water, filter or location"}
 					value={value}
 					onChangeText={onChangeText}
 					aria-labelledbyledBy="inputLabel"
 					aria-errormessage="inputError"
-					className={`w-full ${getSearchPadding()} z-20 !h-16 !rounded-full transition-all duration-100`}
+					className="w-full pl-6 z-20 !h-16 !rounded-full transition-all duration-100"
 					onFocus={handleFocus}
 					onBlur={handleBlur}
 				/>
 
-				{showSearchIcon && (
+				{/* {showSearchIcon && (
 					<View
 						className="flex flex-row gap-4 z-20 items-center"
 						style={{ position: "absolute", left: 16 }}
 					>
 						<Feather name="search" size={20} color={mutedForegroundColor} />
 					</View>
-				)}
+				)} */}
 
 				<View
 					className={`flex flex-row gap-4 z-20 items-center ${
