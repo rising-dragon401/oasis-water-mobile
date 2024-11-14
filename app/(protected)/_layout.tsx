@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Tabs, useRouter } from "expo-router";
+import { Tabs } from "expo-router";
 import React, { useEffect } from "react";
 
 import { useSupabase } from "@/context/supabase-provider";
@@ -8,7 +8,6 @@ import { useColorScheme } from "@/lib/useColorScheme";
 export default function ProtectedLayout() {
 	const { backgroundColor, iconColor, textSecondaryColor } = useColorScheme();
 	const { user } = useSupabase();
-	const router = useRouter();
 
 	useEffect(() => {
 		if (!user) {
@@ -33,9 +32,6 @@ export default function ProtectedLayout() {
 				tabBarActiveTintColor: iconColor,
 				tabBarInactiveTintColor: textSecondaryColor,
 				tabBarShowLabel: true,
-				// tabBarLabelStyle: {
-				// 	color: textColor,
-				// },
 			})}
 		>
 			<Tabs.Screen

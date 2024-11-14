@@ -10,7 +10,7 @@ import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function SavedScreen() {
-	const { backgroundColor, iconColor } = useColorScheme();
+	const { iconColor } = useColorScheme();
 	const { userFavorites, tapScore } = useUserProvider();
 	const router = useRouter();
 

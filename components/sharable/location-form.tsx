@@ -12,6 +12,7 @@ import Score from "./score";
 
 import { incrementItemsViewed } from "@/actions/user";
 import Skeleton from "@/components/sharable/skeleton";
+import UntestedRow from "@/components/sharable/untested-row";
 import { Button } from "@/components/ui/button";
 import { H2, Large } from "@/components/ui/typography";
 import { useUserProvider } from "@/context/user-provider";
@@ -24,6 +25,8 @@ type Props = {
 export function LocationForm({ id }: Props) {
 	const recommendedFilterRowRef = useRef<View>(null);
 
+	console.log("LocationForm", id);
+
 	const navigation = useNavigation();
 	const { uid } = useUserProvider();
 	const { iconColor } = useColorScheme();
@@ -31,7 +34,6 @@ export function LocationForm({ id }: Props) {
 
 	const [location, setLocation] = useState<any>({});
 	const [isLoading, setIsLoading] = useState(true);
-	const [openUtility, setOpenUtility] = useState<string>("0");
 
 	useEffect(() => {
 		incrementItemsViewed(uid);
@@ -88,6 +90,8 @@ export function LocationForm({ id }: Props) {
 			);
 		}
 	};
+
+	const isTested = location?.is_indexed !== false;
 
 	if (isLoading)
 		return (
@@ -156,23 +160,27 @@ export function LocationForm({ id }: Props) {
 									label="Total contaminants"
 									value={contaminants.length}
 									score={contaminants.length > 0 ? "bad" : "good"}
+									untested={!isTested}
 								/>
 
 								<BlurredLineItem
 									label="Above guidelines"
 									value={contaminantsAboveLimit.length}
 									score={contaminantsAboveLimit.length > 0 ? "bad" : "good"}
+									untested={!isTested}
 								/>
 
-								<Button
-									variant="outline"
-									onPress={handleRecommendedFilterPress}
-									className="w-56 !h-10 !py-0 my-4"
-									icon={
-										<Ionicons name="arrow-down" size={16} color={iconColor} />
-									}
-									label="Recommended filter"
-								/>
+								{isTested && (
+									<Button
+										variant="outline"
+										onPress={handleRecommendedFilterPress}
+										className="w-56 !h-10 !py-0 my-4"
+										icon={
+											<Ionicons name="arrow-down" size={16} color={iconColor} />
+										}
+										label="Recommended filter"
+									/>
+								)}
 							</View>
 
 							<View className="flex !w-2/5 justify-center items-center">
@@ -184,38 +192,31 @@ export function LocationForm({ id }: Props) {
 									}
 									size="sm"
 									showScore
+									untested={!isTested}
 								/>
 							</View>
 						</View>
 					</View>
 
-					<View className="flex flex-col mt-2">
-						<View className="flex flex-row items-center gap-2 mb-2">
-							<Ionicons name="skull-outline" size={16} color={iconColor} />
+					{isTested ? (
+						<View className="flex flex-col mt-2">
+							<View className="flex flex-row items-center gap-2 mb-2">
+								<Ionicons name="skull-outline" size={16} color={iconColor} />
+								<Large className="mb-0 pb-0">Contaminants detected</Large>
+							</View>
 
-							<Large className="mb-0 pb-0">Contaminants detected</Large>
+							<View className="flex flex-wrap gap-4 w-full pt-2">
+								{lowestScoringUtility?.contaminants.map((contaminant: any) => (
+									<HorizontalContaminantCard
+										key={contaminant.id}
+										data={contaminant}
+									/>
+								))}
+							</View>
 						</View>
-
-						<View className="flex flex-wrap gap-4 w-full pt-2">
-							{lowestScoringUtility?.contaminants.map((contaminant: any) => (
-								<HorizontalContaminantCard
-									key={contaminant.id}
-									data={contaminant}
-								/>
-							))}
-						</View>
-					</View>
-
-					{/* {location?.sources && (
-						<View className="flex flex-col gap-6 my-10">
-							<Typography size="2xl" fontWeight="normal">
-								Sources
-							</Typography>
-							{location && location?.sources?.length > 0 && (
-								<Sources data={location.sources} />
-							)}
-						</View>
-					)} */}
+					) : (
+						<UntestedRow thing={location} />
+					)}
 				</View>
 
 				{/* Recommended filter based on contaminants */}

@@ -27,12 +27,14 @@ export default function Search({
 	placeholder,
 	overridePress,
 	hideScan,
+	showRequestItem = true,
 }: {
 	indices?: string[];
 	setActive: (active: boolean) => void;
 	placeholder?: string;
 	overridePress?: (item: any) => void;
 	hideScan?: boolean;
+	showRequestItem?: boolean;
 }) {
 	const [results, setResults] = useState<any[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
@@ -236,6 +238,7 @@ export default function Search({
 					noResults={noResults}
 					overridePress={overridePress}
 					setResults={setResults}
+					showRequestItem={showRequestItem}
 				/>
 			)}
 		</>

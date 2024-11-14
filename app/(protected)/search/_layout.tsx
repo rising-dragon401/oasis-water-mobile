@@ -2,58 +2,59 @@ import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import {
 	Stack,
-	useLocalSearchParams,
+	useGlobalSearchParams,
 	usePathname,
 	useRouter,
 } from "expo-router";
-import { TouchableOpacity, View, useWindowDimensions } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 
 import OasisLogo from "@/assets/oasis-word.png";
-import { P } from "@/components/ui/typography";
-import { useUserProvider } from "@/context/user-provider";
+import HeaderBackButton from "@/components/sharable/header-back-button";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 function CustomHeader() {
 	return <Image source={OasisLogo} style={{ width: 85, height: 24 }} />;
 }
 
-function HomeHeader({
-	screenWidth,
-	location,
-	score,
-}: {
-	screenWidth: number;
-	location: any;
-	score: number | null;
-}) {
+function ReportHeader() {
+	const router = useRouter();
+
+	return (
+		<TouchableOpacity onPress={() => router.push("/requestModal")}>
+			<Ionicons name="alert-circle-outline" size={24} color="black" />
+		</TouchableOpacity>
+	);
+}
+
+function HomeHeader() {
+	const router = useRouter();
+
 	return (
 		<View className="flex flex-row items-center justify-between w-full pr-6">
 			<View className="flex items-start justify-start">
 				<Image source={OasisLogo} style={{ width: 85, height: 24 }} />
 			</View>
 
-			<View className="w-10">{/* <ScoreBadge /> */}</View>
+			<View className="w-10 mr-2">
+				<TouchableOpacity
+					onPress={() => router.push("/(protected)/search/community")}
+				>
+					<Ionicons name="globe-outline" size={24} color="black" />
+				</TouchableOpacity>
+			</View>
 		</View>
 	);
 }
 
 export default function SearchLayout() {
-	const { backgroundColor, textColor, iconColor } = useColorScheme();
-	const { width } = useWindowDimensions();
+	const { backgroundColor, textColor } = useColorScheme();
 
-	const { userData } = useUserProvider();
-
-	const { userScores } = userData ?? {};
-
-	const locationName = userData?.location?.city
-		? `${userData?.location?.city}, ${userData?.location?.state}`
-		: "Unknown";
-
-	const params = useLocalSearchParams();
-	const router = useRouter();
+	const globalParams = useGlobalSearchParams();
 
 	// Determine back path
-	const backPath = params?.backPath || "search";
+	const backPath = Array.isArray(globalParams?.backPath)
+		? globalParams.backPath[0]
+		: globalParams?.backPath || "search";
 
 	const isSearchPage = usePathname() === "/search";
 
@@ -61,28 +62,13 @@ export default function SearchLayout() {
 		<Stack
 			screenOptions={{
 				headerShown: true,
-				headerBackTitle: "Search",
+				// headerBackTitle: "Search",
 				headerLeft: ({ canGoBack }) =>
 					canGoBack &&
-					!isSearchPage && (
-						<TouchableOpacity
-							onPress={() => {
-								if (backPath === "saved") {
-									router.push("/saved");
-								} else {
-									router.back();
-								}
-							}}
-							className="flex flex-row items-center gap-1"
-						>
-							<Ionicons name="arrow-back" size={20} color={iconColor} />
-							<P className="text-base">Back</P>
-						</TouchableOpacity>
-					),
+					!isSearchPage && <HeaderBackButton backPath={backPath} />,
 				contentStyle: {
 					backgroundColor,
 				},
-
 				headerStyle: {
 					backgroundColor,
 				},
@@ -97,20 +83,29 @@ export default function SearchLayout() {
 			<Stack.Screen
 				name="index"
 				options={{
-					headerTitle: () => (
-						<HomeHeader
-							screenWidth={width}
-							location={locationName}
-							score={userScores?.overallScore}
-						/>
-					),
+					headerTitle: () => <HomeHeader />,
 					headerLeft: () => null,
 				}}
 			/>
-			<Stack.Screen name="item/[id]" />
-			<Stack.Screen name="location/[id]" />
+			<Stack.Screen
+				name="item/[id]"
+				options={{
+					headerRight: () => <ReportHeader />,
+				}}
+			/>
+			<Stack.Screen
+				name="location/[id]"
+				options={{
+					headerRight: () => <ReportHeader />,
+				}}
+			/>
 			<Stack.Screen name="ingredient/[id]" />
-			<Stack.Screen name="filter/[id]" />
+			<Stack.Screen
+				name="filter/[id]"
+				options={{
+					headerRight: () => <ReportHeader />,
+				}}
+			/>
 			<Stack.Screen name="article/[id]" />
 			<Stack.Screen name="bottled-waters/index" />
 			<Stack.Screen name="tap-water/index" />
@@ -119,6 +114,8 @@ export default function SearchLayout() {
 			<Stack.Screen name="top-rated/[id]" />
 			<Stack.Screen name="top-rated-all/index" />
 			<Stack.Screen name="company/[id]" />
+			<Stack.Screen name="articles/index" />
+			<Stack.Screen name="community/index" />
 		</Stack>
 	);
 }

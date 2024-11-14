@@ -1,12 +1,13 @@
+import { Feather } from "@expo/vector-icons";
 import * as Sentry from "@sentry/react-native";
 import { PortalHost } from "components/primitives/portal";
 import { isRunningInExpoGo } from "expo";
 import "expo-dev-client";
 import { Image } from "expo-image";
-import { Stack, useNavigationContainerRef } from "expo-router";
+import { Stack, useNavigationContainerRef, useRouter } from "expo-router";
 import { PostHogProvider } from "posthog-react-native";
 import React from "react";
-import { RootSiblingParent } from "react-native-root-siblings";
+import { TouchableOpacity } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { SWRConfig } from "swr";
 
@@ -23,6 +24,17 @@ const routingInstrumentation = new Sentry.ReactNavigationInstrumentation();
 
 function LogoHeader() {
 	return <Image source={OasisLogo} style={{ width: 85, height: 24 }} />;
+}
+
+function CloseHeader() {
+	const { mutedForegroundColor } = useColorScheme();
+	const router = useRouter();
+
+	return (
+		<TouchableOpacity onPress={() => router.back()}>
+			<Feather name="x" size={28} color={mutedForegroundColor} />
+		</TouchableOpacity>
+	);
 }
 
 Sentry.init({
@@ -81,91 +93,111 @@ function RootLayout() {
 							autocapture
 						>
 							<SWRConfig>
-								<RootSiblingParent>
-									<ToastProvider>
-										<SafeAreaProvider>
-											<Stack
-												screenOptions={{
+								{/* <RootSiblingParent> */}
+								<ToastProvider>
+									<SafeAreaProvider>
+										<Stack
+											screenOptions={{
+												headerShown: false,
+												headerShadowVisible: false,
+												contentStyle: {
+													backgroundColor,
+												},
+												headerStyle: {
+													backgroundColor,
+												},
+											}}
+										>
+											<Stack.Screen name="(public)" />
+											<Stack.Screen
+												name="(protected)"
+												options={{
 													headerShown: false,
 												}}
-											>
-												<Stack.Screen name="(public)" />
-												<Stack.Screen
-													name="(protected)"
-													options={{
-														headerShown: false,
-													}}
-												/>
-												<Stack.Screen
-													name="subscribeModal"
-													options={{
-														presentation: "modal",
-													}}
-												/>
-												<Stack.Screen
-													name="deleteAccountModal"
-													options={{
-														presentation: "modal",
-													}}
-												/>
-												<Stack.Screen
-													name="chatModal"
-													options={{
-														presentation: "modal",
-													}}
-												/>
-												<Stack.Screen
-													name="inviteModal"
-													options={{
-														presentation: "modal",
-													}}
-												/>
-												<Stack.Screen
-													name="redeemModal"
-													options={{
-														presentation: "modal",
-													}}
-												/>
-												<Stack.Screen
-													name="reviewModal"
-													options={{
-														presentation: "modal",
-													}}
-												/>
-												<Stack.Screen
-													name="scanModal"
-													options={{
-														presentation: "modal",
-													}}
-												/>
-												<Stack.Screen
-													name="locationModal"
-													options={{
-														presentation: "modal",
-													}}
-												/>
-												<Stack.Screen
-													name="scoreModal"
-													options={{
-														contentStyle: {
-															backgroundColor,
-														},
-														headerShown: true,
-														presentation: "modal",
-														headerTitle: () => <LogoHeader />,
-														headerTitleAlign: "center",
-														headerShadowVisible: false,
-														headerStyle: {
-															backgroundColor,
-														},
-														headerBackVisible: false,
-													}}
-												/>
-											</Stack>
-										</SafeAreaProvider>
-										<PortalHost />
-									</ToastProvider>
-								</RootSiblingParent>
+											/>
+											<Stack.Screen
+												name="subscribeModal"
+												options={{
+													presentation: "modal",
+												}}
+											/>
+											<Stack.Screen
+												name="deleteAccountModal"
+												options={{
+													presentation: "modal",
+												}}
+											/>
+											<Stack.Screen
+												name="chatModal"
+												options={{
+													presentation: "modal",
+												}}
+											/>
+											<Stack.Screen
+												name="inviteModal"
+												options={{
+													presentation: "modal",
+												}}
+											/>
+											<Stack.Screen
+												name="redeemModal"
+												options={{
+													presentation: "modal",
+												}}
+											/>
+											<Stack.Screen
+												name="reviewModal"
+												options={{
+													presentation: "modal",
+												}}
+											/>
+											<Stack.Screen
+												name="scanModal"
+												options={{
+													headerShown: false,
+													presentation: "modal",
+												}}
+											/>
+											<Stack.Screen
+												name="locationModal"
+												options={{
+													headerShown: true,
+													headerTitle: "Location",
+													headerRight: () => <CloseHeader />,
+													presentation: "modal",
+												}}
+											/>
+											<Stack.Screen
+												name="scoreModal"
+												options={{
+													contentStyle: {
+														backgroundColor,
+													},
+													headerShown: true,
+													presentation: "modal",
+													headerTitle: () => <LogoHeader />,
+													headerTitleAlign: "center",
+													headerShadowVisible: false,
+													headerStyle: {
+														backgroundColor,
+													},
+													headerBackVisible: false,
+												}}
+											/>
+											<Stack.Screen
+												name="requestModal"
+												options={{
+													headerShown: true,
+													headerTitle: "Contribute to Oasis",
+													headerRight: () => <CloseHeader />,
+													presentation: "modal",
+												}}
+											/>
+										</Stack>
+									</SafeAreaProvider>
+									<PortalHost />
+								</ToastProvider>
+								{/* </RootSiblingParent> */}
 							</SWRConfig>
 						</PostHogProvider>
 					</BlogProvider>

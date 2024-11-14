@@ -27,13 +27,16 @@ type CategoryType = {
 export const ITEM_TYPES = [
 	{
 		id: "water",
+		name: "water",
 		typeId: "bottled_water",
 		dbTypes: ["bottled_water", "water_gallon"],
 		tags: ["bottled_water", "water_gallon", "gallon"],
 		productType: "water",
+		tableName: "items",
 	},
 	{
 		id: "filter",
+		name: "filter",
 		typeId: "filter",
 		dbTypes: ["filter", "shower_filter", "bottle_filter"],
 		productType: "filter",
@@ -46,6 +49,15 @@ export const ITEM_TYPES = [
 			"house",
 			"tap",
 		],
+		tableName: "water_filters",
+	},
+	{
+		id: "tap_water",
+		name: "tap water",
+		typeId: "tap_water",
+		dbTypes: ["tap_water"],
+		productType: "water",
+		tableName: "tap_water_locations",
 	},
 ];
 

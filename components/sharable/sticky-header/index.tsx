@@ -10,17 +10,23 @@ export default function StickyHeader({
 	icon,
 	path,
 	description,
+	hideMargin,
 }: {
 	title: string;
 	icon?: string;
 	path?: string;
 	description?: string;
+	hideMargin?: boolean;
 }) {
 	const router = useRouter();
 	const { iconColor } = useColorScheme();
 
 	return (
-		<View className="flex-row w-full justify-between items-center mt-24">
+		<View
+			className={`flex-row w-full justify-between items-center ${
+				hideMargin ? "" : "mt-24"
+			}`}
+		>
 			<View className="flex-col gap-y-1">
 				<H1>{title}</H1>
 

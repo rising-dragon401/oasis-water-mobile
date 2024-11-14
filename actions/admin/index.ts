@@ -332,14 +332,16 @@ export const getMostRecentlyUpdatedItems = async () => {
 		.from("items")
 		.select("*")
 		.eq("is_indexed", true)
-		.order("created_at", { ascending: false })
+		.not("updated_at", "is", null)
+		.order("updated_at", { ascending: false })
 		.limit(5);
 
 	const { data: filtersData, error: filtersError } = await supabase
 		.from("water_filters")
 		.select("*")
 		.eq("is_indexed", true)
-		.order("created_at", { ascending: false })
+		.not("updated_at", "is", null)
+		.order("updated_at", { ascending: false })
 		.limit(5);
 
 	if (itemsError || filtersError) {
@@ -352,10 +354,12 @@ export const getMostRecentlyUpdatedItems = async () => {
 
 	const combinedData = [...itemsData, ...filtersData];
 
+	// console.log("combinedData", JSON.stringify(combinedData, null, 2));
+
 	// Sort combined data by created_at
 	combinedData.sort(
 		(a, b) =>
-			new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+			new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime(),
 	);
 
 	return combinedData;
@@ -580,4 +584,127 @@ export const getContaminantData = async () => {
 
 	console.log("categoryDetails: ", JSON.stringify(categoryDetails, null, 2));
 	return categoryDetails;
+};
+
+export const getIngIdsByName = async () => {
+	const names = [
+		"Bromochloromethane",
+		"Bromodichloromethane",
+		"Bromoform",
+		"Chloroform",
+		"Dibromochloromethane",
+		"Dibromomethane",
+		"Boron",
+		"Chloride",
+		"Fluoride",
+		"Nitrate (as N)",
+		"Nitrite (as N)",
+		"Phosphorus",
+		"Sulfate",
+		"Aluminum",
+		"Antimony",
+		"Arsenic",
+		"Barium",
+		"Beryllium",
+		"Cadmium",
+		"Chromium (Total)",
+		"Cobalt",
+		"Copper",
+		"Iron",
+		"Lead",
+		"Lithium",
+		"Manganese",
+		"Mercury",
+		"Molybdenum",
+		"Nickel",
+		"Selenium",
+		"Silver",
+		"Strontium",
+		"Thallium",
+		"Tin",
+		"Titanium",
+		"Uranium",
+		"Vanadium",
+		"Zinc",
+		"Calcium",
+		"Magnesium",
+		"Potassium",
+		"Sodium",
+		"Benzene",
+		"Ethylbenzene",
+		"Methyl Tertiary Butyl Ether",
+		"Naphthalene",
+		"Toluene",
+		"m,p Xylene",
+		"o Xylene",
+		"1,1 Dichloroethane",
+		"1,1 Dichloroethylene",
+		"1,1 Dichloropropene",
+		"1,1,1 Trichloroethane",
+		"1,1,1,2 Tetrachloroethane",
+		"1,1,2 Trichloroethane",
+		"1,1,2,2 Tetrachloroethane",
+		"1,2 Dichlorobenzene",
+		"1,2 Dichloroethane",
+		"1,2 Dichloropropane",
+		"1,2,3 Trichlorobenzene",
+		"1,2,3 Trichloropropane",
+		"1,2,4 Trichlorobenzene",
+		"1,2,4 Trimethylbenzene",
+		"1,3 Dichlorobenzene",
+		"1,3 Dichloropropane",
+		"1,3,5 Trimethylbenzene",
+		"1,4 Dichlorobenzene",
+		"2,2 Dichloropropane",
+		"Bromobenzene",
+		"Bromomethane",
+		"Carbon Tetrachloride",
+		"Chlorobenzene",
+		"Chloroethane",
+		"Chloromethane",
+		"Chlorotoluene 2",
+		"Chlorotoluene 4",
+		"Dibromochloropropane",
+		"Dichlorodifluoromethane",
+		"Dichloromethane",
+		"Ethylene dibromide",
+		"Hexachlorobutadiene",
+		"Isopropylbenzene",
+		"Styrene",
+		"Tetrachloroethylene",
+		"Trichloroethylene",
+		"Trichlorofluoromethane",
+		"Vinyl Chloride",
+		"cis 1,2 Dichloroethylene",
+		"cis 1,3 Dichloropropene",
+		"n Butylbenzene",
+		"n Propylbenzene",
+		"p Isopropyltoluene",
+		"sec Butylbenzene",
+		"tert Butylbenzene",
+		"trans 1,3 Dichloropropene",
+		"Chlorine",
+	];
+
+	let listIds: string[] = [];
+
+	for (const name of names) {
+		const lowerCaseName = name.toLowerCase();
+
+		const { data, error } = await supabase
+			.from("ingredients")
+			.select("id")
+			.ilike("name", `%${lowerCaseName}%`); // Use ilike for case-insensitive matching
+
+		if (error) {
+			console.error(`Error fetching ingredient IDs for name ${name}:`, error);
+			continue;
+		}
+
+		listIds = listIds.concat(data.map((ingredient) => ingredient.id));
+	}
+
+	console.log("listIds: ", JSON.stringify(listIds, null, 2));
+
+	return listIds;
 };

@@ -6,10 +6,12 @@ const ItemSelector = ({
 	items,
 	setItems,
 	initialItems = [],
+	singleSelect = false,
 }: {
 	items: any[];
 	setItems: (items: any[]) => void;
 	initialItems?: any[];
+	singleSelect?: boolean;
 }) => {
 	const [searchActive, setSearchActive] = useState(false);
 
@@ -28,12 +30,12 @@ const ItemSelector = ({
 
 	return (
 		<Search
-			placeholder="Enter bottled water or filter"
+			placeholder="Search for a water, filter or location"
 			setActive={setSearchActive}
 			overridePress={handleItemPress}
 			hideScan
-			showSearchIcon
-			indices={["items", "water_filters"]}
+			indices={["items", "water_filters", "tap_water_locations"]}
+			showRequestItem={false}
 		/>
 	);
 };

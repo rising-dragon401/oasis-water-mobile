@@ -44,8 +44,6 @@ export default function ProfileLayout() {
 
 			{/* Score screen */}
 			<Stack.Screen name="score/[id]" options={{ headerShown: true }} />
-
-			{/* <Stack.Screen name="settings/help" options={{ headerTitle: "Help" }} /> */}
 		</Stack>
 	);
 }

@@ -1,4 +1,5 @@
 import { Feather } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useUserProvider } from "context/user-provider";
 import { useRouter } from "expo-router";
 import { TouchableOpacity, View } from "react-native";
@@ -14,6 +15,7 @@ type BlurredLineItemProps = {
 	isPaywalled?: boolean;
 	score?: "good" | "bad" | "neutral";
 	icon?: React.ReactNode;
+	untested?: boolean;
 };
 
 export default function BlurredLineItem({
@@ -24,10 +26,11 @@ export default function BlurredLineItem({
 	isPaywalled = false,
 	score,
 	icon,
+	untested = false,
 }: BlurredLineItemProps) {
 	const router = useRouter();
 	const { subscription } = useUserProvider();
-	const { textColor } = useColorScheme();
+	const { textColor, mutedForegroundColor } = useColorScheme();
 
 	const handleOpenPaywall = () => {
 		if (!subscription) {
@@ -37,8 +40,9 @@ export default function BlurredLineItem({
 
 	const showPaywall = !subscription && isPaywalled;
 
-	const colorMark =
-		score === "good"
+	const colorMark = untested
+		? "#E5E7EB" // gray-200
+		: score === "good"
 			? "#34D399" // emerald-400
 			: score === "bad"
 				? "#FB7185" // rose-400
@@ -62,7 +66,13 @@ export default function BlurredLineItem({
 					</TouchableOpacity>
 				) : (
 					<>
-						<P className="text-right text-lg text-muted-foreground">{value}</P>
+						{untested ? (
+							<Ionicons name="help" size={16} color={mutedForegroundColor} />
+						) : (
+							<P className="text-right text-lg text-muted-foreground">
+								{value}
+							</P>
+						)}
 						<View
 							className="rounded-full"
 							style={{

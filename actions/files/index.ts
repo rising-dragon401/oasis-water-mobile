@@ -59,3 +59,22 @@ export const uploadCameraImage = async (
 		return false;
 	}
 };
+
+export const uploadFile = async (file: File, path: string, name: string) => {
+	try {
+		const { data, error } = await supabase.storage
+			.from(path)
+			.upload(name, file);
+
+		if (error) {
+			throw error;
+		}
+
+		const { data: urlData } = supabase.storage.from(path).getPublicUrl(name);
+
+		return urlData;
+	} catch (e) {
+		console.error("Error uploading file: ", e);
+		return false;
+	}
+};

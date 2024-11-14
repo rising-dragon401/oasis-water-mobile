@@ -6,6 +6,7 @@ import {
 	getCurrentUserData,
 	getUserFavorites,
 	getUserTapScore,
+	getUserUpvoted,
 } from "actions/user";
 import React, {
 	ReactNode,
@@ -29,12 +30,19 @@ interface UserContextType {
 	userData: any;
 	tapScore: any;
 	userScores: any;
+	userRequests: any;
 	userFavorites: any[] | null | undefined;
 	subscription: boolean;
 	subscriptionData: any | null | undefined;
 	subscriptionProvider: SubscriptionProviderType;
 	refreshUserData: (
-		type?: "all" | "favorites" | "scores" | "subscription" | "userData",
+		type?:
+			| "all"
+			| "favorites"
+			| "scores"
+			| "subscription"
+			| "userData"
+			| "requests",
 	) => Promise<void>;
 	fetchUserFavorites: (uid: string | null) => Promise<void>;
 	fetchUserScores: (userTapId?: any) => Promise<void>;
@@ -96,11 +104,16 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 	const [userFavorites, setUserFavorites] = useState<any[] | null | undefined>(
 		null,
 	);
+	const [userRequests, setUserRequests] = useState<any>({
+		items: [],
+		filters: [],
+		tapLocations: [],
+	});
 
 	// Admin scripts
-	// useEffect(() => {
-	// 	getContaminantData();
-	// }, []);
+	useEffect(() => {
+		// getIngIdsByName();
+	}, []);
 
 	// set active session and refresh user data
 	useEffect(() => {
@@ -148,6 +161,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 		});
 
 		fetchUserFavorites(session?.user?.id);
+		fetchUserUpvoted(session?.user?.id);
 	};
 
 	const fetchUserData = async (uid?: string | null) => {
@@ -228,6 +242,12 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 		setUserScores(scores);
 	};
 
+	const fetchUserUpvoted = async (userId: string) => {
+		const upvoted = await getUserUpvoted(userId);
+		console.log("upvoted", upvoted);
+		setUserRequests(upvoted);
+	};
+
 	const refreshUserData = useCallback(
 		async (
 			type:
@@ -235,6 +255,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 				| "favorites"
 				| "scores"
 				| "subscription"
+				| "requests"
 				| "userData" = "all",
 		) => {
 			const userId = user?.id;
@@ -257,6 +278,9 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 			}
 			if (type === "all" || type === "userData") {
 				promises.push(fetchUserData(userId));
+			}
+			if (type === "all" || type === "requests") {
+				promises.push(fetchUserUpvoted(userId));
 			}
 
 			await Promise.all(promises);
@@ -296,6 +320,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 			subscriptionProvider,
 			tapScore,
 			userScores,
+			userRequests,
 			refreshUserData,
 			fetchUserFavorites,
 			fetchUserScores,
@@ -315,6 +340,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 			subscriptionProvider,
 			tapScore,
 			userScores,
+			userRequests,
 			refreshUserData,
 			fetchUserFavorites,
 			fetchUserScores,

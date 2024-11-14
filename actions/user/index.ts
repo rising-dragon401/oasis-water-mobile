@@ -1195,3 +1195,75 @@ export const addWatersAndFiltersToUserFavorites = async (
 
 	return true;
 };
+
+export const getUserUpvoted = async (userId: string) => {
+	const { data: itemsData, error: itemsError } = await supabase
+		.from("requests")
+		.select("*")
+		.eq("user_id", userId)
+		.eq("product_type", "bottled_water");
+
+	const { data: filtersData, error: filtersError } = await supabase
+		.from("requests")
+		.select("*")
+		.eq("user_id", userId)
+		.eq("product_type", "filter");
+
+	const { data: tapLocationsData, error: tapLocationsError } = await supabase
+		.from("requests")
+		.select("*")
+		.eq("user_id", userId)
+		.eq("product_type", "tap_water");
+
+	if (itemsError || filtersError || tapLocationsError) {
+		console.error(
+			"Error fetching user upvoted data:",
+			itemsError,
+			filtersError,
+			tapLocationsError,
+		);
+		return {
+			items: [],
+			filters: [],
+			tapLocations: [],
+		};
+	}
+
+	console.log("itemsData", itemsData);
+
+	return {
+		items: itemsData.map((item: any) => item.product_id),
+		filters: filtersData.map((filter: any) => filter.product_id),
+		tapLocations: tapLocationsData.map(
+			(tapLocation: any) => tapLocation.product_id,
+		),
+	};
+};
+
+export const checkIfUserUpvoted = async (
+	userId: string,
+	thingId: string,
+	product_type: string,
+) => {
+	console.log("userId", userId);
+	console.log("thingId", thingId);
+	console.log("product_type", product_type);
+
+	const { data, error } = await supabase
+		.from("requests")
+		.select("*")
+		.eq("user_id", userId)
+		.eq("product_id", thingId)
+		.eq("product_type", product_type);
+
+	if (error) {
+		console.error("Error checking if user upvoted:", error);
+		return false;
+	}
+
+	if (data && data.length > 0) {
+		return true;
+	}
+
+	return false;
+};

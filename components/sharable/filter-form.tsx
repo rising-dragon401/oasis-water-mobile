@@ -13,6 +13,7 @@ import {
 import ItemImage from "./item-image";
 import Score from "./score";
 import Sources from "./sources";
+import UntestedRow from "./untested-row";
 
 import { getFilterDetails } from "@/actions/filters";
 import ContaminantTable from "@/components/sharable/contaminant-table";
@@ -21,6 +22,7 @@ import { H3, Muted } from "@/components/ui/typography";
 import { useUserProvider } from "@/context/user-provider";
 import { IngredientCategories } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
+
 type Props = {
 	id: string;
 };
@@ -138,6 +140,8 @@ export function FilterForm({ id }: Props) {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [contaminants, filteredContaminants]);
 
+	const isTested = filter?.is_indexed !== false;
+
 	if (filter.is_draft) {
 		return (
 			<View>This filter has not been rated yet. Please check back later.</View>
@@ -189,9 +193,11 @@ export function FilterForm({ id }: Props) {
 						</View>
 
 						<View className="flex w-1/3 flex-col-reverse justify-end items-end -mt-2">
-							<Score score={filter.score} size="sm" />
+							<Score score={filter.score} size="sm" untested={!isTested} />
 						</View>
 					</View>
+
+					{!isTested && <UntestedRow thing={filter} />}
 
 					<View>
 						<FilterMetadata

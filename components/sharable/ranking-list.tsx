@@ -16,10 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { H2, Muted, P } from "@/components/ui/typography";
 import { useUserProvider } from "@/context/user-provider";
-import {
-	CATEGORIES as CATEGORIES_CONST,
-	ITEM_TYPES,
-} from "@/lib/constants/categories";
+import { CATEGORIES as CATEGORIES_CONST } from "@/lib/constants/categories";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 const CATEOGRIES = [
@@ -177,8 +174,6 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 
 	const isAuthUser = uid === user?.uid;
 
-	console.log("categoryId", categoryId);
-
 	const fetchAndSetData = async (
 		key: string,
 		fetchFunction: () => Promise<any>,
@@ -210,20 +205,15 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 
 	// Fetch items based on categoryId
 	useEffect(() => {
-		const type = ITEM_TYPES.find((item) => item.dbTypes.includes(categoryId));
-
 		const category = CATEGORIES_CONST.find((item) => item.id === categoryId);
-
-		console.log("category", category);
-		console.log("type", type);
-		console.log("type.dbTypes", category?.dbTypes);
-		console.log("category.selectedTags", category?.selectedTags);
 
 		const productType_ = category?.productType || "";
 
 		console.log("productType_", productType_);
+		console.log("category", category);
 
 		setTitle(category?.title || "");
+
 		navigation.setOptions({
 			title: category?.title || "",
 		});
@@ -237,7 +227,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 						limit: 500,
 						sortMethod: "name",
 						type: category?.dbTypes,
-						tags: category?.tags,
+						tags: category?.selectedTags,
 					}),
 				);
 				// navigation.setOptions({
@@ -549,10 +539,22 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 						)}
 						keyExtractor={(item) => item.id}
 						numColumns={1}
-						contentContainerStyle={{ paddingTop: 0, paddingBottom: 0, gap: 2 }}
+						contentContainerStyle={{
+							paddingTop: 0,
+							paddingBottom: 100,
+							gap: 2,
+						}}
 						showsVerticalScrollIndicator={false}
 						ListEmptyComponent={loading ? renderLoader() : null}
 						ListHeaderComponent={<View style={{ height: 1 }} />}
+						ListFooterComponent={
+							<Button
+								label="Request a product"
+								variant="outline"
+								onPress={() => router.push("/requestModal")}
+								className="mt-4 !h-16"
+							/>
+						}
 						initialNumToRender={8}
 						maxToRenderPerBatch={4}
 						windowSize={5}

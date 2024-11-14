@@ -11,14 +11,6 @@ import { Muted, P } from "@/components/ui/typography";
 import { theme } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
 
-const healthRisks = ["Hair loss", "Dry skin", "Nausea", "Low sperm count"];
-
-const benefits = [
-	"Strong mineral content",
-	"Increased energy levels",
-	"Enhanced fertility",
-];
-
 export default function ProfileScreen() {
 	const { userScores, userData, subscription, tapScore, userFavorites } =
 		useUserProvider();

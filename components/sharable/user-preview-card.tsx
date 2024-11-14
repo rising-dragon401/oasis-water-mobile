@@ -37,6 +37,27 @@ const UserPreviewCard = ({
 	// 	);
 	// };
 
+	const timeSince = () => {
+		const now = new Date();
+		const createdAt = new Date(item.created_at);
+		const diffTime = Math.abs(now.getTime() - createdAt.getTime());
+
+		const diffSeconds = Math.floor(diffTime / 1000);
+		const diffMinutes = Math.floor(diffSeconds / 60);
+		const diffHours = Math.floor(diffMinutes / 60);
+		const diffDays = Math.floor(diffHours / 24);
+
+		if (diffSeconds < 60) {
+			return `${diffSeconds} seconds ago`;
+		} else if (diffMinutes < 60) {
+			return `${diffMinutes} minutes ago`;
+		} else if (diffHours < 24) {
+			return `${diffHours} hours ago`;
+		} else {
+			return `${diffDays} days ago`;
+		}
+	};
+
 	return (
 		<Link href={`/search/oasis/${item.id}`}>
 			<View className="flex flex-row items-center gap-2 h-20 w-full bg-white rounded-xl  px-4 py-2">
@@ -54,13 +75,13 @@ const UserPreviewCard = ({
 				<View className="flex-row w-full justify-between items-start gap-2 flex-1">
 					<View className="flex flex-col gap-0">
 						<P className="flex flex-wrap">{item.full_name}</P>
-						<Muted>{new Date(item.created_at).toLocaleDateString()}</Muted>
+						<Muted>{timeSince()}</Muted>
 					</View>
 
-					<View className="flex flex-col gap-0 items-end">
+					{/* <View className="flex flex-col gap-0 items-end">
 						<P className="flex font-bold text-lg">{item.score}</P>
 						<Muted>/100</Muted>
-					</View>
+					</View> */}
 
 					{/* {item.score && <View className="w-1/3">{renderScore()}</View>}
 

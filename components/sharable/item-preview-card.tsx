@@ -1,9 +1,9 @@
 import { Ionicons, Octicons } from "@expo/vector-icons";
 import { useUserProvider } from "context/user-provider";
 import { Image } from "expo-image";
-import { Link } from "expo-router";
+import { useRouter } from "expo-router";
 import React, { useMemo } from "react";
-import { View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 
 import { H4, Muted, P } from "@/components/ui/typography";
 import {
@@ -20,6 +20,8 @@ type Props = {
 	isGeneralListing?: boolean;
 	imageHeight?: number;
 	variation?: "square" | "row";
+	showVotes?: boolean;
+	backPath?: string;
 };
 
 const ItemPreviewCard = ({
@@ -29,9 +31,12 @@ const ItemPreviewCard = ({
 	isGeneralListing = false,
 	imageHeight = 100,
 	variation = "square",
+	showVotes = false,
+	backPath = "",
 }: Props) => {
 	const { subscription } = useUserProvider();
 	const { mutedForegroundColor } = useColorScheme();
+	const router = useRouter();
 
 	// show if listed in top-rate or preview list but not on favorites page
 	// unless subscribed or is the auth user
@@ -50,7 +55,7 @@ const ItemPreviewCard = ({
 			width: variation === "row" ? 80 : "100%",
 			height: imageHeight || 80,
 			aspectRatio: variation === "row" ? undefined : 1,
-			contentFit: "contain",
+			contentFit: "cover",
 			borderRadius: 10,
 		};
 
@@ -113,13 +118,23 @@ const ItemPreviewCard = ({
 		}
 	};
 
+	const link = backPath
+		? `${determineLink(item)}?backPath=${backPath}`
+		: determineLink(item);
+
+	console.log("link", link);
+
 	return (
-		// @ts-ignore
-		<Link href={showData ? determineLink(item) : "/subscribeModal"}>
+		<TouchableOpacity
+			onPress={() => {
+				// @ts-ignore
+				router.push(link);
+			}}
+		>
 			<View
-				className={`relative flex w-full rounded-2xl ${
-					variation === "row" ? "flex-row gap-2 px-2 py-3" : "flex-col"
-				} w-full  border border-border overflow-hidden bg-white pt-4 `}
+				className={`relative w-full flex rounded-2xl ${
+					variation === "row" ? "flex-row gap-2 px-2 py-3 " : "flex-col"
+				}  border border-border overflow-hidden bg-white pt-4 `}
 			>
 				<View
 					className={`flex justify-center items-center ${
@@ -175,6 +190,13 @@ const ItemPreviewCard = ({
 					{variation === "row" && item.brandName && (
 						<Muted>{item.brandName} </Muted>
 					)}
+
+					{variation === "row" && showVotes && (
+						<Muted>
+							{item.test_request_count || 0}{" "}
+							{item.test_request_count === 1 ? "vote" : "votes"}
+						</Muted>
+					)}
 				</View>
 
 				{variation === "row" && (
@@ -225,7 +247,7 @@ const ItemPreviewCard = ({
 					</View>
 				)}
 			</View>
-		</Link>
+		</TouchableOpacity>
 	);
 };
 

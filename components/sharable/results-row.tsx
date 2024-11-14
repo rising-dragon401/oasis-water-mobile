@@ -14,6 +14,7 @@ type Props = {
 	noResults?: boolean;
 	overridePress?: (item: any) => void;
 	setResults?: (results: any[]) => void;
+	showRequestItem?: boolean;
 };
 
 export default function ResultsRow({
@@ -21,6 +22,7 @@ export default function ResultsRow({
 	noResults,
 	overridePress,
 	setResults,
+	showRequestItem = true,
 }: Props) {
 	const { colorScheme } = useColorScheme();
 	const showToast = useToast();
@@ -68,7 +70,7 @@ export default function ResultsRow({
 				}}
 				className="bg-input rounded-xl"
 			>
-				{noResults ? (
+				{noResults && showRequestItem ? (
 					<View className="flex justify-center pl-4 h-12">
 						<TouchableOpacity onPress={handleRequestItem}>
 							<Muted>

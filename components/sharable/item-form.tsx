@@ -18,6 +18,7 @@ import MetaDataCard from "./metadata-card";
 import Score from "./score";
 import Sources from "./sources";
 import Typography from "./typography";
+import UntestedRow from "./untested-row";
 
 import { incrementItemsViewed } from "@/actions/user";
 import { H3, Muted } from "@/components/ui/typography";
@@ -183,6 +184,8 @@ export function ItemForm({ id }: Props) {
 		[item?.ingredients],
 	);
 
+	const isTested = item?.is_indexed;
+
 	return (
 		<ScrollView
 			contentContainerStyle={{
@@ -221,15 +224,14 @@ export function ItemForm({ id }: Props) {
 							<Link href={`/search/company/${item.company?.id}`}>
 								<Muted>{item.company?.name}</Muted>
 							</Link>
-							{/* <Link href={`/search/company/${item.company?.id}`}>
-								<Muted>{item.brand?.name}</Muted>
-							</Link> */}
 						</View>
 
 						<View className="flex w-1/3 flex-col-reverse justify-end items-end -mt-2">
-							<Score score={item.score} size="sm" />
+							<Score score={item.score} size="sm" untested={!isTested} />
 						</View>
 					</View>
+
+					{!isTested && <UntestedRow thing={item} />}
 
 					<View className="flex flex-col gap-10 gap-y-1 w-full">
 						<View className="flex flex-col gap-y-1 w-full">
@@ -252,28 +254,6 @@ export function ItemForm({ id }: Props) {
 						</View>
 					</View>
 				</View>
-
-				{!item.is_indexed && (
-					<View className="w-full mt-4">
-						<Typography
-							size="base"
-							fontWeight="normal"
-							className="text-primary"
-						>
-							⚠️ No lab reports
-						</Typography>
-						<View className="flex flex-col gap-6 mt-6">
-							<Typography
-								size="base"
-								fontWeight="normal"
-								className="text-primary"
-							>
-								This item was found to not have complete lab reports. Proceed
-								with caution as there may be unexpected contaminants inside.
-							</Typography>
-						</View>
-					</View>
-				)}
 
 				<>
 					{sortedContaminants && sortedContaminants.length > 0 && (
@@ -351,11 +331,11 @@ export function ItemForm({ id }: Props) {
 					</>
 
 					{item.type === "bottled_water" && (
-						<View className="flex flex-col gap-4 w-full">
+						<View className="flex flex-col gap-4 w-full mt-6">
 							<View className="flex flex-col w-full gap-4">
 								<MetaDataCard
 									title="Water Source"
-									description={item.metadata?.source}
+									description={item.metadata?.source || "Not specified"}
 									className="flex-1"
 								/>
 								<MetaDataCard

@@ -4,8 +4,6 @@ import { useRouter } from "expo-router";
 import { TouchableOpacity, View } from "react-native";
 import { Circle, Svg } from "react-native-svg";
 
-import Typography from "../typography";
-
 import { Muted, P } from "@/components/ui/typography";
 import { useToast } from "@/context/toast-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
@@ -13,6 +11,7 @@ import { useColorScheme } from "@/lib/useColorScheme";
 type Props = {
 	score: number;
 	size?: "xs" | "sm" | "md" | "lg" | "xl";
+	untested?: boolean;
 	showScore?: boolean;
 	showTooltip?: boolean;
 	tooltipContent?: string;
@@ -21,6 +20,7 @@ type Props = {
 export default function Score({
 	score,
 	size,
+	untested = false,
 	showScore = false,
 	showTooltip = false,
 	tooltipContent = "",
@@ -38,7 +38,7 @@ export default function Score({
 				: size === "md"
 					? 50
 					: size === "sm"
-						? 46
+						? 42
 						: size === "xs"
 							? 34
 							: 40;
@@ -92,6 +92,10 @@ export default function Score({
 							: 10;
 
 	const grade = () => {
+		if (untested) {
+			return "Untested";
+		}
+
 		if (score >= 90) {
 			return "Excellent";
 		} else if (score >= 70) {
@@ -213,7 +217,7 @@ export default function Score({
 				disabled={!showTooltip}
 				className="absolute flex flex-col justify-center items-center"
 			>
-				{score !== null ? (
+				{!untested ? (
 					<P style={{ fontSize }} className={`pt-${paddingTop}`}>
 						{score} / 100
 					</P>
@@ -224,15 +228,7 @@ export default function Score({
 					</View>
 				)}
 
-				{size !== "xs" && (
-					<Typography
-						size={gradeTextSize}
-						fontWeight="normal"
-						className="text-muted "
-					>
-						{grade()}
-					</Typography>
-				)}
+				{size !== "xs" && <Muted>{grade()}</Muted>}
 			</TouchableOpacity>
 		</View>
 	);

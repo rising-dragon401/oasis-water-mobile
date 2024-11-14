@@ -29,7 +29,7 @@ const TabsTrigger = React.forwardRef<
 		<TextClassContext.Provider
 			value={cn(
 				"text-sm native:text-base font-medium web:transition-all",
-				value === props.value && "text-secondary-foreground",
+				value === props.value && "",
 			)}
 		>
 			<TabsPrimitive.Trigger
@@ -38,7 +38,7 @@ const TabsTrigger = React.forwardRef<
 					"inline-flex items-center justify-center shadow-none web:whitespace-nowrap border-muted border rounded-full px-4 py-1.5 text-sm font-medium web:ring-offset-background web:transition-all web:focus-visible:outline-none web:focus-visible:ring-2 web:focus-visible:ring-ring web:focus-visible:ring-offset-2",
 					props.disabled && "web:pointer-events-none opacity-50",
 					props.value === value &&
-						"bg-secondary border-none !border-none border-0",
+						"bg-secondary !border-none border-0 !font-semibold !text-white",
 					className,
 				)}
 				{...props}

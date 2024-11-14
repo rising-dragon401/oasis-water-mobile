@@ -1,19 +1,13 @@
 import Feather from "@expo/vector-icons/Feather";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import {
-	KeyboardAvoidingView,
-	Platform,
-	TouchableOpacity,
-	View,
-} from "react-native";
+import { KeyboardAvoidingView, Platform, View } from "react-native";
 
 import { getNearestLocation } from "@/actions/admin";
 import { updateUserData } from "@/actions/user";
 import LocationSelector from "@/components/sharable/location-selector";
 import { Button } from "@/components/ui/button";
-import { H1, H2, Muted, P } from "@/components/ui/typography";
+import { H1, Muted, P } from "@/components/ui/typography";
 import { useToast } from "@/context/toast-provider";
 import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
@@ -111,21 +105,6 @@ export default function LocationModal() {
 			behavior={Platform.OS === "ios" ? "padding" : "height"}
 		>
 			<View className="pt-8 px-8 flex-1">
-				<View className="flex flex-col justify-between items-center">
-					<H2>Location</H2>
-					<TouchableOpacity
-						style={{
-							justifyContent: "center",
-							alignItems: "center",
-							position: "absolute",
-							right: 0,
-						}}
-						onPress={() => router.back()}
-					>
-						<Ionicons name="close" size={28} color={mutedForegroundColor} />
-					</TouchableOpacity>
-				</View>
-
 				<View className="flex flex-col items-center justify-between h-full">
 					{userData?.location?.formattedAddress && (
 						<View className="flex flex-col items-center pt-14 ">

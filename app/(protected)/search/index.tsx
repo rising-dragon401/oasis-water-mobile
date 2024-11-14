@@ -205,7 +205,7 @@ export default function TabOneScreen() {
 							<Muted className="text-center m-0 p-0">explore all</Muted>
 						</Link> */}
 					</View>
-					<View className="flex flex-col gap-4">
+					<View className="">
 						{loadingRecents ? (
 							<FlatList
 								data={[1, 2, 3, 4, 5, 6]} // Placeholder items
@@ -230,15 +230,9 @@ export default function TabOneScreen() {
 									paddingTop: 8,
 									height: "100%",
 								}}
-								className="overflow-x-scroll flex"
+								className="gap-4"
 								renderItem={({ item }) => (
-									<View
-										className="mr-4 h-full"
-										style={{
-											flex: 1,
-											maxWidth: 140,
-										}}
-									>
+									<View className="mr-4 w-40">
 										<ItemPreviewCard
 											item={item}
 											showFavorite={false}
@@ -374,8 +368,7 @@ export default function TabOneScreen() {
 					<View className="flex flex-row justify-between w-full items-center mb-2">
 						<H4 className="text-left">News and research</H4>
 						<Link
-							// @ts-ignore
-							href="/(protected)/research?defaultTab=articles"
+							href="/(protected)/search/articles"
 							className="flex flex-row items-center gap-2"
 						>
 							<Muted className="m-0 p-0">see all</Muted>
@@ -538,13 +531,6 @@ export default function TabOneScreen() {
 											</Link>
 										</View>
 									)}
-									// contentContainerStyle={{
-									// 	borderWidth: 1,
-									// 	borderColor: "red",
-									// 	borderRadius: 12,
-									// 	paddingVertical: 10, // Example style
-									// 	backgroundColor: "#f0f0f0", // Example style
-									// }}
 								/>
 							</>
 						)}

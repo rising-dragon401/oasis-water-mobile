@@ -1,4 +1,5 @@
 import React, { createContext, useCallback, useContext } from "react";
+import { RootSiblingParent } from "react-native-root-siblings";
 import Toast from "react-native-root-toast";
 
 type ShowToastFunction = (
@@ -22,21 +23,28 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
 					: position === "bottom"
 						? Toast.positions.BOTTOM
 						: -100;
-			const toast = Toast.show(message, {
-				duration,
-				position: toastPosition,
-				shadow: true,
-				animation: true,
-				hideOnPress: true,
-				delay: 0,
-				backgroundColor: "#645E58",
-				textColor: "#EDE8DA",
-				opacity: 1.0,
-				containerStyle: {
-					borderRadius: 99,
-					paddingHorizontal: 16,
-				},
-			});
+
+			// Wrap Toast.show in RootSiblingParent
+			const toast = (
+				<RootSiblingParent>
+					{Toast.show(message, {
+						duration,
+						position: toastPosition,
+						shadow: false,
+						animation: true,
+						hideOnPress: true,
+						delay: 0.1,
+						backgroundColor: "#EDE8DA",
+						textColor: "#EDE8DA",
+						opacity: 0.8,
+						containerStyle: {
+							borderRadius: 14,
+							paddingHorizontal: 36,
+							paddingVertical: 14,
+						},
+					})}
+				</RootSiblingParent>
+			);
 
 			setTimeout(() => {
 				Toast.hide(toast);
@@ -46,7 +54,9 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
 	);
 
 	return (
-		<ToastContext.Provider value={showToast}>{children}</ToastContext.Provider>
+		<ToastContext.Provider value={showToast}>
+			<RootSiblingParent>{children}</RootSiblingParent>
+		</ToastContext.Provider>
 	);
 };
 
