@@ -134,6 +134,7 @@ export const getLatestActions = async ({ limit = 10 }: { limit?: number }) => {
 	const favorites = await getLatestFavorites({ limit });
 
 	const combinedActions: {
+		id: string;
 		image: string | null;
 		name: string | null;
 		date: string | null;
@@ -141,8 +142,9 @@ export const getLatestActions = async ({ limit = 10 }: { limit?: number }) => {
 	}[] = [];
 
 	if (usersJoined) {
-		usersJoined.forEach((user: any) => {
+		usersJoined.forEach((user: any, index: number) => {
 			combinedActions.push({
+				id: `user-${user?.id || index}`,
 				image: user?.avatar_url,
 				name: user?.full_name || `@${user?.username}`,
 				date: user?.created_at,
@@ -152,8 +154,9 @@ export const getLatestActions = async ({ limit = 10 }: { limit?: number }) => {
 	}
 
 	if (favorites) {
-		favorites.forEach((favorite: any) => {
+		favorites.forEach((favorite: any, index: number) => {
 			combinedActions.push({
+				id: `favorite-${favorite.id || index}`,
 				image: favorite.user?.avatar_url,
 				name: favorite.user?.full_name || `@${favorite.user?.username}`,
 				date: favorite.created_at,

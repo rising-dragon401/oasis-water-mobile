@@ -4,7 +4,6 @@ import React from "react";
 import { FlatList, TouchableOpacity, View } from "react-native";
 
 import { Muted, P } from "@/components/ui/typography";
-import { useToast } from "@/context/toast-provider";
 import { placeHolderImageBlurHash } from "@/lib/constants/images";
 import { useColorScheme } from "@/lib/useColorScheme";
 import { determineLink, readableType } from "@/lib/utils";
@@ -25,12 +24,11 @@ export default function ResultsRow({
 	showRequestItem = true,
 }: Props) {
 	const { colorScheme } = useColorScheme();
-	const showToast = useToast();
 	const router = useRouter();
 	const borderColor = colorScheme === "dark" ? "#333" : "#ddd";
 
 	const handleRequestItem = () => {
-		showToast("Added to our testing list. Thanks!", 2000, "top");
+		router.push("/requestModal");
 	};
 
 	const handleItemPress = async (item: any) => {
@@ -74,9 +72,9 @@ export default function ResultsRow({
 					<View className="flex justify-center pl-4 h-12">
 						<TouchableOpacity onPress={handleRequestItem}>
 							<Muted>
-								No results.{" "}
+								No result for this yet.{" "}
 								<Muted style={{ textDecorationLine: "underline" }}>
-									Request this item
+									Request
 								</Muted>
 							</Muted>
 						</TouchableOpacity>

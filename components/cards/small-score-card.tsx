@@ -17,7 +17,7 @@ export default function ScoreCard({
 	icon: React.ReactNode;
 	id: string;
 }) {
-	const { iconColor, mutedForegroundColor } = useColorScheme();
+	const { mutedForegroundColor } = useColorScheme();
 	const router = useRouter();
 	const scoreColor = useMemo(() => {
 		if (score > 70) return "text-green-500";

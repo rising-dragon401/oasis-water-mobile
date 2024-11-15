@@ -135,7 +135,7 @@ const ItemPreviewCard = ({
 			<View
 				className={`relative w-full flex rounded-2xl ${
 					variation === "row" ? "flex-row gap-2 px-2 py-2 " : "flex-col"
-				}  border border-border overflow-hidden bg-white pt-4 `}
+				}  bg-card pt-4 border border-border`}
 			>
 				<View
 					className={`flex justify-center items-center ${

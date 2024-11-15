@@ -14,11 +14,8 @@ export default function ScoreScreen() {
 		(Array.isArray(glob?.id) ? glob?.id[0] : glob?.id) ||
 		"1";
 
-	// console.log("id", id);
-
 	const userScoreData = userScores?.scoreMetadata?.[id];
 
-	// console.log("userScoreData", JSON.stringify(userScoreData, null, 2));
 	return (
 		<View>
 			<Large>{userScoreData?.scoreName}</Large>

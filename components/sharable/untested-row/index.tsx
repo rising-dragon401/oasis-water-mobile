@@ -5,7 +5,7 @@ import { View } from "react-native";
 import { upvoteThing } from "@/actions/labs";
 import { checkIfUserUpvoted } from "@/actions/user";
 import { Button } from "@/components/ui/button";
-import { Large, P } from "@/components/ui/typography";
+import { Large, Muted } from "@/components/ui/typography";
 import { useToast } from "@/context/toast-provider";
 import { useUserProvider } from "@/context/user-provider";
 import { ITEM_TYPES } from "@/lib/constants/categories";
@@ -73,10 +73,10 @@ export default function UntestedRow({ thing }: { thing: any }) {
 					className="!h-10 !py-0"
 				/>
 			</View>
-			<P>
+			<Muted>
 				This item does not have verified lab results, so its quality and safety
 				remain unknown. Want to see it tested?
-			</P>
+			</Muted>
 		</View>
 	);
 }

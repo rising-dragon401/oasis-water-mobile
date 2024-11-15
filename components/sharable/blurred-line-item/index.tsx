@@ -30,7 +30,14 @@ export default function BlurredLineItem({
 }: BlurredLineItemProps) {
 	const router = useRouter();
 	const { subscription } = useUserProvider();
-	const { textColor, mutedForegroundColor } = useColorScheme();
+	const {
+		textColor,
+		mutedForegroundColor,
+		greenColor,
+		yellowColor,
+		redColor,
+		neutralColor,
+	} = useColorScheme();
 
 	const handleOpenPaywall = () => {
 		if (!subscription) {
@@ -41,12 +48,12 @@ export default function BlurredLineItem({
 	const showPaywall = !subscription && isPaywalled;
 
 	const colorMark = untested
-		? "#E5E7EB" // gray-200
+		? neutralColor
 		: score === "good"
-			? "#34D399" // emerald-400
+			? greenColor
 			: score === "bad"
-				? "#FB7185" // rose-400
-				: "#E5E7EB"; // gray-200
+				? redColor
+				: neutralColor;
 
 	return (
 		<View className="flex flex-row justify-between w-full py-1 ">

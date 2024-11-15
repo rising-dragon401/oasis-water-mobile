@@ -1,4 +1,3 @@
-import { useColorScheme } from "@/lib/useColorScheme";
 import { Octicons } from "@expo/vector-icons";
 import * as AccordionPrimitive from "components/primitives/accordion";
 import { TextClassContext } from "components/ui/text";
@@ -16,6 +15,8 @@ import Animated, {
 	useDerivedValue,
 	withTiming,
 } from "react-native-reanimated";
+
+import { useColorScheme } from "@/lib/useColorScheme";
 
 const Accordion = React.forwardRef<
 	React.ElementRef<typeof AccordionPrimitive.Root>,
@@ -44,12 +45,12 @@ const AccordionItem = React.forwardRef<
 >(({ className, value, ...props }, ref) => {
 	return (
 		<Animated.View
-			className={"overflow-hidden"}
+			className="overflow-hidden"
 			layout={LinearTransition.duration(200)}
 		>
 			<AccordionPrimitive.Item
 				ref={ref}
-				className={cn("border-b border-border", className)}
+				className={cn("", className)}
 				value={value}
 				{...props}
 			/>

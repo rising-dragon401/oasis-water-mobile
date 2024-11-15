@@ -1,5 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useNavigation, usePathname } from "expo-router";
+import { useNavigation, usePathname, useRouter } from "expo-router";
 import { TouchableOpacity } from "react-native";
 
 import { P } from "@/components/ui/typography";
@@ -7,20 +7,25 @@ import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function HeaderBackButton({ backPath }: { backPath: string }) {
 	const navigation = useNavigation();
+	const router = useRouter();
 	const { iconColor } = useColorScheme();
 
 	const currentPage = usePathname();
 
 	const isInSameStack = currentPage === "/research/view-all";
+	const isOutsideStack = currentPage !== "/research/view-all";
+
+	const clearBackPath = () => {
+		router.setParams({ backPath: "" });
+	};
 
 	return (
 		<TouchableOpacity
-			onPress={(canGoBack) => {
-				if (isInSameStack) {
-					navigation.goBack();
-				} else if (backPath) {
+			onPress={() => {
+				if (backPath && backPath !== "") {
 					// @ts-ignore
 					navigation.navigate(backPath);
+					clearBackPath();
 				} else {
 					navigation.goBack();
 				}

@@ -195,7 +195,12 @@ export function ItemForm({ id }: Props) {
 			<View className="w-full items-center justify-center px-8">
 				<View className="flex flex-col gap-2 justify-center items-center w-full">
 					<View className="flex justify-center items-center h-64 w-64 p-4">
-						<ItemImage src={item.image} alt={item.name} thing={item} />
+						<ItemImage
+							src={item.image}
+							alt={item.name}
+							thing={item}
+							showFavorite={isTested}
+						/>
 					</View>
 
 					<View className="flex flex-row gap-2 w-full">

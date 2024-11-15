@@ -27,8 +27,17 @@ export default function Score({
 }: Props) {
 	const router = useRouter();
 	const { subscription } = useUserProvider();
-	const { textColor, secondaryColor } = useColorScheme();
+	const {
+		textColor,
+		secondaryColor,
+		greenColor,
+		yellowColor,
+		redColor,
+		neutralColor,
+	} = useColorScheme();
 	const showToast = useToast();
+
+	const roundedScore = Math.round(score);
 
 	const radius =
 		size === "xl"
@@ -58,25 +67,23 @@ export default function Score({
 
 	const svgSize = 2 * (radius + strokeWidth); // Adjust SVG size to accommodate stroke
 	const circumference = 2 * Math.PI * radius;
-	const offset = circumference - (score / 100) * circumference;
+	const offset = circumference - (roundedScore / 100) * circumference;
 
 	const gradeColor =
-		score >= 90
-			? "#6fbf75" // darker green
-			: score >= 70
-				? "#d1b86a" // darker yellow
-				: score >= 50
-					? "#d5976f" // darker orange
-					: "#d56f6f"; // darker red
+		roundedScore >= 70
+			? greenColor
+			: roundedScore >= 40
+				? yellowColor
+				: redColor;
 
 	const gradeBackground =
-		score >= 90
-			? "#a3d9a5" // pastel green
-			: score >= 70
-				? "#f3e5ab" // pastel yellow
-				: score >= 50
-					? "#f5c6a5" // pastel orange
-					: "#f5a5a5"; // pastel red
+		roundedScore >= 70
+			? greenColor
+			: roundedScore >= 40
+				? yellowColor
+				: roundedScore >= 50
+					? yellowColor
+					: redColor;
 
 	const fontSize =
 		size === "xl"
@@ -96,36 +103,23 @@ export default function Score({
 			return "Untested";
 		}
 
-		if (score >= 90) {
+		if (roundedScore >= 90) {
 			return "Excellent";
-		} else if (score >= 70) {
+		} else if (roundedScore >= 70) {
 			return "Good";
-		} else if (score >= 50) {
+		} else if (roundedScore >= 50) {
 			return "Alright";
-		} else if (score >= 35) {
+		} else if (roundedScore >= 35) {
 			return "Poor";
 			// @ts-ignore
 		} else if (score === "?" || score === undefined || score === null) {
 			return "Untested";
-		} else if (score === 0) {
+		} else if (roundedScore === 0) {
 			return "Missing";
 		} else {
 			return "Bad";
 		}
 	};
-
-	const gradeTextSize =
-		size === "xl"
-			? "base"
-			: size === "lg"
-				? "sm"
-				: size === "md"
-					? "xs"
-					: size === "sm"
-						? "xs"
-						: size === "xs"
-							? "xs"
-							: "xs";
 
 	const paddingTop =
 		size === "xl"
@@ -219,7 +213,7 @@ export default function Score({
 			>
 				{!untested ? (
 					<P style={{ fontSize }} className={`pt-${paddingTop}`}>
-						{score} / 100
+						{roundedScore} / 100
 					</P>
 				) : (
 					<View className="flex flex-row gap-1">

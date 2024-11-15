@@ -45,32 +45,21 @@ const CommunityActionCard = ({ image, name, action, date }: Props) => {
 					resizeMode="cover"
 				/>
 			</View>
-			<View className="flex-row w-full justify-between items-start gap-2 flex-1">
-				<View className="flex flex-col gap-0">
-					<View className="flex flex-row items-center gap-1">
-						<P className="flex flex-wrap font-medium" numberOfLines={2}>
-							{name}
-							<P className="flex flex-wrap font-normal">
-								{` `}
-								{action}
-							</P>
-						</P>
-					</View>
-					<Muted>{timeSince()}</Muted>
+			<View className="flex-row w-full justify-between gap-2 flex-1 h-full items-center">
+				<View className="flex flex-row items-start gap-1 h-12">
+					<P className="flex flex-wrap pr-6`" numberOfLines={2}>
+						{name}
+						<Muted className="flex flex-wrap font-normal text-sm">
+							{` `}
+							{action}
+						</Muted>
+
+						<Muted className="text-sm">
+							{` `}
+							{timeSince()}
+						</Muted>
+					</P>
 				</View>
-
-				{/* <View className="flex flex-col gap-0 items-end">
-						<P className="flex font-bold text-lg">{item.score}</P>
-						<Muted>/100</Muted>
-					</View> */}
-
-				{/* {item.score && <View className="w-1/3">{renderScore()}</View>}
-
-					{!item.score && showWarning && (
-						<View className="w-2/3">
-							<Text style={{ fontSize: 24, color: "red" }}>⚠️</Text>
-						</View>
-					)} */}
 			</View>
 		</View>
 	);

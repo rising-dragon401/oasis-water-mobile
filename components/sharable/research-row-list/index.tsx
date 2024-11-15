@@ -72,7 +72,7 @@ export const ResearchRowList = ({
 
 	return (
 		<View>
-			<View className="flex flex-col w-full bg-white rounded-xl ">
+			<View className="flex flex-col w-full bg-white rounded-xl border border-border">
 				<FlatList
 					data={limitedData}
 					keyExtractor={(item, index) => item.id + item.toString()}

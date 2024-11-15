@@ -148,7 +148,7 @@ export function LocationForm({ id }: Props) {
 								src={location.image}
 								alt={location.name}
 								thing={location}
-								showFavorite={false}
+								showFavorite
 							/>
 						</View>
 

@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import Feather from "@expo/vector-icons/Feather";
 import { Image } from "expo-image";
 import {
 	Stack,
@@ -39,7 +40,7 @@ function HomeHeader() {
 				<TouchableOpacity
 					onPress={() => router.push("/(protected)/search/community")}
 				>
-					<Ionicons name="globe-outline" size={24} color="black" />
+					<Feather name="globe" size={24} color="black" />
 				</TouchableOpacity>
 			</View>
 		</View>
@@ -54,7 +55,7 @@ export default function SearchLayout() {
 	// Determine back path
 	const backPath = Array.isArray(globalParams?.backPath)
 		? globalParams.backPath[0]
-		: globalParams?.backPath || "search";
+		: globalParams?.backPath || "";
 
 	const isSearchPage = usePathname() === "/search";
 

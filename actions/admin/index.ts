@@ -472,8 +472,6 @@ export const getNearestLocation = async (
 			}
 		}
 
-		console.log("nearestLocation: ", nearestLocation);
-
 		// update user's nearest location
 		if (nearestLocation) {
 			const { error: updateError } = await supabase

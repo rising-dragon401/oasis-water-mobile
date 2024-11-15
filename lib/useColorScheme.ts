@@ -37,6 +37,10 @@ export function useColorScheme() {
 
 	const foregroundColor =
 		colorScheme === "dark" ? theme.dark.foreground : theme.light.foreground;
+	const greenColor = "#2E8B57"; // Less dark green
+	const yellowColor = "#FFDD57"; // Less harsh yellow
+	const redColor = "#FF6F61"; // Less harsh red
+	const neutralColor = "#E5E7EB";
 
 	return {
 		colorMode: colorScheme,
@@ -54,5 +58,9 @@ export function useColorScheme() {
 		mutedForegroundColor,
 		accentColor,
 		foregroundColor,
+		greenColor,
+		yellowColor,
+		redColor,
+		neutralColor,
 	};
 }

@@ -2,14 +2,33 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useUserProvider } from "context/user-provider";
 import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
+import { useState } from "react";
 import { ScrollView, TouchableOpacity, View } from "react-native";
 
 import ProfileHeader from "@/components/sharable/profile-header";
 import StickyHeader from "@/components/sharable/sticky-header";
+import {
+	Accordion,
+	AccordionContent,
+	AccordionItem,
+	AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Muted, P } from "@/components/ui/typography";
 import { theme } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
+
+const getAccordionTriggerStyle = (isOpen: boolean) => {
+	return `bg-card !border !border-border px-4 ${
+		isOpen ? "!rounded-t-2xl !border-b-0" : "!rounded-2xl"
+	}`;
+};
+
+const getAccordionContentStyle = (isOpen: boolean) => {
+	return `bg-card !border !border-border pb-4 px-4 ${
+		isOpen ? "!rounded-b-2xl !border-t-0" : "!rounded-lg"
+	}`;
+};
 
 export default function ProfileScreen() {
 	const { userScores, userData, subscription, tapScore, userFavorites } =
@@ -17,6 +36,13 @@ export default function ProfileScreen() {
 	const { colorScheme } = useColorScheme();
 	const { iconColor, mutedForegroundColor } = useColorScheme();
 	const router = useRouter();
+	const [openItems, setOpenItems] = useState<string[]>([]);
+
+	const toggleItem = (item: string) => {
+		setOpenItems((prev) =>
+			prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item],
+		);
+	};
 
 	const backgroundColor =
 		colorScheme === "dark" ? theme.dark.background : theme.light.background;
@@ -119,44 +145,105 @@ export default function ProfileScreen() {
 
 				{userHasTapScore || userHasFavorites ? (
 					<>
-						<View className="flex flex-col gap-0 mt-4">
-							<View className="flex flex-row items-center gap-2 w-full mb-2">
-								<Ionicons name="skull-outline" size={20} color={iconColor} />
-								<P className=" text-xl">Contaminants found:</P>
-								{renderAmount(userScores?.allContaminants?.length)}
-							</View>
-							<View className="flex flex-row flex-wrap gap-2">
-								{userScores?.allContaminants?.map((ingredient: any) => (
-									<>{itemBadge(ingredient.name, "harm")}</>
-								))}
-							</View>
-						</View>
+						<View>
+							<Accordion
+								type="multiple"
+								className="flex flex-col mt-8 mb-8 gap-y-4"
+							>
+								<AccordionItem
+									key="contaminants_found"
+									value="contaminants_found"
+								>
+									<AccordionTrigger
+										className={getAccordionTriggerStyle(
+											openItems.includes("contaminants_found"),
+										)}
+										onPress={() => toggleItem("contaminants_found")}
+									>
+										<View className="flex flex-row items-start justify-between gap-2 w-full mb-2 pr-2">
+											<View className="flex flex-col">
+												<P className=" text-xl">Contaminants found</P>
+												<Muted className="max-w-xs">
+													Toxins found in your drinking and bathing water
+												</Muted>
+											</View>
+											{renderAmount(userScores?.allContaminants?.length)}
+										</View>
+									</AccordionTrigger>
+									<AccordionContent
+										className={getAccordionContentStyle(
+											openItems.includes("contaminants_found"),
+										)}
+									>
+										<View className="flex flex-row flex-wrap gap-2">
+											{userScores?.allContaminants?.map((ingredient: any) => (
+												<>{itemBadge(ingredient.name, "harm")}</>
+											))}
+										</View>
+									</AccordionContent>
+								</AccordionItem>
 
-						<View className="flex flex-col gap-0 mt-8">
-							<View className="flex flex-row items-center gap-2 w-full mb-2">
-								<Ionicons name="warning-outline" size={20} color={iconColor} />
+								<AccordionItem key="health_risks" value="health_risks">
+									<AccordionTrigger
+										className={getAccordionTriggerStyle(
+											openItems.includes("health_risks"),
+										)}
+										onPress={() => toggleItem("health_risks")}
+									>
+										<View className="flex flex-row items-start justify-between gap-2 w-full mb-2 pr-2">
+											<View className="flex flex-col">
+												<P className=" text-xl">Health concerns</P>
+												<Muted className="max-w-xs">
+													You may be at risk to the following based on your
+													hydration habits
+												</Muted>
+											</View>
+											{renderAmount(userScores?.allHarms?.length)}
+										</View>
+									</AccordionTrigger>
+									<AccordionContent
+										className={getAccordionContentStyle(
+											openItems.includes("health_risks"),
+										)}
+									>
+										<View className="flex flex-row flex-wrap gap-2">
+											{userScores?.allHarms?.map((harm: any) => (
+												<>{itemBadge(harm.name, "harm")}</>
+											))}
+										</View>
+									</AccordionContent>
+								</AccordionItem>
 
-								<P className="text-xl">Health risks:</P>
-								{renderAmount(userScores?.allHarms?.length)}
-							</View>
-							<View className="flex flex-row flex-wrap gap-2">
-								{userScores?.allHarms?.map((harm: any) => (
-									<>{itemBadge(harm.name, "harm")}</>
-								))}
-							</View>
-						</View>
-
-						<View className="flex flex-col gap-0 mt-8">
-							<View className="flex flex-row items-center gap-2 w-full mb-2">
-								<Ionicons name="leaf-outline" size={20} color={iconColor} />
-								<P className="text-xl">Benefits:</P>
-								{renderAmount(userScores?.allBenefits?.length)}
-							</View>
-							<View className="flex flex-row flex-wrap gap-2">
-								{userScores?.allBenefits?.map((benefit: any) => (
-									<>{itemBadge(benefit.name, "benefit")}</>
-								))}
-							</View>
+								<AccordionItem key="benefits" value="benefits">
+									<AccordionTrigger
+										className={getAccordionTriggerStyle(
+											openItems.includes("benefits"),
+										)}
+										onPress={() => toggleItem("benefits")}
+									>
+										<View className="flex flex-row items-start justify-between gap-2 w-full mb-2 pr-2">
+											<View className="flex flex-col">
+												<P className=" text-xl">Benefits</P>
+												<Muted className="max-w-xs">
+													The positive effects found in your water routine
+												</Muted>
+											</View>
+											{renderAmount(userScores?.allBenefits?.length)}
+										</View>
+									</AccordionTrigger>
+									<AccordionContent
+										className={getAccordionContentStyle(
+											openItems.includes("benefits"),
+										)}
+									>
+										<View className="flex flex-row flex-wrap gap-2">
+											{userScores?.allBenefits?.map((benefit: any) => (
+												<>{itemBadge(benefit.name, "benefit")}</>
+											))}
+										</View>
+									</AccordionContent>
+								</AccordionItem>
+							</Accordion>
 						</View>
 					</>
 				) : (

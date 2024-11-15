@@ -227,7 +227,6 @@ export default function TabOneScreen() {
 								horizontal
 								showsHorizontalScrollIndicator={false}
 								contentContainerStyle={{
-									paddingTop: 8,
 									height: "100%",
 								}}
 								className="gap-4"
@@ -292,7 +291,7 @@ export default function TabOneScreen() {
 				<View className="flex w-full justify-start mt-6 min-w-full">
 					<View className="flex flex-row justify-between w-full items-center mb-2">
 						<H4 className="text-left font-medium">What others are drinking</H4>
-						<Link href="/(protected)/search/users">
+						<Link href="/(protected)/search/community">
 							<Ionicons
 								name="arrow-forward"
 								size={16}
@@ -474,7 +473,7 @@ export default function TabOneScreen() {
 							<Muted className="m-0 p-0">see all</Muted>
 						</Link>
 					</View>
-					<View className="flex flex-col gap-4 w-full bg-white rounded-xl">
+					<View className="flex flex-col gap-4 w-full bg-card rounded-xl border border-border">
 						{loadingCategoryData ? (
 							<FlatList
 								data={[1, 2, 3, 4, 5, 6]}

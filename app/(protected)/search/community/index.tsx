@@ -9,6 +9,7 @@ import {
 
 import { getLatestActions } from "@/actions/global";
 import CommunityActionCard from "@/components/sharable/community-action-card";
+import Skeleton from "@/components/sharable/skeleton";
 import StickyHeader from "@/components/sharable/sticky-header";
 export default function CommunityPage() {
 	const [liveActions, setLiveActions] = useState<any[]>([]);
@@ -67,11 +68,22 @@ export default function CommunityPage() {
 			<View className="h-4" />
 
 			<View className="flex flex-col gap-4">
-				{liveActions.map((action) => (
-					<View key={action.id}>
-						<CommunityActionCard {...action} />
-					</View>
-				))}
+				{loading &&
+					Array.from({ length: 12 }).map((_, index) => (
+						<Skeleton
+							key={index}
+							height={60}
+							width="100%"
+							style={{ borderRadius: 14 }}
+						/>
+					))}
+
+				{!loading &&
+					liveActions.map((action) => (
+						<View key={action.id}>
+							<CommunityActionCard {...action} />
+						</View>
+					))}
 			</View>
 		</ScrollView>
 	);

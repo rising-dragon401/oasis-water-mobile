@@ -2,19 +2,21 @@
 
 export const theme = {
 	light: {
-		background: "hsl(40 42.86% 97.25%)",
+		background: "#FEFCF9",
+		primary: "#222529",
+		card: "#FFFFFF",
+		accent: "#0D00F3",
+		border: "#D3D6D1",
+		input: "#f6f4f2",
+		secondary: "#9B9C9A",
+		accentForeground: "#FEFCF9",
+
 		foreground: "hsl(20 14.3% 4.1%)",
-		card: "hsl(42 42% 94%)",
 		popover: "hsl(30 4.2% 38.82%)",
-		primary: "hsl(20 14.3% 10%)",
-		secondary: "hsl(24 5% 40%)",
 		"secondary-foreground": "hsl(40 13% 92.94%)",
 		"muted-foreground": "hsl(0 0% 45%)",
 		muted: "hsl(30 6% 93%)",
-		accent: "hsl(229 59% 38%)",
 		destructive: "hsl(0 84.2% 60.2%)",
-		border: "hsl(30 6% 89%)",
-		input: "hsl(30 6% 93)",
 	},
 	dark: {
 		background: "hsl(330, 6%, 12%)",

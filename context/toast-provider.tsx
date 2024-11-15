@@ -2,6 +2,8 @@ import React, { createContext, useCallback, useContext } from "react";
 import { RootSiblingParent } from "react-native-root-siblings";
 import Toast from "react-native-root-toast";
 
+import { useColorScheme } from "@/lib/useColorScheme";
+
 type ShowToastFunction = (
 	message: string,
 	duration?: number,
@@ -11,6 +13,8 @@ type ShowToastFunction = (
 const ToastContext = createContext<ShowToastFunction | null>(null);
 
 export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
+	const { accentColor, backgroundColor } = useColorScheme();
+
 	const showToast: ShowToastFunction = useCallback(
 		(
 			message: string,
@@ -34,11 +38,11 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
 						animation: true,
 						hideOnPress: true,
 						delay: 0.1,
-						backgroundColor: "#EDE8DA",
-						textColor: "#000000",
-						opacity: 0.8,
+						backgroundColor: accentColor,
+						textColor: backgroundColor,
+						opacity: 1.0,
 						containerStyle: {
-							borderRadius: 18,
+							borderRadius: 24,
 							paddingHorizontal: 36,
 							paddingVertical: 14,
 						},

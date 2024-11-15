@@ -7,7 +7,9 @@ import {
 	addFavorite,
 	calculateUserScore,
 	removeFavorite,
+	updateUserData,
 } from "@/actions/user";
+import { useToast } from "@/context/toast-provider";
 import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
 
@@ -20,6 +22,7 @@ export default function FavoriteButton({ item, size = 18 }: Props) {
 	const { userFavorites, uid, userData, refreshUserData } = useUserProvider();
 	const router = useRouter();
 	const { iconColor } = useColorScheme();
+	const showToast = useToast();
 
 	const [loadingFavorite, setLoadingFavorite] = useState(false);
 	const [isItemInFavorites, setIsItemInFavorites] = useState(false);
@@ -34,8 +37,32 @@ export default function FavoriteButton({ item, size = 18 }: Props) {
 		}
 	}, [userFavorites, item]);
 
+	const handleUpdateLocation = async (location: any) => {
+		try {
+			if (!uid) {
+				return false;
+			}
+
+			const res = await updateUserData(uid, "tap_location_id", location.id);
+
+			if (res) {
+				return true;
+			} else {
+				return false;
+			}
+		} catch (error) {
+			console.error("Error updating location", error);
+			return false;
+		}
+	};
+
 	const handleFavoriteClick = async (e: GestureResponderEvent) => {
 		e.preventDefault();
+
+		if (isItemInFavorites || selectedTapLocation) {
+			showToast("Already in your favorites");
+			return;
+		}
 
 		if (!uid || !userData) {
 			Alert.alert(
@@ -52,34 +79,45 @@ export default function FavoriteButton({ item, size = 18 }: Props) {
 			return;
 		}
 
+		console.log("item", JSON.stringify(item, null, 2));
+
 		setLoadingFavorite(true);
 
-		try {
-			if (isItemInFavorites) {
-				setIsItemInFavorites(false);
-				await removeFavorite(uid, item.type, item.id);
-			} else {
-				setIsItemInFavorites(true);
-				await addFavorite(uid, item.type, item.id);
+		if (item.type === "tap_water") {
+			const res = await handleUpdateLocation(item);
+			if (res) {
+				refreshUserData("userData");
+				showToast("Tap water location updated");
 			}
-
-			refreshUserData("favorites");
-			calculateUserScore(uid);
-			// mutate(`userFavorites-${uid}`);
-			// fetchUserFavorites(uid);
-		} catch (error) {
-			console.error("Error updating favorites", error);
+		} else {
+			try {
+				if (isItemInFavorites) {
+					setIsItemInFavorites(false);
+					await removeFavorite(uid, item.type, item.id);
+				} else {
+					setIsItemInFavorites(true);
+					await addFavorite(uid, item.type, item.id);
+				}
+				refreshUserData("favorites");
+				calculateUserScore(uid);
+			} catch (error) {
+				console.error("Error updating favorites", error);
+			}
 		}
 
 		setLoadingFavorite(false);
 	};
+
+	const isTapWater = item.type === "tap_water";
+	const selectedTapLocation =
+		isTapWater && userData?.tap_location_id === item.id;
 
 	return (
 		<TouchableOpacity
 			onPress={handleFavoriteClick}
 			className="w-8 h-8 rounded-full bg-muted flex items-center justify-center"
 		>
-			{isItemInFavorites ? (
+			{isItemInFavorites || selectedTapLocation ? (
 				<Feather name="check" size={18} color={iconColor} />
 			) : (
 				<Feather name="plus" size={18} color={iconColor} />

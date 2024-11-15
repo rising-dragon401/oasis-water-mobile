@@ -1,4 +1,4 @@
-import { Feather, Octicons } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
 import algoliasearch from "algoliasearch";
 import { Camera } from "expo-camera";
 import { useRouter } from "expo-router";
@@ -10,7 +10,6 @@ import ResultsRow from "./results-row";
 
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/context/toast-provider";
-import { theme } from "@/lib/constants";
 import { useDebounce } from "@/lib/hooks/use-debounce";
 import { useColorScheme } from "@/lib/useColorScheme";
 
@@ -44,7 +43,7 @@ export default function Search({
 	const [showSearchIcon, setShowSearchIcon] = useState(true);
 
 	const debouncedQuery = useDebounce(value, 400);
-	const { colorScheme, mutedForegroundColor } = useColorScheme();
+	const { mutedForegroundColor, accentColor } = useColorScheme();
 	const router = useRouter();
 	const posthog = usePostHog();
 	const showToast = useToast();
@@ -160,9 +159,6 @@ export default function Search({
 		}
 	};
 
-	const iconColor =
-		colorScheme === "dark" ? theme.dark.primary : theme.light.primary;
-
 	const inputRef = useRef<any>(null);
 
 	useEffect(() => {
@@ -183,51 +179,55 @@ export default function Search({
 		setActive(false);
 	};
 
-	const getSearchPadding = (show: boolean) => (show ? "pl-12" : "pl-6");
-
 	return (
 		<>
 			<View className="flex flex-row gap-2 items-center relative z-10">
 				<Input
 					ref={inputRef}
-					placeholder={placeholder || "Search water, filter or location"}
+					placeholder={placeholder || "Water, filters, locations"}
 					value={value}
 					onChangeText={onChangeText}
 					aria-labelledbyledBy="inputLabel"
 					aria-errormessage="inputError"
-					className="w-full pl-6 z-20 !h-16 !rounded-full transition-all duration-100"
+					className="w-full pl-12 z-20 !h-16 !rounded-full transition-all duration-100"
 					onFocus={handleFocus}
 					onBlur={handleBlur}
 				/>
 
-				{/* {showSearchIcon && (
+				{!value ? (
 					<View
 						className="flex flex-row gap-4 z-20 items-center"
 						style={{ position: "absolute", left: 16 }}
 					>
-						<Feather name="search" size={20} color={mutedForegroundColor} />
+						<Feather name="search" size={20} color={accentColor} />
 					</View>
-				)} */}
+				) : (
+					<TouchableOpacity
+						onPress={handleClear}
+						className="flex flex-row gap-4 z-20 items-center"
+						style={{ position: "absolute", left: 16 }}
+					>
+						<Feather name="arrow-left" size={20} color={mutedForegroundColor} />
+					</TouchableOpacity>
+				)}
 
 				<View
-					className={`flex flex-row gap-4 z-20 items-center ${
-						showSearchIcon && "pr-4"
-					}`}
+					className="flex flex-row gap-4 z-20 items-center"
 					style={{ position: "absolute", right: 10 }}
 				>
-					{value && !isLoading && (
+					{/* {value && !isLoading && (
 						<TouchableOpacity onPress={handleClear}>
 							<Octicons name="x-circle-fill" size={20} color={iconColor} />
 						</TouchableOpacity>
-					)}
+					)} */}
 
 					{isLoading && (
 						<ActivityIndicator size="small" color={mutedForegroundColor} />
 					)}
 
 					{!hideScan && (
-						<TouchableOpacity onPress={handleScan} className="mr-4">
-							<Feather name="camera" size={20} color={iconColor} />
+						<TouchableOpacity onPress={handleScan} className="pr-4">
+							<Feather name="camera" size={20} color={mutedForegroundColor} />
 						</TouchableOpacity>
 					)}
 				</View>

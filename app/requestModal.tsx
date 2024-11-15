@@ -1,3 +1,4 @@
+import Feather from "@expo/vector-icons/Feather";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
@@ -74,10 +75,10 @@ export default function RequestModal() {
 		setLoadingSubmit(false);
 
 		if (success) {
-			showToast("Submitted. Thanks!", 2000, "bottom");
+			showToast("Submitted. Thanks!", 2000);
 			router.back();
 		} else {
-			showToast("Something went wrong. Please try again.", 2000, "bottom");
+			showToast("Something went wrong. Please try again.", 2000);
 		}
 	}
 
@@ -90,12 +91,7 @@ export default function RequestModal() {
 				<View className="pt-8 px-8 flex-1 pb-16 justify-between">
 					<View className="flex flex-col">
 						<View className="flex flex-col justify-between items-center text-center">
-							<Ionicons
-								name="file-tray-outline"
-								size={36}
-								color="black"
-								className="mb-4"
-							/>
+							<Feather name="globe" size={36} color="black" className="mb-4" />
 
 							<P className="text-center max-w-sm">
 								Help us source the most accurate information possible by sharing
