@@ -1,60 +1,52 @@
-import { Ionicons } from "@expo/vector-icons";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { FlatList, RefreshControl, TouchableOpacity, View } from "react-native";
+import { FlatList, RefreshControl, View } from "react-native";
+import useSWR, { mutate } from "swr";
 
 import { getResearch } from "@/actions/admin";
 import {
-	fetchInProgressItems,
+	fetchInProgressThings,
 	fetchTestedThings,
 	fetchUntestedThings,
+	fetchUpcomingCategories,
+	upvoteCategory,
 } from "@/actions/labs";
-import { RowList } from "@/components/sharable/row-list";
+import { getUserUpvoted } from "@/actions/user";
+import NewCategoriesRow from "@/components/sharable/new-categories-row";
+import { ResearchRowList } from "@/components/sharable/research-row-list";
 import SectionHeader from "@/components/sharable/section-header";
 import Skeleton from "@/components/sharable/skeleton";
 import StickyHeader from "@/components/sharable/sticky-header";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { P } from "@/components/ui/typography";
+import { useUserProvider } from "@/context/user-provider";
 import { theme } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function ResearchScreen() {
-	const { colorScheme, iconColor } = useColorScheme();
-	const router = useRouter();
+	const { colorScheme } = useColorScheme();
+	const { uid } = useUserProvider();
 	const params = useLocalSearchParams<{ defaultTab?: string }>();
 	const { defaultTab } = params;
 
 	const [tabValue, setTabValue] = useState(defaultTab || "untested");
 	const [research, setResearch] = useState<any[]>([]);
 	const [loading, setLoading] = useState({
-		untested: false,
-		inProgress: false,
-		tested: false,
+		untested: true,
+		inProgress: true,
+		tested: true,
+		newCategories: true,
 	});
-	const [untestedThings, setUntestedThings] = useState<any>({
-		waters: [],
-		filters: [],
-		tapLocations: [],
-	});
-	const [inProgressThings, setInProgressThings] = useState<any>({
-		waters: [],
-		filters: [],
-		tapLocations: [],
-	});
-	const [testedThings, setTestedThings] = useState<any>({
-		waters: [],
-		filters: [],
-		tapLocations: [],
-	});
-
+	const [untestedThings, setUntestedThings] = useState<any[]>([]);
+	const [inProgressThings, setInProgressThings] = useState<any[]>([]);
+	const [testedThings, setTestedThings] = useState<any[]>([]);
+	const [newCategories, setNewCategories] = useState<any[]>([]);
 	const [refreshing, setRefreshing] = useState(false);
 
 	const backgroundColor =
 		colorScheme === "dark" ? theme.dark.background : theme.light.background;
 
-	useEffect(() => {
-		setTabValue(defaultTab || "untested");
-	}, [defaultTab]);
+	const userVotes = useSWR(`user-votes-${uid}`, () => getUserUpvoted(uid));
 
 	useEffect(() => {
 		const fetchResearch = async () => {
@@ -72,7 +64,27 @@ export default function ResearchScreen() {
 		getInProgressItems();
 
 		getTestedItems();
+
+		getUpcomingCategories();
 	}, []);
+
+	useEffect(() => {
+		setTabValue(defaultTab || "untested");
+	}, [defaultTab]);
+
+	const getUntestedItems = async () => {
+		const untested = await fetchUntestedThings({
+			tables: ["items", "water_filters", "tap_water_locations"],
+			limit: 10,
+		});
+
+		setUntestedThings(untested);
+
+		setLoading((prevState) => ({
+			...prevState,
+			untested: false,
+		}));
+	};
 
 	const getInProgressItems = async () => {
 		setLoading((prevState) => ({
@@ -80,39 +92,12 @@ export default function ResearchScreen() {
 			inProgress: true,
 		}));
 
-		const waterData = await fetchInProgressItems({
-			type: "bottled_water",
-			limit: 10,
-		});
-		const filterData = await fetchInProgressItems({
-			type: "filter",
-			limit: 10,
-		});
-		const tapData = await fetchInProgressItems({
-			type: "tap_water",
+		const data = await fetchInProgressThings({
+			type: ["bottled_water", "filter", "tap_water"],
 			limit: 10,
 		});
 
-		if (waterData) {
-			setInProgressThings((prevState: any) => ({
-				...prevState,
-				waters: { data: waterData, loading: false },
-			}));
-		}
-
-		if (filterData) {
-			setInProgressThings((prevState: any) => ({
-				...prevState,
-				filters: { data: filterData, loading: false },
-			}));
-		}
-
-		if (tapData) {
-			setInProgressThings((prevState: any) => ({
-				...prevState,
-				tapLocations: { data: tapData, loading: false },
-			}));
-		}
+		setInProgressThings(data);
 
 		setLoading((prevState) => ({
 			...prevState,
@@ -126,36 +111,12 @@ export default function ResearchScreen() {
 			tested: true,
 		}));
 
-		const waterData = await fetchTestedThings({ table: "items", limit: 10 });
-		const filterData = await fetchTestedThings({
-			table: "water_filters",
-			limit: 10,
-		});
-		const tapData = await fetchTestedThings({
-			table: "tap_water_locations",
+		const data = await fetchTestedThings({
+			tables: ["items", "water_filters", "tap_water_locations"],
 			limit: 10,
 		});
 
-		if (waterData) {
-			setTestedThings((prevState: any) => ({
-				...prevState,
-				waters: waterData,
-			}));
-		}
-
-		if (filterData) {
-			setTestedThings((prevState: any) => ({
-				...prevState,
-				filters: filterData,
-			}));
-		}
-
-		if (tapData) {
-			setTestedThings((prevState: any) => ({
-				...prevState,
-				tapLocations: tapData,
-			}));
-		}
+		setTestedThings(data);
 
 		setLoading((prevState) => ({
 			...prevState,
@@ -163,162 +124,64 @@ export default function ResearchScreen() {
 		}));
 	};
 
-	const getUntestedItems = async () => {
+	const getUpcomingCategories = async () => {
 		setLoading((prevState) => ({
 			...prevState,
-			untested: true,
+			newCategories: true,
 		}));
 
-		const waterData = await fetchUntestedThings({ table: "items", limit: 10 });
-		const filterData = await fetchUntestedThings({
-			table: "water_filters",
-			limit: 10,
-		});
-		const tapData = await fetchUntestedThings({
-			table: "tap_water_locations",
-			limit: 10,
-		});
+		const data = await fetchUpcomingCategories();
 
-		if (waterData) {
-			setUntestedThings((prevState: any) => ({
-				...prevState,
-				waters: waterData,
-			}));
-		}
-
-		if (filterData) {
-			setUntestedThings((prevState: any) => ({
-				...prevState,
-				filters: filterData,
-			}));
-		}
-
-		if (tapData) {
-			setUntestedThings((prevState: any) => ({
-				...prevState,
-				tapLocations: tapData,
-			}));
-		}
+		setNewCategories(data || []);
 
 		setLoading((prevState) => ({
 			...prevState,
-			untested: false,
+			newCategories: false,
 		}));
+	};
+
+	const handleVoteForCategory = async (id: string) => {
+		await upvoteCategory(id, uid || "");
+		await getUpcomingCategories();
+		mutate(`user-votes-${uid}`);
 	};
 
 	const onRefresh = async () => {
 		setRefreshing(true);
+		setLoading({
+			untested: true,
+			inProgress: true,
+			tested: true,
+			newCategories: true,
+		});
 		await getUntestedItems();
 		await getInProgressItems();
 		await getTestedItems();
+		await getUpcomingCategories();
+		setLoading({
+			untested: false,
+			inProgress: false,
+			tested: false,
+			newCategories: false,
+		});
 		setRefreshing(false);
 	};
 
-	const renderSection = (
-		title: string,
-		data: any[],
-		limitItems: number,
-		type: string,
-	) => {
-		return (
-			<View className="flex flex-col gap-2 flex-shrink">
-				<SectionHeader
-					title={title}
-					iconButton={
-						<TouchableOpacity
-							onPress={() => router.push("/requestModal")}
-							className="flex justify-end pt-2"
-						>
-							<Ionicons name="add" size={20} color={iconColor} />
-						</TouchableOpacity>
-					}
-				/>
-				{loading[tabValue as keyof typeof loading] ? (
-					<View className="w-full flex-col gap-2">
-						<Skeleton width="100%" height={40} style={{ borderRadius: 12 }} />
-						<Skeleton width="100%" height={40} style={{ borderRadius: 12 }} />
-						<Skeleton width="100%" height={40} style={{ borderRadius: 12 }} />
-					</View>
-				) : (
-					<RowList
-						data={data}
-						limitItems={limitItems}
-						status={tabValue}
-						type={type}
-						showVotes={tabValue === "untested"}
-					/>
-				)}
-			</View>
-		);
-	};
-
-	const getDataForTab = (tab: string) => {
-		switch (tab) {
-			case "untested":
-				return [
-					{ title: "Waters", data: untestedThings.waters, type: "water" },
-					{ title: "Filters", data: untestedThings.filters, type: "filter" },
-					{
-						title: "Tap Water",
-						data: untestedThings.tapLocations,
-						type: "tap_water",
-					},
-				];
-			case "in_progress":
-				return [
-					{
-						title: "Waters",
-						data: inProgressThings.waters.data,
-						type: "water",
-					},
-					{
-						title: "Filters",
-						data: inProgressThings.filters.data,
-						type: "filter",
-					},
-					{
-						title: "Tap Water",
-						data: inProgressThings.tapLocations.data,
-						type: "tap_water",
-					},
-				];
-			case "completed":
-				return [
-					{ title: "Waters", data: testedThings.waters, type: "water" },
-					{ title: "Filters", data: testedThings.filters, type: "filter" },
-					{
-						title: "Tap Water",
-						data: testedThings.tapLocations,
-						type: "tap_water",
-					},
-				];
-			default:
-				return [];
-		}
-	};
-
 	return (
-		<View>
-			<FlatList
-				data={getDataForTab(tabValue)}
-				keyExtractor={(item) => item.title}
-				renderItem={({ item }) => (
-					<View className="mb-6">
-						{renderSection(item.title, item.data, 3, item.type)}
-					</View>
-				)}
-				ListHeaderComponent={
-					<>
+		<FlatList
+			data={[{ key: "content" }]}
+			renderItem={() => (
+				<View style={{ backgroundColor, paddingBottom: 100 }}>
+					<View className="px-8">
 						<StickyHeader
 							title="Lab testing"
-							description="Track and vote on what products we test next"
+							description="Contribute to and follow product testing "
+							icon="plus"
+							path="/requestModal"
 						/>
-						<Tabs
-							value={tabValue}
-							onValueChange={setTabValue}
-							className="mt-4 mb-2"
-						>
-							<TabsList className="mb-1">
+
+						<Tabs value={tabValue} onValueChange={setTabValue} className="mt-4">
+							<TabsList className="mb-2">
 								<TabsTrigger value="untested">
 									<P
 										className={`${
@@ -353,25 +216,80 @@ export default function ResearchScreen() {
 									</P>
 								</TabsTrigger>
 							</TabsList>
+							<TabsContent value="untested" className="">
+								{loading.untested ? (
+									<View className="flex flex-col gap-2">
+										{Array.from({ length: 6 }).map((_, index) => (
+											<Skeleton
+												key={index}
+												width="100%"
+												height={40}
+												style={{ borderRadius: 8 }}
+											/>
+										))}
+									</View>
+								) : (
+									<ResearchRowList
+										data={untestedThings || []}
+										limitItems={6}
+										status={tabValue}
+										label="votes"
+										showVotes={tabValue === "untested"}
+									/>
+								)}
+								<View className="mt-6">
+									<SectionHeader
+										title="New categories"
+										subtitle="Vote on new categories for lab testing"
+									/>
+
+									<View className="">
+										{loading.newCategories ? (
+											<View className="flex flex-row overflow-x-scroll">
+												{Array.from({ length: 6 }).map((_, index) => (
+													<Skeleton
+														key={index}
+														width={150}
+														height={100}
+														style={{ borderRadius: 8 }}
+													/>
+												))}
+											</View>
+										) : (
+											<NewCategoriesRow
+												data={newCategories || []}
+												handlePress={handleVoteForCategory}
+												userVotes={userVotes}
+											/>
+										)}
+									</View>
+								</View>
+							</TabsContent>
+							<TabsContent value="in_progress" className="">
+								<ResearchRowList
+									data={inProgressThings || []}
+									limitItems={6}
+									status={tabValue}
+									label={null}
+									showVotes={tabValue === "in_progress"}
+								/>
+							</TabsContent>
+							<TabsContent value="completed" className="">
+								<ResearchRowList
+									data={testedThings || []}
+									limitItems={10}
+									status={tabValue}
+									label="dates"
+									showVotes={tabValue === "completed"}
+								/>
+							</TabsContent>
 						</Tabs>
-					</>
-				}
-				ListFooterComponent={
-					<View className="mt-8 mx-auto">
-						{/* <Button
-						variant="outline"
-						// onPress={() => router.push("/requestModal")}
-						label="Request something else"
-					/> */}
 					</View>
-				}
-				refreshControl={
-					<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-				}
-				style={{ backgroundColor }}
-				contentContainerStyle={{ paddingHorizontal: 6 }}
-				className="px-6"
-			/>
-		</View>
+				</View>
+			)}
+			refreshControl={
+				<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+			}
+		/>
 	);
 }

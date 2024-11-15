@@ -45,6 +45,27 @@ export const readableType = (type: string) => {
 	}
 };
 
+export const timeSince = (date: string) => {
+	const now = new Date();
+	const createdAt = new Date(date);
+	const diffTime = Math.abs(now.getTime() - createdAt.getTime());
+
+	const diffSeconds = Math.floor(diffTime / 1000);
+	const diffMinutes = Math.floor(diffSeconds / 60);
+	const diffHours = Math.floor(diffMinutes / 60);
+	const diffDays = Math.floor(diffHours / 24);
+
+	if (diffSeconds < 60) {
+		return `${diffSeconds} seconds ago`;
+	} else if (diffMinutes < 60) {
+		return `${diffMinutes} minutes ago`;
+	} else if (diffHours < 24) {
+		return `${diffHours} hours ago`;
+	} else {
+		return `${diffDays} days ago`;
+	}
+};
+
 export function generateLoremIpsum(letterCount: number) {
 	const loremWords = [
 		"lorem",

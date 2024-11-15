@@ -62,7 +62,7 @@ export default function UntestedRow({ thing }: { thing: any }) {
 					onPress={handleUpvote}
 					variant={isUpvoted ? "outline" : "outline"}
 					disabled={isUpvoted}
-					label={isUpvoted ? "Requested" : "Request testing"}
+					label={isUpvoted ? "Requested" : "Request"}
 					icon={
 						<Feather
 							name={isUpvoted ? "check" : "plus"}
@@ -75,7 +75,7 @@ export default function UntestedRow({ thing }: { thing: any }) {
 			</View>
 			<P>
 				This item does not have verified lab results, so its quality and safety
-				remain unknown.
+				remain unknown. Want to see it tested?
 			</P>
 		</View>
 	);

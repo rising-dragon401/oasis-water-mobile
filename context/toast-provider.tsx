@@ -35,10 +35,10 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
 						hideOnPress: true,
 						delay: 0.1,
 						backgroundColor: "#EDE8DA",
-						textColor: "#EDE8DA",
+						textColor: "#000000",
 						opacity: 0.8,
 						containerStyle: {
-							borderRadius: 14,
+							borderRadius: 18,
 							paddingHorizontal: 36,
 							paddingVertical: 14,
 						},

@@ -1,10 +1,6 @@
 import { supabase } from "@/config/supabase";
 import { ITEM_TYPES } from "@/lib/constants/categories";
-import {
-	CATEGORY_HEALTH_EFFECTS,
-	HEALTH_EFFECTS,
-	SCORES,
-} from "@/lib/constants/health-effects";
+import { HEALTH_EFFECTS } from "@/lib/constants/health-effects";
 
 export async function getCurrentUserData(uid?: string) {
 	const userId = uid;
@@ -951,103 +947,6 @@ const calculateBottledWaterScore = (favorites: any[]) => {
 	};
 };
 
-const getScoreMetadata = async (ingredientsMetadata: any[]) => {
-	// Initialize score metadata array with placeholders for each score
-	const scoreMetadataArray = SCORES.map((score) => ({
-		scoreId: score.id,
-		scoreName: score.name,
-		score: 0, // Placeholder for score calculation
-		scoreIcon: score.icon,
-		harms: [] as {
-			label: string;
-			description: string;
-			source: string;
-			scoreId: string;
-		}[], // Explicitly define the type
-		benefits: [] as {
-			label: string;
-			description: string;
-			source: string;
-			scoreId: string;
-		}[], // Explicitly define the type
-		contaminants: [] as {
-			id: number;
-			name: string;
-			category: string;
-			risks: any[];
-			benefits: any[];
-			is_contaminant: boolean;
-		}[], // Include contaminant metadata
-	}));
-
-	// Process each ingredient
-	ingredientsMetadata.forEach((ingredient) => {
-		const matchedCategory = CATEGORY_HEALTH_EFFECTS.find((category) =>
-			category.dbRowIds.includes(ingredient.id),
-		);
-
-		if (matchedCategory) {
-			const harms = matchedCategory.harms || [];
-			const benefits = matchedCategory.benefits || [];
-
-			harms.forEach((harm) => {
-				const scoreEntry = scoreMetadataArray.find(
-					(entry) => entry.scoreId === harm.scoreId,
-				);
-				if (
-					scoreEntry &&
-					!scoreEntry.harms.some((h) => h.label === harm.label)
-				) {
-					scoreEntry.harms.push(harm);
-				}
-			});
-
-			benefits.forEach((benefit) => {
-				const scoreEntry = scoreMetadataArray.find(
-					(entry) => entry.scoreId === benefit.scoreId,
-				);
-				if (
-					scoreEntry &&
-					!scoreEntry.benefits.some((b) => b.label === benefit.label)
-				) {
-					scoreEntry.benefits.push(benefit);
-				}
-			});
-
-			// Add contaminant metadata to the score entry
-			scoreMetadataArray.forEach((entry) => {
-				if (!entry.contaminants.some((c) => c.id === ingredient.id)) {
-					entry.contaminants.push({
-						id: ingredient.id,
-						name: ingredient.name,
-						category: ingredient.category,
-						risks: ingredient.risks,
-						benefits: ingredient.benefits,
-						is_contaminant: ingredient.is_contaminant,
-					});
-				}
-			});
-		}
-	});
-
-	// Calculate the score for each entry
-	scoreMetadataArray.forEach((entry) => {
-		const numBenefits = entry.benefits.length;
-		const numHarms = entry.harms.length;
-		const sum = numHarms - numBenefits;
-
-		if (sum > 0) {
-			entry.score = 70;
-		} else if (sum < 3) {
-			entry.score = 60;
-		} else {
-			entry.score = 20;
-		}
-	});
-
-	return scoreMetadataArray;
-};
-
 export const getIngredientsMetadata = async (ingredientIds: number[]) => {
 	// Remove duplicate ingredient IDs
 	const uniqueIngredientIds = Array.from(new Set(ingredientIds));
@@ -1196,26 +1095,43 @@ export const addWatersAndFiltersToUserFavorites = async (
 	return true;
 };
 
-export const getUserUpvoted = async (userId: string) => {
+export const getUserUpvoted = async (userId: string | null | undefined) => {
+	if (!userId) {
+		return {
+			items: [],
+			filters: [],
+			tapLocations: [],
+			categories: [],
+		};
+	}
 	const { data: itemsData, error: itemsError } = await supabase
-		.from("requests")
+		.from("contributions")
 		.select("*")
 		.eq("user_id", userId)
+		.eq("kind", "upvote_product")
 		.eq("product_type", "bottled_water");
 
 	const { data: filtersData, error: filtersError } = await supabase
-		.from("requests")
+		.from("contributions")
 		.select("*")
 		.eq("user_id", userId)
-		.eq("product_type", "filter");
+		.eq("product_type", "filter")
+		.eq("kind", "upvote_product");
 
 	const { data: tapLocationsData, error: tapLocationsError } = await supabase
-		.from("requests")
+		.from("contributions")
 		.select("*")
 		.eq("user_id", userId)
-		.eq("product_type", "tap_water");
+		.eq("product_type", "tap_water")
+		.eq("kind", "upvote_product");
 
-	if (itemsError || filtersError || tapLocationsError) {
+	const { data: categoriesData, error: categoriesError } = await supabase
+		.from("contributions")
+		.select("*")
+		.eq("user_id", userId)
+		.eq("kind", "upvote_category");
+
+	if (itemsError || filtersError || tapLocationsError || categoriesError) {
 		console.error(
 			"Error fetching user upvoted data:",
 			itemsError,
@@ -1229,14 +1145,13 @@ export const getUserUpvoted = async (userId: string) => {
 		};
 	}
 
-	console.log("itemsData", itemsData);
-
 	return {
 		items: itemsData.map((item: any) => item.product_id),
 		filters: filtersData.map((filter: any) => filter.product_id),
 		tapLocations: tapLocationsData.map(
 			(tapLocation: any) => tapLocation.product_id,
 		),
+		categories: categoriesData.map((category: any) => category.category_id),
 	};
 };
 
@@ -1245,16 +1160,13 @@ export const checkIfUserUpvoted = async (
 	thingId: string,
 	product_type: string,
 ) => {
-	console.log("userId", userId);
-	console.log("thingId", thingId);
-	console.log("product_type", product_type);
-
 	const { data, error } = await supabase
-		.from("requests")
+		.from("contributions")
 		.select("*")
 		.eq("user_id", userId)
 		.eq("product_id", thingId)
-		.eq("product_type", product_type);
+		.eq("product_type", product_type)
+		.eq("kind", "upvote_product");
 
 	if (error) {
 		console.error("Error checking if user upvoted:", error);

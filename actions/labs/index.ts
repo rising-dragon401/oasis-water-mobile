@@ -1,56 +1,58 @@
 import { supabase } from "@/config/supabase";
 import { ITEM_TYPES } from "@/lib/constants/categories";
 
-export const fetchInProgressItems = async ({
+export const fetchInProgressThings = async ({
 	type,
 	limit,
 }: {
-	type?: string;
+	type?: string[];
 	limit: number;
 }) => {
 	try {
-		const query = supabase.from("labs").select("*").eq("status", "in_progress");
+		let allItemDetails: any[] = [];
 
 		if (type) {
-			query.eq("product_type", type);
-		}
+			for (const t of type) {
+				const query = supabase
+					.from("labs")
+					.select("*")
+					.eq("status", "in_progress")
+					.eq("product_type", t);
 
-		const { data, error } = await query.limit(limit);
+				const { data, error } = await query.limit(limit);
 
-		if (error) {
-			throw new Error(
-				`Error fetchInProgressItems fetching data from labs: ${error.message}`,
-			);
-		}
+				if (error) {
+					throw new Error(
+						`Error fetchInProgressThings fetching data from labs: ${error.message}`,
+					);
+				}
 
-		const productId = data[0]?.product;
+				const table = ITEM_TYPES.find((item) => item.typeId === t)?.tableName;
 
-		if (!productId) {
-			return [];
-		}
+				if (table) {
+					for (const labItem of data) {
+						const itemQuery = supabase
+							.from(table)
+							.select("id, name, image, test_request_count, type")
+							.eq("id", labItem.product);
 
-		const table = ITEM_TYPES.find((item) => item.typeId === type)?.tableName;
+						const { data: itemData, error: itemError } = await itemQuery;
 
-		let itemDetails = data;
+						if (itemError) {
+							throw new Error(
+								`Error getting table data from ${table}: ${itemError.message}`,
+							);
+						}
 
-		if (table) {
-			const itemQuery = supabase
-				.from(table)
-				.select("id, name, image, test_request_count, type")
-				.eq("id", productId);
-
-			const { data: itemData, error: itemError } = await itemQuery;
-
-			if (itemError) {
-				throw new Error(
-					`Error gettting tabl data from ${table}: ${itemError.message}`,
-				);
+						if (itemData) {
+							allItemDetails = allItemDetails.concat(itemData);
+						}
+					}
+				}
 			}
-
-			itemDetails = itemData;
 		}
 
-		return itemDetails;
+		return allItemDetails;
 	} catch (error) {
 		console.error(error);
 		return [];
@@ -58,28 +60,40 @@ export const fetchInProgressItems = async ({
 };
 
 export const fetchTestedThings = async ({
-	table,
+	tables,
 	limit,
 }: {
-	table: string;
+	tables: string[];
 	limit: number;
 }) => {
 	try {
-		const query = supabase
-			.from(table)
-			.select("id, name, image, updated_at, type")
-			.eq("is_indexed", true)
-			.order("updated_at", { ascending: true });
+		let allData: any[] = [];
 
-		const { data, error } = await query.limit(limit);
+		for (const table of tables) {
+			const query = supabase
+				.from(table)
+				.select("id, name, image, updated_at, type")
+				.eq("is_indexed", true)
+				.order("updated_at", { ascending: true });
 
-		if (error) {
-			throw new Error(
-				`Error fetchTestedThings fetching data from ${table}: ${error.message}`,
-			);
+			const { data, error } = await query.limit(limit);
+
+			if (error) {
+				throw new Error(
+					`Error fetchTestedThings fetching data from ${table}: ${error.message}`,
+				);
+			}
+
+			allData = allData.concat(data);
 		}
 
-		return data;
+		// Sort the combined data by updated_at in ascending order
+		allData.sort(
+			(a, b) =>
+				new Date(b?.updated_at).getTime() - new Date(a?.updated_at).getTime(),
+		);
+
+		return allData;
 	} catch (error) {
 		console.error(error);
 		return [];
@@ -87,28 +101,41 @@ export const fetchTestedThings = async ({
 };
 
 export const fetchUntestedThings = async ({
-	table,
+	tables,
 	limit,
 }: {
-	table: string;
+	tables: string[];
 	limit: number;
 }) => {
 	try {
-		const query = supabase
-			.from(table)
-			.select("id, name, image, test_request_count, type")
-			.eq("is_indexed", false)
-			.order("test_request_count", { ascending: true });
+		let allData: any[] = [];
 
-		const { data, error } = await query.limit(limit);
+		for (const table of tables) {
+			let query = supabase
+				.from(table)
+				.select("id, name, image, test_request_count, type")
+				.eq("is_indexed", false)
+				.order("test_request_count", { ascending: true });
 
-		if (error) {
-			throw new Error(
-				`Error fetchUntestedThings fetching data from ${table}: ${error.message}`,
-			);
+			if (table === "items") {
+				query = query.in("type", ["bottled_water", "water_gallon"]);
+			}
+
+			const { data, error } = await query.limit(limit);
+
+			if (error) {
+				throw new Error(
+					`Error fetchUntestedThings fetching data from ${table}: ${error.message}`,
+				);
+			}
+
+			allData = allData.concat(data);
 		}
 
-		return data;
+		// Sort the combined data by test_request_count in descending order
+		allData.sort((a, b) => b?.test_request_count - a?.test_request_count);
+
+		return allData;
 	} catch (error) {
 		console.error(error);
 		return [];
@@ -158,8 +185,6 @@ export const upvoteThing = async (
 	table: string,
 	userId: string,
 ) => {
-	console.log("upvoteThing", thingId, type, table, userId);
-
 	// Call the RPC function with table name, column name, record ID, and amount
 	const { data, error } = await supabase.rpc("increment", {
 		table_name: table,
@@ -175,10 +200,106 @@ export const upvoteThing = async (
 
 	const { data: requestData, error: requestError } = await supabase
 		.from("requests")
-		.insert([{ product_id: thingId, user_id: userId, product_type: type }]);
+		.insert([
+			{
+				product_id: thingId,
+				user_id: userId,
+				product_type: type,
+				kind: "upvote_product",
+			},
+		]);
 
 	if (requestError) {
 		console.error("Error inserting request:", requestError);
+		return false;
+	}
+
+	return true;
+};
+
+export const fetchUpcomingCategories = async () => {
+	const { data, error } = await supabase
+		.from("categories")
+		.select("*")
+		.eq("status", "inactive")
+		.order("request_count", { ascending: true });
+
+	if (error) {
+		console.error("Error fetching upcoming categories:", error);
+		return [];
+	}
+
+	return data;
+};
+
+export const upvoteCategory = async (categoryId: string, userId: string) => {
+	const { data, error } = await supabase.rpc("increment", {
+		table_name: "categories",
+		column_name: "request_count",
+		record_id: categoryId,
+		amount: 1,
+	});
+
+	if (error) {
+		console.error("Error incrementing count:", error);
+		return false;
+	}
+
+	const { data: requestData, error: requestError } = await supabase
+		.from("contributions")
+		.insert([
+			{ category_id: categoryId, user_id: userId, kind: "upvote_category" },
+		]);
+
+	if (requestError) {
+		console.error("Error inserting request:", requestError);
+		return false;
+	}
+
+	return true;
+};
+
+export const submitRequest = async ({
+	name,
+	productId,
+	productType,
+	userId,
+	message,
+	attachment,
+	kind,
+}: {
+	name: string;
+	productId?: string;
+	productType?: string;
+	userId: string;
+	message: string;
+	attachment?: string | null;
+	kind: "request_new_product" | "update_existing_product";
+}) => {
+	console.log("submitRequest", {
+		name,
+		productId,
+		productType,
+		userId,
+		message,
+		attachment,
+		kind,
+	});
+
+	const { data, error } = await supabase.from("contributions").insert([
+		{
+			name,
+			product_id: productId,
+			product_type: productType,
+			user_id: userId,
+			note: message,
+			file_url: attachment,
+			kind,
+		},
+	]);
+
+	if (error) {
+		console.error("Error submitting request:", error);
 		return false;
 	}
 

@@ -209,9 +209,6 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 
 		const productType_ = category?.productType || "";
 
-		console.log("productType_", productType_);
-		console.log("category", category);
-
 		setTitle(category?.title || "");
 
 		navigation.setOptions({

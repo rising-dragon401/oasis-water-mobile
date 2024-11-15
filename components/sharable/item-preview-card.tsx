@@ -6,12 +6,13 @@ import React, { useMemo } from "react";
 import { TouchableOpacity, View } from "react-native";
 
 import { H4, Muted, P } from "@/components/ui/typography";
+import { ITEM_TYPES } from "@/lib/constants/categories";
 import {
 	RANDOM_BLUR_IMAGES,
 	placeHolderImageBlurHash,
 } from "@/lib/constants/images";
 import { useColorScheme } from "@/lib/useColorScheme";
-import { determineLink } from "@/lib/utils";
+import { determineLink, timeSince } from "@/lib/utils";
 
 type Props = {
 	item: any;
@@ -21,6 +22,7 @@ type Props = {
 	imageHeight?: number;
 	variation?: "square" | "row";
 	showVotes?: boolean;
+	showTime?: boolean;
 	backPath?: string;
 };
 
@@ -32,6 +34,7 @@ const ItemPreviewCard = ({
 	imageHeight = 100,
 	variation = "square",
 	showVotes = false,
+	showTime = false,
 	backPath = "",
 }: Props) => {
 	const { subscription } = useUserProvider();
@@ -122,8 +125,6 @@ const ItemPreviewCard = ({
 		? `${determineLink(item)}?backPath=${backPath}`
 		: determineLink(item);
 
-	console.log("link", link);
-
 	return (
 		<TouchableOpacity
 			onPress={() => {
@@ -133,7 +134,7 @@ const ItemPreviewCard = ({
 		>
 			<View
 				className={`relative w-full flex rounded-2xl ${
-					variation === "row" ? "flex-row gap-2 px-2 py-3 " : "flex-col"
+					variation === "row" ? "flex-row gap-2 px-2 py-2 " : "flex-col"
 				}  border border-border overflow-hidden bg-white pt-4 `}
 			>
 				<View
@@ -157,7 +158,7 @@ const ItemPreviewCard = ({
 						<P
 							className={`text-base ${
 								variation === "row"
-									? "text-lg max-w-48 w-48 flex-wrap"
+									? "text-lg max-w-56 w-56 flex-wrap"
 									: "px-3 text-sm"
 							}`}
 							numberOfLines={2}
@@ -191,15 +192,34 @@ const ItemPreviewCard = ({
 						<Muted>{item.brandName} </Muted>
 					)}
 
+					{variation === "row" && showTime && (
+						<View className="flex flex-row items-center gap-1">
+							<Muted className="text-xs">{timeSince(item.updated_at)}</Muted>
+						</View>
+					)}
+
 					{variation === "row" && showVotes && (
-						<Muted>
-							{item.test_request_count || 0}{" "}
-							{item.test_request_count === 1 ? "vote" : "votes"}
-						</Muted>
+						<View className="flex flex-row items-center gap-1">
+							<Ionicons
+								// @ts-ignore
+								name={
+									ITEM_TYPES.find((itemObj) => itemObj.typeId === item.type)
+										?.icon
+								}
+								size={10}
+								color={mutedForegroundColor}
+							/>
+							<Muted className="text-xs">
+								{
+									ITEM_TYPES.find((itemObj) => itemObj.typeId === item.type)
+										?.categoryLabel
+								}
+							</Muted>
+						</View>
 					)}
 				</View>
 
-				{variation === "row" && (
+				{variation === "row" && !showVotes && (
 					<View className="absolute mt-4 right-4  z-10  rounded-full p-1 px-2">
 						{subscription ? (
 							item.score ? (
@@ -220,6 +240,12 @@ const ItemPreviewCard = ({
 								<Muted>/ 100</Muted>
 							</View>
 						)}
+					</View>
+				)}
+
+				{variation === "row" && showVotes && (
+					<View className="w-10 h-14 flex items-center justify-center">
+						<Muted>{item.test_request_count || 0}</Muted>
 					</View>
 				)}
 

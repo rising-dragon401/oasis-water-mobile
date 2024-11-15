@@ -33,6 +33,8 @@ export const ITEM_TYPES = [
 		tags: ["bottled_water", "water_gallon", "gallon"],
 		productType: "water",
 		tableName: "items",
+		categoryLabel: "Bottled water",
+		icon: "water-outline",
 	},
 	{
 		id: "filter",
@@ -50,6 +52,8 @@ export const ITEM_TYPES = [
 			"tap",
 		],
 		tableName: "water_filters",
+		categoryLabel: "Filters",
+		icon: "funnel-outline",
 	},
 	{
 		id: "tap_water",
@@ -57,7 +61,9 @@ export const ITEM_TYPES = [
 		typeId: "tap_water",
 		dbTypes: ["tap_water"],
 		productType: "water",
+		categoryLabel: "Tap water",
 		tableName: "tap_water_locations",
+		icon: "location-outline",
 	},
 ];
 

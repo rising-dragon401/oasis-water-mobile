@@ -23,7 +23,7 @@ export default function StickyHeader({
 
 	return (
 		<View
-			className={`flex-row w-full justify-between items-center ${
+			className={`flex-row w-full justify-between items-start ${
 				hideMargin ? "" : "mt-24"
 			}`}
 		>
@@ -35,7 +35,7 @@ export default function StickyHeader({
 
 			<TouchableOpacity
 				onPress={() => path && router.push(path as any)}
-				className="!bg-transparent"
+				className="!bg-transparent flex flex-row items-center gap-x-1"
 			>
 				<Feather name={icon as any} size={24} color={iconColor} />
 			</TouchableOpacity>

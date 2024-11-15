@@ -33,7 +33,7 @@ const CommunityActionCard = ({ image, name, action, date }: Props) => {
 	};
 
 	return (
-		<View className="flex flex-row items-center gap-2 h-20 w-full bg-white rounded-xl border  border-border  px-4 py-2">
+		<View className="flex flex-row items-center gap-2 h-20 w-full bg-white rounded-xl border border-border  px-4 py-2">
 			<View className="flex h-10 w-10 rounded-full overflow-hidden">
 				<Image
 					source={{ uri: image || undefined }}
