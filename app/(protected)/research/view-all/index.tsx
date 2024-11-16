@@ -222,7 +222,7 @@ export default function ProductTestingScreen() {
 				)}
 				keyExtractor={(item) => item.id}
 				numColumns={1}
-				contentContainerStyle={{ paddingTop: 0, paddingBottom: 0, gap: 2 }}
+				contentContainerStyle={{ paddingTop: 0, paddingBottom: 120, gap: 2 }}
 				showsVerticalScrollIndicator={false}
 				ListHeaderComponent={<View style={{ height: 1 }} />}
 				initialNumToRender={8}

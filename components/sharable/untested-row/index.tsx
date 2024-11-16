@@ -35,6 +35,8 @@ export default function UntestedRow({ thing }: { thing: any }) {
 			const id = thing.id;
 			const table = identified?.tableName;
 
+			console.log("handleUpvote", { type, id, table });
+
 			if (!type || !id || !table) {
 				console.error("No type found for", thing.type);
 				return;
