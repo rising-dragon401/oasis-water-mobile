@@ -1,6 +1,5 @@
 import { FontAwesome6 } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -13,10 +12,7 @@ import {
 } from "react-native";
 import * as z from "zod";
 
-import OasisLogo from "@/assets/oasis-word.png";
-import { SafeAreaView } from "@/components/safe-area-view";
 import { AppleAuthButton } from "@/components/sharable/apple-auth-button";
-import BackButton from "@/components/sharable/back-button";
 import { Button } from "@/components/ui/button";
 import { Form, FormField, FormInput } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
@@ -94,19 +90,14 @@ export default function SignUp() {
 		colorScheme === "dark" ? theme.dark.primary : theme.light.primary;
 
 	return (
-		<SafeAreaView className="flex-1 px-4">
-			<View className="flex-row justify-center items-center">
-				<Image source={OasisLogo} style={{ width: 85, height: 24 }} />
-			</View>
-
+		<View className="flex-1 px-6 pb-10 pt-4">
 			<KeyboardAvoidingView
 				behavior={Platform.OS === "ios" ? "padding" : "height"}
 				className="flex-1"
 			>
-				<ScrollView contentContainerClassName="flex-grow p-4">
+				<ScrollView contentContainerClassName="flex-grow ">
 					<View className="flex-1">
 						<View className="flex flex-col items-start justify-start">
-							<BackButton />
 							<H1 className="self-start">Sign Up</H1>
 						</View>
 						<Muted className="self-start mb-5">
@@ -191,6 +182,6 @@ export default function SignUp() {
 					<Muted className="text-foreground">Sign in</Muted>
 				</Muted>
 			</View>
-		</SafeAreaView>
+		</View>
 	);
 }

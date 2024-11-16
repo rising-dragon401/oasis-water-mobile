@@ -108,7 +108,13 @@ function RootLayout() {
 												},
 											}}
 										>
-											<Stack.Screen name="(public)" />
+											<Stack.Screen
+												name="(public)"
+												options={{
+													headerShown: false,
+													headerShadowVisible: false,
+												}}
+											/>
 											<Stack.Screen
 												name="(protected)"
 												options={{

@@ -17,8 +17,9 @@ import {
 	addWatersAndFiltersToUserFavorites,
 	updateUserData,
 } from "@/actions/user";
-// import ItemSelector from "@/components/sharable/item-selector";
-// import LocationSelector from "@/components/sharable/location-selector";
+import ItemSelector from "@/components/sharable/item-selector";
+import Loader from "@/components/sharable/loader";
+import LocationSelector from "@/components/sharable/location-selector";
 import { SubscribeOnboarding } from "@/components/sharable/subscribe-onboarding";
 import { Button } from "@/components/ui/button";
 import * as ProgressPrimitive from "@/components/ui/progress";
@@ -28,12 +29,19 @@ import { useRevenueCat } from "@/context/revenue-cat-provider";
 import { useToast } from "@/context/toast-provider";
 import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
-// import { readableType } from "@/lib/utils";
+import { readableType } from "@/lib/utils";
 
 export default function OnboardingScreen() {
 	const router = useRouter();
-	const { user, userData, userFavorites, subscription, uid } =
-		useUserProvider();
+	const {
+		user,
+		userData,
+		userFavorites,
+		subscription,
+		uid,
+		userScores,
+		refreshUserData,
+	} = useUserProvider();
 	const { packages, purchasePackage } = useRevenueCat();
 	const { iconColor, mutedForegroundColor } = useColorScheme();
 	const showToast = useToast();
@@ -59,19 +67,23 @@ export default function OnboardingScreen() {
 	const [favs, setFavs] = useState<any[]>([]);
 	const [loadingSubStatus, setLoadingSubStatus] = useState(false);
 	const [loadingLocation, setLoadingLocation] = useState(false);
+	const [loadingNearestLocation, setLoadingNearestLocation] = useState(false);
+	const [nearestLocation, setNearestLocation] = useState<any>(null);
 	const [loadingFavs, setLoadingFavs] = useState(false);
 
 	const windowWidth = Dimensions.get("window").width;
 	const windowHeight = Dimensions.get("window").height;
+
+	const hasScores = userScores && userScores?.allIngredients?.length > 0;
 
 	// Onboarding steps
 	const steps = [
 		{
 			title: "Our water is contaminated",
 			subtitle:
-				"90% of drinking water is laced with endocrine disruptors, forever chemicals and other toxins, all upping the risk of inflammation, illness and other health issues.",
+				"90% of drinking water is laced with endocrine disruptors, microplastics, forever chemicals and other toxins all of which expose your to serious health issues. Oasis shows you what's actually inside",
 			image:
-				"https://connect.live-oasis.com/storage/v1/object/public/website/images/onboarding/toxins%20in%20water%20graphic.png?t=2024-10-08T05%3A26%3A22.658Z", // Add image option
+				"https://connect.live-oasis.com/storage/v1/object/public/website/images/onboarding/toxins%20in%20water%20graphic.png?t=2024-10-08T05%3A26%3A22.658Z",
 			imageStyle: {
 				width: "100%",
 				height: windowHeight * 0.4,
@@ -86,9 +98,9 @@ export default function OnboardingScreen() {
 			canSkip: false,
 		},
 		{
-			title: "Stay notified of the latest research",
+			title: "Stay notified of new lab results and research",
 			subtitle:
-				"Get weekly updates on the latest research and insights on water quality and health delivered to your inbox.",
+				"Get weekly updates on the latest research and insights on water quality and health.",
 			image:
 				"https://connect.live-oasis.com/storage/v1/object/public/website/images/onboarding/app%20newsletter%20subscribe.png?t=2024-10-08T17%3A34%3A58.212Z",
 			imageStyle: {
@@ -116,115 +128,132 @@ export default function OnboardingScreen() {
 			onSkip: null,
 			canSkip: false,
 		},
-		// {
-		// 	title: "Where are you based?",
-		// 	subtitle:
-		// 		"This is used to locate your nearest tap water report and find available brands",
-		// 	image: null,
-		// 	imageStyle: {
-		// 		width: "100%",
-		// 		height: windowHeight * 0.44,
-		// 		resizeMode: "contain",
-		// 	},
-		// 	component: (
-		// 		<View className="flex mt-8">
-		// 			<LocationSelector
-		// 				address={selectedAddress}
-		// 				setAddress={setSelectedAddress}
-		// 				initialAddress={userData?.location?.formattedAddress || null}
-		// 			/>
-		// 		</View>
-		// 	),
-		// 	onSubmit: () => {
-		// 		handleUpdateLocation();
-		// 	},
-		// 	loading: loadingLocation,
-		// 	submitButtonLabel: "Continue",
-		// 	onSkip: () => {
-		// 		setCurrentStep((prev) => Math.min(totalSteps - 1, prev + 1));
-		// 	},
-		// 	canSkip: true,
-		// 	skipButtonLabel: "Skip",
-		// },
-		// {
-		// 	title: "What do you drink?",
-		// 	subtitle: "Enter all the bottled waters and filters you use",
-		// 	image: null,
-		// 	imageStyle: {
-		// 		width: "100%",
-		// 		height: windowHeight * 0.44,
-		// 		resizeMode: "contain",
-		// 	},
-		// 	component: (
-		// 		<View className="flex mt-6">
-		// 			<ItemSelector
-		// 				items={favs}
-		// 				setItems={setFavs}
-		// 				initialItems={userFavorites || []} // Pass in initial items
-		// 			/>
-
-		// 			{favs.length > 0 && (
-		// 				<View className="flex flex-col items-center gap-4 mt-4 ">
-		// 					{favs.map((fav) => (
-		// 						<View
-		// 							key={fav.id}
-		// 							className="flex flex-row items-center gap-2 bg-card p-2 rounded-xl border border-border w-full py-2 px-4 justify-between"
-		// 						>
-		// 							<View className="flex flex-row items-center gap-2">
-		// 								<Image
-		// 									source={{ uri: fav.image }}
-		// 									style={{ width: 36, height: 36 }}
-		// 									className="rounded-lg"
-		// 								/>
-		// 								<View className="flex flex-col gap-0  flex-wrap">
-		// 									<P className="max-w-64 font-medium" numberOfLines={1}>
-		// 										{fav.name}
-		// 									</P>
-		// 									<Muted>{readableType(fav.type)}</Muted>
-		// 								</View>
-		// 							</View>
-
-		// 							<TouchableOpacity onPress={() => handleRemoveFav(fav)}>
-		// 								<Ionicons
-		// 									name="close"
-		// 									size={24}
-		// 									color={mutedForegroundColor}
-		// 								/>
-		// 							</TouchableOpacity>
-		// 						</View>
-		// 					))}
-		// 				</View>
-		// 			)}
-		// 		</View>
-		// 	),
-		// 	onSubmit: () => {
-		// 		handleUpdateFavs();
-		// 	},
-		// 	loading: loadingFavs,
-		// 	submitButtonLabel: "Continue",
-		// 	onSkip: () => {
-		// 		setCurrentStep((prev) => Math.min(totalSteps - 1, prev + 1));
-		// 	},
-		// 	canSkip: true,
-		// 	skipButtonLabel: "Skip",
-		// },
 		{
-			title: "Oasis Member",
+			id: "location",
+			title: "Where are you based?",
 			subtitle:
-				"Join 10,000+ members transforming their water habits and supporting unbiased ratings.",
+				"This is used to locate your nearest tap water report and find available brands",
+			image: null,
+			imageStyle: {
+				width: "100%",
+				height: windowHeight * 0.44,
+				resizeMode: "contain",
+			},
+			component: (
+				<View className="flex mt-2">
+					<LocationSelector
+						address={selectedAddress}
+						setAddress={setSelectedAddress}
+						initialAddress={null}
+					/>
+					{loadingNearestLocation && (
+						<View className="flex flex-row items-center justify-center gap-2 mt-4">
+							<Loader size="small" />
+							<P>Finding nearest tap water report</P>
+						</View>
+					)}
+					{nearestLocation && !loadingNearestLocation && (
+						<View className="flex flex-col items-center gap-2 mt-4">
+							<P>Nearest tap water report:</P>
+							<P>{nearestLocation?.name || "None"}</P>
+						</View>
+					)}
+				</View>
+			),
+			onSubmit: () => {
+				handleUpdateLocation();
+			},
+			loading: loadingLocation,
+			submitButtonLabel: "Continue",
+			onSkip: () => {
+				setCurrentStep((prev) => Math.min(totalSteps - 1, prev + 1));
+			},
+			canSkip: true,
+			skipButtonLabel: "Skip",
+		},
+		{
+			id: "favs",
+			title: "What do you drink?",
+			subtitle: "Enter all the bottled waters and filters you use",
+			image: null,
+			imageStyle: {
+				width: "100%",
+				height: windowHeight * 0.44,
+				resizeMode: "contain",
+			},
+			component: (
+				<View className="flex mt-6">
+					<ItemSelector
+						items={favs}
+						setItems={setFavs}
+						initialItems={userFavorites || []} // Pass in initial items
+					/>
+
+					{favs.length > 0 && (
+						<View className="flex flex-col items-center gap-4 mt-4 ">
+							{favs.map((fav) => (
+								<View
+									key={fav.id}
+									className="flex flex-row items-center gap-2 bg-card p-2 rounded-xl border border-border w-full py-2 px-4 justify-between"
+								>
+									<View className="flex flex-row items-center gap-2">
+										<Image
+											source={{ uri: fav.image }}
+											style={{ width: 36, height: 36 }}
+											className="rounded-lg"
+										/>
+										<View className="flex flex-col gap-0  flex-wrap">
+											<P className="max-w-64 font-medium" numberOfLines={1}>
+												{fav.name}
+											</P>
+											<Muted>{readableType(fav.type)}</Muted>
+										</View>
+									</View>
+
+									<TouchableOpacity onPress={() => handleRemoveFav(fav)}>
+										<Ionicons
+											name="close"
+											size={24}
+											color={mutedForegroundColor}
+										/>
+									</TouchableOpacity>
+								</View>
+							))}
+						</View>
+					)}
+				</View>
+			),
+			onSubmit: () => {
+				handleUpdateFavs();
+			},
+			loading: loadingFavs,
+			submitButtonLabel: "Continue",
+			onSkip: () => {
+				setCurrentStep((prev) => Math.min(totalSteps - 1, prev + 1));
+			},
+			canSkip: true,
+			skipButtonLabel: "Skip",
+		},
+		{
+			title: "Unlock healthy hydration",
+			subtitle: "Join 10,000+ members improving their water habits.",
 			titleStyle: "text-center",
 			image:
 				"https://connect.live-oasis.com/storage/v1/object/public/website/images/onboarding/paywall%20cards.jpg",
 			// image: null,
 			imageStyle: {
-				width: "70%",
-				height: windowHeight * 0.16,
+				width: !hasScores ? "80%" : "54%",
+				height: !hasScores ? windowHeight * 0.18 : windowHeight * 0.1,
 				resizeMode: "contain",
+				marginTop: 8,
 			},
 			component: (
 				<SubscribeOnboarding
 					setSelectedPlan={setSelectedPlan}
 					selectedPlan={selectedPlan}
+					onPress={() => {
+						handleSubscribe();
+					}}
 				/>
 			),
 			onSubmit: () => {
@@ -303,6 +332,71 @@ export default function OnboardingScreen() {
 		setLoadingSubStatus(false);
 	};
 
+	const isAddressInUS = (address: any) => {
+		// Assuming address has a country property
+		return address.country === "United States";
+	};
+
+	// update nearest location
+	useEffect(() => {
+		const fetch = async () => {
+			if (!selectedAddress || !uid) {
+				return;
+			}
+
+			try {
+				if (!isAddressInUS(selectedAddress)) {
+					showToast(
+						"Tap water reports are only available in the US as of now",
+						1000,
+						"top",
+					);
+					setNearestLocation(null);
+					throw new Error("Address is not in the US");
+				}
+
+				const userCoords = {
+					latitude: selectedAddress?.latitude,
+					longitude: selectedAddress?.longitude,
+				};
+
+				// Ensure latitude and longitude are defined
+				if (
+					userCoords.latitude !== undefined &&
+					userCoords.longitude !== undefined
+				) {
+					setLoadingNearestLocation(true);
+					// first get and update nearest taplocation for user id
+					const nearestLocationRes = await getNearestLocation(
+						{ latitude: userCoords.latitude, longitude: userCoords.longitude },
+						uid || "",
+					);
+
+					console.log("nearestLocationRes");
+
+					if (!nearestLocationRes) {
+						throw new Error(
+							"Unable to sync location: getNearestLocation failed",
+						);
+					}
+
+					setNearestLocation(nearestLocationRes);
+					refreshUserData("scores");
+				} else {
+					throw new Error("Unable to sync location: userCoords is incomplete");
+				}
+			} catch (error) {
+				throw new Error(error as string);
+			} finally {
+				setLoadingNearestLocation(false);
+			}
+		};
+
+		if (steps[currentStep].id === "location") {
+			fetch();
+		}
+	}, [selectedAddress, currentStep]);
+
 	const handleUpdateLocation = async () => {
 		try {
 			const thisAddress = selectedAddress || userData.location;
@@ -313,63 +407,55 @@ export default function OnboardingScreen() {
 				);
 			}
 
-			const userCoords = {
-				latitude: thisAddress?.latitude,
-				longitude: thisAddress?.longitude,
-			};
-
-			// Ensure latitude and longitude are defined
-			if (
-				userCoords.latitude !== undefined &&
-				userCoords.longitude !== undefined
-			) {
-				// first get and update nearest taplocation for user id
-				const nearestLocationRes = await getNearestLocation(userCoords, uid);
-
-				if (!nearestLocationRes) {
-					throw new Error("Unable to sync location: getNearestLocation failed");
-				}
-			} else {
-				throw new Error("Unable to sync location: userCoords is incomplete");
-			}
-
 			// then update user data with location
 			await updateUserData(uid, "location", thisAddress);
+			await refreshUserData("scores");
 		} catch (error) {
-			showToast("Unable to update location");
+			showToast("Unable to update location", 1000, "top");
 			throw new Error(error as string);
+		} finally {
+			setLoadingNearestLocation(false);
 		}
 	};
+
+	// when favs change add or remove from user favorites
+	useEffect(() => {
+		const addFavs = async () => {
+			if (favs.length > 0 && steps[currentStep].id === "favs" && uid) {
+				const recentFav = favs[favs.length - 1];
+				await addWatersAndFiltersToUserFavorites(uid, favs);
+				refreshUserData("scores");
+			}
+		};
+
+		addFavs();
+	}, [favs]);
 
 	const handleRemoveFav = (fav: any) => {
 		setFavs((prev) => prev.filter((item) => item.id !== fav.id));
+		refreshUserData("scores");
 	};
 
 	const handleUpdateFavs = async () => {
-		setLoadingFavs(true);
-
-		try {
-			if (!uid) {
-				console.log("uid is null");
-				throw new Error("Unable to update favs: uid is null");
-			}
-
-			const added = await addWatersAndFiltersToUserFavorites(uid, favs);
-
-			// refreshUserData(uid, "all");
-
-			if (!added) {
-				throw new Error(
-					"Unable to update favs: addWatersAndFiltersToUserFavorites failed",
-				);
-			}
-
-			return true;
-		} catch (error) {
-			return false;
-		} finally {
-			setLoadingFavs(false);
-		}
+		// setLoadingFavs(true);
+		// try {
+		// 	if (!uid) {
+		// 		console.log("uid is null");
+		// 		throw new Error("Unable to update favs: uid is null");
+		// 	}
+		// 	const added = await addWatersAndFiltersToUserFavorites(uid, favs);
+		// 	refreshUserData("scores");
+		// 	if (!added) {
+		// 		throw new Error(
+		// 			"Unable to update favs: addWatersAndFiltersToUserFavorites failed",
+		// 		);
+		// 	}
+		// 	return true;
+		// } catch (error) {
+		// 	return false;
+		// } finally {
+		// 	setLoadingFavs(false);
+		// }
 	};
 
 	const handleSubscribe = async () => {
@@ -430,7 +516,13 @@ export default function OnboardingScreen() {
 			{/* Back Button and Progress Bar */}
 			<View className="flex flex-row items-center justify-between mb-2 py px-4 ">
 				<View className="w-14 flex flex-row justify-center">
-					{currentStep !== 0 && currentStep !== totalSteps - 1 ? (
+					<TouchableOpacity
+						onPress={handlePrevStep}
+						disabled={currentStep === 0}
+					>
+						<Ionicons name="arrow-back" size={24} color={iconColor} />
+					</TouchableOpacity>
+					{/* {currentStep !== 0 && currentStep !== totalSteps - 1 ? (
 						<TouchableOpacity
 							onPress={handlePrevStep}
 							disabled={currentStep === 0}
@@ -439,7 +531,7 @@ export default function OnboardingScreen() {
 						</TouchableOpacity>
 					) : (
 						<View style={{ width: 24, height: 24 }} />
-					)}
+					)} */}
 				</View>
 				<View className="flex-1 mx-4">
 					<ProgressPrimitive.Root

@@ -197,7 +197,6 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 			const thisUserId = userId || session?.user?.id || null;
 			const thisRcCustomerId = rcCustomerId || userData?.rc_customer_id || null;
 
-			console.log("thisUserId:", thisUserId);
 			// console.log("userData:", userData);
 			// console.log("thisRcCustomerId:", thisRcCustomerId);
 
@@ -233,7 +232,10 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 	const fetchUserScores = async (userTapId?: any) => {
 		const tapId = userTapId || userData?.tap_location_id;
 
+		console.log("fetchUserScores", tapId);
 		const tapData = await getUserTapScore(tapId);
+
+		console.log("tapData", JSON.stringify(tapData, null, 2));
 
 		setTapScore(tapData);
 
@@ -249,45 +251,47 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 		setUserRequests(upvoted);
 	};
 
-	const refreshUserData = useCallback(
-		async (
-			type:
-				| "all"
-				| "favorites"
-				| "scores"
-				| "subscription"
-				| "requests"
-				| "userData" = "all",
-		) => {
-			const userId = user?.id;
+	const refreshUserData = async (
+		type:
+			| "all"
+			| "favorites"
+			| "scores"
+			| "subscription"
+			| "requests"
+			| "userData" = "all",
+	) => {
+		const userId = user?.id;
 
-			if (!userId) {
-				return;
-			}
+		console.log("refreshUserData", userId);
 
-			const promises = [];
+		if (!userId) {
+			return;
+		}
 
-			if (type === "all" || type === "subscription") {
-				promises.push(
-					fetchSubscription({
-						userId,
-					}),
-				);
-			}
-			if (type === "all" || type === "favorites") {
-				promises.push(fetchUserFavorites(userId));
-			}
-			if (type === "all" || type === "userData") {
-				promises.push(fetchUserData(userId));
-			}
-			if (type === "all" || type === "requests") {
-				promises.push(fetchUserUpvoted(userId));
-			}
+		const promises = [];
 
-			await Promise.all(promises);
-		},
-		[user?.id],
-	);
+		if (type === "all" || type === "subscription") {
+			promises.push(
+				fetchSubscription({
+					userId,
+				}),
+			);
+		}
+		if (type === "all" || type === "favorites") {
+			promises.push(fetchUserFavorites(userId));
+		}
+		if (type === "all" || type === "userData") {
+			promises.push(fetchUserData(userId));
+		}
+		if (type === "all" || type === "requests") {
+			promises.push(fetchUserUpvoted(userId));
+		}
+		if (type === "all" || type === "scores") {
+			promises.push(fetchUserScores(userData?.tap_location_id));
+		}
+
+		await Promise.all(promises);
+	};
 
 	const logout = useCallback(async () => {
 		clearUserData();

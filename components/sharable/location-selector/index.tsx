@@ -133,8 +133,8 @@ const LocationSelector = ({
 			</View>
 
 			{results.length > 0 && !address && (
-				<View className="border border-gray-300 rounded-lg mb-5 max-h-60 overflow-y-scroll">
-					{results.map((result, index) => (
+				<View className="border border-gray-300 bg-card rounded-lg mb-5 max-h-60 overflow-y-scroll">
+					{results.slice(0, 3).map((result, index) => (
 						<TouchableOpacity
 							key={result.place_id}
 							onPress={() => handleSelectAddress(result.place_id)}

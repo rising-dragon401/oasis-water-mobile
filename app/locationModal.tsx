@@ -7,7 +7,7 @@ import { getNearestLocation } from "@/actions/admin";
 import { updateUserData } from "@/actions/user";
 import LocationSelector from "@/components/sharable/location-selector";
 import { Button } from "@/components/ui/button";
-import { H1, Muted, P } from "@/components/ui/typography";
+import { H3, Muted, P } from "@/components/ui/typography";
 import { useToast } from "@/context/toast-provider";
 import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
@@ -107,7 +107,7 @@ export default function LocationModal() {
 			<View className="pt-8 px-8 flex-1">
 				<View className="flex flex-col items-center justify-between h-full">
 					{userData?.location?.formattedAddress && (
-						<View className="flex flex-col items-center pt-14 ">
+						<View className="flex flex-col items-center ">
 							<View className="flex flex-col items-center ">
 								<P className="text-center">Current location:</P>
 								<View className="flex flex-row items-center max-w-lg px-4 py-2 bg-muted rounded-full gap-2">
@@ -131,13 +131,13 @@ export default function LocationModal() {
 					)}
 					<View className="flex flex-grow flex-shrink items-center" />
 					<View className="flex flex-grow flex-shrink items-center">
-						<Feather
+						{/* <Feather
 							name="map-pin"
-							size={32}
+							size={24}
 							color={iconColor}
-							className="mb-4"
-						/>
-						<H1>Update location</H1>
+							className="mb-2"
+						/> */}
+						<H3>Change location</H3>
 						<Muted>Enter your address to see the nearest tap water score</Muted>
 						<LocationSelector
 							address={selectedAddress}

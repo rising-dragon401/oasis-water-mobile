@@ -86,7 +86,7 @@ export function BrandForm({ id }: { id: string }) {
 				{products && products.length > 0 && (
 					<FlatList
 						data={products}
-						numColumns={2}
+						numColumns={1}
 						keyExtractor={(item) => item.id.toString()}
 						renderItem={({ item }) => (
 							<View className="flex-1 m-2">
@@ -100,7 +100,6 @@ export function BrandForm({ id }: { id: string }) {
 							</View>
 						)}
 						contentContainerStyle={{ paddingHorizontal: 8 }}
-						columnWrapperStyle={{ justifyContent: "space-between" }}
 						className="w-full"
 						scrollEnabled={false}
 					/>

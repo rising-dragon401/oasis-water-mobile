@@ -2,6 +2,7 @@ import axios from "axios";
 
 import { getFilterDetails } from "@/actions/filters";
 import { getItemDetails } from "@/actions/items";
+import { getLocationDetails } from "@/actions/locations";
 import { supabase } from "@/config/supabase";
 import { CATEGORIES } from "@/lib/constants/categories";
 
@@ -487,7 +488,9 @@ export const getNearestLocation = async (
 			}
 		}
 
-		return true;
+		const locationWithDetails = await getLocationDetails(nearestLocation.id);
+
+		return locationWithDetails;
 	} catch (error) {
 		console.error("Error fetching nearest location:", error);
 		return null;

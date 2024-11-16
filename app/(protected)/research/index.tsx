@@ -175,7 +175,7 @@ export default function ResearchScreen() {
 					<View className="px-8">
 						<StickyHeader
 							title="Lab testing"
-							description="Contribute to and follow product testing "
+							description="Track our latest product testing"
 							icon="plus"
 							// @ts-ignore
 							path="/contributeModal?kind=new_item"

@@ -25,8 +25,6 @@ type Props = {
 export function LocationForm({ id }: Props) {
 	const recommendedFilterRowRef = useRef<View>(null);
 
-	console.log("LocationForm", id);
-
 	const navigation = useNavigation();
 	const { uid } = useUserProvider();
 	const { iconColor } = useColorScheme();

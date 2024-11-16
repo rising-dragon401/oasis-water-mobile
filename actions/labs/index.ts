@@ -276,16 +276,6 @@ export const submitRequest = async ({
 	attachment?: string | null;
 	kind: "request_new_product" | "update_existing_product";
 }) => {
-	console.log("submitRequest", {
-		name,
-		productId,
-		productType,
-		userId,
-		message,
-		attachment,
-		kind,
-	});
-
 	const { data, error } = await supabase.from("contributions").insert([
 		{
 			name,

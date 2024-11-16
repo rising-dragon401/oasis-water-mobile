@@ -82,15 +82,15 @@ export default function BlurredLineItem({
 							<>
 								<P className="text-right text-lg text-muted-foreground">
 									{value}
-									<View
-										className="rounded-full"
-										style={{
-											width: 14,
-											height: 14,
-											backgroundColor: colorMark,
-										}}
-									/>
 								</P>
+								<View
+									className="rounded-full"
+									style={{
+										width: 14,
+										height: 14,
+										backgroundColor: colorMark,
+									}}
+								/>
 							</>
 						)}
 					</>

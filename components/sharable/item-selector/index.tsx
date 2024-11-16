@@ -30,7 +30,7 @@ const ItemSelector = ({
 
 	return (
 		<Search
-			placeholder="Search for a water, filter or location"
+			placeholder="Search"
 			setActive={setSearchActive}
 			overridePress={handleItemPress}
 			hideScan

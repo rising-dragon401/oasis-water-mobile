@@ -1,18 +1,18 @@
+import { Octicons } from "@expo/vector-icons";
+import { Link } from "expo-router";
+import { useState } from "react";
+
+import Typography from "../typography";
+
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuGroup,
 	DropdownMenuItem,
-	DropdownMenuLabel,
-	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useColorScheme } from "@/lib/useColorScheme";
-import { Octicons } from "@expo/vector-icons";
-import { Link } from "expo-router";
-import { useState } from "react";
-import Typography from "../typography";
 
 type Props = {
 	sources: any[];
@@ -26,11 +26,9 @@ export function ArticlesDropdown({ sources }: Props) {
 	return (
 		<DropdownMenu open={open} onOpenChange={setOpen}>
 			<DropdownMenuTrigger asChild>
-				<Button variant="outline" label="Research" />
+				<Button variant="ghost" label="Research" />
 			</DropdownMenuTrigger>
-			<DropdownMenuContent className="w-96" align="start">
-				<DropdownMenuLabel>Sources</DropdownMenuLabel>
-				<DropdownMenuSeparator />
+			<DropdownMenuContent className="w-96" align="end">
 				<DropdownMenuGroup>
 					{sources.map((source: any) => (
 						<DropdownMenuItem

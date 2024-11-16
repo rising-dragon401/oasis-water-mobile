@@ -24,6 +24,7 @@ type Props = {
 	showVotes?: boolean;
 	showTime?: boolean;
 	backPath?: string;
+	hideScore?: boolean;
 };
 
 const ItemPreviewCard = ({
@@ -36,6 +37,7 @@ const ItemPreviewCard = ({
 	showVotes = false,
 	showTime = false,
 	backPath = "",
+	hideScore = false,
 }: Props) => {
 	const { subscription } = useUserProvider();
 	const { mutedForegroundColor, accentColor } = useColorScheme();
@@ -248,7 +250,7 @@ const ItemPreviewCard = ({
 					</View>
 				)}
 
-				{variation !== "row" && (
+				{variation !== "row" && !hideScore && (
 					<View className="absolute top-2 right-2 z-10 mt-1 mr-1 p-1 px-2">
 						{subscription ? (
 							item.score ? (

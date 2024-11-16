@@ -1,5 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useGlobalSearchParams } from "expo-router";
+import { useGlobalSearchParams, usePathname } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { FlatList, TouchableOpacity, View } from "react-native";
 
@@ -37,6 +37,8 @@ export default function ProductTestingScreen() {
 		: global.status;
 	const type = Array.isArray(global.type) ? global.type[0] : global.type;
 
+	const pathname = usePathname();
+
 	const handlePageTitle = (status: string, type: string) => {
 		let testingStatus = "";
 		const thingName = "items";
@@ -66,44 +68,46 @@ export default function ProductTestingScreen() {
 	};
 
 	useEffect(() => {
-		const fetchData = async () => {
-			handlePageTitle(status, type);
+		if (pathname === "/research/view-all") {
+			const fetchData = async () => {
+				handlePageTitle(status, type);
 
-			let data;
+				let data;
 
-			switch (status) {
-				case "untested":
-					data = await fetchUntestedThings({
-						tables: ["items", "water_filters", "tap_water_locations"],
-						limit: 100,
-					});
+				switch (status) {
+					case "untested":
+						data = await fetchUntestedThings({
+							tables: ["items", "water_filters", "tap_water_locations"],
+							limit: 100,
+						});
 
-					break;
-				case "completed":
-					data = await fetchTestedThings({
-						tables: ["items", "water_filters", "tap_water_locations"],
-						limit: 100,
-					});
-					break;
-				case "in_progress":
-					data = await fetchInProgressThings({
-						type: ["bottled_water", "filter", "tap_water"],
-						limit: 1000,
-					});
+						break;
+					case "completed":
+						data = await fetchTestedThings({
+							tables: ["items", "water_filters", "tap_water_locations"],
+							limit: 100,
+						});
+						break;
+					case "in_progress":
+						data = await fetchInProgressThings({
+							type: ["bottled_water", "filter", "tap_water"],
+							limit: 1000,
+						});
 
-					break;
-				default:
-					data = await fetchInProgressThings({
-						type: ["bottled_water", "filter", "tap_water"],
-						limit: 1000,
-					});
-			}
+						break;
+					default:
+						data = await fetchInProgressThings({
+							type: ["bottled_water", "filter", "tap_water"],
+							limit: 1000,
+						});
+				}
 
-			setProducts(data);
-		};
+				setProducts(data);
+			};
 
-		fetchData();
-	}, [status, type]);
+			fetchData();
+		}
+	}, [pathname, status, type]);
 
 	const filteredProducts = products.filter(
 		(product) =>
@@ -212,6 +216,7 @@ export default function ProductTestingScreen() {
 							showVotes={status === "untested"}
 							showTime={status === "completed"}
 							backPath="research"
+							hideScore={pathname !== "/research/view-all"}
 						/>
 					</View>
 				)}

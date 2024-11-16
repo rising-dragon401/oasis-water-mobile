@@ -17,7 +17,7 @@ export default function ResearchLayout() {
 	// Determine back path
 	const backPath = Array.isArray(globalParams?.backPath)
 		? globalParams.backPath[0]
-		: globalParams?.backPath || "research";
+		: globalParams?.backPath || "";
 
 	return (
 		<Stack

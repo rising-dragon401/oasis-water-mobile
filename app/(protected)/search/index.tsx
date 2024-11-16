@@ -395,15 +395,15 @@ export default function TabOneScreen() {
 							contentContainerStyle={{
 								paddingLeft: 0,
 							}}
-							style={{ height: 100 }}
-							className="overflow-x-scroll"
+							// style={{ height: 80 }}
+							className="overflow-x-scroll "
 							renderItem={({ item: brand }) => (
 								<TouchableOpacity
 									key={brand.id}
 									onPress={() => {
 										router.push(`/search/brand/${brand.id}`);
 									}}
-									className="flex-col items-center justify-center gap-2 bg-card border border-border mr-6 rounded-full overflow-hidden w-20 h-20"
+									className="flex-col items-center justify-center gap-2 bg-card border border-border mr-8 flex rounded-full overflow-hidden w-20 h-20"
 								>
 									<Image
 										source={{
@@ -528,7 +528,7 @@ export default function TabOneScreen() {
 		{
 			key: "categories",
 			render: () => (
-				<View className="flex-1 flex-col w-full mt-2 z-10 min-w-full">
+				<View className="flex-1 flex-col w-full mt-6 z-10 min-w-full">
 					<View className="flex flex-row justify-between w-full items-center mb-2">
 						<H4 className="text-left">Top rated</H4>
 						<Link

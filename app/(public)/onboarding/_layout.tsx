@@ -1,7 +1,7 @@
-import OasisLogo from "@/assets/oasis-word.png";
 import { Image } from "expo-image";
 import { Stack } from "expo-router";
 
+import OasisLogo from "@/assets/oasis-word.png";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 function CustomHeader() {
@@ -14,11 +14,11 @@ export default function OnboardingLayout() {
 	return (
 		<Stack
 			screenOptions={{
-				// headerShown: true,
-				// headerBackTitle: "Search",
+				headerShown: true,
 				contentStyle: {
 					backgroundColor,
 				},
+				headerBackVisible: false,
 				headerStyle: {
 					backgroundColor,
 				},
@@ -30,7 +30,14 @@ export default function OnboardingLayout() {
 				headerShadowVisible: false,
 			}}
 		>
-			<Stack.Screen name="index" />
+			<Stack.Screen
+				options={{
+					headerShown: true,
+					headerTitle: () => <CustomHeader />,
+					headerBackVisible: false,
+				}}
+				name="index"
+			/>
 		</Stack>
 	);
 }

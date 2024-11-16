@@ -1,9 +1,10 @@
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { useRouter } from "expo-router";
+import { TouchableOpacity } from "react-native";
+
 import { P } from "@/components/ui/typography";
 import { theme } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
-import { Octicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { TouchableOpacity } from "react-native";
 
 export default function BackButton() {
 	const router = useRouter();
@@ -17,10 +18,10 @@ export default function BackButton() {
 			onPress={() => {
 				router.back();
 			}}
-			className="mb-3 flex flex-row items-center gap-2"
+			className="flex flex-row items-center gap-1"
 		>
-			<Octicons name="chevron-left" size={24} color={iconColor} />
-			<P className="self-start">back</P>
+			<Ionicons name="arrow-back" size={20} color={iconColor} />
+			<P className="text-base">Back</P>
 		</TouchableOpacity>
 	);
 }
