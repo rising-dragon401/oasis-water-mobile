@@ -4,6 +4,7 @@ import {
 	NativeSyntheticEvent,
 	RefreshControl,
 	ScrollView,
+	Text,
 	View,
 } from "react-native";
 
@@ -15,15 +16,23 @@ export default function CommunityPage() {
 	const [liveActions, setLiveActions] = useState<any[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [refreshing, setRefreshing] = useState(false);
-	const [limit, setLimit] = useState(25);
+	const [limit, setLimit] = useState(50);
+	const [error, setError] = useState<string | null>(null);
 
 	const fetchActions = useCallback(async () => {
 		setLoading(true);
-		const latestActions = await getLatestActions({ limit });
-		if (latestActions) {
-			setLiveActions((prevActions) => [...prevActions, ...latestActions]);
+		setError(null);
+		try {
+			const latestActions = await getLatestActions({ limit });
+			if (latestActions) {
+				setLiveActions((prevActions) => [...prevActions, ...latestActions]);
+			}
+		} catch (err) {
+			setError("Error fetching data: Network request failed");
+			console.error("Error fetching data:", err);
+		} finally {
+			setLoading(false);
 		}
-		setLoading(false);
 	}, [limit]);
 
 	useEffect(() => {
@@ -42,9 +51,9 @@ export default function CommunityPage() {
 				event.nativeEvent;
 			if (
 				layoutMeasurement.height + contentOffset.y >=
-				contentSize.height - 20
+				contentSize.height - 35
 			) {
-				setLimit((prevLimit) => prevLimit + 25);
+				setLimit((prevLimit) => prevLimit + 50);
 			}
 		},
 		[],
@@ -65,6 +74,12 @@ export default function CommunityPage() {
 		>
 			<StickyHeader title="Community" hideMargin />
 
+			{error && (
+				<View>
+					<Text>{error}</Text>
+				</View>
+			)}
+
 			<View className="h-4" />
 
 			<View className="flex flex-col gap-4">
@@ -79,6 +94,7 @@ export default function CommunityPage() {
 					))}
 
 				{!loading &&
+					!error &&
 					liveActions.map((action) => (
 						<View key={action.id}>
 							<CommunityActionCard {...action} />

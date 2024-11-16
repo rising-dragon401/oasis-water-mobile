@@ -197,7 +197,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 			const thisUserId = userId || session?.user?.id || null;
 			const thisRcCustomerId = rcCustomerId || userData?.rc_customer_id || null;
 
-			// console.log("thisUserId:", thisUserId);
+			console.log("thisUserId:", thisUserId);
 			// console.log("userData:", userData);
 			// console.log("thisRcCustomerId:", thisRcCustomerId);
 
@@ -211,6 +211,8 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 				thisUserId,
 				thisRcCustomerId,
 			);
+
+			console.log("checkSubscription: ", JSON.stringify(response, null, 2));
 
 			if (response && response?.apiStatus === 200) {
 				const status = response.data?.status;
@@ -244,7 +246,6 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
 	const fetchUserUpvoted = async (userId: string) => {
 		const upvoted = await getUserUpvoted(userId);
-		console.log("upvoted", upvoted);
 		setUserRequests(upvoted);
 	};
 

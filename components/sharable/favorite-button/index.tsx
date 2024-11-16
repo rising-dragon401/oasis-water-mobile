@@ -79,8 +79,6 @@ export default function FavoriteButton({ item, size = 18 }: Props) {
 			return;
 		}
 
-		console.log("item", JSON.stringify(item, null, 2));
-
 		setLoadingFavorite(true);
 
 		if (item.type === "tap_water") {

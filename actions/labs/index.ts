@@ -199,7 +199,7 @@ export const upvoteThing = async (
 	}
 
 	const { data: requestData, error: requestError } = await supabase
-		.from("requests")
+		.from("contributions")
 		.insert([
 			{
 				product_id: thingId,

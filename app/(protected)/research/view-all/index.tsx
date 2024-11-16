@@ -135,8 +135,10 @@ export default function ProductTestingScreen() {
 							{ITEM_TYPES.map((item, index) => (
 								<TouchableOpacity
 									key={item.id + index.toString()}
-									className={`border rounded-full border-muted px-2 py-1 my-2 ${
-										selected === item.typeId ? "border-muted border-2" : ""
+									className={`border rounded-full px-2 py-1 my-2 ${
+										selected === item.typeId
+											? "border-accent bg-accent"
+											: "border-muted"
 									}`}
 									style={{ alignSelf: "flex-start" }}
 									onPress={() =>
@@ -147,8 +149,8 @@ export default function ProductTestingScreen() {
 										<P
 											className={
 												selected === item.id
-													? "text-muted font-bold"
-													: "text-muted"
+													? "text-background font-bold"
+													: "text-foreground"
 											}
 										>
 											{item.categoryLabel}

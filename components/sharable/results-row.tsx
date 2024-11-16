@@ -25,7 +25,7 @@ export default function ResultsRow({
 	setResults,
 	showRequestItem = true,
 }: Props) {
-	const { colorScheme, mutedForegroundColor } = useColorScheme();
+	const { colorScheme, foregroundColor } = useColorScheme();
 	const router = useRouter();
 	const borderColor = colorScheme === "dark" ? "#333" : "#ddd";
 
@@ -49,11 +49,11 @@ export default function ResultsRow({
 
 	const renderItemIcon = (item: any) => {
 		let icon = ITEM_TYPES.find((itemObj) =>
-			itemObj.dbTypes.includes(item.typeId),
+			itemObj.dbTypes.includes(item.typeId || item.type),
 		)?.icon;
 
 		let categoryLabel = ITEM_TYPES.find((itemObj) =>
-			itemObj.dbTypes.includes(item.typeId),
+			itemObj.dbTypes.includes(item.typeId || item.type),
 		)?.categoryLabel;
 
 		if (item.type === "item") {
@@ -64,14 +64,12 @@ export default function ResultsRow({
 		return (
 			<View className="flex flex-row items-center gap-1">
 				{/* @ts-ignore */}
-				<Ionicons name={icon} size={10} color={mutedForegroundColor} />
+				<Ionicons name={icon} size={10} color={foregroundColor} />
 
-				<Muted className="text-xs">{categoryLabel}</Muted>
+				<Muted className="text-sm text-foreground">{categoryLabel}</Muted>
 			</View>
 		);
 	};
-
-	console.log("results", JSON.stringify(results, null, 2));
 
 	return (
 		<View
@@ -95,7 +93,7 @@ export default function ResultsRow({
 					elevation: 5,
 					maxHeight: 240,
 				}}
-				className="bg-input rounded-xl"
+				className="bg-card border border-border rounded-xl"
 			>
 				{noResults && showRequestItem ? (
 					<View className="flex justify-center pl-4 h-12">
@@ -147,7 +145,7 @@ export default function ResultsRow({
 											/>
 											<View className="flex flex-col">
 												<P
-													className="max-w-80 font-medium"
+													className="max-w-80"
 													numberOfLines={1}
 													ellipsizeMode="tail"
 												>

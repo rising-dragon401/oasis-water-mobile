@@ -2,7 +2,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { getFeaturedUsers } from "actions/admin";
 import { Image } from "expo-image";
 import { Link, usePathname, useRouter } from "expo-router";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
 	FlatList,
 	ImageBackground,
@@ -14,13 +14,13 @@ import {
 	getCategoryCounts,
 	getMostRecentlyUpdatedItems,
 } from "@/actions/admin";
+import { getFeaturedBrands } from "@/actions/companies";
 import RecsBg from "@/assets/recs-bg.png";
 import LocationCard from "@/components/cards/location-card";
 import ItemPreviewCard from "@/components/sharable/item-preview-card";
 import Search from "@/components/sharable/search";
 import Skeleton from "@/components/sharable/skeleton";
 import { H4, Muted, P, Small } from "@/components/ui/typography";
-import { BlogContext } from "@/context/blogs-provider";
 import { useUserProvider } from "@/context/user-provider";
 import { CATEGORIES } from "@/lib/constants/categories";
 import { useColorScheme } from "@/lib/useColorScheme";
@@ -68,34 +68,44 @@ export default function TabOneScreen() {
 	const router = useRouter();
 	const pathname = usePathname();
 	const { textSecondaryColor, mutedColor } = useColorScheme();
-	const { blogs } = useContext(BlogContext);
 
 	const [people, setPeople] = useState<any[]>([]);
 	const [loadingPeople, setLoadingPeople] = useState(false);
+	const [brands, setBrands] = useState<any[]>([]);
+	const [loadingBrands, setLoadingBrands] = useState(true);
 	const [searchInputActive, setSearchInputActive] = useState(false);
 	const [loadingCategoryData, setLoadingCategoryData] = useState(true);
 	const [categoryData, setCategoryData] = useState<any[]>([]);
 	const [recentlyUpdatedItems, setRecentlyUpdatedItems] = useState<any[]>([]);
 	const [loadingRecents, setLoadingRecents] = useState(true);
+	const [refreshing, setRefreshing] = useState(false);
+
+	const onRefresh = async () => {
+		setRefreshing(true);
+		await fetchData();
+		setRefreshing(false);
+	};
+
+	const fetchData = async () => {
+		await Promise.all([
+			getRecentlyUpdatedItems(),
+			// getPeople(),
+			getBrands(),
+			// refreshUserData(),
+		]);
+
+		const categoryCounts = await getCategoryCounts();
+		if (categoryCounts) {
+			setCategoryData(categoryCounts);
+		} else {
+			setCategoryData(CATEGORIES);
+		}
+		setLoadingCategoryData(false);
+
+		setLoadingRecents(false);
+	};
 
 	useEffect(() => {
-		const fetchData = async () => {
-			await Promise.all([
-				getRecentlyUpdatedItems(),
-				getPeople(),
-				// refreshUserData(),
-			]);
-
-			const categoryCounts = await getCategoryCounts();
-			if (categoryCounts) {
-				setCategoryData(categoryCounts);
-			} else {
-				setCategoryData(CATEGORIES);
-			}
-			setLoadingCategoryData(false);
-
-			setLoadingRecents(false);
-		};
 		fetchData();
 	}, []);
 
@@ -126,23 +136,12 @@ export default function TabOneScreen() {
 		setRecentlyUpdatedItems(data || []);
 	}
 
-	function handleCreateYourOwn() {
-		if (userData) {
-			router.push(`/search/oasis/${userData.id}`);
-		} else {
-			router.push("/sign-in");
-		}
+	async function getBrands() {
+		setLoadingBrands(true);
+		const data = await getFeaturedBrands();
+		setBrands(data || []);
+		setLoadingBrands(false);
 	}
-
-	const handleTapWaterPress = () => {
-		if (uid && userData?.tap_location_id) {
-			router.push(`/search/location/${userData?.location?.city}`);
-		} else if (uid) {
-			router.push("/locationModal");
-		} else {
-			router.push("/(public)/sign-up");
-		}
-	};
 
 	const sections = [
 		{
@@ -359,99 +358,65 @@ export default function TabOneScreen() {
 			),
 		},
 		{
-			key: "newsAndResearch",
+			key: "brands",
 			show: true,
 			render: () => (
-				<View className="w-full justify-start mt-6">
+				<View className="flex w-full justify-start mt-6 min-w-full">
 					<View className="flex flex-row justify-between w-full items-center mb-2">
-						<H4 className="text-left">News and research</H4>
-						<Link
-							href="/(protected)/search/articles"
-							className="flex flex-row items-center gap-2"
-						>
-							<Muted className="m-0 p-0">see all</Muted>
-						</Link>
+						<H4 className="text-left font-medium">Trending brands</H4>
+						{/* <Link href="/(protected)/search/brands">
+							<Ionicons
+								name="arrow-forward"
+								size={16}
+								color={textSecondaryColor}
+							/>
+						</Link> */}
 					</View>
-
-					{blogs.length === 0 ? (
+					{loadingBrands ? (
 						<FlatList
-							data={[1, 2, 3]}
+							data={[1, 2, 3]} // Placeholder items
 							horizontal
-							showsHorizontalScrollIndicator={false}
-							contentContainerStyle={{
-								paddingTop: 8,
-								paddingHorizontal: 0,
-							}}
-							className="overflow-x-scroll"
 							renderItem={() => (
-								<Skeleton
-									width={180}
-									height={120}
-									style={{
-										borderRadius: 8,
-										marginRight: 16,
-									}}
-								/>
+								<View className="mr-4">
+									<Skeleton
+										width={80}
+										height={80}
+										style={{ borderRadius: 99 }}
+									/>
+								</View>
 							)}
 							keyExtractor={(item) => item.toString()}
 						/>
 					) : (
 						<FlatList
-							data={blogs}
+							data={[...brands]}
 							horizontal
 							showsHorizontalScrollIndicator={false}
 							contentContainerStyle={{
-								paddingTop: 8,
-								paddingHorizontal: 0,
+								paddingLeft: 0,
 							}}
+							style={{ height: 100 }}
 							className="overflow-x-scroll"
-							renderItem={({ item }) => (
-								<Link
-									href={`/search/article/${item.id}`}
-									className="flex flex-col mr-4"
+							renderItem={({ item: brand }) => (
+								<TouchableOpacity
+									key={brand.id}
+									onPress={() => {
+										router.push(`/search/brand/${brand.id}`);
+									}}
+									className="flex-col items-center justify-center gap-2 bg-card border border-border mr-6 rounded-full overflow-hidden w-20 h-20"
 								>
-									<View style={{ width: 160 }}>
-										<View
-											style={{
-												width: 160,
-												height: 100,
-												borderRadius: 8,
-												overflow: "hidden",
-												position: "relative",
-											}}
-										>
-											<Image
-												source={{ uri: item.cover }}
-												alt={item.attributes.title}
-												style={{
-													width: "100%",
-													height: "100%",
-													borderRadius: 8,
-												}}
-											/>
-											<View
-												style={{
-													position: "absolute",
-													top: 0,
-													left: 0,
-													right: 0,
-													bottom: 0,
-													backgroundColor: "rgba(0,0,0,0.3)",
-													padding: 8,
-													justifyContent: "flex-end",
-												}}
-											>
-												<P
-													className="text-left text-white  text-sm"
-													numberOfLines={3}
-													ellipsizeMode="tail"
-												>
-													{item.attributes.title}
-												</P>
-											</View>
-										</View>
-									</View>
-								</Link>
+									<Image
+										source={{
+											uri: brand?.image,
+										}}
+										alt={brand?.name}
+										style={{
+											width: "100%",
+											height: "100%",
+										}}
+										contentFit="cover"
+									/>
+								</TouchableOpacity>
 							)}
 							keyExtractor={(item) => item.id}
 						/>
@@ -459,10 +424,111 @@ export default function TabOneScreen() {
 				</View>
 			),
 		},
+		// {
+		// 	key: "newsAndResearch",
+		// 	show: false,
+		// 	render: () => (
+		// 		<View className="w-full justify-start mt-6">
+		// 			<View className="flex flex-row justify-between w-full items-center mb-2">
+		// 				<H4 className="text-left">News and research</H4>
+		// 				<Link
+		// 					href="/(protected)/search/articles"
+		// 					className="flex flex-row items-center gap-2"
+		// 				>
+		// 					<Muted className="m-0 p-0">see all</Muted>
+		// 				</Link>
+		// 			</View>
+
+		// 			{blogs.length === 0 ? (
+		// 				<FlatList
+		// 					data={[1, 2, 3]}
+		// 					horizontal
+		// 					showsHorizontalScrollIndicator={false}
+		// 					contentContainerStyle={{
+		// 						paddingTop: 8,
+		// 						paddingHorizontal: 0,
+		// 					}}
+		// 					className="overflow-x-scroll"
+		// 					renderItem={() => (
+		// 						<Skeleton
+		// 							width={180}
+		// 							height={120}
+		// 							style={{
+		// 								borderRadius: 8,
+		// 								marginRight: 16,
+		// 							}}
+		// 						/>
+		// 					)}
+		// 					keyExtractor={(item) => item.toString()}
+		// 				/>
+		// 			) : (
+		// 				<FlatList
+		// 					data={blogs}
+		// 					horizontal
+		// 					showsHorizontalScrollIndicator={false}
+		// 					contentContainerStyle={{
+		// 						paddingTop: 8,
+		// 						paddingHorizontal: 0,
+		// 					}}
+		// 					className="overflow-x-scroll"
+		// 					renderItem={({ item }) => (
+		// 						<Link
+		// 							href={`/search/article/${item.id}`}
+		// 							className="flex flex-col mr-4"
+		// 						>
+		// 							<View style={{ width: 160 }}>
+		// 								<View
+		// 									style={{
+		// 										width: 160,
+		// 										height: 100,
+		// 										borderRadius: 8,
+		// 										overflow: "hidden",
+		// 										position: "relative",
+		// 									}}
+		// 								>
+		// 									<Image
+		// 										source={{ uri: item.cover }}
+		// 										alt={item.attributes.title}
+		// 										style={{
+		// 											width: "100%",
+		// 											height: "100%",
+		// 											borderRadius: 8,
+		// 										}}
+		// 									/>
+		// 									<View
+		// 										style={{
+		// 											position: "absolute",
+		// 											top: 0,
+		// 											left: 0,
+		// 											right: 0,
+		// 											bottom: 0,
+		// 											backgroundColor: "rgba(0,0,0,0.3)",
+		// 											padding: 8,
+		// 											justifyContent: "flex-end",
+		// 										}}
+		// 									>
+		// 										<P
+		// 											className="text-left text-white  text-sm"
+		// 											numberOfLines={3}
+		// 											ellipsizeMode="tail"
+		// 										>
+		// 											{item.attributes.title}
+		// 										</P>
+		// 									</View>
+		// 								</View>
+		// 							</View>
+		// 						</Link>
+		// 					)}
+		// 					keyExtractor={(item) => item.id}
+		// 				/>
+		// 			)}
+		// 		</View>
+		// 	),
+		// },
 		{
 			key: "categories",
 			render: () => (
-				<View className="flex-1 flex-col w-full mt-6 z-10 min-w-full">
+				<View className="flex-1 flex-col w-full mt-2 z-10 min-w-full">
 					<View className="flex flex-row justify-between w-full items-center mb-2">
 						<H4 className="text-left">Top rated</H4>
 						<Link
@@ -590,6 +656,8 @@ export default function TabOneScreen() {
 				showsVerticalScrollIndicator={false}
 				keyboardShouldPersistTaps="handled"
 				className="flex flex-col z-0"
+				refreshing={refreshing}
+				onRefresh={onRefresh}
 			/>
 		</View>
 	);

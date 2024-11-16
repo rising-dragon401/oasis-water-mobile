@@ -1,18 +1,28 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useGlobalSearchParams, useRouter } from "expo-router";
 import { TouchableOpacity } from "react-native";
 
+import HeaderBackButton from "@/components/sharable/header-back-button";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function ProfileLayout() {
 	const { backgroundColor, textColor } = useColorScheme();
 	const router = useRouter();
 
+	const globalParams = useGlobalSearchParams();
+
+	// Determine back path
+	const backPath = Array.isArray(globalParams?.backPath)
+		? globalParams.backPath[0]
+		: globalParams?.backPath || "";
+
 	return (
 		<Stack
 			screenOptions={{
 				headerShown: true,
 				headerBackTitle: "Profile",
+				headerLeft: ({ canGoBack }) =>
+					canGoBack && <HeaderBackButton backPath={backPath} />,
 				contentStyle: { backgroundColor },
 				headerStyle: { backgroundColor },
 				headerTitleStyle: { color: textColor },
@@ -42,8 +52,13 @@ export default function ProfileLayout() {
 				}}
 			/>
 
-			{/* Score screen */}
-			<Stack.Screen name="score/[id]" options={{ headerShown: true }} />
+			{/* Help screen */}
+			<Stack.Screen
+				name="help/index"
+				options={{ headerShown: true, headerTitle: "Help" }}
+			/>
+
+			{/* <Stack.Screen name="score/[id]" options={{ headerShown: true }} /> */}
 		</Stack>
 	);
 }

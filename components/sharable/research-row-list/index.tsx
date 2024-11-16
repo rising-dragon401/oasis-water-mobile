@@ -127,7 +127,7 @@ export const ResearchRowList = ({
 									<View className="flex flex-col items-end justify-start gap-2 h-full">
 										{label === "votes" && (
 											<View className="px-2 min-w-6 flex flex-row items-center justify-end rounded-full ">
-												<Muted className="!text-accent text-xs">
+												<Muted className="text-primary text-xs">
 													{item.test_request_count || 0}
 												</Muted>
 											</View>

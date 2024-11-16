@@ -2,32 +2,32 @@ import { Image } from "expo-image";
 import { useEffect, useState } from "react";
 import { FlatList, ScrollView, View } from "react-native";
 
-import { getCompanyAndProducts } from "@/actions/companies";
+import { getBrandAndProducts } from "@/actions/companies";
 import ItemPreviewCard from "@/components/sharable/item-preview-card";
 import Skeleton from "@/components/sharable/skeleton";
-import { H2, P } from "@/components/ui/typography";
+import { H2, Muted } from "@/components/ui/typography";
 import { BLUR_IMAGE_PLACEHOLDER } from "@/lib/constants/images";
 
-export function CompanyForm({ id }: { id: string }) {
+export function BrandForm({ id }: { id: string }) {
+	const [brand, setBrand] = useState<any>(null);
 	const [company, setCompany] = useState<any>(null);
 	const [products, setProducts] = useState<any>(null);
-	const [brands, setBrands] = useState<any>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
-		const fetchCompany = async () => {
-			const company = await getCompanyAndProducts(id);
-			if (company && company.length > 0) {
-				setCompany(company[0]);
-				setProducts(company[0].products);
-				setBrands(company[0].brands);
+		const fetchBrand = async () => {
+			const brand = await getBrandAndProducts(id);
+			if (brand) {
+				setBrand(brand);
+				setProducts(brand?.products);
+				setCompany(brand?.company);
 			} else {
-				setError("No company found");
+				setError("No brand found");
 			}
 			setLoading(false);
 		};
-		fetchCompany();
+		fetchBrand();
 	}, [id]);
 
 	if (loading) {
@@ -39,8 +39,7 @@ export function CompanyForm({ id }: { id: string }) {
 						height={160}
 						style={{ borderRadius: 8, marginBottom: 16 }}
 					/>
-					{/* <Skeleton width="75%" height={32} style={{ marginBottom: 16 }} />
-					<Skeleton width="100%" height={80} style={{ marginBottom: 16 }} /> */}
+
 					<View className="flex flex-row flex-wrap justify-between w-full gap-2">
 						{Array.from({ length: 4 }).map((_, index) => (
 							<Skeleton
@@ -67,38 +66,22 @@ export function CompanyForm({ id }: { id: string }) {
 	return (
 		<ScrollView contentContainerStyle={{ flexGrow: 1 }}>
 			<View className="p-5 rounded-lg flex flex-col items-center justify-start w-full">
-				{/* <Image
-					source={{ uri: company.image || BLUR_IMAGE_PLACEHOLDER }}
-					style={{
-						width: 72,
-						height: 72,
-						borderRadius: 10,
-						marginRight: 10,
-					}}
-					contentFit="cover"
-					className="rounded-md"
-					transition={1000}
-				/> */}
-
 				<View className="w-40 h-40 rounded-2xl mb-4 shadow-md flex overflow-hidden">
 					<Image
-						source={{ uri: company.image || BLUR_IMAGE_PLACEHOLDER }}
+						source={{ uri: brand?.image || BLUR_IMAGE_PLACEHOLDER }}
 						style={{ width: "100%", height: "100%" }}
 						contentFit="contain"
 					/>
 				</View>
 
-				<H2>{company?.name}</H2>
+				<H2>{brand?.name}</H2>
 				<View className="flex flex-row flex-wrap">
-					{brands?.map((brand: any) => (
-						<View className="bg-gray-100 rounded-md p-2 m-1">
-							<P>{brand.name}</P>
-						</View>
-					))}
+					<Muted>{brand?.companyName}</Muted>
 				</View>
-				{/* <Muted>{company?.brand}</Muted> */}
 
-				<P className="mb-4">{company.description}</P>
+				{/* <P className="mb-4">{company?.description}</P> */}
+
+				<View className="h-4" />
 
 				{products && products.length > 0 && (
 					<FlatList
@@ -107,7 +90,13 @@ export function CompanyForm({ id }: { id: string }) {
 						keyExtractor={(item) => item.id.toString()}
 						renderItem={({ item }) => (
 							<View className="flex-1 m-2">
-								<ItemPreviewCard item={item} />
+								<ItemPreviewCard
+									item={item}
+									showFavorite
+									isGeneralListing
+									variation="row"
+									imageHeight={80}
+								/>
 							</View>
 						)}
 						contentContainerStyle={{ paddingHorizontal: 8 }}

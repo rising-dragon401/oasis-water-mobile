@@ -90,11 +90,11 @@ export default function HelpScreen() {
 					<H3 className="text-left">Contact us</H3>
 					<P className="text-left">
 						We may be in the lab or out searching for the best water but we will
-						get back to you as soon as possible. Email hello@live-oasis.com for
-						the quickest response.
+						get back to you as soon as possible. For the quickest response
+						please email: hello@live-oasis.com.
 					</P>
 					<Button
-						variant="secondary"
+						variant="outline"
 						onPress={handleCopyEmail}
 						className="mt-4"
 						label={copyStatus}

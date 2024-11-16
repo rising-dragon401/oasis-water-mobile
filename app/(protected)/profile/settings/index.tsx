@@ -249,7 +249,7 @@ export default function SettingsScreen() {
 						<View className="flex flex-col gap-y-2 mt-6">
 							<P className="text-muted-foreground">Membership</P>
 
-							<View className="bg-muted p-4 rounded-xl border border-accent shadow-sm shadow-blue-500/50">
+							<View className="bg-card p-4 rounded-xl border border-border">
 								{subscription ? (
 									<>
 										<View className="flex flex-row items-center gap-x-1">
@@ -280,17 +280,18 @@ export default function SettingsScreen() {
 										</View>
 									</>
 								) : (
-									<View className="mt-2 flex flex-col items-center gap-y-2">
+									<View className="mt-2 flex flex-col items-center gap-0">
 										<View className="flex flex-row items-center gap-x-1 mb-4">
 											<P className="text-lg">Current plan:</P>
 											<P className="font-bold text-lg">Free</P>
 										</View>
-
-										<UpgradeButton />
+										<View className="px-4 w-full">
+											<UpgradeButton />
+										</View>
 
 										{!subscription && (
 											<Button
-												className="w-full"
+												className="w-full h-10"
 												variant="ghost"
 												label="Restore purchases"
 												loading={loadingRestorePurchases}
@@ -323,7 +324,7 @@ export default function SettingsScreen() {
 
 						<View className="flex flex-col gap-y-2 mt-6">
 							<P className="text-muted-foreground">Edit profile</P>
-							<View className="bg-muted p-4 rounded-xl border border-border">
+							<View className="bg-card p-4 rounded-xl border border-border flex flex-col items-end">
 								<View className="flex flex-col w-full space-y-4">
 									<Label nativeID="name" className="text-sm">
 										Name
@@ -375,13 +376,13 @@ export default function SettingsScreen() {
 											placeholder="username (don't include @)"
 											value={newReferralCode}
 											onChangeText={(text) => setNewReferralCode(text)}
-											className="w-full border border-border bg-background"
+											className="w-full"
 										/>
 									</View>
 								</View>
 
 								<Button
-									variant="secondary"
+									variant="outline"
 									loading={loading}
 									onPress={handleUpdateProfile}
 									className="w-36 mt-4"
@@ -506,22 +507,24 @@ export default function SettingsScreen() {
 							</View>
 						</View> */}
 
-						<View className="flex flex-col gap-y-2 mt-6">
+						<View className="flex flex-col gap-y-2 mt-6 ">
 							<P className="text-muted-foreground">Account</P>
-							<View className="bg-muted p-4 rounded-xl border border-border">
+							<View className="bg-card p-4 rounded-xl border border-border flex flex-col">
 								<Typography size="base" fontWeight="normal" className="mt-2">
 									Signed in as {user?.email}
 								</Typography>
-								<Button
-									className="w-40 mt-4"
-									variant="outline"
-									label="Sign Out"
-									onPress={logout}
-								/>
+								<View className="w-full flex flex-row justify-end">
+									<Button
+										className="w-40 mt-4"
+										variant="outline"
+										label="Sign Out"
+										onPress={logout}
+									/>
+								</View>
 							</View>
 						</View>
 
-						<View className="flex flex-col mt-10 pb-8 gap-y-2">
+						<View className="flex flex-col mt-24 pb-8 gap-y-2">
 							<Link
 								className="w-full mt-2 text-red-500 text-center"
 								// @ts-ignore

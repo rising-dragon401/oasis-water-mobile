@@ -18,18 +18,6 @@ import { Muted, P } from "@/components/ui/typography";
 import { theme } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
 
-const getAccordionTriggerStyle = (isOpen: boolean) => {
-	return `bg-card !border !border-border px-4 ${
-		isOpen ? "!rounded-t-2xl !border-b-0" : "!rounded-2xl"
-	}`;
-};
-
-const getAccordionContentStyle = (isOpen: boolean) => {
-	return `bg-card !border !border-border pb-4 px-4 ${
-		isOpen ? "!rounded-b-2xl !border-t-0" : "!rounded-lg"
-	}`;
-};
-
 export default function ProfileScreen() {
 	const { userScores, userData, subscription, tapScore, userFavorites } =
 		useUserProvider();
@@ -101,6 +89,18 @@ export default function ProfileScreen() {
 		} else {
 			return blurryBadge(name, type);
 		}
+	};
+
+	const getAccordionTriggerStyle = (isOpen: boolean) => {
+		return `bg-card border border-border px-4 ${
+			isOpen ? "rounded-t-2xl border-b-0" : "rounded-2xl"
+		}`;
+	};
+
+	const getAccordionContentStyle = (isOpen: boolean) => {
+		return `bg-card border border-border pb-4 px-4 ${
+			isOpen ? "rounded-b-2xl border-t-0" : "rounded-lg"
+		}`;
 	};
 
 	const renderAmount = (amount: number) => {
