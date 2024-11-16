@@ -70,9 +70,6 @@ export function ItemForm({ id }: Props) {
 		(contaminant: { name: string }) =>
 			contaminant.name.toLowerCase() === "fluoride",
 	);
-	const fluorideValue = fluorideContaminant
-		? `${fluorideContaminant.amount} ppm`
-		: "Not Detected";
 
 	const sortedContaminants = contaminants.sort(
 		(a: { exceedingLimit: number }, b: { exceedingLimit: number }) => {
@@ -88,10 +85,6 @@ export function ItemForm({ id }: Props) {
 				  item.packaging === "cardboard"
 				? "Some"
 				: "Minimal";
-
-	const harmfulIngredients = item.ingredients?.filter(
-		(ingredient: any) => ingredient.severity_score > 0,
-	);
 
 	const waterSource = (() => {
 		switch (item.water_source) {

@@ -23,7 +23,7 @@ import { SubscribeOnboarding } from "@/components/sharable/subscribe-onboarding"
 import { Button } from "@/components/ui/button";
 import * as ProgressPrimitive from "@/components/ui/progress";
 import { Switch } from "@/components/ui/switch";
-import { H1, Large, Muted, P } from "@/components/ui/typography";
+import { H1, Muted, P } from "@/components/ui/typography";
 import { useRevenueCat } from "@/context/revenue-cat-provider";
 import { useToast } from "@/context/toast-provider";
 import { useUserProvider } from "@/context/user-provider";
@@ -231,7 +231,7 @@ export default function OnboardingScreen() {
 				handleSubscribe();
 			},
 			loading: loadingPurchase,
-			submitButtonLabel: "Try for free 💧",
+			submitButtonLabel: "Try for free",
 			submitButtonStyles: "shadow-lg shadow-blue-500/50 bg-primary",
 			onSkip: null,
 			skipButtonLabel: "No thanks, continue with basic and view limited data",
@@ -501,11 +501,11 @@ export default function OnboardingScreen() {
 
 			{/* Continue Button pinned to bottom */}
 			<View className="px-8">
-				{currentStep === steps.length - 1 && (
+				{/* {currentStep === steps.length - 1 && (
 					<Large className="text-center font-semibold mb-6">
 						No payment due now
 					</Large>
-				)}
+				)} */}
 				<Button
 					onPress={() => handleNextStep(true)}
 					variant="default"

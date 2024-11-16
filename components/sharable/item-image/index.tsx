@@ -18,7 +18,7 @@ export default function ItemImage({
 	return (
 		<View
 			style={{ position: "relative", width: "100%", height: "100%" }}
-			className="rounded-xl shadow-lg shadow-muted/80 bg-white "
+			className="rounded-xl shadow-lg shadow-muted bg-card"
 		>
 			<Image
 				source={src}

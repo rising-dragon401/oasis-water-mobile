@@ -8,14 +8,14 @@ export const theme = {
 		accent: "#0D00F3",
 		border: "#D3D6D1",
 		input: "#f6f4f2",
-		secondary: "#9B9C9A",
+		secondary: "#F1F0ED",
 		accentForeground: "#FEFCF9",
+		foreground: "#9B9C9A",
+		muted: "#D3D6D1",
 
-		foreground: "hsl(20 14.3% 4.1%)",
 		popover: "hsl(30 4.2% 38.82%)",
 		"secondary-foreground": "hsl(40 13% 92.94%)",
 		"muted-foreground": "hsl(0 0% 45%)",
-		muted: "hsl(30 6% 93%)",
 		destructive: "hsl(0 84.2% 60.2%)",
 	},
 	dark: {

@@ -1,12 +1,14 @@
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React from "react";
 import { FlatList, TouchableOpacity, View } from "react-native";
 
 import { Muted, P } from "@/components/ui/typography";
+import { ITEM_TYPES } from "@/lib/constants/categories";
 import { placeHolderImageBlurHash } from "@/lib/constants/images";
 import { useColorScheme } from "@/lib/useColorScheme";
-import { determineLink, readableType } from "@/lib/utils";
+import { determineLink } from "@/lib/utils";
 
 type Props = {
 	results: any[];
@@ -23,12 +25,13 @@ export default function ResultsRow({
 	setResults,
 	showRequestItem = true,
 }: Props) {
-	const { colorScheme } = useColorScheme();
+	const { colorScheme, mutedForegroundColor } = useColorScheme();
 	const router = useRouter();
 	const borderColor = colorScheme === "dark" ? "#333" : "#ddd";
 
 	const handleRequestItem = () => {
-		router.push("/requestModal");
+		// @ts-ignore
+		router.push("/contributeModal?kind=new_item");
 	};
 
 	const handleItemPress = async (item: any) => {
@@ -43,6 +46,32 @@ export default function ResultsRow({
 			router.push(link);
 		}
 	};
+
+	const renderItemIcon = (item: any) => {
+		let icon = ITEM_TYPES.find((itemObj) =>
+			itemObj.dbTypes.includes(item.typeId),
+		)?.icon;
+
+		let categoryLabel = ITEM_TYPES.find((itemObj) =>
+			itemObj.dbTypes.includes(item.typeId),
+		)?.categoryLabel;
+
+		if (item.type === "item") {
+			icon = "water-outline";
+			categoryLabel = "Bottled water";
+		}
+
+		return (
+			<View className="flex flex-row items-center gap-1">
+				{/* @ts-ignore */}
+				<Ionicons name={icon} size={10} color={mutedForegroundColor} />
+
+				<Muted className="text-xs">{categoryLabel}</Muted>
+			</View>
+		);
+	};
+
+	console.log("results", JSON.stringify(results, null, 2));
 
 	return (
 		<View
@@ -124,7 +153,7 @@ export default function ResultsRow({
 												>
 													{result.name}
 												</P>
-												<Muted>{readableType(result.type)}</Muted>
+												{renderItemIcon(result)}
 											</View>
 										</View>
 									</View>

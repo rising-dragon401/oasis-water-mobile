@@ -32,7 +32,7 @@ export const ResearchRowList = ({
 	label?: "votes" | "dates" | null;
 	showVotes?: boolean;
 }) => {
-	const { mutedColor, mutedForegroundColor } = useColorScheme();
+	const { mutedForegroundColor } = useColorScheme();
 	const router = useRouter();
 	// Define styles based on size
 	const sizeStyles = {
@@ -58,8 +58,6 @@ export const ResearchRowList = ({
 			iconSize: 18,
 		},
 	}[size];
-
-	const typeLabel = ITEM_TYPES.find((item) => item.id === type)?.name;
 
 	// Limit the data array if limitItems is provided
 	const limitedData = Array.isArray(data)
@@ -167,7 +165,7 @@ export const ResearchRowList = ({
 						elevation: 5, // Elevation for Android
 					}}
 				>
-					<P className="text-sm text-center text-secondary">View all</P>
+					<P className="text-sm text-center">View all</P>
 				</TouchableOpacity>
 			</View>
 			{/* )} */}

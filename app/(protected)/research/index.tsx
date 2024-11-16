@@ -177,7 +177,8 @@ export default function ResearchScreen() {
 							title="Lab testing"
 							description="Contribute to and follow product testing "
 							icon="plus"
-							path="/requestModal"
+							// @ts-ignore
+							path="/contributeModal?kind=new_item"
 						/>
 
 						<Tabs value={tabValue} onValueChange={setTabValue} className="mt-4">
@@ -186,7 +187,7 @@ export default function ResearchScreen() {
 									<P
 										className={`${
 											tabValue === "untested"
-												? "text-secondary-foreground"
+												? "!font-semibold text-background"
 												: "text-primary"
 										}`}
 									>
@@ -197,7 +198,7 @@ export default function ResearchScreen() {
 									<P
 										className={`${
 											tabValue === "in_progress"
-												? "text-secondary-foreground"
+												? "!font-semibold text-background"
 												: "text-primary"
 										}`}
 									>
@@ -208,7 +209,7 @@ export default function ResearchScreen() {
 									<P
 										className={`${
 											tabValue === "completed"
-												? "text-secondary-foreground"
+												? "!font-semibold text-background"
 												: "text-primary"
 										}`}
 									>
@@ -223,7 +224,7 @@ export default function ResearchScreen() {
 											<Skeleton
 												key={index}
 												width="100%"
-												height={40}
+												height={50}
 												style={{ borderRadius: 8 }}
 											/>
 										))}

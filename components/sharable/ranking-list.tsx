@@ -548,7 +548,10 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 							<Button
 								label="Request a product"
 								variant="outline"
-								onPress={() => router.push("/requestModal")}
+								onPress={() =>
+									// @ts-ignore
+									router.push("/contributeModal?kind=new_item")
+								}
 								className="mt-4 !h-16"
 							/>
 						}

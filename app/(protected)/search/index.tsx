@@ -64,11 +64,10 @@ const FEATURED_LOCATIONS = [
 ];
 
 export default function TabOneScreen() {
-	const { userData, subscription, uid, refreshUserData, tapScore, userScores } =
-		useUserProvider();
+	const { userData, subscription, uid } = useUserProvider();
 	const router = useRouter();
 	const pathname = usePathname();
-	const { textSecondaryColor, mutedForegroundColor } = useColorScheme();
+	const { textSecondaryColor, mutedColor } = useColorScheme();
 	const { blogs } = useContext(BlogContext);
 
 	const [people, setPeople] = useState<any[]>([]);
@@ -197,13 +196,13 @@ export default function TabOneScreen() {
 			render: () => (
 				<View className="flex-col w-full z-10 mt-6">
 					<View className="flex flex-row justify-between w-full items-center mb-2">
-						<H4 className="text-left">Recently updated</H4>
-						{/* <Link
-							href="/(protected)/search/top-rated-all"
+						<H4 className="text-left">Recently tested</H4>
+						<Link
+							href="/(protected)/research"
 							className="flex flex-row items-center gap-2"
 						>
-							<Muted className="text-center m-0 p-0">explore all</Muted>
-						</Link> */}
+							<Muted className="text-center m-0 p-0">see all</Muted>
+						</Link>
 					</View>
 					<View className="">
 						{loadingRecents ? (
@@ -363,7 +362,7 @@ export default function TabOneScreen() {
 			key: "newsAndResearch",
 			show: true,
 			render: () => (
-				<View className="w-full justify-start mt-2">
+				<View className="w-full justify-start mt-6">
 					<View className="flex flex-row justify-between w-full items-center mb-2">
 						<H4 className="text-left">News and research</H4>
 						<Link
@@ -464,7 +463,7 @@ export default function TabOneScreen() {
 			key: "categories",
 			render: () => (
 				<View className="flex-1 flex-col w-full mt-6 z-10 min-w-full">
-					<View className="flex flex-row justify-between w-full items-center mb-4">
+					<View className="flex flex-row justify-between w-full items-center mb-2">
 						<H4 className="text-left">Top rated</H4>
 						<Link
 							href="/(protected)/search/top-rated-all"
@@ -473,8 +472,9 @@ export default function TabOneScreen() {
 							<Muted className="m-0 p-0">see all</Muted>
 						</Link>
 					</View>
-					<View className="flex flex-col gap-4 w-full bg-card rounded-xl border border-border">
-						{loadingCategoryData ? (
+
+					{loadingCategoryData ? (
+						<View className="flex flex-col gap-4 w-full">
 							<FlatList
 								data={[1, 2, 3, 4, 5, 6]}
 								renderItem={() => (
@@ -488,52 +488,52 @@ export default function TabOneScreen() {
 								)}
 								keyExtractor={(item) => item.toString()}
 							/>
-						) : (
-							<>
-								<FlatList
-									data={categoryData.sort(
-										(a, b) => (b.is_new ? 1 : 0) - (a.is_new ? 1 : 0),
-									)}
-									keyExtractor={(item, index) => item.id + index.toString()}
-									renderItem={({ item: category }) => (
-										<View
-											className="flex justify-center rounded-2xl border-b border-muted"
-											style={{ maxHeight: 60, width: "100%" }}
-										>
-											<Link href={`/search/top-rated/${category.id}`}>
-												<View className="flex flex-row items-center px-4 justify-between w-full">
-													<View className="flex flex-row items-center gap-4">
-														<View className="rounded-full overflow-hidden ">
-															<Image
-																source={{ uri: category.image }}
-																alt={category.title}
-																style={{
-																	width: 36,
-																	height: 36,
-																}}
-																contentFit="cover"
-															/>
-														</View>
-														<View className="flex flex-col gap-1 h-full">
-															<P className=" text-xl">{category.title}</P>
-														</View>
-													</View>
-													<View className="flex flex-col justify-end items-center gap-2 h-full mr-2">
-														<Ionicons
-															name="chevron-forward"
-															size={18}
-															color={mutedForegroundColor}
+						</View>
+					) : (
+						<View className="flex flex-col gap-4 w-full bg-card rounded-xl border border-border">
+							<FlatList
+								data={categoryData.sort(
+									(a, b) => (b.is_new ? 1 : 0) - (a.is_new ? 1 : 0),
+								)}
+								keyExtractor={(item, index) => item.id + index.toString()}
+								renderItem={({ item: category }) => (
+									<View
+										className="flex justify-center rounded-2xl border-b border-muted"
+										style={{ maxHeight: 60, width: "100%" }}
+									>
+										<Link href={`/search/top-rated/${category.id}`}>
+											<View className="flex flex-row items-center px-4 justify-between w-full">
+												<View className="flex flex-row items-center gap-4">
+													<View className="rounded-full overflow-hidden ">
+														<Image
+															source={{ uri: category.image }}
+															alt={category.title}
+															style={{
+																width: 36,
+																height: 36,
+															}}
+															contentFit="cover"
 														/>
-														<View className="h-3" />
+													</View>
+													<View className="flex flex-col gap-1 h-full">
+														<P className=" text-xl">{category.title}</P>
 													</View>
 												</View>
-											</Link>
-										</View>
-									)}
-								/>
-							</>
-						)}
-					</View>
+												<View className="flex flex-col justify-end items-center gap-2 h-full mr-2">
+													<Ionicons
+														name="chevron-forward"
+														size={18}
+														color={mutedColor}
+													/>
+													<View className="h-3" />
+												</View>
+											</View>
+										</Link>
+									</View>
+								)}
+							/>
+						</View>
+					)}
 				</View>
 			),
 		},

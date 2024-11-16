@@ -7,7 +7,7 @@ import { Alert, ScrollView, View } from "react-native";
 
 import OasisIcon from "@/assets/oasis-icon.png";
 import { Button } from "@/components/ui/button";
-import { H2, Large, Muted, P } from "@/components/ui/typography";
+import { H2, Muted, P } from "@/components/ui/typography";
 import { useRevenueCat } from "@/context/revenue-cat-provider";
 import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
@@ -138,15 +138,15 @@ export default function SubscribeModal() {
 				{/* Subscribe Button Section */}
 				<View className="w-full flex-col items-center mt-auto justify-center max-w-md px-4">
 					<View className="flex flex-col w-full items-center">
-						<Large className="text-center font-semibold mb-6">
+						{/* <Large className="text-center font-semibold mb-6">
 							No payment due now
-						</Large>
+						</Large> */}
 						{/* mt-auto pushes this section to the bottom */}
 						<Button
 							className="w-full !max-w-sm !h-20 mb-2 0"
 							textClassName="!text-lg"
 							variant="default"
-							label="Try for free 💧"
+							label="Try for free"
 							loading={loading}
 							onPress={() => handleSubscribe()}
 						/>

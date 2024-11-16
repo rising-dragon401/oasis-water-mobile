@@ -29,11 +29,12 @@ export default function Score({
 	const { subscription } = useUserProvider();
 	const {
 		textColor,
+		mutedForegroundColor,
 		secondaryColor,
 		greenColor,
 		yellowColor,
 		redColor,
-		neutralColor,
+		accentColor,
 	} = useColorScheme();
 	const showToast = useToast();
 
@@ -167,7 +168,7 @@ export default function Score({
 				<View className="absolute flex-1 flex-col justify-center items-center">
 					<P>Score:</P>
 					<View className="flex-1 flex-row items-center gap-2">
-						<Octicons name="lock" size={16} color={textColor} />
+						<Octicons name="lock" size={16} color={accentColor} />
 						<Muted>/ 100</Muted>
 					</View>
 				</View>
@@ -217,7 +218,11 @@ export default function Score({
 					</P>
 				) : (
 					<View className="flex flex-row gap-1">
-						<Feather name="alert-triangle" size={18} color={secondaryColor} />
+						<Feather
+							name="alert-triangle"
+							size={18}
+							color={mutedForegroundColor}
+						/>
 						<P>/ 100</P>
 					</View>
 				)}

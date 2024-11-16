@@ -73,7 +73,7 @@ export function FileUpload({ file, setFile }: FileUploadProps) {
 	return (
 		<TouchableOpacity
 			onPress={onFileChange}
-			className="bg-muted border border-border rounded-xl px-4 py-2 w-full flex flex-row items-center gap-2 m-1"
+			className="bg-card border border-border rounded-xl px-4 py-2 w-full flex flex-row items-center gap-2 m-1"
 		>
 			<Feather name="paperclip" size={18} color={mutedForegroundColor} />
 

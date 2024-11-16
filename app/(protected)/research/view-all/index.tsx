@@ -173,7 +173,8 @@ export default function ProductTestingScreen() {
 				description={subTitle}
 				hideMargin
 				icon="plus"
-				path="requestModal"
+				// @ts-ignore
+				path="/contributeModal?kind=new_item"
 			/>
 			<View className="h-2" />
 			<View className="flex flex-row items-center justify-between ">

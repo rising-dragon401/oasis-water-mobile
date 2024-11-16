@@ -1,8 +1,8 @@
 import Feather from "@expo/vector-icons/Feather";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image } from "expo-image";
-import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import {
 	Keyboard,
 	KeyboardAvoidingView,
@@ -25,18 +25,25 @@ import { useToast } from "@/context/toast-provider";
 import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
 
-export default function RequestModal() {
+export default function ContributeModal() {
 	const { uid } = useUserProvider();
 	const { mutedForegroundColor } = useColorScheme();
 	const showToast = useToast();
 	const router = useRouter();
 
-	const [tabValue, setTabValue] = useState("existing");
+	const params = useLocalSearchParams<{ kind?: string }>();
+	const { kind } = params;
+
+	const [tabValue, setTabValue] = useState(kind || "existing");
 	const [selectedItems, setSelectedItems] = useState<any[]>([]);
 	const [message, setMessage] = useState("");
 	const [productName, setProductName] = useState("");
 	const [fileUrl, setFileUrl] = useState<string | null>(null);
 	const [loadingSubmit, setLoadingSubmit] = useState(false);
+
+	useEffect(() => {
+		setTabValue(kind || "existing");
+	}, [kind]);
 
 	async function handleSubmit() {
 		const thisName =
@@ -88,7 +95,7 @@ export default function RequestModal() {
 				style={{ flex: 1 }}
 				behavior={Platform.OS === "ios" ? "padding" : "height"}
 			>
-				<View className="pt-8 px-8 flex-1 pb-16 justify-between">
+				<View className="pt-4 px-8 flex-1 pb-16 justify-between">
 					<View className="flex flex-col">
 						<View className="flex flex-col justify-between items-center text-center">
 							<Feather name="globe" size={36} color="black" className="mb-4" />
@@ -105,7 +112,7 @@ export default function RequestModal() {
 									<P
 										className={`${
 											tabValue === "existing"
-												? "!text-secondary-foreground !font-semibold"
+												? "!font-semibold text-background"
 												: "text-primary"
 										}`}
 									>
@@ -116,7 +123,7 @@ export default function RequestModal() {
 									<P
 										className={`${
 											tabValue === "new_item"
-												? "!text-secondary-foreground !font-semibold"
+												? "!font-semibold text-background"
 												: "text-primary"
 										}`}
 									>
@@ -124,10 +131,10 @@ export default function RequestModal() {
 									</P>
 								</TabsTrigger>
 							</TabsList>
-							<TabsContent value="existing" className="">
+							<TabsContent value="existing" className="mt-2">
 								<View className="flex flex-col w-full space-y-4 z-50">
 									<Label nativeID="item" className="text-sm">
-										Which item?
+										Select item
 									</Label>
 									<View className="flex flex-row w-full gap-2">
 										{!selectedItems.length ? (
@@ -176,7 +183,7 @@ export default function RequestModal() {
 											placeholder="Let us know"
 											value={message}
 											onChangeText={setMessage}
-											className="w-full bg-muted"
+											className="w-full"
 										/>
 									</View>
 								</View>
@@ -193,14 +200,14 @@ export default function RequestModal() {
 							<TabsContent value="new_item">
 								<View className="flex flex-col w-full space-y-4">
 									<Label nativeID="name" className="text-sm">
-										Product or location name
+										What are we missing?
 									</Label>
 									<View className="flex flex-row w-full gap-2">
 										<Input
 											placeholder="Name"
 											value={productName}
 											onChangeText={(text) => setProductName(text)}
-											className="w-full border border-border bg-muted"
+											className="w-full"
 										/>
 									</View>
 								</View>
@@ -214,7 +221,7 @@ export default function RequestModal() {
 											placeholder="Message"
 											value={message}
 											onChangeText={setMessage}
-											className="w-full bg-muted"
+											className="w-full d"
 										/>
 									</View>
 								</View>

@@ -38,7 +38,7 @@ const ItemPreviewCard = ({
 	backPath = "",
 }: Props) => {
 	const { subscription } = useUserProvider();
-	const { mutedForegroundColor } = useColorScheme();
+	const { mutedForegroundColor, accentColor } = useColorScheme();
 	const router = useRouter();
 
 	// show if listed in top-rate or preview list but not on favorites page
@@ -135,7 +135,7 @@ const ItemPreviewCard = ({
 			<View
 				className={`relative w-full flex rounded-2xl ${
 					variation === "row" ? "flex-row gap-2 px-2 py-2 " : "flex-col"
-				}  bg-card pt-4 border border-border`}
+				}  bg-card pt-2 border border-border`}
 			>
 				<View
 					className={`flex justify-center items-center ${
@@ -236,8 +236,7 @@ const ItemPreviewCard = ({
 							)
 						) : (
 							<View className="flex flex-row items-center gap-1">
-								<Octicons name="lock" size={14} color={mutedForegroundColor} />
-								<Muted>/ 100</Muted>
+								<Octicons name="lock" size={14} color={accentColor} />
 							</View>
 						)}
 					</View>
@@ -250,7 +249,7 @@ const ItemPreviewCard = ({
 				)}
 
 				{variation !== "row" && (
-					<View className="absolute top-2 right-2 z-10 mt-1 p-1 px-2">
+					<View className="absolute top-2 right-2 z-10 mt-1 mr-1 p-1 px-2">
 						{subscription ? (
 							item.score ? (
 								renderScore()
@@ -266,8 +265,7 @@ const ItemPreviewCard = ({
 							)
 						) : (
 							<View className="flex flex-row items-center gap-1">
-								<Octicons name="lock" size={14} color={mutedForegroundColor} />
-								<Muted>/ 100</Muted>
+								<Octicons name="lock" size={14} color={accentColor} />
 							</View>
 						)}
 					</View>

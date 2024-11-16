@@ -21,7 +21,10 @@ function ReportHeader() {
 	const router = useRouter();
 
 	return (
-		<TouchableOpacity onPress={() => router.push("/requestModal")}>
+		<TouchableOpacity
+			// @ts-ignore
+			onPress={() => router.push("/contributeModal?kind=existing")}
+		>
 			<Ionicons name="alert-circle-outline" size={24} color="black" />
 		</TouchableOpacity>
 	);

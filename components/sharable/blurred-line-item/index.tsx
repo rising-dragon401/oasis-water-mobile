@@ -1,5 +1,4 @@
 import { Feather } from "@expo/vector-icons";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { useUserProvider } from "context/user-provider";
 import { useRouter } from "expo-router";
 import { TouchableOpacity, View } from "react-native";
@@ -74,20 +73,26 @@ export default function BlurredLineItem({
 				) : (
 					<>
 						{untested ? (
-							<Ionicons name="help" size={16} color={mutedForegroundColor} />
+							<Feather
+								name="alert-triangle"
+								size={18}
+								color={mutedForegroundColor}
+							/>
 						) : (
-							<P className="text-right text-lg text-muted-foreground">
-								{value}
-							</P>
+							<>
+								<P className="text-right text-lg text-muted-foreground">
+									{value}
+									<View
+										className="rounded-full"
+										style={{
+											width: 14,
+											height: 14,
+											backgroundColor: colorMark,
+										}}
+									/>
+								</P>
+							</>
 						)}
-						<View
-							className="rounded-full"
-							style={{
-								width: 14,
-								height: 14,
-								backgroundColor: colorMark,
-							}}
-						/>
 					</>
 				)}
 			</View>

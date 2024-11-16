@@ -10,12 +10,11 @@
 		--accent: #0d00f3;
 		--border: #d3d6d1;
 		--input: #f6f4f2;
-		--secondary: #9b9c9a;
+		--secondary: #f1f0ed;
+		--foreground: #9b9c9a;
+		--muted: #d3d6d1;
 
-		--foreground: 20 14.3% 4.1%; /* light.foreground */
 		--popover: 30 4.2% 38.82%; /* light.popover */
-		--secondary: 30 4.2% 38.82%; /* light.secondary */
-		--muted: 30 6% 93%; /* light.muted */
 		--muted-foreground: 0 0% 45%; /* light.muted-foreground */
 		--secondary-foreground: 40 13% 92.94%; /* light.secondary-foreground */
 		--destructive: 0 84.2% 60.2%; /* light.destructive */

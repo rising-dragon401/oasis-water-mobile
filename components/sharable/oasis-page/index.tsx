@@ -166,7 +166,7 @@ export default function OasisPage({
 					<TabsList className="mb-1">
 						<TabsTrigger value="all">
 							<P
-								className={`${tabValue === "all" ? "text-secondary-foreground font-medium" : ""}`}
+								className={`${tabValue === "all" ? "!font-semibold text-background" : ""}`}
 							>
 								All
 							</P>
@@ -177,7 +177,7 @@ export default function OasisPage({
 							className={`${(waterFavorites && waterFavorites.length > 0) || isAuthUser ? "" : "!hidden"}`}
 						>
 							<P
-								className={`${tabValue === "waters" ? "text-secondary-foreground font-medium" : ""}`}
+								className={`${tabValue === "waters" ? "!font-semibold text-background" : ""}`}
 							>
 								Waters
 							</P>
@@ -192,7 +192,7 @@ export default function OasisPage({
 							}`}
 						>
 							<P
-								className={`${tabValue === "filters" ? "text-secondary-foreground font-medium" : ""}`}
+								className={`${tabValue === "filters" ? "!font-semibold text-background" : ""}`}
 							>
 								Filters
 							</P>

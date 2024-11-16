@@ -185,7 +185,7 @@ function RootLayout() {
 												}}
 											/>
 											<Stack.Screen
-												name="requestModal"
+												name="contributeModal"
 												options={{
 													headerShown: true,
 													headerTitle: "Contribute to Oasis",

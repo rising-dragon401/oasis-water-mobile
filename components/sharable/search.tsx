@@ -43,7 +43,7 @@ export default function Search({
 	const [showSearchIcon, setShowSearchIcon] = useState(true);
 
 	const debouncedQuery = useDebounce(value, 400);
-	const { mutedForegroundColor, accentColor } = useColorScheme();
+	const { mutedForegroundColor, iconColor } = useColorScheme();
 	const router = useRouter();
 	const posthog = usePostHog();
 	const showToast = useToast();
@@ -199,7 +199,7 @@ export default function Search({
 						className="flex flex-row gap-4 z-20 items-center"
 						style={{ position: "absolute", left: 16 }}
 					>
-						<Feather name="search" size={20} color={accentColor} />
+						<Feather name="search" size={20} color={iconColor} />
 					</View>
 				) : (
 					<TouchableOpacity

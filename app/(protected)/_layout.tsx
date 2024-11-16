@@ -6,7 +6,7 @@ import { useSupabase } from "@/context/supabase-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function ProtectedLayout() {
-	const { backgroundColor, iconColor, textSecondaryColor } = useColorScheme();
+	const { backgroundColor, iconColor, foregroundColor } = useColorScheme();
 	const { user } = useSupabase();
 
 	useEffect(() => {
@@ -30,7 +30,7 @@ export default function ProtectedLayout() {
 					backgroundColor,
 				},
 				tabBarActiveTintColor: iconColor,
-				tabBarInactiveTintColor: textSecondaryColor,
+				tabBarInactiveTintColor: foregroundColor,
 				tabBarShowLabel: true,
 			})}
 		>
