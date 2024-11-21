@@ -1,7 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image } from "expo-image";
 import { Link, useRouter } from "expo-router";
-import { FlatList, TouchableOpacity, View } from "react-native";
+import { FlatList, View } from "react-native";
 
 import { Muted, P } from "@/components/ui/typography";
 import { ITEM_TYPES } from "@/lib/constants/categories";
@@ -22,14 +22,15 @@ export const ResearchRowList = ({
 		name: string;
 		type: string;
 		image: string;
-		test_request_count?: number;
+		raised_amount?: number;
+		total_cost?: number;
 		updated_at?: string;
 	}[];
 	limitItems?: number;
 	size?: "small" | "medium" | "large";
 	status?: string;
 	type?: string;
-	label?: "votes" | "dates" | null;
+	label?: "funding" | "dates" | null;
 	showVotes?: boolean;
 }) => {
 	const { mutedForegroundColor } = useColorScheme();
@@ -125,13 +126,20 @@ export const ResearchRowList = ({
 										</View>
 									</View>
 									<View className="flex flex-col items-end justify-start gap-2 h-full">
-										{label === "votes" && (
-											<View className="px-2 min-w-6 flex flex-row items-center justify-end rounded-full ">
-												<Muted className="text-primary text-xs">
-													{item.test_request_count || 0}
-												</Muted>
-											</View>
-										)}
+										{label === "funding" &&
+											(item?.raised_amount ?? 0) > 0 &&
+											(item?.total_cost ?? 0) > 0 && (
+												<View className="px-2 min-w-6 flex flex-row items-center justify-end rounded-full ">
+													<Muted className="text-primary text-xs">
+														{(
+															((item.raised_amount || 0) /
+																(item.total_cost || 1)) *
+															100
+														).toFixed(0)}
+														% raised
+													</Muted>
+												</View>
+											)}
 
 										{label === "dates" && (
 											<Muted className="text-xs">
@@ -152,7 +160,7 @@ export const ResearchRowList = ({
 			</View>
 
 			{/* {limitedData?.length < data?.length && ( */}
-			<View className="flex justify-center items-center mt-1">
+			{/* <View className="flex justify-center items-center mt-1">
 				<TouchableOpacity
 					// @ts-ignore
 					onPress={() => router.push(viewAllLink)}
@@ -167,7 +175,7 @@ export const ResearchRowList = ({
 				>
 					<P className="text-sm text-center">View all</P>
 				</TouchableOpacity>
-			</View>
+			</View> */}
 			{/* )} */}
 
 			{(!data || data?.length === 0) && (

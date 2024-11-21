@@ -1,7 +1,7 @@
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { FlatList, RefreshControl, View } from "react-native";
-import useSWR, { mutate } from "swr";
+import { FlatList, RefreshControl, TouchableOpacity, View } from "react-native";
+import { mutate } from "swr";
 
 import { getResearch } from "@/actions/admin";
 import {
@@ -11,10 +11,7 @@ import {
 	fetchUpcomingCategories,
 	upvoteCategory,
 } from "@/actions/labs";
-import { getUserUpvoted } from "@/actions/user";
-import NewCategoriesRow from "@/components/sharable/new-categories-row";
 import { ResearchRowList } from "@/components/sharable/research-row-list";
-import SectionHeader from "@/components/sharable/section-header";
 import Skeleton from "@/components/sharable/skeleton";
 import StickyHeader from "@/components/sharable/sticky-header";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -24,7 +21,7 @@ import { theme } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function ResearchScreen() {
-	const { colorScheme } = useColorScheme();
+	const { colorScheme, iconColor } = useColorScheme();
 	const { uid } = useUserProvider();
 	const params = useLocalSearchParams<{ defaultTab?: string }>();
 	const { defaultTab } = params;
@@ -42,11 +39,14 @@ export default function ResearchScreen() {
 	const [testedThings, setTestedThings] = useState<any[]>([]);
 	const [newCategories, setNewCategories] = useState<any[]>([]);
 	const [refreshing, setRefreshing] = useState(false);
+	const [untestedPage, setUntestedPage] = useState(1);
+	const [inProgressPage, setInProgressPage] = useState(1);
+	const [testedPage, setTestedPage] = useState(1);
 
 	const backgroundColor =
 		colorScheme === "dark" ? theme.dark.background : theme.light.background;
 
-	const userVotes = useSWR(`user-votes-${uid}`, () => getUserUpvoted(uid));
+	const limitItems = 10;
 
 	useEffect(() => {
 		const fetchResearch = async () => {
@@ -74,11 +74,11 @@ export default function ResearchScreen() {
 
 	const getUntestedItems = async () => {
 		const untested = await fetchUntestedThings({
-			tables: ["items", "water_filters", "tap_water_locations"],
-			limit: 10,
+			tables: ["items"],
+			limit: 15,
 		});
 
-		setUntestedThings(untested);
+		setUntestedThings(untested || []);
 
 		setLoading((prevState) => ({
 			...prevState,
@@ -93,7 +93,7 @@ export default function ResearchScreen() {
 		}));
 
 		const data = await fetchInProgressThings({
-			type: ["bottled_water", "filter", "tap_water"],
+			type: ["bottled_water"],
 			limit: 10,
 		});
 
@@ -113,7 +113,7 @@ export default function ResearchScreen() {
 
 		const data = await fetchTestedThings({
 			tables: ["items", "water_filters", "tap_water_locations"],
-			limit: 10,
+			limit: 15,
 		});
 
 		setTestedThings(data);
@@ -167,6 +167,48 @@ export default function ResearchScreen() {
 		setRefreshing(false);
 	};
 
+	const fetchMoreUntestedItems = async () => {
+		const newPage = untestedPage + 1;
+		const moreUntested = await fetchUntestedThings({
+			tables: ["items"],
+			limit: limitItems,
+			offset: newPage * limitItems,
+		});
+
+		if (moreUntested && moreUntested.length > 0) {
+			setUntestedThings((prev) => [...prev, ...moreUntested]);
+			setUntestedPage(newPage);
+		}
+	};
+
+	const fetchMoreInProgressItems = async () => {
+		const newPage = inProgressPage + 1;
+		const moreInProgress = await fetchInProgressThings({
+			type: ["bottled_water"],
+			limit: limitItems,
+			offset: newPage * limitItems,
+		});
+
+		if (moreInProgress && moreInProgress.length > 0) {
+			setInProgressThings((prev) => [...prev, ...moreInProgress]);
+			setInProgressPage(newPage);
+		}
+	};
+
+	const fetchMoreTestedItems = async () => {
+		const newPage = testedPage + 1;
+		const moreTested = await fetchTestedThings({
+			tables: ["items", "water_filters", "tap_water_locations"],
+			limit: limitItems,
+			offset: newPage * limitItems,
+		});
+
+		if (moreTested && moreTested.length > 0) {
+			setTestedThings((prev) => [...prev, ...moreTested]);
+			setTestedPage(newPage);
+		}
+	};
+
 	return (
 		<FlatList
 			data={[{ key: "content" }]}
@@ -174,11 +216,11 @@ export default function ResearchScreen() {
 				<View style={{ backgroundColor, paddingBottom: 100 }}>
 					<View className="px-8">
 						<StickyHeader
-							title="Lab testing"
-							description="Track our latest product testing"
+							title="Product testing"
+							description="Track our latest lab results"
 							icon="plus"
-							// @ts-ignore
 							path="/contributeModal?kind=new_item"
+							showContributions
 						/>
 
 						<Tabs value={tabValue} onValueChange={setTabValue} className="mt-4">
@@ -230,59 +272,85 @@ export default function ResearchScreen() {
 										))}
 									</View>
 								) : (
-									<ResearchRowList
-										data={untestedThings || []}
-										limitItems={6}
-										status={tabValue}
-										label="votes"
-										showVotes={tabValue === "untested"}
-									/>
+									<>
+										<ResearchRowList
+											data={untestedThings || []}
+											limitItems={untestedPage * 15}
+											status={tabValue}
+											size="large"
+											label="funding"
+											showVotes={tabValue === "untested"}
+										/>
+									</>
 								)}
-								<View className="mt-6">
-									<SectionHeader
-										title="New categories"
-										subtitle="Vote on new categories for lab testing"
-									/>
-
-									<View className="">
-										{loading.newCategories ? (
-											<View className="flex flex-row overflow-x-scroll">
-												{Array.from({ length: 6 }).map((_, index) => (
-													<Skeleton
-														key={index}
-														width={150}
-														height={100}
-														style={{ borderRadius: 8 }}
-													/>
-												))}
-											</View>
-										) : (
-											<NewCategoriesRow
-												data={newCategories || []}
-												handlePress={handleVoteForCategory}
-												userVotes={userVotes}
-											/>
-										)}
-									</View>
+								<View className="flex justify-center items-center mt-1 w-full">
+									<TouchableOpacity
+										onPress={fetchMoreUntestedItems}
+										disabled={loading.untested}
+										className="flex w-32 mt-2 bg-white rounded-full px-4 py-2 shadow-md"
+										style={{
+											shadowColor: "#000",
+											shadowOffset: { width: 0, height: 2 },
+											shadowOpacity: 0.3,
+											shadowRadius: 3.84,
+											elevation: 5,
+										}}
+									>
+										<P className="text-sm text-center">View more</P>
+									</TouchableOpacity>
 								</View>
 							</TabsContent>
 							<TabsContent value="in_progress" className="">
 								<ResearchRowList
 									data={inProgressThings || []}
-									limitItems={6}
+									limitItems={inProgressPage * 10}
 									status={tabValue}
 									label={null}
 									showVotes={tabValue === "in_progress"}
 								/>
+								{inProgressThings.length === inProgressPage * limitItems && (
+									<View className="flex justify-center items-center mt-1 w-full">
+										<TouchableOpacity
+											disabled={loading.inProgress}
+											onPress={fetchMoreInProgressItems}
+											className="flex w-32 mt-2 bg-white rounded-full px-4 py-2 shadow-md"
+											style={{
+												shadowColor: "#000",
+												shadowOffset: { width: 0, height: 2 },
+												shadowOpacity: 0.3,
+												shadowRadius: 3.84,
+												elevation: 5,
+											}}
+										>
+											<P className="text-sm text-center">View more</P>
+										</TouchableOpacity>
+									</View>
+								)}
 							</TabsContent>
 							<TabsContent value="completed" className="">
 								<ResearchRowList
 									data={testedThings || []}
-									limitItems={10}
+									limitItems={testedPage * 15}
 									status={tabValue}
 									label="dates"
 									showVotes={tabValue === "completed"}
 								/>
+								<View className="flex justify-center items-center mt-1 w-full">
+									<TouchableOpacity
+										onPress={fetchMoreTestedItems}
+										disabled={loading.tested}
+										className="flex w-32 mt-2 bg-white rounded-full px-4 py-2 shadow-md"
+										style={{
+											shadowColor: "#000",
+											shadowOffset: { width: 0, height: 2 },
+											shadowOpacity: 0.3,
+											shadowRadius: 3.84,
+											elevation: 5,
+										}}
+									>
+										<P className="text-sm text-center">View more</P>
+									</TouchableOpacity>
+								</View>
 							</TabsContent>
 						</Tabs>
 					</View>

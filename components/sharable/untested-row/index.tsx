@@ -1,4 +1,5 @@
 import Feather from "@expo/vector-icons/Feather";
+import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { View } from "react-native";
 
@@ -15,7 +16,7 @@ export default function UntestedRow({ thing }: { thing: any }) {
 	const { uid, refreshUserData } = useUserProvider();
 	const { iconColor } = useColorScheme();
 	const showToast = useToast();
-
+	const router = useRouter();
 	const [isUpvoted, setIsUpvoted] = useState(false);
 
 	useEffect(() => {
@@ -61,6 +62,13 @@ export default function UntestedRow({ thing }: { thing: any }) {
 				</View>
 
 				<Button
+					onPress={() => router.push(`/(protected)/research`)}
+					variant="outline"
+					label="Check status"
+					className="!h-10 !py-0"
+				/>
+
+				{/* <Button
 					onPress={handleUpvote}
 					variant={isUpvoted ? "outline" : "outline"}
 					disabled={isUpvoted}
@@ -73,7 +81,7 @@ export default function UntestedRow({ thing }: { thing: any }) {
 						/>
 					}
 					className="!h-10 !py-0"
-				/>
+				/> */}
 			</View>
 			<Muted>
 				This item does not have verified lab results, so its quality and safety

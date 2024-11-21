@@ -11,12 +11,14 @@ export default function StickyHeader({
 	path,
 	description,
 	hideMargin,
+	showContributions,
 }: {
 	title: string;
 	icon?: string;
 	path?: string;
 	description?: string;
 	hideMargin?: boolean;
+	showContributions?: boolean;
 }) {
 	const router = useRouter();
 	const { iconColor } = useColorScheme();
@@ -33,12 +35,25 @@ export default function StickyHeader({
 				{description && <Muted>{description}</Muted>}
 			</View>
 
-			<TouchableOpacity
-				onPress={() => path && router.push(path as any)}
-				className="!bg-transparent flex flex-row items-center gap-x-1"
-			>
-				<Feather name={icon as any} size={24} color={iconColor} />
-			</TouchableOpacity>
+			<View className="flex flex-row gap-x-4 items-center">
+				{showContributions && (
+					<TouchableOpacity
+						onPress={() =>
+							router.push("https://www.oasiswater.app/product-testing")
+						}
+						className="border border-accent rounded-full px-2 py-1 flex flex-row items-center gap-x-1"
+					>
+						<Muted className="text-accent">Contributions</Muted>
+					</TouchableOpacity>
+				)}
+
+				<TouchableOpacity
+					onPress={() => path && router.push(path as any)}
+					className="!bg-transparent flex flex-row items-center gap-x-1"
+				>
+					<Feather name={icon as any} size={24} color={iconColor} />
+				</TouchableOpacity>
+			</View>
 		</View>
 	);
 }

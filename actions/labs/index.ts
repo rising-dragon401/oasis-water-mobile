@@ -1,12 +1,143 @@
 import { supabase } from "@/config/supabase";
 import { ITEM_TYPES } from "@/lib/constants/categories";
 
+export const fetchFundingStatus = async ({
+	itemId,
+	type,
+	name,
+	createLab = true,
+}: {
+	itemId: any;
+	type: string;
+	name: string;
+	createLab: boolean;
+}) => {
+	console.log(
+		"fetching funding status for item",
+		itemId,
+		type,
+		name,
+		createLab,
+	);
+
+	if (!itemId || !type) {
+		return {
+			lab_id: null,
+			raised_amount: 0,
+			status: "not_started",
+			total_cost: 28500,
+			user_contributions: [],
+		};
+	}
+
+	const query = supabase
+		.from("labs")
+		.select("id, test_kit, raised_amount, is_funded, status")
+		.eq("product", itemId)
+		.eq("product_type", type);
+
+	const { data, error } = await query;
+
+	if (error) {
+		console.error("Error fetching funding status: ", error);
+	}
+
+	const labRow = data?.[0];
+
+	// create new lab row for standard water testing
+	if (!labRow && createLab) {
+		console.log("no lab row, creating new lab row");
+		// create new lab row for standard water testing
+		const { data: newLabData, error: newLabError } = await supabase
+			.from("labs")
+			.insert({
+				product: itemId,
+				product_type: type as any,
+				label: name + " - Standard Water Testing",
+				test_kit: 1,
+				status: "not_started",
+			})
+			.select();
+
+		if (newLabError) {
+			return {
+				lab_id: null,
+				raised_amount: 0,
+				status: "not_started",
+				total_cost: 28500, // assume all funding is for standard water testing for now (test kit id === 1)
+			};
+		}
+
+		const newLabRow = newLabData?.[0];
+
+		if (!newLabRow) {
+			throw new Error("Error creating new lab");
+		}
+
+		return {
+			lab_id: newLabRow?.id,
+			raised_amount: 0,
+			status: "not_started",
+			total_cost: 28500, // assume all funding is for standard water testing for now (test kit id === 1)
+		};
+	}
+
+	const testKit = labRow?.test_kit;
+
+	const { data: testKitData, error: testKitError } = await supabase
+		.from("test_kits")
+		.select("price")
+		.eq("id", testKit as any);
+
+	if (testKitError) {
+		throw new Error(`Error fetching test kit: ${testKitError.message}`);
+	}
+
+	if (labRow?.id) {
+		const { data: contributionsData, error: contributionsError } =
+			await supabase
+				.from("contributions")
+				.select("user_id, amount, users!inner(avatar_url, full_name, username)")
+				.eq("kind", "donation")
+				.eq("lab_id", labRow.id);
+
+		if (contributionsError) {
+			throw new Error(
+				`Error fetching contributors: ${contributionsError.message}`,
+			);
+		}
+
+		// Restructure contributions to include user details in the same object
+		const userContributions = contributionsData.map((contribution) => ({
+			user_id: contribution.user_id,
+			amount: contribution.amount,
+			avatar_url: contribution.users[0]?.avatar_url,
+			full_name: contribution.users[0]?.full_name,
+			username: contribution.users[0]?.username,
+		}));
+
+		const labDetails = {
+			lab_id: labRow.id,
+			raised_amount: labRow.raised_amount || 0,
+			status: labRow.status,
+			total_cost: testKitData?.[0]?.price || null,
+			user_contributions: userContributions,
+		};
+
+		return labDetails;
+	} else {
+		throw new Error("Lab ID is undefined");
+	}
+};
+
 export const fetchInProgressThings = async ({
 	type,
 	limit,
+	offset = 0,
 }: {
 	type?: string[];
 	limit: number;
+	offset?: number;
 }) => {
 	try {
 		let allItemDetails: any[] = [];
@@ -17,9 +148,10 @@ export const fetchInProgressThings = async ({
 					.from("labs")
 					.select("*")
 					.eq("status", "in_progress")
-					.eq("product_type", t);
+					.eq("product_type", t)
+					.range(offset, offset + limit - 1);
 
-				const { data, error } = await query.limit(limit);
+				const { data, error } = await query;
 
 				if (error) {
 					throw new Error(
@@ -62,9 +194,11 @@ export const fetchInProgressThings = async ({
 export const fetchTestedThings = async ({
 	tables,
 	limit,
+	offset = 0,
 }: {
 	tables: string[];
 	limit: number;
+	offset?: number;
 }) => {
 	try {
 		let allData: any[] = [];
@@ -74,9 +208,10 @@ export const fetchTestedThings = async ({
 				.from(table)
 				.select("id, name, image, updated_at, type")
 				.eq("is_indexed", true)
-				.order("updated_at", { ascending: true });
+				.order("updated_at", { ascending: true })
+				.range(offset, offset + limit - 1);
 
-			const { data, error } = await query.limit(limit);
+			const { data, error } = await query;
 
 			if (error) {
 				throw new Error(
@@ -103,25 +238,29 @@ export const fetchTestedThings = async ({
 export const fetchUntestedThings = async ({
 	tables,
 	limit,
+	offset = 0,
 }: {
 	tables: string[];
 	limit: number;
+	offset?: number;
 }) => {
 	try {
-		let allData: any[] = [];
+		const allData: any[] = [];
 
 		for (const table of tables) {
 			let query = supabase
 				.from(table)
-				.select("id, name, image, test_request_count, type")
+				.select("id, name, image, test_request_count, type, labs, is_indexed")
 				.eq("is_indexed", false)
-				.order("test_request_count", { ascending: true });
+				.order("lab_updated_at", { ascending: true })
+				.order("created_at", { ascending: true })
+				.range(offset, offset + limit - 1);
 
 			if (table === "items") {
 				query = query.in("type", ["bottled_water", "water_gallon"]);
 			}
 
-			const { data, error } = await query.limit(limit);
+			const { data, error } = await query;
 
 			if (error) {
 				throw new Error(
@@ -129,11 +268,37 @@ export const fetchUntestedThings = async ({
 				);
 			}
 
-			allData = allData.concat(data);
+			// Fetch funding status for each item
+			for (const item of data) {
+				const fundingStatus = await fetchFundingStatus({
+					itemId: item.id,
+					type: item.type,
+					name: item.name,
+					createLab: true,
+				});
+
+				if (!fundingStatus) {
+					return null;
+				}
+
+				allData.push({
+					...item,
+					raised_amount: fundingStatus.raised_amount,
+					total_cost: fundingStatus.total_cost,
+				});
+			}
 		}
 
-		// Sort the combined data by test_request_count in descending order
-		allData.sort((a, b) => b?.test_request_count - a?.test_request_count);
+		// Sort the combined data by raised_amount in descending order, then by updated_at or created_at
+		allData.sort((a, b) => {
+			if (b?.raised_amount !== a?.raised_amount) {
+				return b?.raised_amount - a?.raised_amount;
+			}
+			return (
+				new Date(b?.updated_at || b?.created_at).getTime() -
+				new Date(a?.updated_at || a?.created_at).getTime()
+			);
+		});
 
 		return allData;
 	} catch (error) {

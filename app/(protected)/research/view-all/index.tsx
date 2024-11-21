@@ -41,7 +41,6 @@ export default function ProductTestingScreen() {
 
 	const handlePageTitle = (status: string, type: string) => {
 		let testingStatus = "";
-		const thingName = "items";
 		let subTitle = "";
 
 		switch (status) {
@@ -102,7 +101,7 @@ export default function ProductTestingScreen() {
 						});
 				}
 
-				setProducts(data);
+				setProducts(data || []);
 			};
 
 			fetchData();
