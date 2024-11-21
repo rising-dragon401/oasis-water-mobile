@@ -9,15 +9,9 @@ import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function DeleteAccountModal() {
-	const { subscription, uid, logout } = useUserProvider();
+	const { uid, logout } = useUserProvider();
 	const router = useRouter();
 	const { iconColor } = useColorScheme();
-
-	// useEffect(() => {
-	// 	if (subscription) {
-	// 		router.back();
-	// 	}
-	// }, [subscription]);
 
 	const handleDeleteAccout = async () => {
 		if (!uid) return alert("User not found");

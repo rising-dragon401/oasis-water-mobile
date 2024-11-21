@@ -1,11 +1,14 @@
 import { Ionicons, Octicons } from "@expo/vector-icons";
-import { useUserProvider } from "context/user-provider";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React, { useMemo } from "react";
 import { TouchableOpacity, View } from "react-native";
 
+import ScoreIndicator from "./score-indicator";
+
 import { H4, Muted, P } from "@/components/ui/typography";
+import { useSubscription } from "@/context/subscription-provider";
+import { useUserProvider } from "@/context/user-provider";
 import { ITEM_TYPES } from "@/lib/constants/categories";
 import {
 	RANDOM_BLUR_IMAGES,
@@ -39,13 +42,24 @@ const ItemPreviewCard = ({
 	backPath = "",
 	hideScore = false,
 }: Props) => {
-	const { subscription } = useUserProvider();
+	const { userData } = useUserProvider();
+	const { hasActiveSub } = useSubscription(); // should not be calling this here lol
 	const { mutedForegroundColor, accentColor } = useColorScheme();
 	const router = useRouter();
 
+	const isItemUnlocked = useMemo(() => {
+		return userData?.unlock_history?.some((unlock: any) => {
+			return (
+				String(unlock.product_id) === String(item.id) &&
+				String(unlock.product_type) === String(item.type)
+			);
+		});
+	}, [userData, item.id, item.type]);
+
 	// show if listed in top-rate or preview list but not on favorites page
 	// unless subscribed or is the auth user
-	const showData = subscription || isAuthUser || isGeneralListing;
+	const showData =
+		hasActiveSub || isAuthUser || isGeneralListing || isItemUnlocked;
 
 	const randomBlurImage = useMemo(
 		() =>
@@ -94,29 +108,20 @@ const ItemPreviewCard = ({
 	};
 
 	const renderScore = () => {
-		if (subscription) {
-			let dotColor;
+		if (hasActiveSub || isItemUnlocked) {
+			let value: "ok" | "good" | "bad" = "ok";
 
 			if (item.score >= 80) {
-				dotColor = "bg-green-300";
+				value = "good";
 			} else if (item.score >= 50) {
-				dotColor = "bg-yellow-300";
-			} else if (item.score >= 0) {
-				dotColor = "bg-red-300";
+				value = "ok";
 			} else {
-				dotColor = "bg-gray-300";
+				value = "bad";
 			}
 
 			return (
-				<View className="flex flex-row items-center gap-2">
-					<View
-						style={{
-							width: 10,
-							height: 10,
-							borderRadius: 5,
-						}}
-						className={dotColor}
-					/>
+				<View className="flex flex-row items-center gap-1">
+					<ScoreIndicator value={value} width={2} height={2} />
 					<H4>{item.score}</H4>
 				</View>
 			);
@@ -223,7 +228,7 @@ const ItemPreviewCard = ({
 
 				{variation === "row" && !showVotes && (
 					<View className="absolute mt-4 right-4  z-10  rounded-full p-1 px-2">
-						{subscription ? (
+						{hasActiveSub || isItemUnlocked ? (
 							item.score ? (
 								renderScore()
 							) : (
@@ -252,7 +257,7 @@ const ItemPreviewCard = ({
 
 				{variation !== "row" && !hideScore && (
 					<View className="absolute top-2 right-2 z-10 mt-1 mr-1 p-1 px-2">
-						{subscription ? (
+						{hasActiveSub || isItemUnlocked ? (
 							item.score ? (
 								renderScore()
 							) : (

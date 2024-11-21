@@ -8,12 +8,13 @@ import ProfileScores from "@/components/sharable/profile-scores";
 import StickyHeader from "@/components/sharable/sticky-header";
 import { Button } from "@/components/ui/button";
 import { Muted, P } from "@/components/ui/typography";
+import { useSubscription } from "@/context/subscription-provider";
 import { theme } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function ProfileScreen() {
-	const { userScores, userData, subscription, tapScore, userFavorites } =
-		useUserProvider();
+	const { hasActiveSub } = useSubscription();
+	const { userScores, userData, tapScore, userFavorites } = useUserProvider();
 	const { colorScheme } = useColorScheme();
 	const { iconColor } = useColorScheme();
 	const router = useRouter();
@@ -43,12 +44,13 @@ export default function ProfileScreen() {
 					<ProfileHeader
 						profileData={userData}
 						score={score}
-						subscription={subscription}
+						subscription={hasActiveSub}
 					/>
 				</View>
 
 				{userHasTapScore || userHasFavorites ? (
 					<View className="my-8 w-full">
+						<P className="mb-2">Your latest water analysis:</P>
 						<ProfileScores userScores={userScores} />
 					</View>
 				) : (

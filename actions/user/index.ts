@@ -49,59 +49,33 @@ export const getUserData = async (uid: string) => {
 	return user;
 };
 
-// gets active subscription
-export async function getSubscription(uid: string | null) {
-	if (!uid) {
-		return {
-			success: false,
-			data: null,
-		};
-	}
-
+// Checks for active Stripe subscription
+export async function getStripeSubscription(uid: string | null) {
 	try {
-		// const { data: subscription } = await supabase
-		// 	.from("subscriptions")
-		// 	.select("*, prices(*, products(*)), metadata")
-		// 	.in("status", ["trialing", "active"])
-		// 	.eq("user_id", uid);
+		if (!uid) {
+			throw new Error("No user id found");
+		}
 
 		// fetch all subscriptions including metadata
 		const { data: subscription } = await supabase
 			.from("subscriptions")
 			.select("*")
 			.in("status", ["active"])
+			.not("rc_customer_id", "is", null)
 			.eq("user_id", uid);
 
-		// console.log("subscription", JSON.stringify(subscription, null, 2));
-
 		if (!subscription || subscription?.length === 0) {
-			return {
-				success: false,
-				data: null,
-			};
+			throw new Error("No subscription found");
 		}
 
-		// use most recent subscription
-		// const activePlan = subscription[0]?.prices?.products?.name;
+		const subData = subscription[0];
 
-		// console.log("activePlan", activePlan);
-
-		// let planPlan = "Free";
-
-		// if (!activePlan) {
-		// 	planPlan = "Free";
-		// 	return {
-		// 		success: false,
-		// 		data: null,
-		// 	};
-		// } else if (
-		// 	// Dont think this is accurate
-		// 	activePlan?.toLowerCase() === "pro (test)" ||
-		// 	activePlan?.toLowerCase() === "pro (beta)" ||
-		// 	activePlan?.toLowerCase() === "oasis pro"
-		// ) {
-		// 	planPlan = "Pro";
-		// }
+		if (
+			subData.metadata.provider === "revenue_cat" ||
+			subData.price_id.includes("pro")
+		) {
+			throw new Error("No active Stripe subscription found");
+		}
 
 		// Default to Pro
 		const subscriptionDetails = {
@@ -109,13 +83,12 @@ export async function getSubscription(uid: string | null) {
 			plan: "Pro",
 		};
 
-		// only return subscription details if user is subscribed
 		return {
 			success: true,
 			data: subscriptionDetails,
 		};
 	} catch (error) {
-		console.error("Error:", error);
+		console.log("Error fetching stripe subscription:", error);
 		return {
 			success: false,
 			data: null,
@@ -319,6 +292,129 @@ const markSubscriptionAsActive = async (uid: string) => {
 	if (error) {
 		console.error("Error marking subscription as active:", error);
 	}
+};
+
+export const awardFreeUnlock = async (
+	uid: string,
+	unlocksRemaining: number,
+) => {
+	const newUnlocksRemaining = unlocksRemaining ? unlocksRemaining + 1 : 1;
+
+	console.log("newUnlocksRemaining", newUnlocksRemaining);
+
+	const { error } = await supabase
+		.from("users")
+		.update({ unlocks_remaining: newUnlocksRemaining })
+		.eq("id", uid);
+
+	if (error) {
+		console.error("Error awarding free unlock:", error);
+		return false;
+	}
+
+	return true;
+};
+
+export const attachReferralCodeToUser = async (
+	uid: string,
+	referred_by: string,
+) => {
+	try {
+		console.log("referred_by", referred_by);
+
+		// first get the uid of the referring user
+		const { data: referringUser, error: referringUserError } = await supabase
+			.from("users")
+			.select("id, username, unlocks_remaining")
+			.eq("username", referred_by);
+
+		if (referringUserError) {
+			console.error("Error fetching referring user:", referringUserError);
+			throw referringUserError;
+		}
+
+		const referringUserId = referringUser[0].id;
+		const referringUnlocksRemaining = referringUser[0].unlocks_remaining;
+
+		// assign user id to new user referred_by column
+		const { error } = await supabase
+			.from("users")
+			.update({ referred_by: referringUserId })
+			.eq("id", uid);
+
+		if (error) {
+			console.error("Error attaching referral code to user:", error);
+			throw error;
+		}
+
+		// then award free unlock to the referring user
+		const success = await awardFreeUnlock(
+			referringUserId,
+			referringUnlocksRemaining,
+		);
+
+		if (!success) {
+			throw new Error("Error awarding free unlock to referring user");
+		}
+
+		return success;
+	} catch (error) {
+		console.error("Error attaching referral code to user:", error);
+		return false;
+	}
+};
+
+export const redeemUnlock = async (
+	uid: string,
+	productId: string,
+	productType: string,
+) => {
+	// first get user data
+	const { data: userData, error: userError } = await supabase
+		.from("users")
+		.select("id, unlock_history, unlocks_remaining")
+		.eq("id", uid);
+
+	const data = userData?.[0];
+
+	if (userError || !data) {
+		console.error("Error fetching user data:", userError);
+		return false;
+	}
+
+	const currentUnlockHistory = data.unlock_history || [];
+	const unlocksRemaining = data.unlocks_remaining || 0;
+
+	if (unlocksRemaining <= 0) {
+		return false;
+	}
+
+	const newUnlockHistory = [
+		...currentUnlockHistory,
+		{
+			product_id: productId,
+			product_type: productType,
+			unlocked_at: new Date(),
+		},
+	];
+
+	const newUnlocksRemaining = unlocksRemaining - 1;
+
+	//  add item to user's unlock history
+	const { error } = await supabase
+		.from("users")
+		.update({
+			unlock_history: newUnlockHistory,
+			unlocks_remaining: newUnlocksRemaining,
+		})
+		.eq("id", uid);
+
+	if (error) {
+		console.error("Error updating user data:", error);
+		return false;
+	}
+
+	return true;
 };
 
 export const getMostRecentUserSub = async (uid: string) => {

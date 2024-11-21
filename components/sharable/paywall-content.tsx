@@ -1,13 +1,13 @@
 import { Octicons } from "@expo/vector-icons";
 import cn from "classnames";
 import { Button } from "components/ui/button";
-import { useUserProvider } from "context/user-provider";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React from "react";
 import { TouchableOpacity, View } from "react-native";
 
 import Typography from "./typography";
 
+import { useSubscription } from "@/context/subscription-provider";
 import { theme } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
 
@@ -36,19 +36,15 @@ const PaywallContent: React.FC<PaywallContentProps> = ({
 	const iconColor =
 		colorScheme === "dark" ? theme.light.primary : theme.dark.primary;
 
-	// const pathname = usePathname();
-	const { subscription } = useUserProvider();
-
-	const [open, setOpen] = useState(false);
+	const { hasActiveSub } = useSubscription();
 
 	const handleUpgradeClick = () => {
-		if (!subscription) {
+		if (!hasActiveSub) {
 			router.push("/subscribeModal");
-			setOpen(true);
 		}
 	};
 
-	if (subscription) {
+	if (hasActiveSub) {
 		return <>{children}</>;
 	}
 

@@ -1,4 +1,4 @@
-import { Ionicons } from "@expo/vector-icons";
+import Feather from "@expo/vector-icons/Feather";
 import { useRouter } from "expo-router";
 import { TouchableOpacity, View } from "react-native";
 
@@ -52,7 +52,7 @@ export default function ProfileHeader({
 						onPress={() => router.push("/subscribeModal")}
 						className="flex flex-col items-end"
 					>
-						<Ionicons name="lock-closed-outline" size={24} color={iconColor} />
+						<Feather name="lock" size={20} color={iconColor} />
 						<Muted> / 100</Muted>
 					</TouchableOpacity>
 				)}

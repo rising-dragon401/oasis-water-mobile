@@ -190,8 +190,6 @@ export const searchForProduct = async (
 	const listToSearch =
 		productIdentified.type === "filter" ? allFilters : allItems;
 
-	console.log("productName: ", productName);
-
 	// ask open ai to search for the closes match
 	const requestBody = {
 		model: "gpt-4o",

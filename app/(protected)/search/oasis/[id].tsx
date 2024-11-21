@@ -1,7 +1,6 @@
 import { useUserProvider } from "context/user-provider";
 import {
 	Link,
-	useGlobalSearchParams,
 	useLocalSearchParams,
 	useNavigation,
 	useRouter,
@@ -13,23 +12,22 @@ import { getCurrentUserData, getUserFavorites } from "@/actions/user";
 import OasisPage from "@/components/sharable/oasis-page";
 import { Button } from "@/components/ui/button";
 import { H1, Muted } from "@/components/ui/typography";
+import { useSubscription } from "@/context/subscription-provider";
 import { theme } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function OasisScreen() {
 	const navigation = useNavigation();
-	const { uid, userData, subscription } = useUserProvider();
+	const { uid, userData } = useUserProvider();
+	const { hasActiveSub } = useSubscription();
 	const router = useRouter();
 	const { colorScheme } = useColorScheme();
 	const local = useLocalSearchParams();
-	const global = useGlobalSearchParams();
 
 	const [oasisUser, setOasisUser] = useState<any>({});
 	const [favorites, setFavorites] = useState<any>([]);
 
 	const userId = Array.isArray(local?.id) ? local.id[0] : local?.id || uid;
-
-	const isCurrentUser = userId === uid;
 
 	useEffect(() => {
 		if (userId) {
@@ -86,7 +84,7 @@ export default function OasisScreen() {
 					</>
 				) : (
 					<>
-						{subscription && !favorites ? (
+						{hasActiveSub && !favorites ? (
 							<View className="w-full justify-center items-center gap-y-2 pt-20">
 								<View className="flex flex-col items-center p-4 gap-y-4 w-full">
 									<H1 className="text-center mt-20">Your Oasis</H1>

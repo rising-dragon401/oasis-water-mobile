@@ -1,6 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image } from "expo-image";
-import { Link, usePathname, useRouter } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
 	FlatList,
@@ -20,7 +20,6 @@ import ItemPreviewCard from "@/components/sharable/item-preview-card";
 import Search from "@/components/sharable/search";
 import Skeleton from "@/components/sharable/skeleton";
 import { H4, Muted, P, Small } from "@/components/ui/typography";
-import { useUserProvider } from "@/context/user-provider";
 import { CATEGORIES } from "@/lib/constants/categories";
 import { useColorScheme } from "@/lib/useColorScheme";
 
@@ -63,9 +62,7 @@ const FEATURED_LOCATIONS = [
 ];
 
 export default function TabOneScreen() {
-	const { userData, subscription, uid } = useUserProvider();
 	const router = useRouter();
-	const pathname = usePathname();
 	const { textSecondaryColor, mutedColor } = useColorScheme();
 
 	const [people, setPeople] = useState<any[]>([]);

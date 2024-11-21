@@ -22,6 +22,7 @@ import UntestedRow from "./untested-row";
 
 import { incrementItemsViewed } from "@/actions/user";
 import { H3, Muted } from "@/components/ui/typography";
+import { useSubscription } from "@/context/subscription-provider";
 import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
 
@@ -32,7 +33,8 @@ type Props = {
 export function ItemForm({ id }: Props) {
 	const navigation = useNavigation();
 	const router = useRouter();
-	const { uid, subscription } = useUserProvider();
+	const { uid, userData } = useUserProvider();
+	const { hasActiveSub } = useSubscription();
 	const { iconColor } = useColorScheme();
 
 	const [item, setItem] = useState<any>({});
@@ -179,6 +181,21 @@ export function ItemForm({ id }: Props) {
 
 	const isTested = item?.is_indexed;
 
+	const itemDetails = {
+		productId: String(item.id),
+		productType: item.type,
+	};
+
+	// determine if this item is in the user's unlock history
+	const isItemUnlocked = useMemo(() => {
+		return userData?.unlock_history?.some((unlock: any) => {
+			return (
+				String(unlock.product_id) === String(id) &&
+				String(unlock.product_type) === String(item.type)
+			);
+		});
+	}, [userData, id, item.type]);
+
 	return (
 		<ScrollView
 			contentContainerStyle={{
@@ -225,7 +242,13 @@ export function ItemForm({ id }: Props) {
 						</View>
 
 						<View className="flex w-1/3 flex-col-reverse justify-end items-end -mt-2">
-							<Score score={item.score} size="sm" untested={!isTested} />
+							<Score
+								score={item.score}
+								size="sm"
+								untested={!isTested}
+								itemDetails={itemDetails}
+								showScore={isItemUnlocked}
+							/>
 						</View>
 					</View>
 
@@ -247,6 +270,8 @@ export function ItemForm({ id }: Props) {
 											? item.score
 											: undefined
 									}
+									untested={!isTested}
+									itemDetails={itemDetails}
 								/>
 							))}
 						</View>
@@ -271,9 +296,12 @@ export function ItemForm({ id }: Props) {
 								{sortedContaminants.map((contaminant: any, index: number) => (
 									<TouchableOpacity
 										key={contaminant.id || index}
-										disabled={subscription}
+										disabled={hasActiveSub || isItemUnlocked}
 										onPress={() => {
-											router.push("/subscribeModal");
+											router.push({
+												pathname: "/subscribeModal",
+												params: itemDetails,
+											});
 										}}
 									>
 										<ContaminantCard
@@ -281,7 +309,7 @@ export function ItemForm({ id }: Props) {
 											data={contaminant}
 										/>
 
-										{!subscription && (
+										{!hasActiveSub && !isItemUnlocked && (
 											<BlurView
 												intensity={32}
 												tint="regular"
@@ -322,7 +350,7 @@ export function ItemForm({ id }: Props) {
 									</View>
 									<IngredientsCard
 										ingredients={item.ingredients}
-										subscription={subscription}
+										subscription={hasActiveSub || isItemUnlocked}
 									/>
 								</View>
 							)}

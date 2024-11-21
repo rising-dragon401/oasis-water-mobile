@@ -17,6 +17,7 @@ import Logo from "@/components/sharable/logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { H3, Muted } from "@/components/ui/typography";
+import { useSubscription } from "@/context/subscription-provider";
 import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
 
@@ -36,9 +37,9 @@ const STARTER_PROMPTS = [
 export default function ChatModal() {
 	const scrollViewRef = useRef<ScrollView>(null);
 
-	const { subscription, uid } = useUserProvider();
+	const { hasActiveSub } = useSubscription();
 	const router = useRouter();
-	const { userData } = useUserProvider();
+	const { userData, uid } = useUserProvider();
 	const { iconColor, backgroundColor } = useColorScheme();
 
 	const [query, setQuery] = useState("");
@@ -154,7 +155,7 @@ export default function ChatModal() {
 			return;
 		}
 
-		if (!subscription) {
+		if (!hasActiveSub) {
 			router.push("/subscribeModal");
 			return;
 		}

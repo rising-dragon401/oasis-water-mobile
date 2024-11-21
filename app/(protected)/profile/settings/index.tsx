@@ -1,7 +1,6 @@
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useUserProvider } from "context/user-provider";
 import * as Clipboard from "expo-clipboard";
-import * as Linking from "expo-linking";
 import { Link, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { Alert, RefreshControl, ScrollView, View } from "react-native";
@@ -21,22 +20,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Large, Muted, P } from "@/components/ui/typography";
-import { useRevenueCat } from "@/context/revenue-cat-provider";
+import { useSubscription } from "@/context/subscription-provider";
 import { useToast } from "@/context/toast-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function SettingsScreen() {
-	const {
-		uid,
-		user,
-		userData,
-		subscription,
-		subscriptionData,
-		subscriptionProvider,
-		refreshUserData,
-		logout,
-	} = useUserProvider();
-	const { restorePurchases } = useRevenueCat();
+	const { hasActiveSub, restorePurchases } = useSubscription();
+	const { uid, user, userData, refreshUserData, logout } = useUserProvider();
 	const { backgroundColor, iconColor } = useColorScheme();
 	const showToast = useToast();
 	const router = useRouter();
@@ -197,10 +187,6 @@ export default function SettingsScreen() {
 		setLoadingSocials(false);
 	};
 
-	const handleManageSubscription = () => {
-		Linking.openURL(subscriptionData.metadata?.managementURL || "");
-	};
-
 	const handleRestorePurchases = async () => {
 		setLoadingRestorePurchases(true);
 		const res = await restorePurchases();
@@ -250,7 +236,7 @@ export default function SettingsScreen() {
 							<P className="text-muted-foreground">Membership</P>
 
 							<View className="bg-card p-4 rounded-xl border border-border">
-								{subscription ? (
+								{hasActiveSub ? (
 									<>
 										<View className="flex flex-row items-center gap-x-1">
 											<MaterialCommunityIcons
@@ -262,15 +248,6 @@ export default function SettingsScreen() {
 												Oasis member
 											</Typography>
 										</View>
-
-										{subscriptionData?.cancel_at_period_end && (
-											<Typography size="base" fontWeight="normal">
-												Expires on{" "}
-												{new Date(
-													subscriptionData?.current_period_end,
-												).toLocaleDateString()}
-											</Typography>
-										)}
 
 										<View className="flex flex-col gap-4 text-center mt-2">
 											<Muted>
@@ -289,7 +266,7 @@ export default function SettingsScreen() {
 											<UpgradeButton />
 										</View>
 
-										{!subscription && (
+										{!hasActiveSub && (
 											<Button
 												className="w-full h-10"
 												variant="ghost"

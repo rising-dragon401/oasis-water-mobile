@@ -1,9 +1,9 @@
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 
-import ScoreIndicator from "@/components/sharable/score-indicator";
 import {
 	Accordion,
 	AccordionContent,
@@ -11,7 +11,7 @@ import {
 	AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Muted, P } from "@/components/ui/typography";
-import { useUserProvider } from "@/context/user-provider";
+import { useSubscription } from "@/context/subscription-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function ProfileScores({
@@ -21,7 +21,7 @@ export default function ProfileScores({
 	userScores: any;
 	hideSubtitle?: boolean;
 }) {
-	const { subscription } = useUserProvider();
+	const { hasActiveSub } = useSubscription();
 	const { greenColor, redColor, yellowColor } = useColorScheme();
 	const router = useRouter();
 	const [openItems, setOpenItems] = useState<string[]>([]);
@@ -65,7 +65,7 @@ export default function ProfileScores({
 	};
 
 	const itemBadge = (id: string, name: string, type: string, index: number) => {
-		if (subscription || index < 1) {
+		if (hasActiveSub || index < 1) {
 			const bgColor =
 				type === "harm"
 					? "bg-red-200"
@@ -104,34 +104,34 @@ export default function ProfileScores({
 	};
 
 	const renderAmount = (amount: number, type: string) => {
-		const getScoreValue = (type: string, amount: number) => {
+		const getIconName = (type: string, amount: number) => {
 			if (
 				(type === "health_risks" || type === "contaminants_found") &&
 				amount > 0
 			) {
-				return "bad";
+				return "warning-outline";
 			} else if (type === "benefits" && amount > 0) {
-				return "good";
+				return "leaf-outline";
 			} else {
-				return "ok";
+				return "checkmark-outline";
 			}
 		};
 
 		return (
 			<View className="flex flex-row items-center gap-x-2">
-				<ScoreIndicator
-					value={getScoreValue(type, amount)}
-					width={3}
-					height={3}
+				<Ionicons
+					name={getIconName(type, amount)}
+					size={24}
+					color={type === "benefits" ? greenColor : redColor}
 				/>
-				<P className="text-3xl">{amount}</P>
+				{/* <P className="text-3xl">{amount}</P> */}
 			</View>
 		);
 	};
 
 	return (
 		<View>
-			<Accordion type="multiple" className="flex flex-col gap-y-6">
+			<Accordion type="multiple" className="flex flex-col gap-y-4">
 				<AccordionItem key="contaminants_found" value="contaminants_found">
 					<AccordionTrigger
 						className={getAccordionTriggerStyle(
@@ -141,11 +141,11 @@ export default function ProfileScores({
 					>
 						<View className="flex flex-row items-start justify-between gap-2 w-full mb-2 pr-2">
 							<View className="flex flex-col">
-								<P className=" text-xl">Contaminants found</P>
+								<P className="text-2xl">
+									{userScores?.allContaminants?.length} contaminants detected
+								</P>
 								{!hideSubtitle && (
-									<Muted className="max-w-xs">
-										Toxins found in your drinking and bathing water
-									</Muted>
+									<Muted className="max-w-xs mt-2">View all</Muted>
 								)}
 							</View>
 							{renderAmount(
@@ -162,9 +162,9 @@ export default function ProfileScores({
 						<View className="flex flex-row flex-wrap gap-2">
 							{userScores?.allContaminants.map(
 								(ingredient: any, index: number) => (
-									<>
+									<View key={ingredient.id}>
 										{itemBadge(ingredient.id, ingredient.name, "harm", index)}
-									</>
+									</View>
 								),
 							)}
 						</View>
@@ -180,13 +180,10 @@ export default function ProfileScores({
 					>
 						<View className="flex flex-row items-start justify-between gap-2 w-full mb-2 pr-2">
 							<View className="flex flex-col">
-								<P className=" text-xl">Health concerns</P>
-								{!hideSubtitle && (
-									<Muted className="max-w-xs">
-										You may be at risk to the following based on your hydration
-										habits
-									</Muted>
-								)}
+								<P className="text-2xl">
+									{userScores?.allHarms?.length} potential health risks
+								</P>
+								{!hideSubtitle && <Muted className="max-w-xs mt-2">View</Muted>}
 							</View>
 							{renderAmount(userScores?.allHarms?.length, "health_risks")}
 						</View>
@@ -198,7 +195,9 @@ export default function ProfileScores({
 					>
 						<View className="flex flex-row flex-wrap gap-2">
 							{userScores?.allHarms?.map((harm: any, index: number) => (
-								<>{itemBadge(harm.id, harm.name, "harm", index)}</>
+								<View key={harm.id}>
+									{itemBadge(harm.id, harm.name, "harm", index)}
+								</View>
 							))}
 						</View>
 					</AccordionContent>
@@ -211,12 +210,10 @@ export default function ProfileScores({
 					>
 						<View className="flex flex-row items-start justify-between gap-2 w-full mb-2 pr-2">
 							<View className="flex flex-col">
-								<P className=" text-xl">Benefits</P>
-								{!hideSubtitle && (
-									<Muted className="max-w-xs">
-										The positive effects found in your water routine
-									</Muted>
-								)}
+								<P className="text-2xl">
+									{userScores?.allBenefits?.length} benefits detected
+								</P>
+								{!hideSubtitle && <Muted className="max-w-xs mt-2">View</Muted>}
 							</View>
 							{renderAmount(userScores?.allBenefits?.length, "benefits")}
 						</View>
@@ -226,7 +223,7 @@ export default function ProfileScores({
 					>
 						<View className="flex flex-row flex-wrap gap-2">
 							{userScores?.allBenefits?.map((benefit: any, index: number) => (
-								<View key={benefit.name}>
+								<View key={benefit.id}>
 									{itemBadge(benefit.id, benefit.name, "benefit", index)}
 								</View>
 							))}

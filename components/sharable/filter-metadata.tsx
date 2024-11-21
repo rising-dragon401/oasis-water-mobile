@@ -29,10 +29,16 @@ export default function FilterMetadata({
 	filteredContaminants,
 	contaminantsByCategory,
 	isPaywalled = false,
+	itemDetails,
 }: {
 	filteredContaminants: any[];
 	contaminantsByCategory: Record<string, { percentageFiltered: number }>;
 	isPaywalled?: boolean;
+	itemDetails?: {
+		productId: string;
+		productType: string;
+		productName: string;
+	};
 }) {
 	// console.log("filteredContaminants", JSON.stringify(filteredContaminants, null, 2));
 	// console.log(
@@ -63,6 +69,7 @@ export default function FilterMetadata({
 								// 		: `${percentageFiltered}% filtered`
 								// }
 								isPaywalled={isPaywalled}
+								itemDetails={itemDetails}
 								score={
 									isPaywalled
 										? "neutral"
@@ -99,6 +106,7 @@ export default function FilterMetadata({
 								label={label}
 								// value={`${percentageFiltered}% filtered`}
 								isPaywalled={isPaywalled}
+								itemDetails={itemDetails}
 								score={
 									isPaywalled
 										? "neutral"

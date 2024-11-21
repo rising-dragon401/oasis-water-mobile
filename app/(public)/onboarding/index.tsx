@@ -16,16 +16,18 @@ import Toast from "react-native-root-toast";
 import { getNearestLocation } from "@/actions/admin";
 import {
 	addWatersAndFiltersToUserFavorites,
+	attachReferralCodeToUser,
 	updateUserData,
 } from "@/actions/user";
 import ItemSelector from "@/components/sharable/item-selector";
 import LocationSelector from "@/components/sharable/location-selector";
 import { SubscribeOnboarding } from "@/components/sharable/subscribe-onboarding";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import * as ProgressPrimitive from "@/components/ui/progress";
 import { Switch } from "@/components/ui/switch";
 import { H1, Muted, P } from "@/components/ui/typography";
-import { useRevenueCat } from "@/context/revenue-cat-provider";
+import { useSubscription } from "@/context/subscription-provider";
 import { useToast } from "@/context/toast-provider";
 import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
@@ -46,16 +48,9 @@ if (Platform.OS !== "web") {
 
 export default function OnboardingScreen() {
 	const router = useRouter();
-	const {
-		user,
-		userData,
-		userFavorites,
-		subscription,
-		uid,
-		userScores,
-		refreshUserData,
-	} = useUserProvider();
-	const { packages, purchasePackage } = useRevenueCat();
+	const { user, userData, userFavorites, uid, userScores, refreshUserData } =
+		useUserProvider();
+	const { hasActiveSub, packages, purchasePackage } = useSubscription();
 	const { iconColor, mutedForegroundColor } = useColorScheme();
 	const showToast = useToast();
 
@@ -84,11 +79,44 @@ export default function OnboardingScreen() {
 	const [nearestLocation, setNearestLocation] = useState<any>(null);
 	const [loadingFavs, setLoadingFavs] = useState(false);
 	const [hasRequestedRate, setHasRequestedRate] = useState(false);
+	const [referralCode, setReferralCode] = useState("");
+	const [loadingReferralCode, setLoadingReferralCode] = useState(false);
+	const [referralCodeError, setReferralCodeError] = useState(false);
 
 	const windowWidth = Dimensions.get("window").width;
 	const windowHeight = Dimensions.get("window").height;
 
 	const hasScores = userScores && userScores?.allIngredients?.length > 0;
+
+	const handleReferralCodeSubmit = async () => {
+		try {
+			setLoadingReferralCode(true);
+			if (uid) {
+				const res = await attachReferralCodeToUser(uid, referralCode);
+
+				if (res) {
+					showToast("Code applied!", 1000, "top");
+					stepForward();
+				} else {
+					setReferralCodeError(true);
+					throw new Error("Unable to apply code");
+				}
+			} else {
+				console.error("No uid found");
+				setReferralCodeError(true);
+				throw new Error("No uid found");
+			}
+		} catch (error) {
+			showToast(
+				"Unable to apply code, please try something else.",
+				1000,
+				"top",
+			);
+			console.error("Error applying referral code", error);
+		} finally {
+			setLoadingReferralCode(false);
+		}
+	};
 
 	// Onboarding steps
 	const steps = [
@@ -157,6 +185,7 @@ export default function OnboardingScreen() {
 				: " ✨ Give 5 stars ✨",
 			onSkip: null,
 			canSkip: true,
+			skipButtonLabel: "Skip",
 		},
 		{
 			title: "Stay notified of new lab results and research",
@@ -188,6 +217,45 @@ export default function OnboardingScreen() {
 			submitButtonLabel: "Continue",
 			onSkip: null,
 			canSkip: false,
+		},
+		{
+			id: "referral",
+			title: "Did someone refer you?",
+			subtitle: "If so, enter their username and they will thank you later.",
+			image: null,
+			imageStyle: {
+				width: "100%",
+				height: windowHeight * 0.44,
+				resizeMode: "contain",
+			},
+			component: (
+				<View className="flex mt-6">
+					<Input
+						placeholder="Their username"
+						onChangeText={setReferralCode}
+						value={referralCode}
+						className="border border-gray-300 rounded-lg p-2"
+					/>
+
+					<Button
+						className="mt-4 text-primary"
+						variant="outline"
+						onPress={handleReferralCodeSubmit}
+						loading={loadingReferralCode}
+						disabled={loadingReferralCode}
+						label="Apply Code"
+					/>
+				</View>
+			),
+			onSubmit: () => {
+				handleReferralCodeSubmit();
+			},
+			submitButtonLabel: "Apply Code",
+			onSkip: () => {
+				stepForward();
+			},
+			canSkip: true,
+			skipButtonLabel: "Skip",
 		},
 		{
 			id: "location",
@@ -306,7 +374,7 @@ export default function OnboardingScreen() {
 		{
 			title: "Find Out What’s in Your Water—and How to Fix It",
 			// subtitle: "😳💧",
-			// titleStyle: "text-center",
+			titleStyle: "text-center",
 			// image:
 			// 	"https://connect.live-oasis.com/storage/v1/object/public/website/images/onboarding/paywall%20cards.jpg",
 			image: null,
@@ -358,7 +426,7 @@ export default function OnboardingScreen() {
 				console.error("Failed to save current step to AsyncStorage", error);
 			}
 
-			if (currentStep === totalSteps - 1 && subscription) {
+			if (currentStep === totalSteps - 1 && hasActiveSub) {
 				handleFinishOnboarding();
 			}
 		};
@@ -401,7 +469,9 @@ export default function OnboardingScreen() {
 			// showToast("Thank you 😊", 1000, "top");
 		}
 
-		setHasRequestedRate(true);
+		setTimeout(() => {
+			setHasRequestedRate(true);
+		}, 1000);
 	};
 
 	const handleFinishOnboarding = async () => {

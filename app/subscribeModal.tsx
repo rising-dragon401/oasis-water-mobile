@@ -1,14 +1,17 @@
 import Feather from "@expo/vector-icons/Feather";
+import * as Clipboard from "expo-clipboard";
 import { Image } from "expo-image";
 import * as Linking from "expo-linking";
-import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
-import { Alert, ScrollView, View } from "react-native";
+import { useGlobalSearchParams, useRouter } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
+import { Alert, ScrollView, TouchableOpacity, View } from "react-native";
 
+import { redeemUnlock } from "@/actions/user";
 import OasisIcon from "@/assets/oasis-icon.png";
 import { Button } from "@/components/ui/button";
 import { H2, Muted, P } from "@/components/ui/typography";
-import { useRevenueCat } from "@/context/revenue-cat-provider";
+import { useSubscription } from "@/context/subscription-provider";
+import { useToast } from "@/context/toast-provider";
 import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
 
@@ -40,18 +43,31 @@ export const FEATURES = [
 ];
 
 export default function SubscribeModal() {
-	const { subscription, user } = useUserProvider();
+	const { user, userData, refreshUserData } = useUserProvider();
 	const router = useRouter();
-	const { packages, purchasePackage } = useRevenueCat();
+	const { packages, purchasePackage, hasActiveSub } = useSubscription();
 	const { accentColor, backgroundColor } = useColorScheme();
-
+	const showToast = useToast();
 	const [loading, setLoading] = useState(false);
 
+	const params = useGlobalSearchParams();
+
+	console.log("params: ", params);
+
+	const { productId, productType } = params as {
+		productId: string;
+		productType: string;
+	};
+
 	useEffect(() => {
-		if (subscription) {
+		if (hasActiveSub) {
 			router.back();
 		}
-	}, [subscription]);
+	}, [hasActiveSub]);
+
+	const unlocksLeft = useCallback(() => {
+		return userData?.unlocks_remaining || 0;
+	}, [userData]);
 
 	const handleSubscribe = async () => {
 		setLoading(true);
@@ -100,9 +116,66 @@ export default function SubscribeModal() {
 		setLoading(false);
 	};
 
+	const handleUnlock = async () => {
+		if (unlocksLeft() > 0) {
+			// Logic to unlock
+			const res = await redeemUnlock(user?.id, productId, productType);
+
+			if (res) {
+				await refreshUserData("userData");
+				showToast("Item unlocked!");
+				router.back();
+			} else {
+				showToast("Unable to unlock item");
+			}
+		} else {
+			// Open an alert to inform the user
+			Alert.alert(
+				"Share to Unlock 🔓",
+				`Earn a free unlock instantly when a friend joins using your code: ${userData?.username}`,
+				[
+					{
+						text: "Copy code",
+						onPress: () => {
+							const referralCode = userData?.username; // Assuming referralCode is part of userData
+							if (referralCode) {
+								showToast("Copied to clipboard");
+								Clipboard.setString(referralCode);
+								console.log("Referral code copied to clipboard");
+							} else {
+								console.log("No referral code available");
+							}
+						},
+					},
+				],
+			);
+		}
+	};
+
 	return (
 		<ScrollView contentContainerStyle={{ flexGrow: 1, backgroundColor }}>
 			<View className="flex flex-col justify-between p-4 py-16 h-full items-center">
+				{/* Unlock Section */}
+				{productId && productType && (
+					<TouchableOpacity
+						style={{
+							position: "absolute",
+							top: 16,
+							right: 16,
+							padding: 8,
+							borderRadius: 16,
+						}}
+						className="bg-muted px-4 py-2 rounded-lg"
+						onPress={handleUnlock}
+					>
+						<P className="">
+							{unlocksLeft() > 0
+								? `Use unlock (${unlocksLeft()})`
+								: "0 unlocks left"}
+						</P>
+					</TouchableOpacity>
+				)}
+
 				{/* Content Section */}
 				<View className="items-center max-w-lg gap-y-8 flex flex-col flex-grow">
 					<View className="flex flex-col items-center">

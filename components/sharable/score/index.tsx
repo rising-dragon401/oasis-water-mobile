@@ -1,10 +1,10 @@
 import { Feather, Octicons } from "@expo/vector-icons";
-import { useUserProvider } from "context/user-provider";
 import { useRouter } from "expo-router";
 import { TouchableOpacity, View } from "react-native";
 import { Circle, Svg } from "react-native-svg";
 
 import { Muted, P } from "@/components/ui/typography";
+import { useSubscription } from "@/context/subscription-provider";
 import { useToast } from "@/context/toast-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
 
@@ -15,6 +15,10 @@ type Props = {
 	showScore?: boolean;
 	showTooltip?: boolean;
 	tooltipContent?: string;
+	itemDetails?: {
+		productId: string;
+		productType: string;
+	};
 };
 
 export default function Score({
@@ -24,13 +28,12 @@ export default function Score({
 	showScore = false,
 	showTooltip = false,
 	tooltipContent = "",
+	itemDetails,
 }: Props) {
 	const router = useRouter();
-	const { subscription } = useUserProvider();
+	const { hasActiveSub } = useSubscription();
 	const {
-		textColor,
 		mutedForegroundColor,
-		secondaryColor,
 		greenColor,
 		yellowColor,
 		redColor,
@@ -135,8 +138,13 @@ export default function Score({
 							? 0
 							: 0;
 
-	const handleOpenSubscribeModal = () => {
-		router.push("/subscribeModal");
+	const handleOpenSubscribeModal = async () => {
+		console.log("itemDetails: ", itemDetails);
+		// await router.setParams(itemDetails);
+		router.push({
+			pathname: "/subscribeModal",
+			params: itemDetails,
+		});
 	};
 
 	const handleShowTooltip = () => {
@@ -144,7 +152,7 @@ export default function Score({
 	};
 
 	// Unindexed items have a score of 0
-	if (!subscription && !showScore) {
+	if (!hasActiveSub && !showScore) {
 		return (
 			<TouchableOpacity
 				onPress={handleOpenSubscribeModal}

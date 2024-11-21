@@ -1,11 +1,12 @@
 import { Feather } from "@expo/vector-icons";
-import { useUserProvider } from "context/user-provider";
 import { useRouter } from "expo-router";
+import { useMemo } from "react";
 import { TouchableOpacity, View } from "react-native";
 
 import { P } from "@/components/ui/typography";
+import { useSubscription } from "@/context/subscription-provider";
+import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
-
 type BlurredLineItemProps = {
 	label: string;
 	value?: string;
@@ -15,6 +16,10 @@ type BlurredLineItemProps = {
 	score?: "good" | "bad" | "neutral";
 	icon?: React.ReactNode;
 	untested?: boolean;
+	itemDetails?: {
+		productId: string;
+		productType: string;
+	};
 };
 
 export default function BlurredLineItem({
@@ -26,25 +31,38 @@ export default function BlurredLineItem({
 	score,
 	icon,
 	untested = false,
+	itemDetails,
 }: BlurredLineItemProps) {
 	const router = useRouter();
-	const { subscription } = useUserProvider();
+	const { userData } = useUserProvider();
+	const { hasActiveSub } = useSubscription();
 	const {
 		textColor,
 		mutedForegroundColor,
 		greenColor,
-		yellowColor,
 		redColor,
 		neutralColor,
 	} = useColorScheme();
 
+	const isItemUnlocked = useMemo(() => {
+		return userData?.unlock_history?.some((unlock: any) => {
+			return (
+				unlock.product_id === itemDetails?.productId &&
+				unlock.product_type === itemDetails?.productType
+			);
+		});
+	}, [userData, itemDetails]);
+
 	const handleOpenPaywall = () => {
-		if (!subscription) {
-			router.push("/subscribeModal");
+		if (!hasActiveSub) {
+			router.push({
+				pathname: "/subscribeModal",
+				params: itemDetails,
+			});
 		}
 	};
 
-	const showPaywall = !subscription && isPaywalled;
+	const showPaywall = !hasActiveSub && isPaywalled && !isItemUnlocked;
 
 	const colorMark = untested
 		? neutralColor

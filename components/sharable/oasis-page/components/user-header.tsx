@@ -5,6 +5,7 @@ import { TouchableOpacity, View } from "react-native";
 import Score from "@/components/sharable/score";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { H3, Muted, P } from "@/components/ui/typography";
+import { useSubscription } from "@/context/subscription-provider";
 import { useUserProvider } from "@/context/user-provider";
 import { PROFILE_AVATAR } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
@@ -23,7 +24,8 @@ export default function ProfileHeader({
 	isAuthUser?: boolean;
 }) {
 	const { iconColor } = useColorScheme();
-	const { uid, userFavorites, userScores, subscription } = useUserProvider();
+	const { uid, userFavorites, userScores } = useUserProvider();
+	const { hasActiveSub } = useSubscription();
 
 	const scoreTooltipContent = () => {
 		if (!uid) {
@@ -100,7 +102,7 @@ export default function ProfileHeader({
 					<Score
 						score={profileData?.score || userScores?.overallScore || 0}
 						size={scoreSize}
-						showScore={subscription}
+						showScore={hasActiveSub}
 						showTooltip
 						tooltipContent={scoreTooltipContent()}
 					/>

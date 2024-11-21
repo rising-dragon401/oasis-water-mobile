@@ -20,12 +20,18 @@ type Props = {
 	filteredContaminants: any[];
 	categories?: any[];
 	subscription: boolean;
+	itemDetails?: {
+		productId: string;
+		productType: string;
+		productName: string;
+	};
 };
 
 export default function ContaminantTable({
 	filteredContaminants,
 	categories,
 	subscription,
+	itemDetails,
 }: Props) {
 	const router = useRouter();
 
@@ -103,7 +109,10 @@ export default function ContaminantTable({
 
 			<TouchableOpacity
 				onPress={() => {
-					router.push("/subscribeModal");
+					router.push({
+						pathname: "/subscribeModal",
+						params: itemDetails,
+					});
 				}}
 				disabled={subscription}
 			>

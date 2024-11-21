@@ -93,7 +93,7 @@ export function SubscribeOnboarding({
 				paddingBottom: 100,
 			}}
 		>
-			<P className="text-left text-4xl mb-4">😳💧</P>
+			<P className="text-center text-4xl mb-4">😳💧</P>
 			<View className="w-full items-left flex flex-col gap-y-2 ">
 				{hasScores && (
 					<View

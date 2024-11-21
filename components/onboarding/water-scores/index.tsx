@@ -1,11 +1,10 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
-import { useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 
 import { P } from "@/components/ui/typography";
-import { useUserProvider } from "@/context/user-provider";
+import { useSubscription } from "@/context/subscription-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function WaterScores({
@@ -15,10 +14,9 @@ export default function WaterScores({
 	userScores: any;
 	hideSubtitle?: boolean;
 }) {
-	const { subscription } = useUserProvider();
+	const { hasActiveSub } = useSubscription();
 	const { redColor, greenColor, yellowColor } = useColorScheme();
 	const router = useRouter();
-	const [openItems, setOpenItems] = useState<string[]>([]);
 
 	const blurryBadge = (name: string, type: string, index: number) => {
 		const color =
@@ -70,7 +68,7 @@ export default function WaterScores({
 	};
 
 	const itemBadge = (name: string, type: string, index: number) => {
-		if (subscription) {
+		if (hasActiveSub) {
 			const bgColor =
 				type === "harm"
 					? "bg-red-200"

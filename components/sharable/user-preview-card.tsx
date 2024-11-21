@@ -1,4 +1,3 @@
-import { useUserProvider } from "context/user-provider";
 import { Link } from "expo-router";
 import React from "react";
 import { Image, View } from "react-native";
@@ -18,8 +17,6 @@ const UserPreviewCard = ({
 	size,
 	showFavorite = false,
 }: Props) => {
-	const { subscription } = useUserProvider();
-
 	// const renderScore = () => {
 	// 	const score = item?.score || 0;
 

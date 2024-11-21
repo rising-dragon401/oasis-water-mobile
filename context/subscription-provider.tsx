@@ -9,17 +9,18 @@ import Purchases, {
 
 import { useUserProvider } from "./user-provider";
 
-import { updateUserRcId } from "@/actions/user";
+import { getStripeSubscription, updateUserRcId } from "@/actions/user";
 
 const APIKeys = {
 	apple: "appl_OIAHthcBxHjpVWGXmtLvBKRTtrR",
 	google: "goog_FvkMjztDreNxCXHMlzQqreSiQxs",
 };
 
-interface RevenueCatProps {
+interface SubscriptionProps {
 	purchasePackage: (pack: PurchasesPackage) => Promise<boolean>;
 	restorePurchases: () => Promise<CustomerInfo>;
 	userSubscription: UserState;
+	hasActiveSub: boolean;
 	packages: {
 		annual: PurchasesPackage | null;
 		weekly: PurchasesPackage | null;
@@ -30,20 +31,21 @@ export interface UserState {
 	pro: boolean;
 }
 
-const RevenueCatContext = createContext<RevenueCatProps | null>(null);
+const SubscriptionContext = createContext<SubscriptionProps | null>(null);
 
-export const useRevenueCat = () => {
-	const context = useContext(RevenueCatContext);
+export const useSubscription = () => {
+	const context = useContext(SubscriptionContext);
 
 	if (!context) {
-		throw new Error("useRevenueCat must be used within a RevenueCatProvider");
+		throw new Error(
+			"useSubscription must be used within a SubscriptionProvider",
+		);
 	}
 	return context;
 };
 
-export const RevenueCatProvider = ({ children }: any) => {
-	const { subscription, uid, userData, setSubscription, fetchSubscription } =
-		useUserProvider();
+export const SubscriptionProvider = ({ children }: any) => {
+	const { uid, userData } = useUserProvider();
 	const [userSubscription, setUserSubscription] = useState<UserState>({
 		pro: false,
 	});
@@ -58,6 +60,7 @@ export const RevenueCatProvider = ({ children }: any) => {
 	});
 	const [customerInfo, setCustomerInfo] = useState<CustomerInfo | null>(null);
 	const [, setIsReady] = useState(false);
+	const [hasActiveSub, setHasActiveSub] = useState(false);
 
 	// Configure Revenue Cat
 	// Setup subscription listener
@@ -75,11 +78,10 @@ export const RevenueCatProvider = ({ children }: any) => {
 
 			setIsReady(true);
 
-			checkSubscription();
+			// check for user subscription
+			await checkForSubscription();
 
 			// listen for customer info updates
-			// Need for restoring purchases
-			// And new subscriptions
 			Purchases.addCustomerInfoUpdateListener(async (customerInfo) => {
 				setCustomerInfo(customerInfo);
 				const rcCustomerId = customerInfo.originalAppUserId;
@@ -103,13 +105,6 @@ export const RevenueCatProvider = ({ children }: any) => {
 			setup().catch(console.log);
 		}
 	}, [uid]);
-
-	// if user purchased through web, set userSubscription to pro
-	useEffect(() => {
-		if (subscription) {
-			setUserSubscription({ pro: true });
-		}
-	}, [subscription]);
 
 	useEffect(() => {
 		if (customerInfo && uid) {
@@ -138,9 +133,7 @@ export const RevenueCatProvider = ({ children }: any) => {
 		try {
 			await Purchases.purchasePackage(pack);
 
-			setSubscription(true);
-
-			fetchSubscription({ rcCustomerId: customerInfo?.originalAppUserId });
+			setHasActiveSub(true);
 
 			posthog?.capture("purchase", {
 				type: "subscription",
@@ -156,8 +149,23 @@ export const RevenueCatProvider = ({ children }: any) => {
 		}
 	};
 
+	const checkForSubscription = async () => {
+		// First check for revenue cat subscription
+		const rcSub = await checkRevenueCatSubscription();
+		if (rcSub) {
+			setHasActiveSub(true);
+		} else {
+			// no rc sub found so check if they prev subbed through stripe
+			const stripeSub = await checkForStripeSubscription();
+			console.log("has active stripe sub", stripeSub);
+			if (stripeSub) {
+				setHasActiveSub(true);
+			}
+		}
+	};
+
 	// This should sufficiently check for active mobile subscription
-	const checkSubscription = async () => {
+	const checkRevenueCatSubscription = async () => {
 		const customerInfo = await Purchases.getCustomerInfo();
 
 		console.log(
@@ -170,15 +178,20 @@ export const RevenueCatProvider = ({ children }: any) => {
 		return hasActiveSubscription;
 	};
 
-	const restorePurchases = async () => {
-		console.log("restorePurchases");
-		// Reload stripe?
-		// Nah it checks stripe on app launch
+	const checkForStripeSubscription = async () => {
+		if (!uid) {
+			return false;
+		}
 
-		// reloads customer info
-		// Triggers Purchases.addCustomerInfoUpdateListener
+		const stripeSubData = await getStripeSubscription(uid);
+
+		const hasActiveStripeSub = stripeSubData.success && stripeSubData.data;
+
+		return hasActiveStripeSub;
+	};
+
+	const restorePurchases = async () => {
 		const customerInfo = await Purchases.restorePurchases();
-		fetchSubscription({ rcCustomerId: customerInfo.originalAppUserId });
 
 		return customerInfo;
 	};
@@ -187,12 +200,13 @@ export const RevenueCatProvider = ({ children }: any) => {
 		purchasePackage,
 		restorePurchases,
 		userSubscription,
+		hasActiveSub,
 		packages,
 	};
 
 	return (
-		<RevenueCatContext.Provider value={value}>
+		<SubscriptionContext.Provider value={value}>
 			{children}
-		</RevenueCatContext.Provider>
+		</SubscriptionContext.Provider>
 	);
 };

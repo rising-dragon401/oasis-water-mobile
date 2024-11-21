@@ -15,6 +15,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { H2, Muted, P } from "@/components/ui/typography";
+import { useSubscription } from "@/context/subscription-provider";
 import { useUserProvider } from "@/context/user-provider";
 import { CATEGORIES as CATEGORIES_CONST } from "@/lib/constants/categories";
 import { useColorScheme } from "@/lib/useColorScheme";
@@ -153,7 +154,8 @@ const categorizeItems = (items: any[]) => {
 };
 
 export default function RankingList({ categoryId }: { categoryId: string }) {
-	const { subscription, uid, user } = useUserProvider();
+	const { uid, user } = useUserProvider();
+	const { hasActiveSub } = useSubscription();
 	const router = useRouter();
 	const navigation = useNavigation();
 	const { backgroundColor } = useColorScheme();
@@ -182,7 +184,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 		const categorizedData = categorizeItems(data);
 
 		// Sort the data if the user has a subscription
-		if (subscription && uid) {
+		if (hasActiveSub && uid) {
 			const items = categorizedData;
 			const indexedItems = categorizedData.filter(
 				(item: any) => item.is_indexed !== false,
@@ -349,7 +351,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 			setOpenFunction: (open: boolean) => void,
 			isOpen: boolean,
 		) => {
-			if (!subscription) {
+			if (!hasActiveSub) {
 				router.push("/subscribeModal");
 			} else {
 				setOpenFunction(isOpen);
@@ -496,7 +498,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 
 	return (
 		<View className="flex-1 md:mt-4 mt-0 w-screen px-6">
-			{!subscription ? (
+			{!hasActiveSub ? (
 				<View className=" pb-2 flex-row gap-4 items-end justify-between w-full">
 					<H2>{title.charAt(0) + title.slice(1)}</H2>
 
@@ -508,7 +510,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 				</View>
 			)}
 
-			{subscription && renderFilters()}
+			{hasActiveSub && renderFilters()}
 
 			{loading ? renderLoader() : null}
 
@@ -556,7 +558,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 						scrollToOverflowEnabled={false}
 					/>
 
-					{!subscription && (
+					{!hasActiveSub && (
 						<View
 							className="flex-1 relative justify-center items-center"
 							style={{ position: "absolute", bottom: 20, width: "100%" }}

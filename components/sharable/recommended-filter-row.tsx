@@ -9,7 +9,7 @@ import { FlatList, TouchableOpacity, View } from "react-native";
 import ItemPreviewCard from "./item-preview-card";
 
 import { Button } from "@/components/ui/button";
-import { useUserProvider } from "@/context/user-provider";
+import { useSubscription } from "@/context/subscription-provider";
 import { RANDOM_BLUR_IMAGES } from "@/lib/constants/images";
 
 type RecommendedFilterRowProps = {
@@ -20,12 +20,12 @@ type RecommendedFilterRowProps = {
 export default function RecommendedFilterRow({
 	contaminants,
 }: RecommendedFilterRowProps) {
-	const { subscription } = useUserProvider();
+	const { hasActiveSub } = useSubscription();
 	const router = useRouter();
 	const [recommended, setRecommended] = useState<any>([]);
 
 	const fetchRecommendedFilter = async () => {
-		if (!subscription) return;
+		if (!hasActiveSub) return;
 		const recommendedFilters = await getRecommendedFilter(contaminants);
 
 		setRecommended(recommendedFilters);
@@ -33,7 +33,7 @@ export default function RecommendedFilterRow({
 
 	useEffect(() => {
 		fetchRecommendedFilter();
-	}, [subscription]);
+	}, [hasActiveSub]);
 
 	const randomBlurs = useMemo(() => {
 		return Array.from(
@@ -50,14 +50,14 @@ export default function RecommendedFilterRow({
 			<View className="flex flex-row justify-between items-center mb-2">
 				<H3>Recommended filters</H3>
 
-				{subscription && (
+				{hasActiveSub && (
 					<Link href="/(protected)/search/top-rated-all">
 						<Muted className="text-center m-0 p-0">see all</Muted>
 					</Link>
 				)}
 			</View>
 
-			{!subscription ? (
+			{!hasActiveSub ? (
 				<View className="mb-2">
 					<Button
 						label="See filters"

@@ -13,7 +13,7 @@ import { SWRConfig } from "swr";
 
 import OasisLogo from "@/assets/oasis-word.png";
 import { BlogProvider } from "@/context/blogs-provider";
-import { RevenueCatProvider } from "@/context/revenue-cat-provider";
+import { SubscriptionProvider } from "@/context/subscription-provider";
 import { SupabaseProvider } from "@/context/supabase-provider";
 import { ToastProvider } from "@/context/toast-provider";
 import UserProvider from "@/context/user-provider";
@@ -62,7 +62,7 @@ function RootLayout() {
 	return (
 		<SupabaseProvider>
 			<UserProvider>
-				<RevenueCatProvider>
+				<SubscriptionProvider>
 					<BlogProvider>
 						<PostHogProvider
 							apiKey="phc_VmBnr5ASsMA5JqVfFzwvxnfe1SJlNu85lH8pWfiAsYZ"
@@ -202,7 +202,7 @@ function RootLayout() {
 							</SWRConfig>
 						</PostHogProvider>
 					</BlogProvider>
-				</RevenueCatProvider>
+				</SubscriptionProvider>
 			</UserProvider>
 		</SupabaseProvider>
 	);

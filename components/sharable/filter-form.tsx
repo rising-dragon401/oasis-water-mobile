@@ -19,6 +19,7 @@ import { getFilterDetails } from "@/actions/filters";
 import ContaminantTable from "@/components/sharable/contaminant-table";
 import FilterMetadata from "@/components/sharable/filter-metadata";
 import { H3, Muted } from "@/components/ui/typography";
+import { useSubscription } from "@/context/subscription-provider";
 import { useUserProvider } from "@/context/user-provider";
 import { IngredientCategories } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
@@ -36,9 +37,9 @@ interface ContaminantsByCategory {
 
 export function FilterForm({ id }: Props) {
 	const navigation = useNavigation();
-	const { subscription } = useUserProvider();
+	const { hasActiveSub } = useSubscription();
 	const { iconColor } = useColorScheme();
-
+	const { userData } = useUserProvider();
 	const [isLoading, setIsLoading] = useState(true);
 	const [filter, setFilter] = useState<any>({});
 	const [contaminants, setContaminants] = useState<any[]>([]);
@@ -142,6 +143,23 @@ export function FilterForm({ id }: Props) {
 
 	const isTested = filter?.is_indexed !== false;
 
+	const filterDetails = {
+		productId: filter.id,
+		productType: filter.type,
+		productName: filter.name,
+	};
+
+	const isItemUnlocked = useMemo(() => {
+		return userData?.unlock_history?.some((unlock: any) => {
+			return (
+				String(unlock.product_id) === String(filter.id) &&
+				String(unlock.product_type) === String(filter.type)
+			);
+		});
+	}, [userData, filter.id, filter.type]);
+
+	console.log("isItemUnlocked: ", isItemUnlocked);
+
 	if (filter.is_draft) {
 		return (
 			<View>This filter has not been rated yet. Please check back later.</View>
@@ -198,7 +216,13 @@ export function FilterForm({ id }: Props) {
 						</View>
 
 						<View className="flex w-1/3 flex-col-reverse justify-end items-end -mt-2">
-							<Score score={filter.score} size="sm" untested={!isTested} />
+							<Score
+								score={filter.score}
+								size="sm"
+								untested={!isTested}
+								itemDetails={filterDetails}
+								showScore={isItemUnlocked}
+							/>
 						</View>
 					</View>
 
@@ -208,7 +232,8 @@ export function FilterForm({ id }: Props) {
 						<FilterMetadata
 							filteredContaminants={filteredContaminants}
 							contaminantsByCategory={contaminantsByCategory}
-							isPaywalled={!subscription}
+							isPaywalled={!hasActiveSub && !isItemUnlocked}
+							itemDetails={filterDetails}
 						/>
 					</View>
 
@@ -222,7 +247,8 @@ export function FilterForm({ id }: Props) {
 						<ContaminantTable
 							filteredContaminants={filter.contaminants_filtered}
 							categories={categoriesFiltered}
-							subscription={subscription}
+							subscription={hasActiveSub || isItemUnlocked}
+							itemDetails={filterDetails}
 						/>
 					</View>
 

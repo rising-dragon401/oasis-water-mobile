@@ -19,7 +19,6 @@ import React, {
 
 import { useSupabase } from "./supabase-provider";
 
-import { checkSubscription } from "@/actions/subscription";
 import { supabase } from "@/config/supabase";
 
 interface UserContextType {
@@ -31,41 +30,13 @@ interface UserContextType {
 	userScores: any;
 	userRequests: any;
 	userFavorites: any[] | null | undefined;
-	subscription: boolean;
-	subscriptionData: any | null | undefined;
-	subscriptionProvider: SubscriptionProviderType;
 	refreshUserData: (
-		type?:
-			| "all"
-			| "favorites"
-			| "scores"
-			| "subscription"
-			| "userData"
-			| "requests",
+		type?: "all" | "favorites" | "scores" | "userData" | "requests",
 	) => Promise<void>;
 	fetchUserFavorites: (uid: string | null) => Promise<void>;
 	fetchUserScores: (userTapId?: any) => Promise<void>;
-	fetchSubscription: ({
-		userId,
-		rcCustomerId,
-	}: {
-		userId?: string;
-		rcCustomerId?: string;
-	}) => Promise<any | null>;
-	setSubscription: (value: boolean) => void;
 	fetchUserData: (uid: string | null) => Promise<any | null>;
 	logout: () => void;
-}
-
-type SubscriptionProviderType = null | "revenue_cat" | "stripe";
-
-interface SubscriptionResponse {
-	apiStatus: number;
-	message?: string;
-	data?: {
-		status?: string;
-		[key: string]: any;
-	} | null; // Allow data to be null
 }
 
 const UserContext = createContext<UserContextType | null>(null);
@@ -83,10 +54,6 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
 	const [userId, setUserId] = useState<string | null | undefined>(null);
 	const [provider, setProvider] = useState<any>(null);
-	const [subscription, setSubscription] = useState<boolean>(false);
-	const [subscriptionData, setSubscriptionData] = useState<any>(null);
-	const [subscriptionProvider, setSubscriptionProvider] =
-		useState<SubscriptionProviderType>(null);
 	const [userData, setUserData] = useState<any>(null);
 	const [tapScore, setTapScore] = useState<any>({
 		id: null,
@@ -108,11 +75,6 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 		filters: [],
 		tapLocations: [],
 	});
-
-	// Admin scripts
-	useEffect(() => {
-		// getIngIdsByName();
-	}, []);
 
 	// set active session and refresh user data
 	useEffect(() => {
@@ -153,13 +115,20 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 		setUserId(session?.user?.id);
 		setProvider(session?.user?.app_metadata?.provider);
 
-		const userData = await fetchUserData(session?.user?.id);
-		fetchSubscription({
-			userId: session.user?.id,
-			rcCustomerId: userData?.rc_customer_id,
-		});
+		const data = await fetchUserData(session?.user?.id);
 
 		fetchUserFavorites(session?.user?.id);
+
+		if (data?.scores) {
+			setUserScores(data?.scores);
+		}
+		if (data?.tap_score) {
+			setTapScore(data?.tap_score);
+		}
+
+		if (!data?.tap_score || !data?.scores) {
+			fetchUserScores(data?.tap_location_id);
+		}
 	};
 
 	const fetchUserData = async (uid?: string | null) => {
@@ -172,17 +141,6 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
 		setUserData(data);
 
-		if (!data?.tap_score || !data?.scores) {
-			fetchUserScores(data?.tap_location_id);
-		} else {
-			if (data?.scores) {
-				setUserScores(data?.scores);
-			}
-			if (data?.tap_score) {
-				setTapScore(data?.tap_score);
-			}
-		}
-
 		return data;
 	};
 
@@ -193,54 +151,6 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
 		const favs = await getUserFavorites(uid);
 		setUserFavorites(favs);
-	};
-
-	const fetchSubscription = async ({
-		userId,
-		rcCustomerId,
-	}: {
-		userId?: string;
-		rcCustomerId?: string;
-	}) => {
-		try {
-			// Check revcat
-			// check stripe
-			// check supabase
-			// ?
-
-			const thisUserId = userId || session?.user?.id || null;
-			const thisRcCustomerId = rcCustomerId || userData?.rc_customer_id || null;
-
-			// console.log("userData:", userData);
-			// console.log("thisRcCustomerId:", thisRcCustomerId);
-
-			// if (!thisUserId) {
-			// 	throw new Error("fetchSubscription failed: No user ID provided");
-			// }
-
-			// console.log("fetchSubscription", userId, rcCustomerId);
-
-			const response: SubscriptionResponse = await checkSubscription(
-				thisUserId,
-				thisRcCustomerId,
-			);
-
-			console.log("checkSubscription: ", JSON.stringify(response, null, 2));
-
-			if (response && response?.apiStatus === 200) {
-				const status = response.data?.status;
-				if (status === "active" || status === "trialing") {
-					setSubscription(true);
-				} else {
-					setSubscription(false);
-				}
-			} else {
-				// mark as false if cannot fetch subscription data
-				setSubscription(false);
-			}
-		} catch (error) {
-			// console.error("Error fetching subscription:", error);
-		}
 	};
 
 	// Should only be called when tap location or favorites change
@@ -261,13 +171,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 	};
 
 	const refreshUserData = async (
-		type:
-			| "all"
-			| "favorites"
-			| "scores"
-			| "subscription"
-			| "requests"
-			| "userData" = "all",
+		type: "all" | "favorites" | "scores" | "requests" | "userData" = "all",
 	) => {
 		const userId = user?.id;
 
@@ -279,13 +183,6 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
 		const promises = [];
 
-		if (type === "all" || type === "subscription") {
-			promises.push(
-				fetchSubscription({
-					userId,
-				}),
-			);
-		}
 		if (type === "all" || type === "favorites") {
 			promises.push(fetchUserFavorites(userId));
 		}
@@ -293,7 +190,8 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 			promises.push(fetchUserData(userId));
 		}
 
-		if (type === "all" || type === "scores") {
+		// we very rarely want to do this
+		if (type === "scores") {
 			promises.push(fetchUserScores(userData?.tap_location_id));
 		}
 
@@ -303,14 +201,12 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 	const logout = useCallback(async () => {
 		clearUserData();
 		await supabase.auth.signOut();
-		setSubscription(false);
 	}, [supabase.auth]);
 
 	const clearUserData = () => {
 		setUserData(null);
 		setUserId(null);
 		setUserFavorites(null);
-		setSubscription(false);
 		setUserScores({
 			showersScore: 0,
 			waterFilterScore: 0,
@@ -325,19 +221,14 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 			user,
 			provider,
 			uid: userId,
-			subscription,
-			subscriptionData,
 			userData,
 			userFavorites,
-			subscriptionProvider,
 			tapScore,
 			userScores,
 			userRequests,
 			refreshUserData,
 			fetchUserFavorites,
 			fetchUserScores,
-			fetchSubscription,
-			setSubscription,
 			fetchUserData,
 			logout,
 		}),
@@ -345,19 +236,15 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 			user,
 			provider,
 			userId,
-			subscription,
-			subscriptionData,
+
 			userData,
 			userFavorites,
-			subscriptionProvider,
 			tapScore,
 			userScores,
 			userRequests,
 			refreshUserData,
 			fetchUserFavorites,
 			fetchUserScores,
-			fetchSubscription,
-			setSubscription,
 			fetchUserData,
 			logout,
 		],
