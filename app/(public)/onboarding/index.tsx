@@ -6,6 +6,7 @@ import {
 	Animated,
 	Dimensions,
 	Image,
+	Platform,
 	TouchableOpacity,
 	View,
 	ViewStyle,
@@ -18,7 +19,6 @@ import {
 	updateUserData,
 } from "@/actions/user";
 import ItemSelector from "@/components/sharable/item-selector";
-import Loader from "@/components/sharable/loader";
 import LocationSelector from "@/components/sharable/location-selector";
 import { SubscribeOnboarding } from "@/components/sharable/subscribe-onboarding";
 import { Button } from "@/components/ui/button";
@@ -30,6 +30,19 @@ import { useToast } from "@/context/toast-provider";
 import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
 import { readableType } from "@/lib/utils";
+
+let StoreReview: {
+	isAvailableAsync: () => Promise<boolean>;
+	requestReview: () => Promise<void>;
+};
+if (Platform.OS !== "web") {
+	StoreReview = require("expo-store-review");
+} else {
+	StoreReview = {
+		isAvailableAsync: async () => false,
+		requestReview: async () => {},
+	};
+}
 
 export default function OnboardingScreen() {
 	const router = useRouter();
@@ -70,6 +83,7 @@ export default function OnboardingScreen() {
 	const [loadingNearestLocation, setLoadingNearestLocation] = useState(false);
 	const [nearestLocation, setNearestLocation] = useState<any>(null);
 	const [loadingFavs, setLoadingFavs] = useState(false);
+	const [hasRequestedRate, setHasRequestedRate] = useState(false);
 
 	const windowWidth = Dimensions.get("window").width;
 	const windowHeight = Dimensions.get("window").height;
@@ -79,14 +93,34 @@ export default function OnboardingScreen() {
 	// Onboarding steps
 	const steps = [
 		{
-			title: "Our water is contaminated",
+			title: "There's something in the water",
+			titleStyle: "max-w-xs",
 			subtitle:
-				"90% of drinking water is laced with endocrine disruptors, microplastics, forever chemicals and other toxins all of which expose your to serious health issues. Oasis shows you what's actually inside",
+				"Most bottled and tap water contains toxic contaminants and you can't rely on brands or organizations to safeguard your health.",
 			image:
-				"https://connect.live-oasis.com/storage/v1/object/public/website/images/onboarding/toxins%20in%20water%20graphic.png?t=2024-10-08T05%3A26%3A22.658Z",
+				"https://connect.live-oasis.com/storage/v1/object/public/website/images/onboarding/brands_cant_be_trusted.png",
 			imageStyle: {
 				width: "100%",
-				height: windowHeight * 0.4,
+				height: windowHeight * 0.44,
+				resizeMode: "cover",
+				borderRadius: 20,
+				marginTop: 18,
+			},
+			component: null,
+			onSubmit: null,
+			submitButtonLabel: "Continue",
+			onSkip: null,
+			canSkip: false,
+		},
+		{
+			title: "Oasis tells you the truth",
+			subtitle:
+				"We independently rank and gather the scientific evidence for each product to help you make informed choices best for your health.",
+			image:
+				"https://connect.live-oasis.com/storage/v1/object/public/website/images/onboarding/toxins%20in%20water%20graphic.png",
+			imageStyle: {
+				width: "100%",
+				height: windowHeight * 0.44,
 				resizeMode: "contain",
 				borderRadius: 20,
 				marginTop: 18,
@@ -96,6 +130,33 @@ export default function OnboardingScreen() {
 			submitButtonLabel: "Continue",
 			onSkip: null,
 			canSkip: false,
+		},
+		{
+			title: "Help spread the word",
+			subtitle:
+				"As a small self-funded team, your 5-star rating helps us share the importance of clean, healthy water with more people around the world.",
+			image:
+				"https://connect.live-oasis.com/storage/v1/object/public/website/images/onboarding/hand_water_dripping.jpeg?t=2024-11-20T19%3A17%3A40.942Z",
+			imageStyle: {
+				width: "100%",
+				height: windowHeight * 0.4,
+				resizeMode: "contain",
+				borderRadius: 20,
+				marginTop: 18,
+			},
+			component: null,
+			onSubmit: () => {
+				if (!hasRequestedRate) {
+					handleRatePress();
+				} else {
+					stepForward();
+				}
+			},
+			submitButtonLabel: hasRequestedRate
+				? "Thank you! 💙 Continue"
+				: " ✨ Give 5 stars ✨",
+			onSkip: null,
+			canSkip: true,
 		},
 		{
 			title: "Stay notified of new lab results and research",
@@ -132,7 +193,7 @@ export default function OnboardingScreen() {
 			id: "location",
 			title: "Where are you based?",
 			subtitle:
-				"This is used to locate your nearest tap water report and find available brands",
+				"Used to locate the nearest tap water report and find available brands2",
 			image: null,
 			imageStyle: {
 				width: "100%",
@@ -140,13 +201,13 @@ export default function OnboardingScreen() {
 				resizeMode: "contain",
 			},
 			component: (
-				<View className="flex mt-2">
+				<View className="flex mt-8">
 					<LocationSelector
 						address={selectedAddress}
 						setAddress={setSelectedAddress}
 						initialAddress={null}
 					/>
-					{loadingNearestLocation && (
+					{/* {loadingNearestLocation && (
 						<View className="flex flex-row items-center justify-center gap-2 mt-4">
 							<Loader size="small" />
 							<P>Finding nearest tap water report</P>
@@ -157,7 +218,17 @@ export default function OnboardingScreen() {
 							<P>Nearest tap water report:</P>
 							<P>{nearestLocation?.name || "None"}</P>
 						</View>
-					)}
+					)} */}
+					{/* {selectedAddress && !loadingLocation && !nearestLocation && (
+						<View className="flex flex-col items-center gap-2 mt-6 bg-card px-4 py-2 rounded-xl">
+							<P>
+								We couldn’t find tap water reports for your area just yet, but
+								you can still enjoy Oasis! We’ll update you when new water
+								quality reports are available.
+							</P>
+
+						</View>
+					)} */}
 				</View>
 			),
 			onSubmit: () => {
@@ -223,24 +294,22 @@ export default function OnboardingScreen() {
 					)}
 				</View>
 			),
-			onSubmit: () => {
-				handleUpdateFavs();
-			},
+			onSubmit: null,
 			loading: loadingFavs,
 			submitButtonLabel: "Continue",
 			onSkip: () => {
-				setCurrentStep((prev) => Math.min(totalSteps - 1, prev + 1));
+				stepForward();
 			},
 			canSkip: true,
 			skipButtonLabel: "Skip",
 		},
 		{
-			title: "Unlock healthy hydration",
-			subtitle: "Join 10,000+ members improving their water habits.",
-			titleStyle: "text-center",
-			image:
-				"https://connect.live-oasis.com/storage/v1/object/public/website/images/onboarding/paywall%20cards.jpg",
-			// image: null,
+			title: "Find Out What’s in Your Water—and How to Fix It",
+			// subtitle: "😳💧",
+			// titleStyle: "text-center",
+			// image:
+			// 	"https://connect.live-oasis.com/storage/v1/object/public/website/images/onboarding/paywall%20cards.jpg",
+			image: null,
 			imageStyle: {
 				width: !hasScores ? "80%" : "54%",
 				height: !hasScores ? windowHeight * 0.18 : windowHeight * 0.1,
@@ -260,7 +329,7 @@ export default function OnboardingScreen() {
 				handleSubscribe();
 			},
 			loading: loadingPurchase,
-			submitButtonLabel: "Try for free",
+			submitButtonLabel: "Unlock for free",
 			submitButtonStyles: "shadow-lg shadow-blue-500/50 bg-primary",
 			onSkip: null,
 			skipButtonLabel: "No thanks, continue with basic and view limited data",
@@ -271,6 +340,15 @@ export default function OnboardingScreen() {
 	const totalSteps = steps.length;
 	const slideAnim = useRef(new Animated.Value(0)).current;
 
+	const stepForward = () => {
+		setCurrentStep((prev) => Math.min(totalSteps - 1, prev + 1));
+	};
+
+	const handlePrevStep = () => {
+		setDirection("backward");
+		setCurrentStep((prev) => Math.max(0, prev - 1));
+	};
+
 	// save current step to AsyncStorage
 	useEffect(() => {
 		const saveCurrentStep = async () => {
@@ -278,6 +356,10 @@ export default function OnboardingScreen() {
 				await AsyncStorage.setItem("currentStep", currentStep.toString());
 			} catch (error) {
 				console.error("Failed to save current step to AsyncStorage", error);
+			}
+
+			if (currentStep === totalSteps - 1 && subscription) {
+				handleFinishOnboarding();
 			}
 		};
 
@@ -299,22 +381,27 @@ export default function OnboardingScreen() {
 
 		// only if user pressed submit button and there is a submit function
 		if (submit && steps[currentStep].onSubmit) {
-			await steps[currentStep].onSubmit();
-		}
-
-		const nextStep = currentStep + 1;
-
-		// Skip the last step if user already has a subscription
-		if (nextStep === totalSteps - 1 && subscription) {
-			handleFinishOnboarding();
+			steps[currentStep].onSubmit(); // submit function responsible for moving to next step
 		} else {
-			setCurrentStep((prev) => Math.min(totalSteps - 1, prev + 1));
+			stepForward();
 		}
 	};
 
-	const handlePrevStep = () => {
-		setDirection("backward");
-		setCurrentStep((prev) => Math.max(0, prev - 1));
+	const handleRatePress = async () => {
+		if (await StoreReview.isAvailableAsync()) {
+			try {
+				await StoreReview.requestReview();
+			} catch (error) {
+				console.error("Error requesting review:", error);
+			}
+		} else {
+			// For development builds or when StoreReview is not available
+			console.log("App rating not available in this environment");
+			// You can add a mock implementation or alert here
+			// showToast("Thank you 😊", 1000, "top");
+		}
+
+		setHasRequestedRate(true);
 	};
 
 	const handleFinishOnboarding = async () => {
@@ -329,6 +416,7 @@ export default function OnboardingScreen() {
 			"newsletter_subscribed",
 			isSubscribedToNewsletter,
 		);
+		stepForward();
 		setLoadingSubStatus(false);
 	};
 
@@ -346,11 +434,6 @@ export default function OnboardingScreen() {
 
 			try {
 				if (!isAddressInUS(selectedAddress)) {
-					showToast(
-						"Tap water reports are only available in the US as of now",
-						1000,
-						"top",
-					);
 					setNearestLocation(null);
 					throw new Error("Address is not in the US");
 				}
@@ -371,8 +454,6 @@ export default function OnboardingScreen() {
 						{ latitude: userCoords.latitude, longitude: userCoords.longitude },
 						uid || "",
 					);
-
-					console.log("nearestLocationRes");
 
 					if (!nearestLocationRes) {
 						throw new Error(
@@ -415,6 +496,7 @@ export default function OnboardingScreen() {
 			throw new Error(error as string);
 		} finally {
 			setLoadingNearestLocation(false);
+			stepForward();
 		}
 	};
 
@@ -436,28 +518,6 @@ export default function OnboardingScreen() {
 		refreshUserData("scores");
 	};
 
-	const handleUpdateFavs = async () => {
-		// setLoadingFavs(true);
-		// try {
-		// 	if (!uid) {
-		// 		console.log("uid is null");
-		// 		throw new Error("Unable to update favs: uid is null");
-		// 	}
-		// 	const added = await addWatersAndFiltersToUserFavorites(uid, favs);
-		// 	refreshUserData("scores");
-		// 	if (!added) {
-		// 		throw new Error(
-		// 			"Unable to update favs: addWatersAndFiltersToUserFavorites failed",
-		// 		);
-		// 	}
-		// 	return true;
-		// } catch (error) {
-		// 	return false;
-		// } finally {
-		// 	setLoadingFavs(false);
-		// }
-	};
-
 	const handleSubscribe = async () => {
 		setLoadingPurchase(true);
 
@@ -470,8 +530,8 @@ export default function OnboardingScreen() {
 				throw new Error("User not found");
 			}
 
-			const annualPackage = packages.find((p) => p.packageType === "ANNUAL");
-			const weeklyPackage = packages.find((p) => p.packageType === "WEEKLY");
+			const annualPackage = packages.annual;
+			const weeklyPackage = packages.weekly;
 
 			const pack = annualPackage;
 
@@ -482,7 +542,7 @@ export default function OnboardingScreen() {
 				throw new Error("No package found");
 			}
 
-			const res = await purchasePackage!(pack);
+			const res = await purchasePackage(pack);
 
 			if (res) {
 				// Handle success here
@@ -512,7 +572,7 @@ export default function OnboardingScreen() {
 	}
 
 	return (
-		<View className="flex h-full  flex-col pb-14">
+		<View className="flex-1 h-full flex-col justify-between pb-14">
 			{/* Back Button and Progress Bar */}
 			<View className="flex flex-row items-center justify-between mb-2 py px-4 ">
 				<View className="w-14 flex flex-row justify-center">
@@ -559,18 +619,20 @@ export default function OnboardingScreen() {
 			</View>
 
 			{/* Content */}
-			<View className="flex-1 overflow-hidden ">
+			<View className="flex-1 overflow-hidden">
 				<Animated.View
 					style={getSlideStyle() as Animated.AnimatedProps<ViewStyle>}
 				>
 					{steps.map((step, index) => (
 						<View key={index} style={{ width: windowWidth }} className="px-8">
-							<View className="flex flex-col gap-2 mt-4 px-4 tex">
-								<H1 className={step.titleStyle}>{step.title}</H1>
-								<P className={step.titleStyle}>{step.subtitle}</P>
+							<View className="flex flex-col gap-2 py-2 text-center">
+								<H1 className={`${step.titleStyle} font-semibold`}>
+									{step.title}
+								</H1>
+								<P>{step.subtitle}</P>
 							</View>
-							<View className="flex flex-col justify-center items-center  w-full ">
-								{step.image && (
+							{step.image && (
+								<View className="flex flex-col justify-center items-center  w-full ">
 									<View className="flex justify-center items-center w-full  ">
 										<Image
 											source={{ uri: step.image }}
@@ -579,8 +641,8 @@ export default function OnboardingScreen() {
 											resizeMode="cover"
 										/>
 									</View>
-								)}
-							</View>
+								</View>
+							)}
 							{step.component && (
 								<View className="flex" style={{ marginBottom: 20 }}>
 									{step.component}
@@ -602,13 +664,14 @@ export default function OnboardingScreen() {
 					onPress={() => handleNextStep(true)}
 					variant="default"
 					className={`!h-20 w-full ${steps[currentStep].submitButtonStyles} bg-primary`}
+					textClassName="!text-lg"
 					label={steps[currentStep].submitButtonLabel}
 					loading={steps[currentStep].loading}
 				/>
 				<View className="text-center mt-2 h-8 flex flex-col items-center">
 					{currentStep === steps.length - 1 && (
 						<Muted className="text-center max-w-sm">
-							3 Day free trial then $0.90 a week (billed annually)
+							3-day free trial then $0.90/week (billed annually)
 						</Muted>
 					)}
 

@@ -115,10 +115,10 @@ const LocationSelector = ({
 	};
 
 	return (
-		<View className="flex p-5 justify-center w-full ">
+		<View className="flex justify-center w-full">
 			<View className="relative">
 				<Input
-					className="border border-gray-300 p-3 mb-0 rounded-xl  pr-10 !h-16 w-96"
+					className="border border-gray-300 p-4 mb-0 rounded-xl !h-16 w-full"
 					placeholder={
 						initialAddress || address?.formattedAddress || "Enter address"
 					}

@@ -227,10 +227,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 						tags: category?.selectedTags,
 					}),
 				);
-				// navigation.setOptions({
-				// 	title: "Bottled water",
-				// });
-				// setTitle("Bottled water");
+
 				break;
 			case "filter":
 				fetchAndSetData("filter", () =>
@@ -241,10 +238,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 						tags: category?.tags,
 					}),
 				);
-				// navigation.setOptions({
-				// 	title: "Filters",
-				// });
-				// setTitle("Water filters");
+
 				break;
 
 			default:

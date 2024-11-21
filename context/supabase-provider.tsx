@@ -231,8 +231,6 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 		const fetchData = async () => {
 			if (!initialized) return;
 
-			console.log("fetching data");
-
 			const inProtectedGroup = segments[0] === "(protected)";
 
 			if (session && !inProtectedGroup) {

@@ -6,7 +6,6 @@ import {
 	getCurrentUserData,
 	getUserFavorites,
 	getUserTapScore,
-	getUserUpvoted,
 } from "actions/user";
 import React, {
 	ReactNode,
@@ -161,7 +160,6 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 		});
 
 		fetchUserFavorites(session?.user?.id);
-		fetchUserUpvoted(session?.user?.id);
 	};
 
 	const fetchUserData = async (uid?: string | null) => {
@@ -173,7 +171,18 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 		const data = await getCurrentUserData(uid);
 
 		setUserData(data);
-		fetchUserScores(data?.tap_location_id);
+
+		if (!data?.tap_score || !data?.scores) {
+			fetchUserScores(data?.tap_location_id);
+		} else {
+			if (data?.scores) {
+				setUserScores(data?.scores);
+			}
+			if (data?.tap_score) {
+				setTapScore(data?.tap_score);
+			}
+		}
+
 		return data;
 	};
 
@@ -194,6 +203,11 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 		rcCustomerId?: string;
 	}) => {
 		try {
+			// Check revcat
+			// check stripe
+			// check supabase
+			// ?
+
 			const thisUserId = userId || session?.user?.id || null;
 			const thisRcCustomerId = rcCustomerId || userData?.rc_customer_id || null;
 
@@ -229,26 +243,21 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 		}
 	};
 
+	// Should only be called when tap location or favorites change
 	const fetchUserScores = async (userTapId?: any) => {
+		if (!userId) {
+			return;
+		}
+
 		const tapId = userTapId || userData?.tap_location_id;
 
-		console.log("fetchUserScores", tapId);
-		const tapData = await getUserTapScore(tapId);
-
-		console.log("tapData", JSON.stringify(tapData, null, 2));
+		const tapData = await getUserTapScore(userId, tapId);
 
 		setTapScore(tapData);
 
-		const scores = await calculateUserScores(userFavorites, tapData);
-
-		// console.log("scores", scores);
+		const scores = await calculateUserScores(userId, userFavorites, tapData);
 
 		setUserScores(scores);
-	};
-
-	const fetchUserUpvoted = async (userId: string) => {
-		const upvoted = await getUserUpvoted(userId);
-		setUserRequests(upvoted);
 	};
 
 	const refreshUserData = async (
@@ -283,9 +292,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 		if (type === "all" || type === "userData") {
 			promises.push(fetchUserData(userId));
 		}
-		if (type === "all" || type === "requests") {
-			promises.push(fetchUserUpvoted(userId));
-		}
+
 		if (type === "all" || type === "scores") {
 			promises.push(fetchUserScores(userData?.tap_location_id));
 		}

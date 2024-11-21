@@ -1,5 +1,4 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { getFeaturedUsers } from "actions/admin";
 import { Image } from "expo-image";
 import { Link, usePathname, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -108,28 +107,6 @@ export default function TabOneScreen() {
 	useEffect(() => {
 		fetchData();
 	}, []);
-
-	// show review modal if user has not reviewed the app
-	useEffect(() => {
-		if (
-			userData &&
-			uid &&
-			subscription &&
-			!userData?.has_reviewed_app &&
-			pathname !== "/reviewModal" &&
-			userData?.is_onboarded
-		) {
-			router.push("/reviewModal");
-		}
-	}, [userData, subscription, uid]);
-
-	async function getPeople() {
-		setLoadingPeople(true);
-		const data = await getFeaturedUsers();
-
-		setPeople(data || []);
-		setLoadingPeople(false);
-	}
 
 	async function getRecentlyUpdatedItems() {
 		const data = await getMostRecentlyUpdatedItems();

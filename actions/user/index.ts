@@ -203,8 +203,6 @@ export async function updateUserData(id: string, column: string, value: any) {
 			throw new Error("No user found");
 		}
 
-		console.log("updateUserData", id, column, value);
-
 		const { error } = await supabase
 			.from("users")
 			.update({ [column]: value })
@@ -795,7 +793,10 @@ export const getRecommendedProducts = async (uid: string) => {
 	// }
 };
 
-export const getUserTapScore = async (tapWaterLocationId: number) => {
+export const getUserTapScore = async (
+	uid: string,
+	tapWaterLocationId: number,
+) => {
 	if (!tapWaterLocationId) {
 		return null;
 	}
@@ -836,6 +837,9 @@ export const getUserTapScore = async (tapWaterLocationId: number) => {
 			),
 		})),
 	};
+
+	// update tap_score in user table
+	await updateUserData(uid, "tap_score", details);
 
 	return details;
 };
@@ -974,7 +978,11 @@ export const getIngredientsMetadata = async (ingredientIds: number[]) => {
 	return ingredientsMetadata.filter((metadata) => metadata !== null);
 };
 
-export const calculateUserScores = async (favorites: any, tapScore: any) => {
+export const calculateUserScores = async (
+	uid: string,
+	favorites: any,
+	tapScore: any,
+) => {
 	const showerFilters = (favorites ?? []).filter((favorite: any) =>
 		favorite.tags.includes("shower"),
 	);
@@ -1071,6 +1079,9 @@ export const calculateUserScores = async (favorites: any, tapScore: any) => {
 		allContaminants,
 		allMinerals,
 	};
+
+	// update scores column in user table
+	await updateUserData(uid, "scores", data);
 
 	return data;
 };

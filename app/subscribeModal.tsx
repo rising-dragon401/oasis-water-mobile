@@ -1,4 +1,4 @@
-import { Octicons } from "@expo/vector-icons";
+import Feather from "@expo/vector-icons/Feather";
 import { Image } from "expo-image";
 import * as Linking from "expo-linking";
 import { useRouter } from "expo-router";
@@ -15,36 +15,37 @@ import { useColorScheme } from "@/lib/useColorScheme";
 export const FEATURES = [
 	{
 		icon: "check",
-		label: "Access all scores and ratings",
+		label: "Unlock all scores and ratings",
 	},
 	{
 		icon: "check",
-		label: "Full contaminant breakdowns",
+		label: "Eliminate toxins with the right filters",
 	},
 	{
 		icon: "check",
-		label: "Top rated products",
+		label: "View full contaminant breakdowns",
 	},
 	{
 		icon: "check",
-		label: "Get notified of new data",
+		label: "Get notified of new findings",
 	},
-
 	{
 		icon: "check",
-		label: "Support unbiased lab testing",
+		label: "Join 10,000+ healthier members",
+	},
+	{
+		icon: "check",
+		label: "Directly support new product testing",
 	},
 ];
 
 export default function SubscribeModal() {
 	const { subscription, user } = useUserProvider();
 	const router = useRouter();
-	const { packages, purchasePackage, restorePurchases } = useRevenueCat();
+	const { packages, purchasePackage } = useRevenueCat();
 	const { accentColor, backgroundColor } = useColorScheme();
 
 	const [loading, setLoading] = useState(false);
-	const [loadingRestore, setLoadingRestore] = useState(false);
-	const [selectedPlan, setSelectedPlan] = useState<"annual">("annual");
 
 	useEffect(() => {
 		if (subscription) {
@@ -77,8 +78,8 @@ export default function SubscribeModal() {
 				throw new Error("User not found");
 			}
 
-			const annualPackage = packages.find((p) => p.packageType === "ANNUAL");
-			const weeklyPackage = packages.find((p) => p.packageType === "WEEKLY");
+			const annualPackage = packages.annual;
+			const weeklyPackage = packages.weekly;
 
 			const pack = annualPackage;
 
@@ -100,36 +101,39 @@ export default function SubscribeModal() {
 	};
 
 	return (
-		<ScrollView contentContainerStyle={{ backgroundColor, height: "100%" }}>
-			<View className="flex-1 justify-between p-4 py-16 h-full items-center ">
+		<ScrollView contentContainerStyle={{ flexGrow: 1, backgroundColor }}>
+			<View className="flex flex-col justify-between p-4 py-16 h-full items-center">
 				{/* Content Section */}
-				<View className="items-center  max-w-lg">
-					<View className="relative w-24 h-24 overflow-hidden object-contain">
-						<Image
-							source={OasisIcon}
-							style={{ width: "100%", height: "100%" }}
-							contentFit="contain"
-						/>
+				<View className="items-center max-w-lg gap-y-8 flex flex-col flex-grow">
+					<View className="flex flex-col items-center">
+						<View className="relative w-24 h-24 overflow-hidden object-contain">
+							<Image
+								source={OasisIcon}
+								style={{ width: "100%", height: "100%" }}
+								contentFit="contain"
+							/>
+						</View>
+						<H2 className="text-center pt-2">Oasis Member</H2>
+						<Muted className="text-center max-w-sm mt-2 text-base">
+							Join 10,000+ members improving their water health and supporting
+							unbiased lab testing.
+						</Muted>
 					</View>
-					<H2 className="text-center pt-2">Oasis Member</H2>
-					<Muted className="text-center max-w-sm mt-2 text-base">
-						Join 10,000+ members transforming their water habits and supporting
-						unbiased ratings.
-					</Muted>
 
 					{/* Features */}
-					<View className="h-full min-h-48 flex-col gap-y-8 pt-8 mt-4">
+					<View className="flex flex-col w-full mt-4 px-8 bg-card p-4 gap-y-6 rounded-lg border border-border">
 						{FEATURES.map((feature, index) => (
 							<View
 								key={index}
-								className="flex flex-row gap-5 w-full items-center"
+								className={`flex flex-row gap-4 w-full  items-center pb-2 ${
+									index !== FEATURES.length - 1 ? "border-b border-border" : ""
+								}`}
 							>
-								<Octicons
-									name="check-circle-fill"
-									size={24}
-									color={accentColor}
-								/>
-								<P className="text-center text-xl">{feature.label}</P>
+								<Feather name="check" size={20} color={accentColor} />
+
+								<P className="text-center text-base font-semibold">
+									{feature.label}
+								</P>
 							</View>
 						))}
 					</View>
@@ -138,12 +142,8 @@ export default function SubscribeModal() {
 				{/* Subscribe Button Section */}
 				<View className="w-full flex-col items-center mt-auto justify-center max-w-md px-4">
 					<View className="flex flex-col w-full items-center">
-						{/* <Large className="text-center font-semibold mb-6">
-							No payment due now
-						</Large> */}
-						{/* mt-auto pushes this section to the bottom */}
 						<Button
-							className="w-full !max-w-sm !h-20 mb-2 0"
+							className="w-full !max-w-sm !h-20 mb-2"
 							textClassName="!text-lg"
 							variant="default"
 							label="Try for free"
@@ -152,7 +152,7 @@ export default function SubscribeModal() {
 						/>
 
 						<Muted className="text-center">
-							3 Day free trial then $0.90 a week (billed annually)
+							3-day free trial then $0.90/week (billed annually)
 						</Muted>
 					</View>
 					<View className="mt-8 px-8 flex flex-row gap-x-4">

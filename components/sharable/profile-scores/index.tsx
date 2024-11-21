@@ -3,6 +3,7 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 
+import ScoreIndicator from "@/components/sharable/score-indicator";
 import {
 	Accordion,
 	AccordionContent,
@@ -11,6 +12,7 @@ import {
 } from "@/components/ui/accordion";
 import { Muted, P } from "@/components/ui/typography";
 import { useUserProvider } from "@/context/user-provider";
+import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function ProfileScores({
 	userScores,
@@ -20,19 +22,25 @@ export default function ProfileScores({
 	hideSubtitle?: boolean;
 }) {
 	const { subscription } = useUserProvider();
+	const { greenColor, redColor, yellowColor } = useColorScheme();
 	const router = useRouter();
 	const [openItems, setOpenItems] = useState<string[]>([]);
 
-	const blurryBadge = (name: string, type: string) => {
+	const blurryBadge = (
+		id: string,
+		name: string,
+		type: string,
+		index: number,
+	) => {
 		const color =
 			type === "harm"
-				? "rgba(255, 0, 0, 0.2)"
+				? redColor
 				: type === "benefit"
-					? "rgba(0, 128, 0, 0.2)" // Darker emerald green
-					: "rgba(255, 255, 0, 0.2)";
+					? greenColor
+					: yellowColor;
 
 		return (
-			<TouchableOpacity onPress={() => router.push("/subscribeModal")}>
+			<TouchableOpacity onPress={() => router.push("/subscribeModal")} key={id}>
 				<P className="text-sm px-2 py-1">{name}</P>
 
 				<BlurView
@@ -56,8 +64,8 @@ export default function ProfileScores({
 		);
 	};
 
-	const itemBadge = (name: string, type: string) => {
-		if (subscription) {
+	const itemBadge = (id: string, name: string, type: string, index: number) => {
+		if (subscription || index < 1) {
 			const bgColor =
 				type === "harm"
 					? "bg-red-200"
@@ -73,7 +81,7 @@ export default function ProfileScores({
 				</View>
 			);
 		} else {
-			return blurryBadge(name, type);
+			return blurryBadge(id, name, type, index);
 		}
 	};
 
@@ -95,25 +103,35 @@ export default function ProfileScores({
 		}`;
 	};
 
-	const renderAmount = (amount: number) => {
-		return <P className="text-2xl">{amount}</P>;
-		// if (subscription) {
-		// 	return <P className="text-2xl">{amount}</P>;
-		// } else {
-		// 	return (
-		// 		<TouchableOpacity
-		// 			className="flex flex-row items-center justify-center gap-2 "
-		// 			onPress={() => router.push("/subscribeModal")}
-		// 		>
-		// 			<Ionicons name="lock-closed-outline" size={20} color={iconColor} />
-		// 		</TouchableOpacity>
-		// 	);
-		// }
+	const renderAmount = (amount: number, type: string) => {
+		const getScoreValue = (type: string, amount: number) => {
+			if (
+				(type === "health_risks" || type === "contaminants_found") &&
+				amount > 0
+			) {
+				return "bad";
+			} else if (type === "benefits" && amount > 0) {
+				return "good";
+			} else {
+				return "ok";
+			}
+		};
+
+		return (
+			<View className="flex flex-row items-center gap-x-2">
+				<ScoreIndicator
+					value={getScoreValue(type, amount)}
+					width={3}
+					height={3}
+				/>
+				<P className="text-3xl">{amount}</P>
+			</View>
+		);
 	};
 
 	return (
 		<View>
-			<Accordion type="multiple" className="flex flex-col gap-y-2">
+			<Accordion type="multiple" className="flex flex-col gap-y-6">
 				<AccordionItem key="contaminants_found" value="contaminants_found">
 					<AccordionTrigger
 						className={getAccordionTriggerStyle(
@@ -130,7 +148,10 @@ export default function ProfileScores({
 									</Muted>
 								)}
 							</View>
-							{renderAmount(userScores?.allContaminants?.length)}
+							{renderAmount(
+								userScores?.allContaminants?.length,
+								"contaminants_found",
+							)}
 						</View>
 					</AccordionTrigger>
 					<AccordionContent
@@ -139,9 +160,13 @@ export default function ProfileScores({
 						)}
 					>
 						<View className="flex flex-row flex-wrap gap-2">
-							{userScores?.allContaminants?.map((ingredient: any) => (
-								<>{itemBadge(ingredient.name, "harm")}</>
-							))}
+							{userScores?.allContaminants.map(
+								(ingredient: any, index: number) => (
+									<>
+										{itemBadge(ingredient.id, ingredient.name, "harm", index)}
+									</>
+								),
+							)}
 						</View>
 					</AccordionContent>
 				</AccordionItem>
@@ -163,7 +188,7 @@ export default function ProfileScores({
 									</Muted>
 								)}
 							</View>
-							{renderAmount(userScores?.allHarms?.length)}
+							{renderAmount(userScores?.allHarms?.length, "health_risks")}
 						</View>
 					</AccordionTrigger>
 					<AccordionContent
@@ -172,8 +197,8 @@ export default function ProfileScores({
 						)}
 					>
 						<View className="flex flex-row flex-wrap gap-2">
-							{userScores?.allHarms?.map((harm: any) => (
-								<>{itemBadge(harm.name, "harm")}</>
+							{userScores?.allHarms?.map((harm: any, index: number) => (
+								<>{itemBadge(harm.id, harm.name, "harm", index)}</>
 							))}
 						</View>
 					</AccordionContent>
@@ -193,16 +218,16 @@ export default function ProfileScores({
 									</Muted>
 								)}
 							</View>
-							{renderAmount(userScores?.allBenefits?.length)}
+							{renderAmount(userScores?.allBenefits?.length, "benefits")}
 						</View>
 					</AccordionTrigger>
 					<AccordionContent
 						className={getAccordionContentStyle(openItems.includes("benefits"))}
 					>
 						<View className="flex flex-row flex-wrap gap-2">
-							{userScores?.allBenefits?.map((benefit: any) => (
+							{userScores?.allBenefits?.map((benefit: any, index: number) => (
 								<View key={benefit.name}>
-									{itemBadge(benefit.name, "benefit")}
+									{itemBadge(benefit.id, benefit.name, "benefit", index)}
 								</View>
 							))}
 						</View>

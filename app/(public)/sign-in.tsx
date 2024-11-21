@@ -85,12 +85,12 @@ export default function SignIn() {
 		colorScheme === "dark" ? theme.dark.primary : theme.light.primary;
 
 	return (
-		<View className="flex-1 px-6 pb-10 pt-4">
+		<View className="flex-1 px-6 pb-10 pt-4 bg-background">
 			<KeyboardAvoidingView
 				behavior={Platform.OS === "ios" ? "padding" : "height"}
 				className="flex-1"
 			>
-				<ScrollView contentContainerClassName="flex">
+				<ScrollView contentContainerClassName="flex bg-background">
 					<View className="flex-1">
 						<View className="flex flex-col items-start justify-start">
 							<H1 className="self-start">Sign In</H1>

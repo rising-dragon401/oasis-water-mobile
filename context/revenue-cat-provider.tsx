@@ -20,7 +20,10 @@ interface RevenueCatProps {
 	purchasePackage: (pack: PurchasesPackage) => Promise<boolean>;
 	restorePurchases: () => Promise<CustomerInfo>;
 	userSubscription: UserState;
-	packages: PurchasesPackage[];
+	packages: {
+		annual: PurchasesPackage | null;
+		weekly: PurchasesPackage | null;
+	};
 }
 
 export interface UserState {
@@ -46,7 +49,13 @@ export const RevenueCatProvider = ({ children }: any) => {
 	});
 	const posthog = usePostHog();
 
-	const [packages, setPackages] = useState<PurchasesPackage[]>([]);
+	const [packages, setPackages] = useState<{
+		annual: PurchasesPackage | null;
+		weekly: PurchasesPackage | null;
+	}>({
+		annual: null,
+		weekly: null,
+	});
 	const [customerInfo, setCustomerInfo] = useState<CustomerInfo | null>(null);
 	const [, setIsReady] = useState(false);
 
@@ -62,9 +71,11 @@ export const RevenueCatProvider = ({ children }: any) => {
 				await Purchases.configure({ apiKey: APIKeys.google });
 			}
 
-			console.log("Purchases.configure");
+			console.log("Purchases.configured!");
 
 			setIsReady(true);
+
+			checkSubscription();
 
 			// listen for customer info updates
 			// Need for restoring purchases
@@ -112,15 +123,15 @@ export const RevenueCatProvider = ({ children }: any) => {
 	const loadOfferings = async () => {
 		const offerings = await Purchases.getOfferings();
 
-		const annualPackage = offerings.current?.annual
-			? [offerings.current.annual]
-			: [];
+		const currentOffering = offerings.current;
 
-		const weeklyPackage = offerings.current?.weekly
-			? [offerings.current.weekly]
-			: [];
+		const annualPackage = currentOffering?.annual || null;
+		const weeklyPackage = currentOffering?.weekly || null;
 
-		setPackages([...annualPackage, ...weeklyPackage]);
+		setPackages({
+			annual: annualPackage,
+			weekly: weeklyPackage,
+		});
 	};
 
 	const purchasePackage = async (pack: PurchasesPackage) => {
@@ -143,6 +154,20 @@ export const RevenueCatProvider = ({ children }: any) => {
 
 			return false;
 		}
+	};
+
+	// This should sufficiently check for active mobile subscription
+	const checkSubscription = async () => {
+		const customerInfo = await Purchases.getCustomerInfo();
+
+		console.log(
+			"checkSubscription activeSubscriptions",
+			customerInfo.activeSubscriptions,
+		);
+
+		const hasActiveSubscription = customerInfo.activeSubscriptions.length > 0;
+
+		return hasActiveSubscription;
 	};
 
 	const restorePurchases = async () => {
