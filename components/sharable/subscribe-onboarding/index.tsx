@@ -10,27 +10,31 @@ import { useColorScheme } from "@/lib/useColorScheme";
 export const SCORE_FEATURES = [
 	{
 		icon: "check",
-		label: "Discover the best waters for you",
+		label: "See all ratings and scores",
 	},
 	{
 		icon: "check",
-		label: "Eliminate toxins with the right filters",
+		label: "Get notified of new product ratings",
 	},
 	{
 		icon: "check",
-		label: "View full contaminant breakdowns",
+		label: "Eliminate high-risk toxins",
+	},
+	{
+		icon: "check",
+		label: "Hydrate healthy on the go",
 	},
 	// {
 	// 	icon: "check",
 	// 	label: "Stay informed with real-time ratings",
 	// },
+	// {
+	// 	icon: "check",
+	// 	label: "Join 10,000+ healthier members",
+	// },
 	{
 		icon: "check",
-		label: "Join 10,000+ healthier members",
-	},
-	{
-		icon: "check",
-		label: "Directly support new product testing",
+		label: "Support independent lab testing",
 	},
 ];
 
@@ -95,15 +99,19 @@ export function SubscribeOnboarding({
 		>
 			<P className="text-center text-4xl mb-4">😳💧</P>
 			<View className="w-full items-left flex flex-col gap-y-2 ">
-				{hasScores && (
-					<View
-						className="w-full justify-start bg-card p-4 rounded-lg border"
-						style={{ borderColor: redColor }}
-					>
-						{generateScoreText}
-						{/* <WaterScores userScores={userScores} hideSubtitle /> */}
-					</View>
-				)}
+				<P className="text-left">
+					<Text className="font-semibold text-lg" style={{ color: redColor }}>
+						90% of water samples
+					</Text>
+					{` `}
+					contain microplastics, heavy metals and other toxic chemicals that can
+					enter your body while drinking or bathing, posing
+					<Text className="font-semibold text-lg" style={{ color: redColor }}>
+						{` `}
+						hidden health risks
+					</Text>
+					{` `}— often without you even knowing.
+				</P>
 
 				<View className="flex flex-col w-full mt-4 px-4 bg-card p-4 rounded-lg border border-border">
 					<P className="text-left text-base mb-4">Why upgrade?</P>

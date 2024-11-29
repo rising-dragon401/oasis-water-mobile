@@ -1,5 +1,5 @@
 import { Feather } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { usePathname, useRouter } from "expo-router";
 import { useMemo } from "react";
 import { TouchableOpacity, View } from "react-native";
 
@@ -7,6 +7,7 @@ import { P } from "@/components/ui/typography";
 import { useSubscription } from "@/context/subscription-provider";
 import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
+
 type BlurredLineItemProps = {
 	label: string;
 	value?: string;
@@ -43,6 +44,7 @@ export default function BlurredLineItem({
 		redColor,
 		neutralColor,
 	} = useColorScheme();
+	const pathName = usePathname();
 
 	const isItemUnlocked = useMemo(() => {
 		return userData?.unlock_history?.some((unlock: any) => {
@@ -57,7 +59,13 @@ export default function BlurredLineItem({
 		if (!hasActiveSub) {
 			router.push({
 				pathname: "/subscribeModal",
-				params: itemDetails,
+				params: {
+					productId: itemDetails?.productId || "",
+					productType: itemDetails?.productType || "",
+					path: pathName,
+					feature: "item-analysis",
+					component: "blurred-line-item",
+				},
 			});
 		}
 	};

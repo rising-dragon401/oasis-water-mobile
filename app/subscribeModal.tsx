@@ -3,6 +3,7 @@ import * as Clipboard from "expo-clipboard";
 import { Image } from "expo-image";
 import * as Linking from "expo-linking";
 import { useGlobalSearchParams, useRouter } from "expo-router";
+import { usePostHog } from "posthog-react-native";
 import { useCallback, useEffect, useState } from "react";
 import { Alert, ScrollView, TouchableOpacity, View } from "react-native";
 
@@ -18,11 +19,11 @@ import { useColorScheme } from "@/lib/useColorScheme";
 export const FEATURES = [
 	{
 		icon: "check",
-		label: "Unlock all scores and ratings",
+		label: "View all scores and ratings",
 	},
 	{
 		icon: "check",
-		label: "Eliminate toxins with the right filters",
+		label: "Eliminate toxin consumption",
 	},
 	{
 		icon: "check",
@@ -30,12 +31,16 @@ export const FEATURES = [
 	},
 	{
 		icon: "check",
-		label: "Get notified of new findings",
+		label: "Product scanner",
 	},
 	{
 		icon: "check",
-		label: "Join 10,000+ healthier members",
+		label: "Get notified of new findings",
 	},
+	// {
+	// 	icon: "check",
+	// 	label: "Join 10,000+ healthier members",
+	// },
 	{
 		icon: "check",
 		label: "Directly support new product testing",
@@ -48,15 +53,19 @@ export default function SubscribeModal() {
 	const { packages, purchasePackage, hasActiveSub } = useSubscription();
 	const { accentColor, backgroundColor } = useColorScheme();
 	const showToast = useToast();
+	const params = useGlobalSearchParams();
+	const posthog = usePostHog();
+
 	const [loading, setLoading] = useState(false);
 
-	const params = useGlobalSearchParams();
-
-	console.log("params: ", params);
-
-	const { productId, productType } = params as {
+	// productId, productType used for unlocking free growth hack
+	// subscriptionSource used to track reason for subscribing
+	const { productId, productType, path, feature, component } = params as {
 		productId: string;
 		productType: string;
+		path: string;
+		feature: string;
+		component: string;
 	};
 
 	useEffect(() => {
@@ -104,7 +113,13 @@ export default function SubscribeModal() {
 				throw new Error("No package found");
 			}
 
-			const res = await purchasePackage!(pack);
+			const res = await purchasePackage(pack, {
+				path,
+				feature,
+				component,
+				productId,
+				productType,
+			});
 
 			if (res) {
 				router.back();
@@ -118,10 +133,14 @@ export default function SubscribeModal() {
 
 	const handleUnlock = async () => {
 		if (unlocksLeft() > 0) {
-			// Logic to unlock
 			const res = await redeemUnlock(user?.id, productId, productType);
 
 			if (res) {
+				posthog.capture("redeemed_free_unlock", {
+					productId,
+					productType,
+				});
+
 				await refreshUserData("userData");
 				showToast("Item unlocked!");
 				router.back();
@@ -129,6 +148,10 @@ export default function SubscribeModal() {
 				showToast("Unable to unlock item");
 			}
 		} else {
+			posthog.capture("shared_to_unlock_pressed", {
+				productId,
+				productType,
+			});
 			// Open an alert to inform the user
 			Alert.alert(
 				"Share to Unlock 🔓",
@@ -165,7 +188,7 @@ export default function SubscribeModal() {
 							padding: 8,
 							borderRadius: 16,
 						}}
-						className="bg-muted px-4 py-2 rounded-lg"
+						className="bg-transparent px-4 py-2 rounded-lg"
 						onPress={handleUnlock}
 					>
 						<P className="">
@@ -186,10 +209,10 @@ export default function SubscribeModal() {
 								contentFit="contain"
 							/>
 						</View>
-						<H2 className="text-center pt-2">Oasis Member</H2>
+						<H2 className="text-center pt-2">Unlock your top water</H2>
 						<Muted className="text-center max-w-sm mt-2 text-base">
-							Join 10,000+ members improving their water health and supporting
-							unbiased lab testing.
+							Join 10,000+ members improving their water and overall health
+							everyday
 						</Muted>
 					</View>
 
@@ -199,7 +222,7 @@ export default function SubscribeModal() {
 							<View
 								key={index}
 								className={`flex flex-row gap-4 w-full  items-center pb-2 ${
-									index !== FEATURES.length - 1 ? "border-b border-border" : ""
+									index !== FEATURES.length - 1 ? "" : ""
 								}`}
 							>
 								<Feather name="check" size={20} color={accentColor} />
@@ -217,9 +240,9 @@ export default function SubscribeModal() {
 					<View className="flex flex-col w-full items-center">
 						<Button
 							className="w-full !max-w-sm !h-20 mb-2"
-							textClassName="!text-lg"
+							textClassName="!text-xl"
 							variant="default"
-							label="Try for free"
+							label="Continue for free 🙌"
 							loading={loading}
 							onPress={() => handleSubscribe()}
 						/>

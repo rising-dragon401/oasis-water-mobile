@@ -9,12 +9,86 @@ import {
 } from "expo-router";
 import { TouchableOpacity, View } from "react-native";
 
-import OasisLogo from "@/assets/oasis-word.png";
+import {
+	default as OasisLogo,
+	default as OasisTextLogo,
+} from "@/assets/oasis-text.png";
 import HeaderBackButton from "@/components/sharable/header-back-button";
+import ScoreBadge from "@/components/sharable/score-badge";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { useUserProvider } from "@/context/user-provider";
+import { PROFILE_AVATAR } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 function CustomHeader() {
-	return <Image source={OasisLogo} style={{ width: 85, height: 24 }} />;
+	return (
+		<View className="flex items-start justify-start  w-24 h-5">
+			<Image
+				source={OasisLogo}
+				style={{ width: "100%", height: "100%" }}
+				contentFit="contain"
+			/>
+		</View>
+	);
+}
+
+function CommunityHeader() {
+	const { iconColor } = useColorScheme();
+	const router = useRouter();
+	return (
+		<View className="mr-0">
+			<TouchableOpacity
+				onPress={() => {
+					router.push("/(protected)/search/community");
+				}}
+			>
+				<Feather name="globe" size={24} color={iconColor} />
+			</TouchableOpacity>
+		</View>
+	);
+}
+
+function ScoreBadgeHeader() {
+	const { userScores } = useUserProvider();
+	return (
+		<View className="flex items-center justify-center">
+			<ScoreBadge score={userScores?.overallScore || 0} />
+		</View>
+	);
+}
+
+function LogoHeader() {
+	return (
+		<View className="flex items-start justify-start w-16 h-5">
+			<Image
+				source={OasisTextLogo}
+				style={{
+					width: "100%",
+					height: "100%",
+				}}
+				contentFit="contain"
+			/>
+		</View>
+	);
+}
+
+function UserProfileHeader() {
+	const { userData } = useUserProvider();
+	const router = useRouter();
+	return (
+		<View className="mr-6">
+			<TouchableOpacity
+				onPress={() => {
+					// @ts-ignore
+					router.push("/(protected)/settings");
+				}}
+			>
+				<Avatar className="h-8 w-8	" alt="oasis pfp">
+					<AvatarImage src={userData?.avatar_url || PROFILE_AVATAR} />
+				</Avatar>
+			</TouchableOpacity>
+		</View>
+	);
 }
 
 function ReportHeader() {
@@ -27,26 +101,6 @@ function ReportHeader() {
 		>
 			<Ionicons name="alert-circle-outline" size={24} color="black" />
 		</TouchableOpacity>
-	);
-}
-
-function HomeHeader() {
-	const router = useRouter();
-
-	return (
-		<View className="flex flex-row items-center justify-between w-full pr-6">
-			<View className="flex items-start justify-start">
-				<Image source={OasisLogo} style={{ width: 85, height: 24 }} />
-			</View>
-
-			<View className="w-10 mr-2">
-				<TouchableOpacity
-					onPress={() => router.push("/(protected)/search/community")}
-				>
-					<Feather name="globe" size={24} color="black" />
-				</TouchableOpacity>
-			</View>
-		</View>
 	);
 }
 
@@ -87,8 +141,10 @@ export default function SearchLayout() {
 			<Stack.Screen
 				name="index"
 				options={{
-					headerTitle: () => <HomeHeader />,
-					headerLeft: () => null,
+					headerShown: true,
+					headerTitle: "Check your water",
+					headerLeft: () => <LogoHeader />,
+					headerRight: () => <CommunityHeader />,
 				}}
 			/>
 			<Stack.Screen
@@ -97,6 +153,7 @@ export default function SearchLayout() {
 					headerRight: () => <ReportHeader />,
 				}}
 			/>
+
 			<Stack.Screen
 				name="location/[id]"
 				options={{
@@ -105,9 +162,9 @@ export default function SearchLayout() {
 			/>
 			<Stack.Screen name="ingredient/[id]" />
 			<Stack.Screen
-				name="filter/[id]"
+				name="top/index"
 				options={{
-					headerRight: () => <ReportHeader />,
+					headerTitle: "Top rated",
 				}}
 			/>
 			<Stack.Screen name="article/[id]" />
@@ -116,7 +173,6 @@ export default function SearchLayout() {
 			<Stack.Screen name="filters/index" />
 			<Stack.Screen name="oasis/[id]" />
 			<Stack.Screen name="top-rated/[id]" />
-			<Stack.Screen name="top-rated-all/index" />
 			<Stack.Screen name="company/[id]" />
 			<Stack.Screen name="articles/index" />
 			<Stack.Screen name="community/index" />

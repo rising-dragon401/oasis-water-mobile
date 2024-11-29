@@ -1,9 +1,9 @@
-import { getLocations } from "@/actions/locations";
 import { useNavigation } from "expo-router";
-
-import RankingList from "@/components/sharable/ranking-list";
 import { useEffect, useState } from "react";
 import { ScrollView } from "react-native";
+
+import { getLocations } from "@/actions/locations";
+import RankingList from "@/components/sharable/ranking-list";
 
 export default function Page() {
 	const navigation = useNavigation();

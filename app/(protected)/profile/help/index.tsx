@@ -1,4 +1,7 @@
+import Feather from "@expo/vector-icons/Feather";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import * as Clipboard from "expo-clipboard";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import { ScrollView, View } from "react-native";
 
@@ -9,8 +12,9 @@ import {
 	AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { H3, Large, Muted, P } from "@/components/ui/typography";
-
+import { Muted, P } from "@/components/ui/typography";
+import { useToast } from "@/context/toast-provider";
+import { useColorScheme } from "@/lib/useColorScheme";
 const FAQ_LIST = [
 	{
 		value: "what-is-oasis",
@@ -75,41 +79,146 @@ const FAQ_LIST = [
 ];
 
 export default function HelpScreen() {
-	const [copyStatus, setCopyStatus] = useState("Copy email");
+	const { iconColor, shadowColor } = useColorScheme();
+	const router = useRouter();
+	const showToast = useToast();
+	const [openItems, setOpenItems] = useState<string[]>([]);
 
 	const handleCopyEmail = async () => {
 		await Clipboard.setStringAsync("hello@live-oasis.com");
-		setCopyStatus("Copied!");
-		setTimeout(() => setCopyStatus("Copy email"), 2000);
+		showToast("Copied email");
+	};
+
+	const handleContribute = () => {
+		// @ts-ignore
+		router.push("/contributeModal");
+	};
+
+	const handleRequest = () => {
+		// @ts-ignore
+		router.push("/contributeModal?kind=new_item");
 	};
 
 	return (
 		<ScrollView className="flex-1">
 			<View className="w-full flex flex-col justify-between pb-14 px-8">
-				<View className="mt-6 w-full h-64 py-4 bg-muted rounded-xl text-left flex flex-col justify-center px-8">
-					<H3 className="text-left">Contact us</H3>
-					<P className="text-left">
-						We may be in the lab or out searching for the best water but we will
-						get back to you as soon as possible. For the quickest response
-						please email: hello@live-oasis.com.
-					</P>
-					<Button
-						variant="outline"
-						onPress={handleCopyEmail}
-						className="mt-4"
-						label={copyStatus}
-					/>
+				<View className="flex flex-col items-center gap-x-2">
+					<View className="flex-1 mt-6 w-full py-4 bg-card border border-border rounded-xl text-left flex flex-col justify-center px-4">
+						<View className="flex flex-row items-center gap-x-2">
+							<Feather name="edit" size={14} color={iconColor} />
+							<P className="text-xl">Update item</P>
+						</View>
+						<Muted className="text-left mt-2">
+							Submit a change request or new data regarding an existing item
+						</Muted>
+						<View className="flex flex-row justify-end gap-x-2">
+							<Button
+								variant="ghost"
+								onPress={handleContribute}
+								className=" w-40"
+								icon={
+									<Ionicons name="arrow-forward" size={14} color={iconColor} />
+								}
+								label="Contribute"
+							/>
+						</View>
+					</View>
+
+					<View className="flex-1 mt-6 w-full py-4 bg-card border border-border rounded-xl text-left flex flex-col justify-center px-4">
+						<View className="flex flex-row items-center gap-x-2">
+							<Feather name="plus" size={14} color={iconColor} />
+							<P className="text-xl">New item</P>
+						</View>
+						<Muted className="text-left mt-2">
+							What should we add next? If you are a brand please submit your
+							products and lab data here
+						</Muted>
+						<View className="flex flex-row justify-end gap-x-2">
+							<Button
+								variant="ghost"
+								onPress={handleRequest}
+								icon={
+									<Ionicons name="arrow-forward" size={14} color={iconColor} />
+								}
+								className="w-40"
+								label="Request"
+							/>
+						</View>
+					</View>
 				</View>
 
-				<View className="flex flex-col mt-8 mb-8">
-					<Large>Frequently asked questions</Large>
-					<Accordion type="multiple">
+				<View className="mt-6 w-full  py-4 bg-card border border-border rounded-xl text-left flex flex-col justify-center px-4">
+					<View className="flex flex-row items-center gap-x-2">
+						<Ionicons name="chatbubble-outline" size={14} color={iconColor} />
+						<P className="text-left text-xl">Support</P>
+					</View>
+					<Muted className="text-left mt-2">
+						Get help with any Oasis inquires or issues.
+					</Muted>
+					<View className="flex flex-row justify-end gap-x-2">
+						<Button
+							variant="ghost"
+							onPress={handleCopyEmail}
+							className="mw-40"
+							icon={
+								<Ionicons name="arrow-forward" size={14} color={iconColor} />
+							}
+							label="Email us"
+						/>
+					</View>
+				</View>
+
+				<View className="flex flex-col mt-14 mb-8">
+					<View className="flex flex-row items-center gap-2 mb-2">
+						<P className="text-xl">FAQ</P>
+					</View>
+					<Accordion
+						type="multiple"
+						value={openItems}
+						onValueChange={setOpenItems}
+					>
 						{FAQ_LIST.map((faq) => (
-							<AccordionItem key={faq.value} value={faq.value}>
-								<AccordionTrigger>
-									<P>{faq.trigger}</P>
+							<AccordionItem
+								key={faq.value}
+								value={faq.value}
+								className="mb-2 w-full"
+							>
+								<AccordionTrigger
+									className="bg-card px-4 flex flex-row items-center justify-between w-full"
+									style={{
+										borderRadius: openItems.includes(faq.value) ? 16 : 16,
+										borderTopLeftRadius: openItems.includes(faq.value)
+											? 16
+											: 16,
+										borderTopRightRadius: openItems.includes(faq.value)
+											? 16
+											: 16,
+										borderBottomLeftRadius: openItems.includes(faq.value)
+											? 0
+											: 16,
+										borderBottomRightRadius: openItems.includes(faq.value)
+											? 0
+											: 16,
+										shadowColor,
+										shadowOffset: { width: 1, height: 1 },
+										shadowOpacity: 0.1,
+										shadowRadius: 4,
+										elevation: 5,
+										overflow: "visible",
+										zIndex: 99,
+										position: "relative",
+									}}
+								>
+									<View className="flex-1 mr-4">
+										<P>{faq.trigger}</P>
+									</View>
+									<Feather
+										name={openItems.includes(faq.value) ? "minus" : "plus"}
+										size={14}
+										color={iconColor}
+									/>
 								</AccordionTrigger>
-								<AccordionContent>
+								<AccordionContent className="bg-card rounded-lg px-4">
 									<Muted>{faq.content}</Muted>
 								</AccordionContent>
 							</AccordionItem>

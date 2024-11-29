@@ -178,24 +178,21 @@ export const CATEGORIES: CategoryType[] = [
 			"https://connect.live-oasis.com/storage/v1/object/public/website/images/categories/sparkling_water_cover%20(1).png",
 		isParentCategory: false,
 	},
-	// {
-	// 	id: "flavored_water",
-	// 	title: "Flavored drinks",
-	// 	image:
-	// 		"https://connect.live-oasis.com/storage/v1/object/public/website/images/categories/sparkling_water_cover.png",
-	// 	tags: ["still", "sparkling"],
-	// },
-	// {
-	// 	id: "energy_drink",
-	// 	title: "Energy drinks",
-	// 	image:
-	// 		"https://connect.live-oasis.com/storage/v1/object/public/website/images/categories/energy%20drink%20cover.png",
-	// },
-	// {
-	// 	id: "coconut_water",
-	// 	title: "Coconut water",
-	// 	image:
-	// 		"https://connect.live-oasis.com/storage/v1/object/public/website/images/categories/coconut%20water%20category%20cover.png",
-	// 	is_new: false,
-	// },
+];
+
+export const FILTER_CONTAMINANT_CATEGORIES = [
+	"Chemical Disinfectants",
+	"Heavy Metals",
+	"Haloacetic Acids",
+	"Fluoride",
+	"Herbicides",
+	"Perfluorinated Chemicals (PFAS)",
+	"Pesticides",
+	"Pharmaceuticals",
+	"Phthalates",
+	"Radiological Elements",
+	"Semi-Volatile Compounds",
+	"Volatile Organic Compounds (VOCs)",
+	"Microbiologicals",
+	"Microplastics",
 ];

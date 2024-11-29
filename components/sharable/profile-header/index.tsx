@@ -49,11 +49,21 @@ export default function ProfileHeader({
 					</View>
 				) : (
 					<TouchableOpacity
-						onPress={() => router.push("/subscribeModal")}
-						className="flex flex-col items-end"
+						onPress={() =>
+							router.push({
+								pathname: "/subscribeModal",
+								params: {
+									path: "profile",
+									feature: "profile-scores",
+									component: "locked-score",
+								},
+							})
+						}
 					>
-						<Feather name="lock" size={20} color={iconColor} />
-						<Muted> / 100</Muted>
+						<View className="flex flex-col items-end">
+							<Feather name="lock" size={20} color={iconColor} />
+							<Muted> / 100</Muted>
+						</View>
 					</TouchableOpacity>
 				)}
 			</View>

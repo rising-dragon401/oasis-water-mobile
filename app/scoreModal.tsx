@@ -116,7 +116,6 @@ export default function ScoreModal() {
 	return (
 		<ScrollView>
 			<View className="flex flex-col pt-4 pb-10 h-full px-8">
-				{/* <ProfileHeader profileData={userData} showSocials={false} /> */}
 				<View className="flex flex-col items-start mb-4">
 					<UserHeader
 						profileData={userData}

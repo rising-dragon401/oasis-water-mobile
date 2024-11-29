@@ -1,10 +1,7 @@
 import { View } from "react-native";
 
-import Typography from "../typography";
-
 import {
 	Card,
-	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle,
@@ -17,85 +14,96 @@ type Props = {
 };
 
 export default function ContaminantCard({ data }: Props) {
-	const { redColor } = useColorScheme();
+	const { redColor, iconColor } = useColorScheme();
+
+	// {
+	// 	/* <View className="flex flex-col gap-2">
+	// 					{data.health_guideline && (
+	// 						<Typography
+	// 							size="xs"
+	// 							fontWeight="normal"
+	// 							className="text-muted-foreground mt-2"
+	// 						>
+	// 							Health Guideline: {data?.health_guideline} {data?.measure}
+	// 						</Typography>
+	// 					)}
+	// 					{data.legal_limit && (
+	// 						<Typography
+	// 								size="xs"
+	// 								fontWeight="normal"
+	// 								className="text-muted-foreground mt-2"
+	// 							>
+	// 								Legal Limit: {data?.legal_limit} {data?.measure}
+	// 							</Typography>
+	// 		)}
+	// 	</View> */
+	// }
+
+	const totalRisks = data.risks.split(",").length;
+
+	const exceedsLimit = data?.exceedingLimit > 0;
 
 	return (
-		<Card>
+		<Card className="rounded-2xl">
 			<CardHeader>
-				<View className="flex flex-row justify-between items-center">
-					<CardTitle className="flex flex-col justify-between relative text-primary">
+				<View className="flex flex-row justify-between items-start">
+					<CardTitle className="flex flex-col justify-between relative text-primary text-xl w-40 text-wrap font-semibold">
 						{data?.name}
 					</CardTitle>
+
 					<View className=" flex flex-row justify-between items-top">
-						{data.exceedingLimit !== undefined &&
-							data.exceedingLimit !== null &&
-							data.exceedingLimit > 0 && (
-								<View
-									className="rounded-full bg-primary w-full max-w-[8rem] gap-2 h-8 flex flex-row justify-center items-center px-2"
+						{exceedsLimit && (
+							<View
+								className="rounded-full bg-primary\ gap-2 h-8 flex flex-row justify-center items-center px-4"
+								style={{
+									backgroundColor: redColor,
+								}}
+							>
+								<P className="!text-background">{data.exceedingLimit}x</P>
+								<P className="text-secondary flex-wrap">guidelines</P>
+							</View>
+						)}
+
+						{!exceedsLimit && totalRisks > 0 && (
+							<View
+								className="rounded-full  gap-2 h-8 flex flex-row justify-center items-center px-4"
+								style={{
+									borderColor: redColor,
+								}}
+							>
+								<P
+									className="text-secondary flex-wrap"
 									style={{
-										backgroundColor: redColor,
+										color: redColor,
 									}}
 								>
-									<P className="!text-background">{data.exceedingLimit}x</P>
-									<P className="text-secondary flex-wrap">guidelines</P>
-								</View>
-							)}
+									{totalRisks} risks
+								</P>
+							</View>
+						)}
 					</View>
 				</View>
 
-				<CardDescription className="overflow-hidden mt-2">
-					{data?.description}
+				<CardDescription className="overflow-hidden mt-2 flex flex-col gap-2">
+					{data?.risks}
 				</CardDescription>
 			</CardHeader>
-			<CardContent className="pl-0 max-w-96 px-6 ">
-				<View className="max-h-32 overflow-hidden">
-					<Typography
-						size="base"
-						fontWeight="normal"
-						className="text-muted-foreground mt-2"
-					>
-						Risks: {data?.risks}
-					</Typography>
-				</View>
+
+			{/* <CardFooter className="flex flex-row w-full justify-end px-4 pb-4 gap-x-8">
 				{data.amount && (
-					<Typography
-						size="base"
-						fontWeight="bold"
-						className="text-muted-foreground mt-2 "
-					>
-						Amount: {data?.amount} {data?.unit} {data?.measure}
-					</Typography>
+					<P>
+						{data?.amount} {data?.unit} {data?.measure}
+					</P>
 				)}
-				{data.health_guideline && (
-					<Typography
-						size="xs"
-						fontWeight="normal"
-						className="text-muted-foreground mt-2"
-					>
-						Health Guideline: {data?.health_guideline} {data?.measure}
-					</Typography>
-				)}
-				{data.legal_limit && (
-					<Typography
-						size="xs"
-						fontWeight="normal"
-						className="text-muted-foreground mt-2"
-					>
-						Legal Limit: {data?.legal_limit} {data?.measure}
-					</Typography>
-				)}
-			</CardContent>
-			{/* <CardFooter className="flex flex-row w-full justify-end px-4 pb-4">
-				{data?.sources && data?.sources.length > 0 ? (
-					<ArticlesDropdown sources={data?.sources || []} />
-				) : (
-					<View />
-				)} */}
-			{/* <ContaminantFiltersDropdown
-					contaminantId={data?.id || ""}
-					align="end"
-				/> */}
-			{/* </CardFooter> */}
+				<View
+
+				// style={{
+				// 	backgroundColor: redColor,
+				// }}
+				>
+					<Feather name="arrow-right" size={18} color={iconColor} />
+				</View>
+			</CardFooter> */}
 		</Card>
 	);
 }

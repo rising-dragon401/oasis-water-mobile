@@ -1,4 +1,3 @@
-import Feather from "@expo/vector-icons/Feather";
 import { BlurView } from "expo-blur";
 import { useMemo } from "react";
 import { View } from "react-native";
@@ -33,12 +32,8 @@ export default function IngredientsCard({ ingredients, subscription }: Props) {
 	return (
 		<>
 			{nonContaminantIngredients?.map((ingredient, index) => (
-				<View key={index} className="rounded-md border">
-					<View
-						className={`flex flex-row justify-between items-center w-full ${getBgColor(
-							ingredient.severity_score,
-						)} rounded-t-md px-4 py-2`}
-					>
+				<View key={index} className="rounded-2xl border bg-card border-border">
+					<View className="flex flex-row justify-between items-center w-full rounded-t-md px-4 py-2">
 						<Typography size="lg" fontWeight="medium">
 							{ingredient.name}
 						</Typography>
@@ -47,21 +42,21 @@ export default function IngredientsCard({ ingredients, subscription }: Props) {
 						</Typography>
 					</View>
 
-					<View className="px-4 py-2 flex md:flex-row flex-col justify-between">
+					<View className="px-4 pb-4 flex md:flex-row flex-col justify-between">
 						<View className="flex flex-col w-full md:w-1/2 pr-2">
 							<View className="flex flex-row items-center gap-1">
-								<Feather name="thumbs-up" size={18} color={iconColor} />
-								<P>Benefits:</P>
+								{/* <Feather name="thumbs-up" size={18} color={iconColor} /> */}
+								{/* <P>Benefits:</P> */}
 							</View>
-							<P>{ingredient.benefits}</P>
+							<P className="text-muted-foreground">{ingredient.benefits}</P>
 						</View>
-						<View className="flex flex-col w-full md:w-1/2 md:pl-4 md:mt-0 mt-2">
+						{/* <View className="flex flex-col w-full md:w-1/2 md:pl-4 md:mt-0 mt-2">
 							<View className="flex flex-row items-center gap-1">
 								<Feather name="thumbs-up" size={18} color={iconColor} />
 								<P>Harms:</P>
 							</View>
 							<P>{ingredient.risks}</P>
-						</View>
+						</View> */}
 					</View>
 
 					{!subscription && (

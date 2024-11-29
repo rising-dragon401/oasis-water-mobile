@@ -2,7 +2,7 @@ import { useGlobalSearchParams, useLocalSearchParams } from "expo-router";
 
 import { BrandForm } from "@/components/sharable/brand-form";
 
-export default function Page() {
+export default function BrandPage() {
 	const glob = useGlobalSearchParams();
 	const local = useLocalSearchParams();
 

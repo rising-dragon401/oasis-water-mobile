@@ -11,12 +11,8 @@ export default function LocationCard({
 	size = "sm",
 }: {
 	location: any;
-	size: "sm" | "lg";
+	size: "sm" | "md" | "lg";
 }) {
-	const scoreSize = size === "lg" ? 3 : 32;
-	const stWidth = size === "lg" ? 4 : 3;
-	const textClassName = size === "lg" ? "text-xl " : "text-sm";
-
 	const getBgColor = () => {
 		if (location?.score === null) {
 			return "bg-zinc-300";
@@ -31,9 +27,9 @@ export default function LocationCard({
 
 	return (
 		<View
-			className="relative rounded-xl my-2 flex-1 min-w-full h-full min-h-32 overflow-hidden "
+			className="relative rounded-xl my-2 flex-1 min-w-full h-full min-h-24 overflow-hidden "
 			style={{
-				minHeight: size === "lg" ? 120 : 80,
+				minHeight: size === "lg" ? 120 : size === "md" ? 80 : 40,
 			}}
 		>
 			{location && (
@@ -46,10 +42,12 @@ export default function LocationCard({
 
 			{/* Circle with full opacity, layered above the overla */}
 			{location && location.score && (
-				<View className="absolute top-4 right-4 z-10 flex-1">
-					<View className="flex-row items-center gap-x-1 bg-muted rounded-full px-4 py-2">
-						<View className={`w-3 h-3 rounded-full ${getBgColor()}`} />
-						<Small>{location.score ? `${location.score}/100` : "0/100"}</Small>
+				<View className="absolute top-2 right-2 z-10 flex-1">
+					<View className="flex-row items-center gap-x-1 bg-background rounded-full px-2 py-1">
+						<View className={`w-2 h-2 rounded-full ${getBgColor()}`} />
+						<Small className="text-primary text-xs">
+							{location.score ? `${location.score}` : "0/100"}
+						</Small>
 					</View>
 				</View>
 			)}
@@ -63,7 +61,7 @@ export default function LocationCard({
 				) : (
 					<View className="flex flex-col gap-2 h-full  items-center justify-center">
 						<Ionicons name="add-outline" size={24} color="hsl(0, 0%, 100%)" />
-						<P className="text-white text-base">Add location</P>
+						<P className="text-white text-base">Check tap water</P>
 					</View>
 				)}
 			</View>

@@ -12,7 +12,7 @@ export const theme = {
 		accentForeground: "#FEFCF9",
 		foreground: "#9B9C9A",
 		muted: "#D3D6D1",
-
+		"tab-background": "#F5F4F0",
 		popover: "hsl(30 4.2% 38.82%)",
 		"secondary-foreground": "hsl(40 13% 92.94%)",
 		"muted-foreground": "hsl(0 0% 45%)",

@@ -5,16 +5,17 @@ import { KeyboardAvoidingView, Platform, View } from "react-native";
 
 import { getNearestLocation } from "@/actions/admin";
 import { updateUserData } from "@/actions/user";
+import LocationCard from "@/components/cards/location-card";
 import LocationSelector from "@/components/sharable/location-selector";
 import { Button } from "@/components/ui/button";
-import { H3, Muted, P } from "@/components/ui/typography";
+import { H3, P } from "@/components/ui/typography";
 import { useToast } from "@/context/toast-provider";
 import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function LocationModal() {
 	const router = useRouter();
-	const { iconColor, mutedForegroundColor } = useColorScheme();
+	const { iconColor } = useColorScheme();
 	const { uid, refreshUserData, userData, tapScore } = useUserProvider();
 
 	const showToast = useToast();
@@ -23,13 +24,13 @@ export default function LocationModal() {
 	const [loading, setLoading] = useState(false);
 	const [showUpdateLocation, setShowUpdateLocation] = useState(true);
 	const [statusText, setStatusText] = useState<string | null>(null);
+	const [focused, setFocused] = useState(false);
 
 	useEffect(() => {
 		if (userData?.tap_location_id) {
-			// setSelectedAddress(userData.location?.formattedAddress);
 			setShowUpdateLocation(false);
 		} else {
-			setShowUpdateLocation(true);
+			setFocused(true);
 		}
 	}, [userData]);
 
@@ -69,25 +70,31 @@ export default function LocationModal() {
 				longitude: selectedAddress.longitude,
 			};
 
+			const res = await updateUserData(uid, "location", selectedAddress);
+
+			// first get and update nearest taplocation
 			if (isAddressInUS(selectedAddress)) {
-				// first get and update nearest taplocation
 				const nearestLocationRes = await getNearestLocation(latLong, uid);
 
 				if (!nearestLocationRes) {
-					throw new Error("Unable to sync location: getNearestLocation failed");
-				}
-
-				const res = await updateUserData(uid, "location", selectedAddress);
-
-				if (res) {
-					refreshUserData("all");
-					setShowUpdateLocation(false);
-					setSelectedAddress(null);
-				} else {
-					throw new Error("Unable to update location: updateUserData failed");
+					setLoading(false);
+					showToast("Unable to find nearest tap location", 2000, "top");
+					return;
 				}
 			} else {
-				setStatusText("Tap water scores are only available in the US");
+				showToast(
+					"Location updated! But tap water scores are only available in the US",
+					2000,
+					"top",
+				);
+			}
+
+			if (res) {
+				refreshUserData("scores");
+				setShowUpdateLocation(false);
+				setSelectedAddress(null);
+			} else {
+				throw new Error("Unable to update location: updateUserData failed");
 			}
 
 			setLoading(false);
@@ -99,14 +106,19 @@ export default function LocationModal() {
 		}
 	};
 
+	const openEditLocation = () => {
+		setShowUpdateLocation(true);
+		setFocused(true);
+	};
+
 	return (
 		<KeyboardAvoidingView
 			style={{ flex: 1 }}
 			behavior={Platform.OS === "ios" ? "padding" : "height"}
 		>
-			<View className="pt-8 px-8 flex-1">
-				<View className="flex flex-col items-center justify-between h-full">
-					{userData?.location?.formattedAddress && (
+			<View className="py-14 px-8 flex-1">
+				<View className="flex flex-col items-center h-full">
+					{userData?.location?.formattedAddress && !focused && (
 						<View className="flex flex-col items-center ">
 							<View className="flex flex-col items-center ">
 								<P className="text-center">Current location:</P>
@@ -118,55 +130,54 @@ export default function LocationModal() {
 								</View>
 							</View>
 
-							<View className="flex flex-col items-start mt-4">
-								<P className="text-center">Nearest tap water score:</P>
-								<View className="flex flex-row items-center px-4 py-2 bg-muted rounded-full gap-2">
-									<Feather name="droplet" size={14} color={iconColor} />
-									<P className="text-center" numberOfLines={1}>
-										{tapScore?.name || "No tap water score found"}
-									</P>
+							<View className="flex flex-col items-start mt-8">
+								<P className="text-center">Nearest tap water report:</P>
+								<View className="h-14">
+									<LocationCard location={tapScore || {}} size="lg" />
 								</View>
 							</View>
 						</View>
 					)}
 					<View className="flex flex-grow flex-shrink items-center" />
-					<View className="flex flex-grow flex-shrink items-center">
-						{/* <Feather
-							name="map-pin"
-							size={24}
-							color={iconColor}
-							className="mb-2"
-						/> */}
-						<H3>Change location</H3>
-						<Muted>Enter your address to see the nearest tap water score</Muted>
-						<LocationSelector
-							address={selectedAddress}
-							setAddress={setSelectedAddress}
-							initialAddress={null}
-						/>
-					</View>
 
-					<View className="flex flex-grow flex-shrink items-center ">
-						<Button
-							onPress={handleUpdateLocation}
-							disabled={!selectedAddress}
-							label="Update location"
-							loading={loading}
-							className="w-80 !h-16"
-						/>
-						{userData?.location?.formattedAddress && (
+					{focused && (
+						<View className="flex flex-col w-full">
+							<H3>Enter new location</H3>
+							<LocationSelector
+								address={selectedAddress}
+								setAddress={setSelectedAddress}
+								initialAddress={null}
+								focused={focused}
+								setFocused={setFocused}
+							/>
+
+							<View className="flex flex-row items-center justify-end w-full gap-4 max-w-sm">
+								<Button
+									onPress={() => setFocused(false)}
+									variant="ghost"
+									label="Cancel"
+									className="mt-4"
+								/>
+								<Button
+									onPress={handleUpdateLocation}
+									label="Update"
+									loading={loading}
+									className="w-36 mt-4"
+								/>
+							</View>
+						</View>
+					)}
+
+					<View className="flex flex-grow flex-shrink items-center mt-6 justify-end w-full pb-10">
+						{!focused && (
 							<Button
-								label="Cancel"
-								variant="ghost"
+								onPress={openEditLocation}
+								label="Change location"
+								loading={loading}
 								className="w-80 !h-16"
-								onPress={() => setShowUpdateLocation(false)}
 							/>
 						)}
 					</View>
-				</View>
-
-				<View className="absolute bottom-20 w-full items-center">
-					{statusText && <P className="text-center">{statusText}</P>}
 				</View>
 			</View>
 		</KeyboardAvoidingView>

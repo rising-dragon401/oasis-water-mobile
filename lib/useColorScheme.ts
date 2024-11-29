@@ -42,6 +42,9 @@ export function useColorScheme() {
 	const redColor = "#FF6F61"; // Less harsh red
 	const neutralColor = "#E5E7EB";
 
+	const shadowColor =
+		colorScheme === "dark" ? theme.dark.primary : theme.light.primary;
+
 	return {
 		colorMode: colorScheme,
 		colorScheme: colorScheme ?? "dark",
@@ -62,5 +65,6 @@ export function useColorScheme() {
 		yellowColor,
 		redColor,
 		neutralColor,
+		shadowColor,
 	};
 }

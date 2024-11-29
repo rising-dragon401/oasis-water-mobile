@@ -63,9 +63,7 @@ export function Circle({
 					alignItems: "center",
 				}}
 			>
-				<P className={textClassName} style={{ color: "white" }}>
-					{value}
-				</P>
+				<P className={textClassName}>{value}</P>
 			</View>
 		</View>
 	);

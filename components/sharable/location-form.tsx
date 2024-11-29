@@ -183,11 +183,7 @@ export function LocationForm({ id }: Props) {
 
 							<View className="flex !w-2/5 justify-center items-center">
 								<Score
-									score={
-										location.utilities?.length > 0
-											? location?.utilities[0]?.score
-											: 0
-									}
+									score={location.score || location?.utilities[0]?.score || 0}
 									size="sm"
 									showScore
 									untested={!isTested}
@@ -222,6 +218,7 @@ export function LocationForm({ id }: Props) {
 					{location?.utilities?.[0]?.contaminants ? (
 						<RecommendedFilterRow
 							contaminants={location.utilities[0].contaminants || []}
+							locationId={location.id}
 						/>
 					) : null}
 				</View>

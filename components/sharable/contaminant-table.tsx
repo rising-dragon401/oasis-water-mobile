@@ -111,7 +111,12 @@ export default function ContaminantTable({
 				onPress={() => {
 					router.push({
 						pathname: "/subscribeModal",
-						params: itemDetails,
+						params: {
+							...itemDetails,
+							path: "search/filter",
+							feature: "item-analysis",
+							component: "contaminant-table",
+						},
 					});
 				}}
 				disabled={subscription}

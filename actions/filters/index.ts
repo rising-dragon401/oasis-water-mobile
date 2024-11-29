@@ -86,7 +86,6 @@ export const getTapContaminants = async (tapLocationId: number) => {
 		return [];
 	}
 
-	console.log("data", JSON.stringify(data, null, 2));
 	const contaminants = data[0].utilities[0].contaminants;
 
 	return contaminants;

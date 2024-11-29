@@ -1,6 +1,4 @@
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { useUserProvider } from "context/user-provider";
-import * as Clipboard from "expo-clipboard";
 import { Link, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { Alert, RefreshControl, ScrollView, View } from "react-native";
@@ -18,10 +16,10 @@ import UpgradeButton from "@/components/sharable/upgrade-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Large, Muted, P } from "@/components/ui/typography";
 import { useSubscription } from "@/context/subscription-provider";
 import { useToast } from "@/context/toast-provider";
+import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function SettingsScreen() {
@@ -161,50 +159,11 @@ export default function SettingsScreen() {
 		Alert.alert("Profile updated");
 	};
 
-	const handleSocialsUpdate = async () => {
-		try {
-			setLoadingSocials(true);
-
-			const res = await updateUserData(userData.id, "socials", {
-				instagram: socials.instagram,
-				youtube: socials.youtube,
-				twitter: socials.twitter,
-			});
-
-			console.log("res", res);
-
-			if (res) {
-				showToast("Socials updated");
-				refreshUserData("userData");
-			} else {
-				showToast("Error updating socials");
-			}
-		} catch (error) {
-			console.error("Error updating socials:", error);
-			showToast("Error updating socials");
-		}
-
-		setLoadingSocials(false);
-	};
-
 	const handleRestorePurchases = async () => {
 		setLoadingRestorePurchases(true);
 		const res = await restorePurchases();
 		showToast("Any applicable purchases have been restored");
 		setLoadingRestorePurchases(false);
-	};
-
-	const handleLoadInviteModal = () => {
-		router.push("/inviteModal");
-	};
-
-	const handleLoadRedeemModal = () => {
-		router.push("/redeemModal");
-	};
-
-	const handleCopyReferralCode = async () => {
-		await Clipboard.setStringAsync(userData.username);
-		Alert.alert("Referral code copied to clipboard");
 	};
 
 	return (
@@ -220,19 +179,57 @@ export default function SettingsScreen() {
 						<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
 					}
 				>
-					<View className="w-full flex flex-col h-full justify-between pb-14 px-8">
-						<View className="flex flex-col mt-6">
+					<View className="w-full flex flex-col h-full justify-between items-center pb-14 px-8">
+						<View className="flex flex-col mt-6 justify-center items-center">
 							<ImageUpload
 								itemId={uid}
 								label="Avatar"
 								file={newAvatar}
 								setFile={setNewAvatar}
 							/>
-							<Large>{userData.full_name || "Unknown name"}</Large>
-							<Muted>@{userData.username || "No username set"}</Muted>
+							<Large className="text-center">
+								{userData.full_name || "Unknown name"}
+							</Large>
+							<Muted className="text-center">
+								@{userData.username || "No username set"}
+							</Muted>
 						</View>
 
-						<View className="flex flex-col gap-y-2 mt-6">
+						<View className="flex flex-col gap-y-2 mt-6 w-full">
+							<P className="text-muted-foreground">Current location</P>
+							<View className="bg-card p-4 rounded-xl border border-border">
+								{userData.location?.formattedAddress && (
+									<P className="text-center flex-wrap">
+										{userData.location?.formattedAddress}
+									</P>
+								)}
+
+								{userData.location?.formattedAddress && (
+									<Button
+										variant="ghost"
+										loading={loading}
+										onPress={() => router.push("/locationModal")}
+										className="w-full mt-4"
+										label="Change"
+									/>
+								)}
+
+								{!userData.location?.formattedAddress && (
+									<Button
+										variant="outline"
+										onPress={() => router.push("/locationModal")}
+										className="w-44"
+										label="Set location"
+									/>
+								)}
+							</View>
+
+							{/* <LocationBadge
+									location={userData.location?.formattedAddress}
+								/> */}
+						</View>
+
+						<View className="flex flex-col gap-y-2 mt-6 w-full">
 							<P className="text-muted-foreground">Membership</P>
 
 							<View className="bg-card p-4 rounded-xl border border-border">
@@ -258,10 +255,6 @@ export default function SettingsScreen() {
 									</>
 								) : (
 									<View className="mt-2 flex flex-col items-center gap-0">
-										<View className="flex flex-row items-center gap-x-1 mb-4">
-											<P className="text-lg">Current plan:</P>
-											<P className="font-bold text-lg">Free</P>
-										</View>
 										<View className="px-4 w-full">
 											<UpgradeButton />
 										</View>
@@ -270,7 +263,7 @@ export default function SettingsScreen() {
 											<Button
 												className="w-full h-10"
 												variant="ghost"
-												label="Restore purchases"
+												label="Restore"
 												loading={loadingRestorePurchases}
 												onPress={handleRestorePurchases}
 											/>
@@ -301,7 +294,7 @@ export default function SettingsScreen() {
 
 						<View className="flex flex-col gap-y-2 mt-6">
 							<P className="text-muted-foreground">Edit profile</P>
-							<View className="bg-card p-4 rounded-xl border border-border flex flex-col items-end">
+							<View className="bg-card p-4 rounded-xl border border-border flex flex-col items-center">
 								<View className="flex flex-col w-full space-y-4">
 									<Label nativeID="name" className="text-sm">
 										Name
@@ -330,36 +323,8 @@ export default function SettingsScreen() {
 									</View>
 								</View>
 
-								<View className="flex flex-col w-full space-y-2 mt-4">
-									<Label nativeID="password" className="text-sm">
-										Bio
-									</Label>
-									<View className="flex flex-row w-full gap-2">
-										<Textarea
-											placeholder="Bio"
-											value={newBio}
-											onChangeText={setNewBio}
-											className="w-full"
-										/>
-									</View>
-								</View>
-
-								<View className="flex flex-col w-full space-y-2 mt-4">
-									<Label nativeID="referred_by" className="text-sm">
-										Who referred you?
-									</Label>
-									<View className="flex flex-row w-full gap-2">
-										<Input
-											placeholder="username (don't include @)"
-											value={newReferralCode}
-											onChangeText={(text) => setNewReferralCode(text)}
-											className="w-full"
-										/>
-									</View>
-								</View>
-
 								<Button
-									variant="outline"
+									variant="ghost"
 									loading={loading}
 									onPress={handleUpdateProfile}
 									className="w-36 mt-4"
@@ -368,129 +333,14 @@ export default function SettingsScreen() {
 							</View>
 						</View>
 
-						{/* <View className="flex flex-col gap-y-2 mt-6">
-							<P className="text-muted-foreground">Socials</P>
-							<View className="bg-muted p-4 rounded-xl border border-border">
-								<View className="flex flex-col w-full space-y-2 mt-4">
-									<Label nativeID="instagram" className="text-sm">
-										Instagram
-									</Label>
-									<View className="flex flex-row w-full gap-2">
-										<Input
-											placeholder="https://www.instagram.com/oasiswaterapp"
-											value={socials.instagram}
-											onChangeText={(text) =>
-												setSocials({ ...socials, instagram: text })
-											}
-											className="w-full border border-border rounded-md bg-background"
-										/>
-									</View>
-								</View>
-								<View className="flex flex-col w-full space-y-2 mt-4">
-									<Label nativeID="youtube" className="text-sm">
-										YouTube
-									</Label>
-									<View className="flex flex-row w-full gap-2">
-										<Input
-											placeholder="https://www.youtube.com/@oasiswaterapp"
-											value={socials.youtube}
-											onChangeText={(text) =>
-												setSocials({ ...socials, youtube: text })
-											}
-											className="w-full border border-border rounded-md bg-background"
-										/>
-									</View>
-								</View>
-								<View className="flex flex-col w-full space-y-2 mt-4">
-									<Label nativeID="twitter" className="text-sm">
-										X (Twitter)
-									</Label>
-									<View className="flex flex-row w-full gap-2">
-										<Input
-											placeholder="https://x.com/oasiswaterapp"
-											value={socials.twitter}
-											onChangeText={(text) =>
-												setSocials({ ...socials, twitter: text })
-											}
-											className="w-full border border-border rounded-md bg-background"
-										/>
-									</View>
-								</View>
-								<Button
-									variant="secondary"
-									loading={loadingSocials}
-									onPress={handleSocialsUpdate}
-									className="w-36 mt-4"
-									label="Update"
-								/>
-							</View>
-						</View> */}
-
-						{/* <View className="flex flex-col gap-y-2 mt-6">
-							<P className="text-muted-foreground">Referrals and Earnings</P>
-							<View className="bg-muted p-4 rounded-xl border border-border">
-								<View className="flex flex-col gap-y-2">
-									<Muted>
-										Earn 20% each time someone becomes an Oasis member using
-										your username as the referral code.
-									</Muted>
-									<TouchableOpacity
-										onPress={handleCopyReferralCode}
-										className="flex flex-row bg-card w-full gap-2 h-10 items-center justify-center rounded-lg cursor-pointer"
-									>
-										<Octicons name="copy" size={14} color="black" />
-										<P>{userData.username}</P>
-									</TouchableOpacity>
-								</View>
-
-								<View className="flex flex-row justify-between mt-4 gap-4">
-									<View className="flex-1 h-20 rounded-lg flex flex-col items-center justify-center border">
-										<Typography size="base" fontWeight="normal">
-											${referralStats.total_earnings}
-										</Typography>
-										<Typography
-											size="xs"
-											fontWeight="normal"
-											className="py-1 bg-muted rounded-lg"
-										>
-											Earnings
-										</Typography>
-									</View>
-									<View className="flex-1 h-20 rounded-lg flex flex-col items-center justify-center border">
-										<Typography size="lg" fontWeight="normal">
-											{referralStats.total_paid_referrals}
-										</Typography>
-										<Typography
-											size="xs"
-											fontWeight="normal"
-											className="py-1 bg-muted rounded-lg"
-										>
-											Paid referrals
-										</Typography>
-									</View>
-									<View className="flex-1 h-20 rounded-lg flex flex-col items-center justify-center border">
-										<Typography size="lg" fontWeight="normal">
-											{referralStats.total_trials}
-										</Typography>
-										<Typography
-											size="xs"
-											fontWeight="normal"
-											className="py-1 bg-muted rounded-lg"
-										>
-											Trial referrals
-										</Typography>
-									</View>
-								</View>
-							</View>
-						</View> */}
-
-						<View className="flex flex-col gap-y-2 mt-6 ">
+						<View className="flex flex-col gap-y-2 mt-6 w-full ">
 							<P className="text-muted-foreground">Account</P>
 							<View className="bg-card p-4 rounded-xl border border-border flex flex-col">
 								<Typography size="base" fontWeight="normal" className="mt-2">
 									Signed in as {user?.email}
 								</Typography>
-								<View className="w-full flex flex-row justify-end">
+
+								<View className="w-full flex flex-row justify-center">
 									<Button
 										className="w-40 mt-4"
 										variant="outline"
@@ -503,7 +353,7 @@ export default function SettingsScreen() {
 
 						<View className="flex flex-col mt-24 pb-8 gap-y-2">
 							<Link
-								className="w-full mt-2 text-red-500 text-center"
+								className="w-full mt-2 text-muted-foreground text-center"
 								// @ts-ignore
 								href="/deleteAccountModal"
 							>

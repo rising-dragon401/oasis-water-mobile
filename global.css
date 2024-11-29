@@ -14,6 +14,8 @@
 		--foreground: #9b9c9a;
 		--muted: #d3d6d1;
 
+		--tab-background: #f5f4f0;
+
 		--popover: 30 4.2% 38.82%; /* light.popover */
 		--muted-foreground: 0 0% 45%; /* light.muted-foreground */
 		--secondary-foreground: 40 13% 92.94%; /* light.secondary-foreground */

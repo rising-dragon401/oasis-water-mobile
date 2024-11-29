@@ -20,6 +20,10 @@ export const determineLink = (item: any) => {
 		basePath = `/search/oasis/${item?.id}`;
 	} else if (item?.type === "category") {
 		basePath = `/search/top-rated/${item?.typeId}?tags=${item?.tags?.join(",")}&catId=${item.id}`;
+	} else if (item?.type === "brand") {
+		basePath = `/search/brand/${item?.id}`;
+	} else if (item?.type === "store") {
+		basePath = `/search/store/${item?.id}`;
 	} else {
 		basePath = `/search/item/${item?.id}`;
 	}
@@ -55,14 +59,18 @@ export const timeSince = (date: string) => {
 	const diffHours = Math.floor(diffMinutes / 60);
 	const diffDays = Math.floor(diffHours / 24);
 
+	const formatTime = (value: number, unit: string) => {
+		return `${value} ${unit}${value !== 1 ? "s" : ""} ago`;
+	};
+
 	if (diffSeconds < 60) {
-		return `${diffSeconds} seconds ago`;
+		return formatTime(diffSeconds, "second");
 	} else if (diffMinutes < 60) {
-		return `${diffMinutes} minutes ago`;
+		return formatTime(diffMinutes, "minute");
 	} else if (diffHours < 24) {
-		return `${diffHours} hours ago`;
+		return formatTime(diffHours, "hour");
 	} else {
-		return `${diffDays} days ago`;
+		return formatTime(diffDays, "day");
 	}
 };
 

@@ -9,6 +9,7 @@ import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 import ResultsRow from "./results-row";
 
 import { Input } from "@/components/ui/input";
+import { useSubscription } from "@/context/subscription-provider";
 import { useToast } from "@/context/toast-provider";
 import { useDebounce } from "@/lib/hooks/use-debounce";
 import { useColorScheme } from "@/lib/useColorScheme";
@@ -35,6 +36,8 @@ export default function Search({
 	hideScan?: boolean;
 	showRequestItem?: boolean;
 }) {
+	const { hasActiveSub } = useSubscription();
+
 	const [results, setResults] = useState<any[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
 	const [, setQueryCompleted] = useState(false);
@@ -43,6 +46,7 @@ export default function Search({
 	const [showSearchIcon, setShowSearchIcon] = useState(true);
 
 	const debouncedQuery = useDebounce(value, 400);
+	const debouncedSearch = useDebounce(value, 1000); // prevent spamming the search event while user typing
 	const { mutedForegroundColor, iconColor } = useColorScheme();
 	const router = useRouter();
 	const posthog = usePostHog();
@@ -57,6 +61,19 @@ export default function Search({
 			setResults([]);
 		}
 	}, [debouncedQuery]);
+
+	useEffect(() => {
+		if (debouncedSearch) {
+			captureSearchEvent();
+		}
+	}, [debouncedSearch]);
+
+	const captureSearchEvent = () => {
+		posthog?.capture("search", {
+			query: debouncedSearch,
+			has_results: results?.length > 0,
+		});
+	};
 
 	const onChangeText = (text: string) => {
 		setValue(text);
@@ -96,7 +113,23 @@ export default function Search({
 					query,
 					params: {
 						restrictSearchableAttributes: ["name"],
-						hitsPerPage: numResults || 15,
+						hitsPerPage: numResults || 10,
+					},
+				},
+				{
+					indexName: "brands",
+					query,
+					params: {
+						// restrictSearchableAttributes: ["name"],
+						hitsPerPage: numResults || 3,
+					},
+				},
+				{
+					indexName: "stores",
+					query,
+					params: {
+						// restrictSearchableAttributes: ["name"],
+						hitsPerPage: numResults || 3,
 					},
 				},
 				{
@@ -104,7 +137,7 @@ export default function Search({
 					query,
 					params: {
 						restrictSearchableAttributes: ["name"],
-						hitsPerPage: numResults || 3,
+						hitsPerPage: numResults || 10,
 					},
 				},
 				{
@@ -126,11 +159,6 @@ export default function Search({
 			];
 		}
 
-		posthog?.capture("search", {
-			query,
-			has_results: results?.length > 0,
-		});
-
 		try {
 			const response = await searchClient.multipleQueries(queries);
 			const hits = response.results.map((result: any) => result.hits);
@@ -147,6 +175,11 @@ export default function Search({
 	};
 
 	const handleScan = async () => {
+		if (!hasActiveSub) {
+			router.push("/subscribeModal");
+			return;
+		}
+
 		if (permission?.granted) {
 			router.push("/scanModal");
 		} else if (!permission?.granted) {

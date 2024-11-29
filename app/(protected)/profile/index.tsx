@@ -1,89 +1,116 @@
-import Ionicons from "@expo/vector-icons/Ionicons";
-import { useUserProvider } from "context/user-provider";
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { ScrollView, View } from "react-native";
+import { useState } from "react";
+import {
+	RefreshControl,
+	ScrollView,
+	TouchableOpacity,
+	View,
+} from "react-native";
 
-import ProfileHeader from "@/components/sharable/profile-header";
+import LocationCard from "@/components/cards/location-card";
+import ItemPreviewCard from "@/components/sharable/item-preview-card";
 import ProfileScores from "@/components/sharable/profile-scores";
-import StickyHeader from "@/components/sharable/sticky-header";
+import SectionHeader from "@/components/sharable/section-header";
 import { Button } from "@/components/ui/button";
 import { Muted, P } from "@/components/ui/typography";
-import { useSubscription } from "@/context/subscription-provider";
-import { theme } from "@/lib/constants";
+import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
 
-export default function ProfileScreen() {
-	const { hasActiveSub } = useSubscription();
-	const { userScores, userData, tapScore, userFavorites } = useUserProvider();
-	const { colorScheme } = useColorScheme();
-	const { iconColor } = useColorScheme();
+export default function SavedScreen() {
+	const { iconColor, backgroundColor } = useColorScheme();
+	const { userFavorites, tapScore, userScores, refreshUserData } =
+		useUserProvider();
 	const router = useRouter();
-
-	const backgroundColor =
-		colorScheme === "dark" ? theme.dark.background : theme.light.background;
-
-	const score = userScores?.overallScore || 0;
+	const [refreshing, setRefreshing] = useState(false);
 
 	const userHasFavorites = userFavorites && userFavorites.length > 0;
 
-	const userHasTapScore = tapScore && tapScore.id;
+	const onRefresh = async () => {
+		setRefreshing(true);
+		await refreshUserData("all");
+		await refreshUserData("scores");
+		setRefreshing(false);
+	};
 
 	return (
 		<ScrollView
 			style={{ backgroundColor }}
-			contentContainerStyle={{ paddingBottom: 100 }}
+			contentContainerStyle={{
+				paddingBottom: 100,
+				paddingHorizontal: 28,
+				paddingTop: 20,
+			}}
+			refreshControl={
+				<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+			}
 		>
-			<View className=" px-8">
-				<StickyHeader
-					title="Profile"
-					icon="settings"
-					path="/(protected)/profile/settings"
-				/>
-
-				<View className="flex flex-col justify-center items-center py-2 mt-2">
-					<ProfileHeader
-						profileData={userData}
-						score={score}
-						subscription={hasActiveSub}
-					/>
+			<View className="flex flex-col gap-4">
+				<View className="flex justify-between w-full">
+					<SectionHeader title="Your latest water analysis" />
+					<View className="flex">
+						{userScores && userScores?.allContaminants?.length > 0 ? (
+							<ProfileScores userScores={userScores} />
+						) : (
+							<View className="h-8 w-full">
+								<Muted>
+									Your scores will appear here once you've added some items
+								</Muted>
+							</View>
+						)}
+					</View>
 				</View>
 
-				{userHasTapScore || userHasFavorites ? (
-					<View className="my-8 w-full">
-						<P className="mb-2">Your latest water analysis:</P>
-						<ProfileScores userScores={userScores} />
+				{/* Render Tap water section separately */}
+				<View className="flex justify-between w-full mt-4">
+					<SectionHeader title="Your tap water" />
+					<View className="h-28 w-full">
+						<TouchableOpacity
+							onPress={() =>
+								router.push(
+									tapScore && tapScore.id
+										? `/search/location/${tapScore?.id}?backPath=saved`
+										: "/locationModal",
+								)
+							}
+							className="flex"
+						>
+							<LocationCard location={tapScore || {}} size="md" />
+						</TouchableOpacity>
 					</View>
-				) : (
-					<View className="mt-6 py-6 px-8  flex flex-col border border-border rounded-lg p-4 bg-card">
-						<P className="text-xl">Find out what's lurking in your water</P>
-						<Muted className="text-sm">
-							Add your tap score, bottled waters and filters to see whats in
-							your water
-						</Muted>
+				</View>
 
-						<View className="flex flex-col gap-2 my-4 w-full">
-							<View className="flex flex-row items-center gap-2">
-								<Ionicons name="skull-outline" size={20} color={iconColor} />
-								<P className=" text-xl">Contaminants</P>
-							</View>
-							<View className="flex flex-row items-center gap-2">
-								<Ionicons name="warning-outline" size={20} color={iconColor} />
-								<P className="text-xl">Health risks</P>
-							</View>
-							<View className="flex flex-row items-center gap-2">
-								<Ionicons name="leaf-outline" size={20} color={iconColor} />
-								<P className="text-xl">Benefits</P>
-							</View>
+				{/* FlatList for Products */}
+				<View className="flex flex-col w-full mt-4">
+					<SectionHeader title="Saved" />
+					{userHasFavorites ? (
+						<View className="flex flex-row flex-wrap gap-4">
+							{userFavorites.map((item) => (
+								<View key={item?.id} style={{ width: "44%" }} className="mb-2">
+									<ItemPreviewCard
+										item={item}
+										isAuthUser
+										isGeneralListing
+										variation="square"
+										imageHeight={80}
+									/>
+								</View>
+							))}
 						</View>
-
-						<Button
-							variant="default"
-							onPress={() => router.push("/(protected)/saved")}
-							label="Add products and tap water"
-							className="mt-232"
-						/>
-					</View>
-				)}
+					) : (
+						<View className="flex flex-col gap-y-2">
+							<P className="text-muted-foreground">
+								Save your favorites here to track their health scores
+							</P>
+							<Button
+								label="Add some"
+								variant="outline"
+								icon={<Ionicons name="search" size={18} color={iconColor} />}
+								onPress={() => router.push("/(protected)/search")}
+							/>
+						</View>
+					)}
+				</View>
 			</View>
 		</ScrollView>
 	);

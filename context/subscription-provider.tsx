@@ -11,13 +11,35 @@ import { useUserProvider } from "./user-provider";
 
 import { getStripeSubscription, updateUserRcId } from "@/actions/user";
 
+export type Features =
+	| "onboarding"
+	| "top-rated"
+	| "scan"
+	| "item-analysis" // includes scores
+	| "recommended-filters"
+	| "profile-scores"
+	| "settings-upgrade";
+
+export type Components = "water-scores" | "contaminant-table";
+
+export type SubscriptionSource = {
+	feature: Features | string | null; // feature user is interacting with
+	path: string | null; // path of the page
+	component: Components | string | null; // component user clicked
+	productId?: string | null; // productId of the item user is interacting with
+	productType?: string | null; // productType of the item user is interacting with
+};
+
 const APIKeys = {
 	apple: "appl_OIAHthcBxHjpVWGXmtLvBKRTtrR",
 	google: "goog_FvkMjztDreNxCXHMlzQqreSiQxs",
 };
 
 interface SubscriptionProps {
-	purchasePackage: (pack: PurchasesPackage) => Promise<boolean>;
+	purchasePackage: (
+		pack: PurchasesPackage,
+		subscriptionSource?: SubscriptionSource,
+	) => Promise<boolean>;
 	restorePurchases: () => Promise<CustomerInfo>;
 	userSubscription: UserState;
 	hasActiveSub: boolean;
@@ -129,8 +151,16 @@ export const SubscriptionProvider = ({ children }: any) => {
 		});
 	};
 
-	const purchasePackage = async (pack: PurchasesPackage) => {
+	const purchasePackage = async (
+		pack: PurchasesPackage,
+		subscriptionSource?: SubscriptionSource,
+	) => {
 		try {
+			console.log(
+				"purchasePackage subscriptionSource",
+				JSON.stringify(subscriptionSource),
+			);
+
 			await Purchases.purchasePackage(pack);
 
 			setHasActiveSub(true);
@@ -138,6 +168,11 @@ export const SubscriptionProvider = ({ children }: any) => {
 			posthog?.capture("purchase", {
 				type: "subscription",
 				package: pack.identifier,
+				feature: subscriptionSource?.feature,
+				path: subscriptionSource?.path,
+				component: subscriptionSource?.component,
+				productId: subscriptionSource?.productId,
+				productType: subscriptionSource?.productType,
 			});
 
 			return true;
@@ -152,6 +187,7 @@ export const SubscriptionProvider = ({ children }: any) => {
 	const checkForSubscription = async () => {
 		// First check for revenue cat subscription
 		const rcSub = await checkRevenueCatSubscription();
+		console.log("has active rc sub", rcSub);
 		if (rcSub) {
 			setHasActiveSub(true);
 		} else {

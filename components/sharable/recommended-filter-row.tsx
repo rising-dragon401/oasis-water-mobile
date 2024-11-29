@@ -14,11 +14,13 @@ import { RANDOM_BLUR_IMAGES } from "@/lib/constants/images";
 
 type RecommendedFilterRowProps = {
 	contaminants: any[];
+	locationId: string;
 };
 
 // recommended filter based on contaminants
 export default function RecommendedFilterRow({
 	contaminants,
+	locationId,
 }: RecommendedFilterRowProps) {
 	const { hasActiveSub } = useSubscription();
 	const router = useRouter();
@@ -48,10 +50,10 @@ export default function RecommendedFilterRow({
 	return (
 		<View className="mb-10 mt-6 ml-2">
 			<View className="flex flex-row justify-between items-center mb-2">
-				<H3>Recommended filters</H3>
+				<H3>Recommended filters for this area</H3>
 
 				{hasActiveSub && (
-					<Link href="/(protected)/search/top-rated-all">
+					<Link href="/(protected)/search/top">
 						<Muted className="text-center m-0 p-0">see all</Muted>
 					</Link>
 				)}
@@ -60,11 +62,19 @@ export default function RecommendedFilterRow({
 			{!hasActiveSub ? (
 				<View className="mb-2">
 					<Button
-						label="See filters"
+						label="Unlock filters"
 						className="mb-2 w-56"
 						icon={<Ionicons name="lock-closed" size={16} color="white" />}
 						onPress={() => {
-							router.push("/subscribeModal");
+							router.push({
+								pathname: "/subscribeModal",
+								params: {
+									path: "search/tap-water",
+									feature: "recommended-filters",
+									productType: "tap_water",
+									productId: locationId,
+								},
+							});
 						}}
 					/>
 					<FlatList
@@ -112,7 +122,6 @@ export default function RecommendedFilterRow({
 						<View className="mr-4 flex-1 max-w-44 h-full">
 							<ItemPreviewCard
 								item={item}
-								showFavorite={false}
 								isAuthUser={false}
 								isGeneralListing={false}
 								variation="square"
@@ -122,24 +131,6 @@ export default function RecommendedFilterRow({
 					keyExtractor={(item: any) => item.id}
 				/>
 			)}
-
-			{/* <PaywallContent
-				label="Unlock recommended filter"
-				buttonLabel="See filter"
-			>
-				<View className="flex overflow-x-auto gap-6 hide-scrollbar">
-					{recommended &&
-						recommended.map((item: any) => (
-							<View
-								key={item.id}
-								// className="flex-shrink-0 h-40"
-								// style={{ minWidth: "20%", maxWidth: "360%" }}
-							>
-								<ItemPreviewCard item={item} isGeneralListing />
-							</View>
-						))}
-				</View>
-			</PaywallContent> */}
 		</View>
 	);
 }
