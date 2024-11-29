@@ -25,7 +25,6 @@ import { H3, Muted } from "@/components/ui/typography";
 import { useSubscription } from "@/context/subscription-provider";
 import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
-
 type Props = {
 	id: string;
 };
@@ -79,6 +78,17 @@ export function ItemForm({ id }: Props) {
 		},
 	);
 
+	const totalHealthRisks = contaminants.reduce(
+		(acc: number, contaminant: any) => {
+			const risks = contaminant.risks || "";
+			const riskCount = risks
+				.split(",")
+				.filter((risk: string) => risk.trim() !== "").length;
+			return acc + riskCount;
+		},
+		0,
+	);
+
 	const nanoPlasticsValue =
 		item.packaging === "plastic"
 			? "Yes"
@@ -127,6 +137,12 @@ export function ItemForm({ id }: Props) {
 			icon: <Ionicons name="warning-outline" size={18} color={iconColor} />,
 			value: contaminantsAboveLimit.length,
 			score: contaminantsAboveLimit.length > 0 ? "bad" : "good",
+		},
+		{
+			label: "Health risks",
+			icon: <Ionicons name="bandage-outline" size={18} color={iconColor} />,
+			value: totalHealthRisks,
+			score: totalHealthRisks > 0 ? "bad" : "good",
 		},
 		{
 			label: "PFAS",
@@ -236,8 +252,8 @@ export function ItemForm({ id }: Props) {
 							)}
 
 							{/* @ts-ignore */}
-							<Link href={`/search/company/${item.company?.id}`}>
-								<Muted>{item.company?.name}</Muted>
+							<Link href={`/search/brand/${item.brand?.id}`}>
+								<Muted>{item.brand?.name}</Muted>
 							</Link>
 						</View>
 
@@ -280,18 +296,19 @@ export function ItemForm({ id }: Props) {
 
 				<>
 					{sortedContaminants && sortedContaminants.length > 0 && (
-						<View className="flex flex-col gap-4 mt-8">
+						<View className="flex flex-col gap-4 mt-8 ">
 							<View className="flex flex-row items-center gap-x-2">
-								<Ionicons name="skull-outline" size={20} color={iconColor} />
+								{/* <MaterialCommunityIcons
+									name="virus-outline"
+									size={18}
+									color={iconColor}
+								/> */}
 
 								<Typography size="2xl" fontWeight="normal">
-									Contaminants
+									Contaminant detected
 								</Typography>
 							</View>
-							{/* <PaywallContent
-								label="See the contaminants in this water"
-								items={FEATURES.map((item) => item.label)}
-							> */}
+
 							<View className="grid md:grid-cols-2 grid-cols-1 gap-6">
 								{sortedContaminants.map((contaminant: any, index: number) => (
 									<TouchableOpacity
@@ -300,7 +317,12 @@ export function ItemForm({ id }: Props) {
 										onPress={() => {
 											router.push({
 												pathname: "/subscribeModal",
-												params: itemDetails,
+												params: {
+													...itemDetails,
+													path: "search/filter",
+													feature: "item-analysis",
+													component: "contaminant-table",
+												},
 											});
 										}}
 									>
@@ -321,7 +343,6 @@ export function ItemForm({ id }: Props) {
 													bottom: 20,
 													borderRadius: 16,
 													height: "100%",
-
 													overflow: "hidden",
 													backgroundColor: "rgba(255, 255, 255, 0.2)",
 												}}
@@ -338,14 +359,14 @@ export function ItemForm({ id }: Props) {
 							nonContaminantIngredients.length > 0 && (
 								<View className="flex flex-col gap-4 my-10">
 									<View className="flex flex-row items-center gap-x-2">
-										<Ionicons
+										{/* <Ionicons
 											name="heart-outline"
 											size={20}
 											color={iconColor}
-										/>
+										/> */}
 
 										<Typography size="2xl" fontWeight="normal">
-											Minerals
+											Minerals found
 										</Typography>
 									</View>
 									<IngredientsCard

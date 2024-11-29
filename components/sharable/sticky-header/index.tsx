@@ -8,6 +8,7 @@ import { useColorScheme } from "@/lib/useColorScheme";
 export default function StickyHeader({
 	title,
 	icon,
+	customIcon,
 	path,
 	description,
 	hideMargin,
@@ -15,6 +16,7 @@ export default function StickyHeader({
 }: {
 	title: string;
 	icon?: string;
+	customIcon?: React.ReactNode;
 	path?: string;
 	description?: string;
 	hideMargin?: boolean;
@@ -47,12 +49,16 @@ export default function StickyHeader({
 					</TouchableOpacity>
 				)}
 
-				<TouchableOpacity
-					onPress={() => path && router.push(path as any)}
-					className="!bg-transparent flex flex-row items-center gap-x-1"
-				>
-					<Feather name={icon as any} size={24} color={iconColor} />
-				</TouchableOpacity>
+				{customIcon ? (
+					customIcon
+				) : (
+					<TouchableOpacity
+						onPress={() => path && router.push(path as any)}
+						className="!bg-transparent flex flex-row items-center gap-x-1"
+					>
+						<Feather name={icon as any} size={24} color={iconColor} />
+					</TouchableOpacity>
+				)}
 			</View>
 		</View>
 	);

@@ -1,4 +1,4 @@
-import { useUserProvider } from "context/user-provider";
+import { useUserProvider } from "@/context/user-provider";
 import {
 	Link,
 	useLocalSearchParams,

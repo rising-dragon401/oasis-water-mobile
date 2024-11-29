@@ -11,7 +11,13 @@ export default function UpgradeButton({ label }: UpgradeButtonProps) {
 	const { push } = useRouter();
 
 	const handleUpgrade = () => {
-		push("/subscribeModal");
+		push({
+			pathname: "/subscribeModal",
+			params: {
+				path: "profile/settings",
+				feature: "settings-upgrade",
+			},
+		});
 	};
 	return (
 		<Button

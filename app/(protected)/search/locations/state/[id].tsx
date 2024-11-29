@@ -38,7 +38,7 @@ export default function StateScreen() {
 	const renderCityCard = ({ item }: { item: any }) => {
 		return (
 			<TouchableOpacity
-				className="flex-row mb-8 bg-card rounded-lg border border-border"
+				className="flex-row mb-8 bg-card rounded-lg items-center justify-between gap-y-4 border border-border"
 				onPress={() => router.push(`/search/location/${item.id}`)}
 			>
 				<Image
@@ -50,14 +50,17 @@ export default function StateScreen() {
 						borderBottomLeftRadius: 8,
 					}}
 				/>
-				<View className="pl-4 py-2">
-					<H3>{item.name}</H3>
+				<View className="pl-4 py-2 gap-y-2">
+					<H3 className="text-lg">{item.name}</H3>
 					<Muted>{item.state}</Muted>
 				</View>
 
 				<View className="flex-1 items-end justify-center pr-4">
 					<Circle
-						value={Math.max(Math.round(item.score), 1)}
+						value={Math.max(
+							Math.round(item.score || item.utilities[0]?.score || 0),
+							1,
+						)}
 						size={40}
 						strokeWidth={4}
 					/>

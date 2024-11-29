@@ -61,6 +61,11 @@ export default function ResultsRow({
 			categoryLabel = "Bottled water";
 		}
 
+		if (item.type === "brand") {
+			icon = "pricetag-outline";
+			categoryLabel = "Brand";
+		}
+
 		return (
 			<View className="flex flex-row items-center gap-1">
 				{/* @ts-ignore */}
@@ -95,23 +100,23 @@ export default function ResultsRow({
 				}}
 				className="bg-card border border-border rounded-xl"
 			>
-				{noResults && showRequestItem ? (
-					<View className="flex justify-center pl-4 h-12">
-						<TouchableOpacity onPress={handleRequestItem}>
-							<Muted>
-								No result for this yet.{" "}
-								<Muted style={{ textDecorationLine: "underline" }}>
-									Request
-								</Muted>
-							</Muted>
-						</TouchableOpacity>
-					</View>
-				) : (
-					<FlatList
-						data={results}
-						keyExtractor={(item) => item.id.toString()}
-						renderItem={({ item: result }) => (
-							<View>
+				<FlatList
+					data={[...results, { id: "request-item", type: "request" }]}
+					keyExtractor={(item) => item.id.toString()}
+					renderItem={({ item: result }) => (
+						<View>
+							{result.type === "request" ? (
+								<View className="flex justify-center pl-4 h-12">
+									<TouchableOpacity onPress={handleRequestItem}>
+										<Muted>
+											Looking for something?{" "}
+											<Muted style={{ textDecorationLine: "underline" }}>
+												Request it
+											</Muted>
+										</Muted>
+									</TouchableOpacity>
+								</View>
+							) : (
 								<TouchableOpacity onPress={() => handleItemPress(result)}>
 									<View
 										className={`flex flex-row items-center justify-between w-full p-2
@@ -156,16 +161,16 @@ export default function ResultsRow({
 										</View>
 									</View>
 								</TouchableOpacity>
-							</View>
-						)}
-						nestedScrollEnabled
-						scrollEnabled
-						showsVerticalScrollIndicator={false}
-						keyboardShouldPersistTaps="handled"
-						style={{ maxHeight: 240 }}
-						contentContainerStyle={{ flexGrow: 1 }}
-					/>
-				)}
+							)}
+						</View>
+					)}
+					nestedScrollEnabled
+					scrollEnabled
+					showsVerticalScrollIndicator={false}
+					keyboardShouldPersistTaps="handled"
+					style={{ maxHeight: 240 }}
+					contentContainerStyle={{ flexGrow: 1 }}
+				/>
 			</View>
 		</View>
 	);

@@ -1,6 +1,5 @@
 import { FontAwesome6 } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import { useEffect, useState } from "react";
@@ -15,7 +14,6 @@ import {
 } from "react-native";
 import * as z from "zod";
 
-import OasisLogo from "@/assets/oasis-word.png";
 import { AppleAuthButton } from "@/components/sharable/apple-auth-button";
 import { Button } from "@/components/ui/button";
 import { Form, FormField, FormInput } from "@/components/ui/form";
@@ -31,10 +29,6 @@ const formSchema = z.object({
 		.min(8, "Please enter at least 8 characters.")
 		.max(64, "Please enter fewer than 64 characters."),
 });
-
-function CustomHeader() {
-	return <Image source={OasisLogo} style={{ width: 85, height: 24 }} />;
-}
 
 export default function SignIn() {
 	const { signInWithPassword, signInWithGoogle } = useSupabase();

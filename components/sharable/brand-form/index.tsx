@@ -15,6 +15,8 @@ export function BrandForm({ id }: { id: string }) {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
+	console.log("brand", brand);
+
 	useEffect(() => {
 		const fetchBrand = async () => {
 			const brand = await getBrandAndProducts(id);
@@ -92,7 +94,6 @@ export function BrandForm({ id }: { id: string }) {
 							<View className="flex-1 m-2">
 								<ItemPreviewCard
 									item={item}
-									showFavorite
 									isGeneralListing
 									variation="row"
 									imageHeight={80}

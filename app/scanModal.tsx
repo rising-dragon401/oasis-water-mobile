@@ -1,8 +1,10 @@
-import { Feather, Ionicons } from "@expo/vector-icons";
+import Feather from "@expo/vector-icons/Feather";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Camera, CameraCapturedPicture, CameraType } from "expo-camera";
 import { Image } from "expo-image";
-import { Link, useNavigation, useRouter } from "expo-router";
+import * as ImagePicker from "expo-image-picker";
+import { useNavigation, useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import {
 	ActivityIndicator,
@@ -24,25 +26,29 @@ import {
 	searchForProduct,
 } from "@/actions/admin";
 import { uploadCameraImage } from "@/actions/files";
-import OasisLogo from "@/assets/oasis-word.png";
-import Score from "@/components/sharable/score";
+import OasisLogo from "@/assets/oasis-text.png";
+import ScoreBadge from "@/components/sharable/score-badge";
 import { Large, Muted, P } from "@/components/ui/typography";
 import { useToast } from "@/context/toast-provider";
 import { useUserProvider } from "@/context/user-provider";
+import { FILTER_CONTAMINANT_CATEGORIES } from "@/lib/constants/categories";
+import { SCORES } from "@/lib/constants/health-effects";
 import { useColorScheme } from "@/lib/useColorScheme";
+
+// Add this interface before the component
+interface MetadataValue {
+	value: number | string | boolean;
+	color: string;
+	icon: string;
+	show: boolean;
+}
 
 export default function ScanModal() {
 	const navigation = useNavigation();
 	const router = useRouter();
 	const { uid } = useUserProvider();
 	const showToast = useToast();
-	const {
-		textSecondaryColor,
-		borderColor,
-		foregroundColor,
-		colorMode,
-		iconColor,
-	} = useColorScheme();
+	const { iconColor, redColor, greenColor, neutralColor } = useColorScheme();
 	const [permission] = Camera.useCameraPermissions();
 
 	const [loading, setLoading] = useState(false);
@@ -175,13 +181,6 @@ export default function ScanModal() {
 		if (!photo) {
 			setMode("scan");
 		}
-
-		// Reset product state when returning to scan mode
-		// if (mode === "scan" && photo) {
-		// 	setPhoto(null);
-		// 	setProduct(null);
-		// 	setProductType(null);
-		// }
 	}, [product, mode, photo]);
 
 	// Save state to AsyncStorage
@@ -277,18 +276,22 @@ export default function ScanModal() {
 			};
 
 			const response = await fetch(
-				"https://api.openai.com/v1/chat/completions",
+				`${process.env.EXPO_PUBLIC_API_ENDPOINT}/api/analyze-image`,
 				{
 					method: "POST",
 					headers: {
-						Authorization: `Bearer ${process.env.EXPO_PUBLIC_OPENAI_API_KEY}`,
 						"Content-Type": "application/json",
 					},
 					body: JSON.stringify(requestBody),
 				},
-			);
+			).catch((error) => {
+				console.error("Error sending image to OpenAI:", error);
+				throw error;
+			});
 
 			const responseData = await response.json();
+
+			console.log("responseData", JSON.stringify(responseData, null, 2));
 
 			const productIdentified = responseData.choices[0].message.content;
 
@@ -308,7 +311,12 @@ export default function ScanModal() {
 				type,
 			};
 
-			setProductType(parsedProductIdentified.type);
+			const type_ = parsedProductIdentified.type;
+			if (type_ === "filter" || type_ === "bottle_filter") {
+				setProductType("filter");
+			} else {
+				setProductType("item");
+			}
 
 			setLoadingText("Searching for product data...");
 
@@ -348,11 +356,14 @@ export default function ScanModal() {
 				"Either the product is not in our database or the image is too blurry",
 				[
 					{
-						text: "Try again",
+						text: "Try another image",
+						onPress: () => {
+							setLoading(false);
+						},
 					},
 				],
 			);
-			showToast("Could not identify product", 1000);
+			// showToast("Could not identify product", 1000);
 		} finally {
 			setLoading(false);
 		}
@@ -369,7 +380,9 @@ export default function ScanModal() {
 						(contaminant: any) => contaminant.exceedingLimit > 0,
 					);
 
-					const hasPFAS = product.metadata?.pfas === "Yes";
+					const totalContaminants = product.contaminants.length;
+
+					const hasPFAS = product.metadata?.pfas;
 
 					const fluorideContaminant = product.contaminants?.find(
 						(contaminant: any) => contaminant.name === "Fluoride",
@@ -380,16 +393,89 @@ export default function ScanModal() {
 
 					const hasFluoride = fluorideValue !== "Not Detected";
 
+					const mineralCount = product.contaminants.filter(
+						(contaminant: any) => contaminant.name === "Minerals",
+					).length;
+
+					const hasMicroplastics = product.packaging !== "glass";
+
 					return {
-						totalContaminants: product.contaminants.length,
-						contaminantsAboveLimit: contaminantsAboveLimit.length,
-						pfas: hasPFAS,
-						fluoride: hasFluoride,
+						totalContaminants: {
+							value: totalContaminants,
+							color: totalContaminants > 0 ? redColor : greenColor,
+							show: totalContaminants > 0,
+						},
+						contaminantsAboveLimit: {
+							value: contaminantsAboveLimit.length,
+							color:
+								contaminantsAboveLimit.length > 0 ? redColor : neutralColor,
+							show: contaminantsAboveLimit.length > 0,
+						},
+						pfas: {
+							value:
+								hasPFAS === "Yes"
+									? "PFAS"
+									: hasPFAS === "No"
+										? "No PFAS"
+										: "Unknown PFAS",
+							color: hasPFAS === "Yes" ? redColor : greenColor,
+							show: true,
+						},
+						minerals: {
+							value: mineralCount,
+							color: mineralCount > 0 ? greenColor : neutralColor,
+							show: mineralCount > 0,
+						},
+						hasMicroplastics: {
+							value: hasMicroplastics ? "Microplastics" : "Minimal plastics",
+							color: hasMicroplastics ? redColor : greenColor,
+							show: true,
+						},
 					};
 				} else {
-					//  TOOD calculate filter metadata
+					const totalCategories = FILTER_CONTAMINANT_CATEGORIES.length;
+					console.log("filter", JSON.stringify(product, null, 2));
+
+					const filterCategories = product.filtered_contaminant_categories;
+
+					// for each category in FILTER_CONTAMINANT_CATEGORIES check if it is in filterCategories and filters above 70 percent
+					const filteredCategories = FILTER_CONTAMINANT_CATEGORIES.filter(
+						(category) =>
+							filterCategories.includes(category) &&
+							product.filtered_contaminant_percentages[category] > 70,
+					);
+
+					const exposedCategories =
+						FILTER_CONTAMINANT_CATEGORIES.length - filteredCategories.length;
+
+					// Get the names of the categories not filtered
+					const notFilteredCategories = FILTER_CONTAMINANT_CATEGORIES.filter(
+						(category) => !filterCategories.includes(category),
+					);
+
+					const uniqueEffects = new Set();
+
+					notFilteredCategories.forEach((category) => {
+						SCORES.forEach((score) => {
+							if (
+								score.categoriesImpactedBy &&
+								score.categoriesImpactedBy.includes(category)
+							) {
+								score.categoriesImpactedBy.forEach((effect) => {
+									uniqueEffects.add(effect);
+								});
+							}
+						});
+					});
+
+					const totalRiskCount = uniqueEffects.size;
+
 					// Currently takes too long
-					return null;
+					return {
+						exposedCategories,
+						notFilteredCategories,
+						totalRisks: totalRiskCount,
+					};
 				}
 			} catch (e) {
 				console.log("Error calculating product metadata:", e);
@@ -403,20 +489,40 @@ export default function ScanModal() {
 		navigation.goBack();
 	};
 
-	const resetState = async () => {
-		setPhoto(null);
-		setProduct(null);
-		setProductType(null);
-		setMode("scan");
-		try {
-			await AsyncStorage.removeItem("savedPhoto");
-			await AsyncStorage.removeItem("savedProduct");
-			await AsyncStorage.removeItem("savedProductType");
-			await AsyncStorage.removeItem("savedMode");
-		} catch (error) {
-			console.error("Error resetting state:", error);
+	const pickImage = async () => {
+		const result = await ImagePicker.launchImageLibraryAsync({
+			mediaTypes: ImagePicker.MediaTypeOptions.Images,
+			allowsEditing: false,
+			// aspect: [4, 3],
+			quality: 1,
+		});
+
+		if (!result.canceled) {
+			const selectedImage = result.assets[0];
+			const cameraCapturedPicture: CameraCapturedPicture = {
+				uri: selectedImage.uri,
+				width: selectedImage.width,
+				height: selectedImage.height,
+				base64: selectedImage.base64 || undefined, // Ensure base64 is not null
+			};
+			setPhoto(cameraCapturedPicture);
+			setProduct(null);
+			setLoadingText("Analyzing image...");
+			setLoading(true);
+			setMode("scan");
+			sendToOpenAI(cameraCapturedPicture);
 		}
 	};
+
+	useEffect(() => {
+		(async () => {
+			const { status } =
+				await ImagePicker.requestMediaLibraryPermissionsAsync();
+			if (status !== "granted") {
+				alert("Sorry, we need camera roll permissions to make this work!");
+			}
+		})();
+	}, []);
 
 	const renderControls = () => {
 		return (
@@ -434,10 +540,15 @@ export default function ScanModal() {
 					>
 						<Ionicons name="close" size={24} color="white" />
 					</TouchableOpacity>
-					<Image source={OasisLogo} style={{ width: 85, height: 24 }} />
+					<View className="flex items-start justify-start  h-5 w-24">
+						<Image
+							source={OasisLogo}
+							style={{ width: "100%", height: "100%" }}
+							contentFit="contain"
+						/>
+					</View>
 					{/* <Large className="text-white items-center">Scan item</Large> */}
 				</View>
-
 				{/* Scan grid */}
 				<View
 					style={{
@@ -541,223 +652,221 @@ export default function ScanModal() {
 						<P className="text-white mt-4 text-lg font-medium">{loadingText}</P>
 					)}
 				</View>
-
 				{/* Product card */}
-				{product && product.data && mode === "preview" && (
-					<View className="flex flex-col items-center w-full px-6 mb-4 n">
-						{mode === "preview" && (
-							<P className="text-white mb-2 text-lg">{loadingText}</P>
-						)}
-						<Link
-							href={
-								productType === "filter"
-									? `/(protected)/search/filter/${product.data.id}`
-									: `/(protected)/search/item/${product.data.id}`
-							}
-						>
-							<View
-								style={{
-									flexDirection: "column",
-									padding: 16,
-									paddingHorizontal: 16,
-									borderRadius: 15,
-									width: "100%",
-									backgroundColor:
-										colorMode === "dark"
-											? "rgba(0, 0, 0, 0.7)"
-											: "rgba(255, 255, 255, 0.7)", // Dark glassmorphic background for dark mode
-
-									borderColor,
-									borderWidth: 1,
-									shadowColor: foregroundColor,
-									shadowOffset: { width: 2, height: 4 },
-									shadowOpacity: 0.2,
-									shadowRadius: 6,
-									elevation: 5,
-									position: "relative",
-								}}
-								className="max-h-[240px] overflow-hidden"
-							>
-								<View className="flex w-full flex-row items-center mb-2">
-									<Image
-										source={{ uri: product.data.image }}
-										style={{
-											width: 72,
-											height: 72,
-											borderRadius: 10,
-											marginRight: 10,
-										}}
-										contentFit="cover"
-										className="rounded-md"
-										transition={1000}
-									/>
-									<View className="flex-1 flex-col">
-										<P className="text-sm">
-											{productType === "bottled_water"
-												? product.data.company?.name
-												: product.data.company}
-										</P>
-										<P className="text-wrap pr-8  text-lg font-semibold leading-tight">
-											{product.data.name.length > 36
-												? `${product.data.name.substring(0, 33)}...`
-												: product.data.name}
-										</P>
-									</View>
-									<View className="flex-row items-center h-8">
-										<Score score={product.data.score} size="xs" />
-									</View>
-								</View>
-
-								{/* Tags */}
-								<View className="flex ">
-									{productType === "bottled_water" && product.metadata && (
-										<View className="flex flex-row flex-wrap items-start justify-start gap-1 mb-2 w-full pr-10">
-											{product.metadata.totalContaminants > 0 && (
-												<View className="h-8 rounded-full px-3 items-center justify-center bg-red-200">
-													<P
-														className={
-															colorMode === "dark"
-																? "text-background"
-																: "text-primary"
-														}
-													>
-														{product.metadata.totalContaminants} contaminants
-													</P>
-												</View>
-											)}
-
-											{product.metadata.contaminantsAboveLimit > 0 && (
-												<View className="h-8 rounded-full px-2 items-center justify-center bg-red-200">
-													<P
-														className={
-															colorMode === "dark"
-																? "text-background"
-																: "text-primary"
-														}
-													>
-														{product.metadata.contaminantsAboveLimit} above
-														guidelines
-													</P>
-												</View>
-											)}
-
-											{product.metadata.pfas === true && (
-												<View className="h-8 rounded-full px-2 items-center justify-center bg-red-200">
-													<P
-														className={
-															colorMode === "dark"
-																? "text-background"
-																: "text-primary"
-														}
-													>
-														PFAS
-													</P>
-												</View>
-											)}
-
-											{product.metadata.fluoride === true && (
-												<View className="h-8 rounded-full px-2 items-center justify-center bg-red-200">
-													<P
-														className={
-															colorMode === "dark"
-																? "text-background"
-																: "text-primary"
-														}
-													>
-														Fluoride
-													</P>
-												</View>
-											)}
-										</View>
-									)}
-
-									{/* {productType === "filter" && product.metadata && (
-										<View>
-											{Object.keys(product.metadata.filterMetadata).map(
-												(key) => {
-													return (
-														<View
-															key={key}
-															className="h-8 rounded-full px-2 items-center justify-center bg-red-200"
-														>
-															<P>{key}</P>
-														</View>
-													);
-												},
-											)}
-										</View>
-									)} */}
-								</View>
-
-								{/* Absolutely position the arrow icon */}
-								<View style={{ position: "absolute", bottom: 16, right: 16 }}>
-									<Feather
-										name="arrow-right"
-										size={24}
-										color={textSecondaryColor}
-									/>
-								</View>
-							</View>
-						</Link>
-					</View>
-				)}
-
+				{product && product.data && mode === "preview" && resultCard()}
 				{/* Scan button */}
-				<View
-					style={{
-						justifyContent: "center",
-						alignItems: "center",
-						marginBottom: 30,
-					}}
-					className="z-50"
-				>
-					<TouchableOpacity
+				{!loading && (
+					<View
 						style={{
-							width: 80,
-							height: 80,
-							backgroundColor: "white",
-							borderRadius: 40,
-							borderWidth: 4,
-							borderColor: "#ddd",
 							justifyContent: "center",
 							alignItems: "center",
-							shadowColor: "#000",
-							shadowOffset: { width: 0, height: 3 },
-							shadowOpacity: 0.3,
-							shadowRadius: 3,
-							position: "relative",
+							marginBottom: 20,
 						}}
 						className="z-50"
-						disabled={loading}
-						onPress={mode === "scan" ? takePicture : () => setMode("scan")}
 					>
-						<View
+						<TouchableOpacity
 							style={{
-								width: 60,
-								height: 60,
-								backgroundColor: "white",
-								borderRadius: 30,
+								width: mode === "scan" ? 80 : 50,
+								height: mode === "scan" ? 80 : 50,
+								backgroundColor: mode === "scan" ? "white" : "#d3d6d1",
+								borderRadius: mode === "scan" ? 40 : 30,
+								borderWidth: 4,
+								marginTop: mode === "scan" ? 0 : 20,
+								borderColor: "#ddd",
+								justifyContent: "center",
+								alignItems: "center",
+								shadowColor: "#000",
+								opacity: mode === "scan" ? 1 : 0.5,
+								shadowOffset: { width: 0, height: 3 },
+								shadowOpacity: 0.3,
+								shadowRadius: 3,
+								position: "relative",
 							}}
-						/>
-					</TouchableOpacity>
-				</View>
-
-				{mode === "preview" && (
+							className="z-50 bg-card rounded-2xl border-2 border-border"
+							disabled={loading}
+							onPress={mode === "scan" ? takePicture : () => setMode("scan")}
+						>
+							{mode === "scan" ? (
+								<View
+									style={{
+										width: 60,
+										height: 60,
+										backgroundColor: "white",
+										borderRadius: 30,
+									}}
+								/>
+							) : (
+								<Ionicons name="refresh" size={20} color={iconColor} />
+							)}
+						</TouchableOpacity>
+					</View>
+				)}
+				{/* Upload existing image button */}
+				{mode === "scan" && !loading && (
 					<TouchableOpacity
 						style={{
-							position: "absolute",
-							right: 20,
-							top: 20,
 							justifyContent: "center",
 							alignItems: "center",
+							marginBottom: 20, // Adjust as needed
 						}}
-						onPress={resetState}
-						className="bg-white/20 rounded-full p-2 z-50"
+						onPress={pickImage}
 					>
-						<Ionicons name="refresh" size={24} color="white" />
+						<P className="underline text-background">Upload existing image</P>
+					</TouchableOpacity>
+				)}
+				{/* Upload existing image button */}
+				{mode === "preview" && !loading && (
+					<TouchableOpacity
+						style={{
+							justifyContent: "center",
+							alignItems: "center",
+							marginBottom: 20, // Adjust as needed
+						}}
+						onPress={closeModal}
+					>
+						<P className="underline text-background">
+							Not the right item? Try search
+						</P>
 					</TouchableOpacity>
 				)}
 			</SafeAreaView>
+		);
+	};
+
+	const ScoreTag = ({
+		text,
+		color = neutralColor,
+	}: {
+		text: any;
+		color?: string;
+	}) => {
+		return (
+			<View
+				className="flex-row items-center justify-center gap-2 px-2 py-1"
+				style={{
+					borderColor: color,
+					borderWidth: 1,
+					borderRadius: 10,
+				}}
+			>
+				<P
+					className="text-sm font-medium"
+					style={{
+						color,
+					}}
+				>
+					{text}
+				</P>
+			</View>
+		);
+	};
+
+	const handleProductPress = () => {
+		router.back();
+		router.push(
+			productType === "filter"
+				? `/(protected)/search/filter/${product.data.id}`
+				: `/(protected)/search/item/${product.data.id}`,
+		);
+	};
+
+	const resultCard = () => {
+		return (
+			<TouchableOpacity
+				onPress={handleProductPress}
+				className="bg-card border border-border rounded-2xl pr-4 pl-4 py-4 shadow-md relative flex flex-row mx-4"
+			>
+				<View className="flex flex-row items-center justify-between w-full">
+					<View className="w-20 h-20 overflow-hidden rounded-md">
+						<Image
+							source={{
+								uri: product?.data?.image || "https://via.placeholder.com/52",
+							}}
+							style={{
+								width: "100%",
+								height: "100%",
+							}}
+							contentFit="cover"
+							className="w-full h-full"
+						/>
+					</View>
+					<View className="flex-1 flex-col ml-4 w-full">
+						<P
+							className="text-xl w-full font-bold text-wrap max-w-56 leading-tight"
+							numberOfLines={2}
+						>
+							{product?.data?.name || "Unknown Product"}
+						</P>
+						<View className="flex flex-row flex-wrap gap-2 mt-4">
+							{productType === "filter" && (
+								<>
+									{product?.metadata?.totalRisks > 0 && (
+										<ScoreTag
+											key={product?.metadata?.totalRisks}
+											text={`${product?.metadata?.totalRisks} potential health risks`}
+											color={redColor}
+										/>
+									)}
+									{product?.metadata?.exposedCategories > 0 && (
+										<ScoreTag
+											key={product?.metadata?.exposedCategories}
+											text={`Exposed to ${product?.metadata?.exposedCategories} severe pollutants`}
+											color={redColor}
+										/>
+									)}
+								</>
+							)}
+
+							{productType === "item" && (
+								<>
+									{Object.entries(
+										(product?.metadata as Record<string, MetadataValue>) || {},
+									).map(([key, value]) => {
+										if (value.show) {
+											let text;
+											let color;
+											switch (key) {
+												case "totalContaminants":
+													text = `${value.value} total contaminants`;
+													color = value.color;
+													break;
+												case "contaminantsAboveLimit":
+													text = `${value.value} above limit`;
+													color = value.color;
+													break;
+												case "pfas":
+													text = value.value;
+													color = value.color;
+													break;
+												case "minerals":
+													text = `${value.value} minerals`;
+													color = value.color;
+													break;
+												case "hasMicroplastics":
+													text = value.value;
+													color = value.color;
+													break;
+												default:
+													return null;
+											}
+											return <ScoreTag key={key} text={text} color={color} />;
+										}
+										return null;
+									})}
+								</>
+							)}
+						</View>
+					</View>
+				</View>
+
+				<View className="absolute top-2 right-2">
+					<ScoreBadge score={product?.data?.score} />
+				</View>
+				{/* Add arrow icon in the bottom right */}
+				<View className="absolute bottom-4 right-4">
+					<Feather name="arrow-right" size={24} color={iconColor} />
+				</View>
+			</TouchableOpacity>
 		);
 	};
 
@@ -799,6 +908,7 @@ export default function ScanModal() {
 							style={{ position: "absolute", width: "100%", height: "100%" }}
 						/>
 					)}
+
 					{renderControls()}
 				</View>
 			)}

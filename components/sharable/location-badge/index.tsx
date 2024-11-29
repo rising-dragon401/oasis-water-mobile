@@ -10,12 +10,12 @@ export default function LocationBadge({ location }: { location: string }) {
 	return (
 		<TouchableOpacity
 			onPress={() => router.push("/locationModal")}
-			className="flex-row items-center gap-x-2  h-8 px-2 rounded-full"
+			className="flex-row items-center gap-x-2 h-8 px-2 rounded-full"
 		>
-			<Feather name="map-pin" size={14} color="black" />
 			<Small>
-				{location?.length > 10 ? `${location?.substring(0, 10)}...` : location}
+				{location?.length > 12 ? `${location?.substring(0, 12)}...` : location}
 			</Small>
+			<Feather name="map-pin" size={14} color="black" />
 		</TouchableOpacity>
 	);
 }

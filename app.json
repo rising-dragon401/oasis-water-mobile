@@ -3,14 +3,14 @@
 		"name": "Oasis",
 		"slug": "Oasis",
 		"scheme": "oasisapp",
-		"version": "1.2.3",
+		"version": "1.2.5",
 		"orientation": "portrait",
 		"icon": "./assets/icon.png",
 		"userInterfaceStyle": "light",
 		"splash": {
 			"image": "./assets/splash.png",
 			"resizeMode": "contain",
-			"backgroundColor": "#ffffff"
+			"backgroundColor": "#fefcf9"
 		},
 		"assetBundlePatterns": ["**/*"],
 		"ios": {
@@ -21,7 +21,8 @@
 			"associatedDomains": ["applinks:oasiswater.app"],
 			"userInterfaceStyle": "light",
 			"infoPlist": {
-				"NSCameraUsageDescription": "Allow Oasis to access your camera to scan your water bottle or filter."
+				"NSCameraUsageDescription": "Allow Oasis to access your camera to scan your water bottle or filter.",
+				"NSPhotoLibraryUsageDescription": "Allow Oasis to access your photos to upload images of waters and filters to search."
 			}
 		},
 		"android": {
@@ -59,7 +60,7 @@
 			[
 				"expo-image-picker",
 				{
-					"photosPermission": "The app accesses your photos to upload your profile picture."
+					"photosPermission": "Allow Oasis to access your photos to upload images of waters and filters to search"
 				}
 			],
 			[

@@ -1,3 +1,4 @@
+import Feather from "@expo/vector-icons/Feather";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
@@ -10,7 +11,7 @@ import {
 	AccordionItem,
 	AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Muted, P } from "@/components/ui/typography";
+import { P } from "@/components/ui/typography";
 import { useSubscription } from "@/context/subscription-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
 
@@ -22,7 +23,8 @@ export default function ProfileScores({
 	hideSubtitle?: boolean;
 }) {
 	const { hasActiveSub } = useSubscription();
-	const { greenColor, redColor, yellowColor } = useColorScheme();
+	const { greenColor, redColor, yellowColor, mutedColor } = useColorScheme();
+	useColorScheme();
 	const router = useRouter();
 	const [openItems, setOpenItems] = useState<string[]>([]);
 
@@ -40,7 +42,19 @@ export default function ProfileScores({
 					: yellowColor;
 
 		return (
-			<TouchableOpacity onPress={() => router.push("/subscribeModal")} key={id}>
+			<TouchableOpacity
+				onPress={() =>
+					router.push({
+						pathname: "/subscribeModal",
+						params: {
+							path: "profile",
+							feature: "profile-scores",
+							component: "blurred-badges",
+						},
+					})
+				}
+				key={id}
+			>
 				<P className="text-sm px-2 py-1">{name}</P>
 
 				<BlurView
@@ -130,7 +144,7 @@ export default function ProfileScores({
 	};
 
 	return (
-		<View>
+		<View className="flex flex-col gap-y-4">
 			<Accordion type="multiple" className="flex flex-col gap-y-4">
 				<AccordionItem key="contaminants_found" value="contaminants_found">
 					<AccordionTrigger
@@ -139,18 +153,18 @@ export default function ProfileScores({
 						)}
 						onPress={() => toggleItem("contaminants_found")}
 					>
-						<View className="flex flex-row items-start justify-between gap-2 w-full mb-2 pr-2">
-							<View className="flex flex-col">
-								<P className="text-2xl">
-									{userScores?.allContaminants?.length} contaminants detected
-								</P>
-								{!hideSubtitle && (
-									<Muted className="max-w-xs mt-2">View all</Muted>
-								)}
-							</View>
+						<View className="flex flex-row items-center gap-2 w-full mb-2 pr-2">
 							{renderAmount(
 								userScores?.allContaminants?.length,
 								"contaminants_found",
+							)}
+							<View className="flex flex-col flex-grow">
+								<P className="text-2xl">
+									{userScores?.allContaminants?.length} toxins
+								</P>
+							</View>
+							{!hideSubtitle && (
+								<Feather name="chevron-down" size={20} color={mutedColor} />
 							)}
 						</View>
 					</AccordionTrigger>
@@ -178,14 +192,16 @@ export default function ProfileScores({
 						)}
 						onPress={() => toggleItem("health_risks")}
 					>
-						<View className="flex flex-row items-start justify-between gap-2 w-full mb-2 pr-2">
-							<View className="flex flex-col">
-								<P className="text-2xl">
-									{userScores?.allHarms?.length} potential health risks
-								</P>
-								{!hideSubtitle && <Muted className="max-w-xs mt-2">View</Muted>}
-							</View>
+						<View className="flex flex-row items-center gap-2 w-full mb-2 pr-2">
 							{renderAmount(userScores?.allHarms?.length, "health_risks")}
+							<View className="flex flex-col flex-grow">
+								<P className="text-2xl">
+									{userScores?.allHarms?.length} health concerns
+								</P>
+							</View>
+							{!hideSubtitle && (
+								<Feather name="chevron-down" size={20} color={mutedColor} />
+							)}
 						</View>
 					</AccordionTrigger>
 					<AccordionContent
@@ -208,14 +224,16 @@ export default function ProfileScores({
 						className={getAccordionTriggerStyle(openItems.includes("benefits"))}
 						onPress={() => toggleItem("benefits")}
 					>
-						<View className="flex flex-row items-start justify-between gap-2 w-full mb-2 pr-2">
-							<View className="flex flex-col">
+						<View className="flex flex-row items-center gap-2 w-full mb-2 pr-2">
+							{renderAmount(userScores?.allBenefits?.length, "benefits")}
+							<View className="flex flex-col flex-grow">
 								<P className="text-2xl">
 									{userScores?.allBenefits?.length} benefits detected
 								</P>
-								{!hideSubtitle && <Muted className="max-w-xs mt-2">View</Muted>}
 							</View>
-							{renderAmount(userScores?.allBenefits?.length, "benefits")}
+							{!hideSubtitle && (
+								<Feather name="chevron-down" size={20} color={mutedColor} />
+							)}
 						</View>
 					</AccordionTrigger>
 					<AccordionContent

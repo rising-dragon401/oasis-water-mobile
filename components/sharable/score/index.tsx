@@ -1,5 +1,5 @@
 import { Feather, Octicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { usePathname, useRouter } from "expo-router";
 import { TouchableOpacity, View } from "react-native";
 import { Circle, Svg } from "react-native-svg";
 
@@ -40,6 +40,7 @@ export default function Score({
 		accentColor,
 	} = useColorScheme();
 	const showToast = useToast();
+	const pathName = usePathname();
 
 	const roundedScore = Math.round(score);
 
@@ -66,7 +67,7 @@ export default function Score({
 					: size === "sm"
 						? 6
 						: size === "xs"
-							? 4
+							? 6
 							: 6;
 
 	const svgSize = 2 * (radius + strokeWidth); // Adjust SVG size to accommodate stroke
@@ -113,7 +114,7 @@ export default function Score({
 			return "Good";
 		} else if (roundedScore >= 50) {
 			return "Alright";
-		} else if (roundedScore >= 35) {
+		} else if (roundedScore >= 0) {
 			return "Poor";
 			// @ts-ignore
 		} else if (score === "?" || score === undefined || score === null) {
@@ -121,7 +122,7 @@ export default function Score({
 		} else if (roundedScore === 0) {
 			return "Missing";
 		} else {
-			return "Bad";
+			return "Missing tests";
 		}
 	};
 
@@ -139,11 +140,14 @@ export default function Score({
 							: 0;
 
 	const handleOpenSubscribeModal = async () => {
-		console.log("itemDetails: ", itemDetails);
-		// await router.setParams(itemDetails);
 		router.push({
 			pathname: "/subscribeModal",
-			params: itemDetails,
+			params: {
+				...itemDetails,
+				path: pathName,
+				feature: "item-analysis",
+				component: "locked-score",
+			},
 		});
 	};
 
@@ -221,7 +225,7 @@ export default function Score({
 				className="absolute flex flex-col justify-center items-center"
 			>
 				{!untested ? (
-					<P style={{ fontSize }} className={`pt-${paddingTop}`}>
+					<P style={{ fontSize }} className={`gap-1 pt-${paddingTop}`}>
 						{roundedScore} / 100
 					</P>
 				) : (
@@ -235,7 +239,7 @@ export default function Score({
 					</View>
 				)}
 
-				{size !== "xs" && <Muted>{grade()}</Muted>}
+				<Muted className="text-center text-xs max-w-14">{grade()}</Muted>
 			</TouchableOpacity>
 		</View>
 	);

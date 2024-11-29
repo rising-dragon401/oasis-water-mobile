@@ -1,4 +1,4 @@
-import { useUserProvider } from "context/user-provider";
+import { useUserProvider } from "@/context/user-provider";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { FlatList, View } from "react-native";

@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons"; // If using expo for icons
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
+import { usePostHog } from "posthog-react-native";
 import { useEffect, useRef, useState } from "react";
 import {
 	Animated,
@@ -20,7 +21,6 @@ import {
 	updateUserData,
 } from "@/actions/user";
 import ItemSelector from "@/components/sharable/item-selector";
-import LocationSelector from "@/components/sharable/location-selector";
 import { SubscribeOnboarding } from "@/components/sharable/subscribe-onboarding";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -53,7 +53,7 @@ export default function OnboardingScreen() {
 	const { hasActiveSub, packages, purchasePackage } = useSubscription();
 	const { iconColor, mutedForegroundColor } = useColorScheme();
 	const showToast = useToast();
-
+	const posthog = usePostHog();
 	const [currentStep, setCurrentStep] = useState<number>(0); // Adjust based on your total number of steps
 
 	const [isSubscribedToNewsletter, setIsSubscribedToNewsletter] =
@@ -97,6 +97,11 @@ export default function OnboardingScreen() {
 				if (res) {
 					showToast("Code applied!", 1000, "top");
 					stepForward();
+
+					posthog?.capture("applied_referral_code", {
+						new_user: uid,
+						referral_code: referralCode,
+					});
 				} else {
 					setReferralCodeError(true);
 					throw new Error("Unable to apply code");
@@ -120,30 +125,30 @@ export default function OnboardingScreen() {
 
 	// Onboarding steps
 	const steps = [
+		// {
+		// 	title: "There's something in the water",
+		// 	titleStyle: "max-w-xs",
+		// 	subtitle:
+		// 		"Much of the water we drink is filled with harmful toxins that brands don't tell you about.",
+		// 	image:
+		// 		"https://connect.live-oasis.com/storage/v1/object/public/website/images/onboarding/brands_cant_be_trusted.png",
+		// 	imageStyle: {
+		// 		width: "100%",
+		// 		height: windowHeight * 0.44,
+		// 		resizeMode: "cover",
+		// 		borderRadius: 20,
+		// 		marginTop: 18,
+		// 	},
+		// 	component: null,
+		// 	onSubmit: null,
+		// 	submitButtonLabel: "Continue",
+		// 	onSkip: null,
+		// 	canSkip: false,
+		// },
 		{
-			title: "There's something in the water",
-			titleStyle: "max-w-xs",
+			title: "Do you know what's in the water you drink?",
 			subtitle:
-				"Most bottled and tap water contains toxic contaminants and you can't rely on brands or organizations to safeguard your health.",
-			image:
-				"https://connect.live-oasis.com/storage/v1/object/public/website/images/onboarding/brands_cant_be_trusted.png",
-			imageStyle: {
-				width: "100%",
-				height: windowHeight * 0.44,
-				resizeMode: "cover",
-				borderRadius: 20,
-				marginTop: 18,
-			},
-			component: null,
-			onSubmit: null,
-			submitButtonLabel: "Continue",
-			onSkip: null,
-			canSkip: false,
-		},
-		{
-			title: "Oasis tells you the truth",
-			subtitle:
-				"We independently rank and gather the scientific evidence for each product to help you make informed choices best for your health.",
+				"Most waters and products are filled with harmful toxins that delibiate our health and lead to disease. We rank and test each product based on the latest lab data so you can make informed choices best for your health.",
 			image:
 				"https://connect.live-oasis.com/storage/v1/object/public/website/images/onboarding/toxins%20in%20water%20graphic.png",
 			imageStyle: {
@@ -160,9 +165,9 @@ export default function OnboardingScreen() {
 			canSkip: false,
 		},
 		{
-			title: "Help spread the word",
+			title: "Your support means everything",
 			subtitle:
-				"As a small self-funded team, your 5-star rating helps us share the importance of clean, healthy water with more people around the world.",
+				"As a small self-funded team your 5-star rating helps support the mission and allows us to share this information with more people.",
 			image:
 				"https://connect.live-oasis.com/storage/v1/object/public/website/images/onboarding/hand_water_dripping.jpeg?t=2024-11-20T19%3A17%3A40.942Z",
 			imageStyle: {
@@ -231,20 +236,20 @@ export default function OnboardingScreen() {
 			component: (
 				<View className="flex mt-6">
 					<Input
-						placeholder="Their username"
+						placeholder="username"
 						onChangeText={setReferralCode}
 						value={referralCode}
 						className="border border-gray-300 rounded-lg p-2"
 					/>
 
-					<Button
+					{/* <Button
 						className="mt-4 text-primary"
 						variant="outline"
 						onPress={handleReferralCodeSubmit}
 						loading={loadingReferralCode}
 						disabled={loadingReferralCode}
 						label="Apply Code"
-					/>
+					/> */}
 				</View>
 			),
 			onSubmit: () => {
@@ -257,59 +262,59 @@ export default function OnboardingScreen() {
 			canSkip: true,
 			skipButtonLabel: "Skip",
 		},
-		{
-			id: "location",
-			title: "Where are you based?",
-			subtitle:
-				"Used to locate the nearest tap water report and find available brands2",
-			image: null,
-			imageStyle: {
-				width: "100%",
-				height: windowHeight * 0.44,
-				resizeMode: "contain",
-			},
-			component: (
-				<View className="flex mt-8">
-					<LocationSelector
-						address={selectedAddress}
-						setAddress={setSelectedAddress}
-						initialAddress={null}
-					/>
-					{/* {loadingNearestLocation && (
-						<View className="flex flex-row items-center justify-center gap-2 mt-4">
-							<Loader size="small" />
-							<P>Finding nearest tap water report</P>
-						</View>
-					)}
-					{nearestLocation && !loadingNearestLocation && (
-						<View className="flex flex-col items-center gap-2 mt-4">
-							<P>Nearest tap water report:</P>
-							<P>{nearestLocation?.name || "None"}</P>
-						</View>
-					)} */}
-					{/* {selectedAddress && !loadingLocation && !nearestLocation && (
-						<View className="flex flex-col items-center gap-2 mt-6 bg-card px-4 py-2 rounded-xl">
-							<P>
-								We couldn’t find tap water reports for your area just yet, but
-								you can still enjoy Oasis! We’ll update you when new water
-								quality reports are available.
-							</P>
+		// {
+		// 	id: "location",
+		// 	title: "Where are you based?",
+		// 	subtitle:
+		// 		"Used to locate the nearest tap water report and find available brands2",
+		// 	image: null,
+		// 	imageStyle: {
+		// 		width: "100%",
+		// 		height: windowHeight * 0.44,
+		// 		resizeMode: "contain",
+		// 	},
+		// 	component: (
+		// 		<View className="flex mt-8">
+		// 			<LocationSelector
+		// 				address={selectedAddress}
+		// 				setAddress={setSelectedAddress}
+		// 				initialAddress={null}
+		// 			/>
+		// 			{/* {loadingNearestLocation && (
+		// 				<View className="flex flex-row items-center justify-center gap-2 mt-4">
+		// 					<Loader size="small" />
+		// 					<P>Finding nearest tap water report</P>
+		// 				</View>
+		// 			)}
+		// 			{nearestLocation && !loadingNearestLocation && (
+		// 				<View className="flex flex-col items-center gap-2 mt-4">
+		// 					<P>Nearest tap water report:</P>
+		// 					<P>{nearestLocation?.name || "None"}</P>
+		// 				</View>
+		// 			)} */}
+		// 			{/* {selectedAddress && !loadingLocation && !nearestLocation && (
+		// 				<View className="flex flex-col items-center gap-2 mt-6 bg-card px-4 py-2 rounded-xl">
+		// 					<P>
+		// 						We couldn’t find tap water reports for your area just yet, but
+		// 						you can still enjoy Oasis! We’ll update you when new water
+		// 						quality reports are available.
+		// 					</P>
 
-						</View>
-					)} */}
-				</View>
-			),
-			onSubmit: () => {
-				handleUpdateLocation();
-			},
-			loading: loadingLocation,
-			submitButtonLabel: "Continue",
-			onSkip: () => {
-				setCurrentStep((prev) => Math.min(totalSteps - 1, prev + 1));
-			},
-			canSkip: true,
-			skipButtonLabel: "Skip",
-		},
+		// 				</View>
+		// 			)} */}
+		// 		</View>
+		// 	),
+		// 	onSubmit: () => {
+		// 		handleUpdateLocation();
+		// 	},
+		// 	loading: loadingLocation,
+		// 	submitButtonLabel: "Continue",
+		// 	onSkip: () => {
+		// 		setCurrentStep((prev) => Math.min(totalSteps - 1, prev + 1));
+		// 	},
+		// 	canSkip: true,
+		// 	skipButtonLabel: "Skip",
+		// },
 		{
 			id: "favs",
 			title: "What do you drink?",
@@ -372,7 +377,7 @@ export default function OnboardingScreen() {
 			skipButtonLabel: "Skip",
 		},
 		{
-			title: "Find Out What’s in Your Water—and How to Fix It",
+			title: "Unlock your top waters",
 			// subtitle: "😳💧",
 			titleStyle: "text-center",
 			// image:
@@ -397,7 +402,7 @@ export default function OnboardingScreen() {
 				handleSubscribe();
 			},
 			loading: loadingPurchase,
-			submitButtonLabel: "Unlock for free",
+			submitButtonLabel: "Continue for free 🙌",
 			submitButtonStyles: "shadow-lg shadow-blue-500/50 bg-primary",
 			onSkip: null,
 			skipButtonLabel: "No thanks, continue with basic and view limited data",
@@ -612,7 +617,11 @@ export default function OnboardingScreen() {
 				throw new Error("No package found");
 			}
 
-			const res = await purchasePackage(pack);
+			const res = await purchasePackage(pack, {
+				feature: "onboarding",
+				path: "onboarding",
+				component: "subscribe-onboarding",
+			});
 
 			if (res) {
 				// Handle success here

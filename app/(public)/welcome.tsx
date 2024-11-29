@@ -3,7 +3,7 @@ import { useRouter } from "expo-router";
 import React from "react";
 import { View } from "react-native";
 
-import OasisLogo from "@/assets/oasis-word.png";
+import OasisLogo from "@/assets/oasis-text.png";
 import SplashGraphic from "@/assets/welcome-scan-graphic.png";
 import { SafeAreaView } from "@/components/safe-area-view";
 import { Button } from "@/components/ui/button";
@@ -21,11 +21,11 @@ export default function WelcomeScreen() {
 			<View className="flex flex-1 mt-0 gap-y-2 items-center">
 				<Image
 					source={OasisLogo}
-					style={{ width: "100%", height: 32 }}
+					style={{ width: "100%", height: 20 }}
 					contentFit="contain"
 				/>
 				<H1 className="text-center text-primary mt-8 max-w-sm">
-					Discover the best water based on science
+					Discover the healthiest waters for you
 				</H1>
 
 				<View

@@ -9,7 +9,6 @@ import ScoreIndicator from "./score-indicator";
 import { H4, Muted, P } from "@/components/ui/typography";
 import { useSubscription } from "@/context/subscription-provider";
 import { useUserProvider } from "@/context/user-provider";
-import { ITEM_TYPES } from "@/lib/constants/categories";
 import {
 	RANDOM_BLUR_IMAGES,
 	placeHolderImageBlurHash,
@@ -19,32 +18,31 @@ import { determineLink, timeSince } from "@/lib/utils";
 
 type Props = {
 	item: any;
-	showFavorite?: boolean;
 	isAuthUser?: boolean;
 	isGeneralListing?: boolean;
 	imageHeight?: number;
 	variation?: "square" | "row";
-	showVotes?: boolean;
 	showTime?: boolean;
 	backPath?: string;
 	hideScore?: boolean;
+	showContPreview?: boolean;
 };
 
 const ItemPreviewCard = ({
 	item,
-	showFavorite = false,
 	isAuthUser = false,
 	isGeneralListing = false,
 	imageHeight = 100,
 	variation = "square",
-	showVotes = false,
 	showTime = false,
 	backPath = "",
 	hideScore = false,
+	showContPreview = false,
 }: Props) => {
 	const { userData } = useUserProvider();
 	const { hasActiveSub } = useSubscription(); // should not be calling this here lol
-	const { mutedForegroundColor, accentColor } = useColorScheme();
+	const { mutedForegroundColor, accentColor, redColor, neutralColor } =
+		useColorScheme();
 	const router = useRouter();
 
 	const isItemUnlocked = useMemo(() => {
@@ -88,7 +86,7 @@ const ItemPreviewCard = ({
 					transition={100}
 					cachePolicy="memory-disk"
 					placeholder={{ blurhash: placeHolderImageBlurHash }}
-					placeholderContentFit="contain"
+					placeholderContentFit="cover"
 				/>
 			);
 		} else {
@@ -101,7 +99,7 @@ const ItemPreviewCard = ({
 					transition={100}
 					cachePolicy="memory-disk"
 					placeholder={{ blurhash: placeHolderImageBlurHash }}
-					placeholderContentFit="contain"
+					placeholderContentFit="cover"
 				/>
 			);
 		}
@@ -141,8 +139,10 @@ const ItemPreviewCard = ({
 		>
 			<View
 				className={`relative w-full flex rounded-2xl ${
-					variation === "row" ? "flex-row gap-2 px-2 py-2 " : "flex-col"
-				}  bg-card pt-2 border border-border`}
+					variation === "row"
+						? "flex-row gap-2 px-2 py-2  border border-muted"
+						: "flex-col border border-muted"
+				}  bg-card pt-2 rounded-2xl`}
 			>
 				<View
 					className={`flex justify-center items-center ${
@@ -157,7 +157,7 @@ const ItemPreviewCard = ({
 					className={`flex ${
 						variation === "row"
 							? "flex-col items-start justify-between py-3"
-							: "h-14 justify-center"
+							: "h-20 justify-center"
 					}`}
 					style={{ flex: variation === "row" ? 3 : undefined }}
 				>
@@ -166,7 +166,7 @@ const ItemPreviewCard = ({
 							className={`text-base ${
 								variation === "row"
 									? "text-lg max-w-56 w-56 flex-wrap"
-									: "px-3 text-sm"
+									: "px-3 text-sm h-12"
 							}`}
 							numberOfLines={2}
 							style={{ lineHeight: 18 }}
@@ -195,38 +195,58 @@ const ItemPreviewCard = ({
 						</>
 					)}
 
-					{variation === "row" && item.brandName && (
-						<Muted>{item.brandName} </Muted>
-					)}
-
-					{variation === "row" && showTime && (
-						<View className="flex flex-row items-center gap-1">
+					{variation !== "row" && showTime && (
+						<View className="flex flex-col items-start px-3">
 							<Muted className="text-xs">{timeSince(item.updated_at)}</Muted>
 						</View>
 					)}
 
-					{variation === "row" && showVotes && (
-						<View className="flex flex-row items-center gap-1">
-							<Ionicons
-								// @ts-ignore
-								name={
-									ITEM_TYPES.find((itemObj) => itemObj.typeId === item.type)
-										?.icon
-								}
-								size={10}
-								color={mutedForegroundColor}
-							/>
-							<Muted className="text-xs">
-								{
-									ITEM_TYPES.find((itemObj) => itemObj.typeId === item.type)
-										?.categoryLabel
-								}
-							</Muted>
-						</View>
+					{showContPreview &&
+						variation === "square" &&
+						(item.cont_count > 0 || item.cont_not_removed > 0) && (
+							<View className="flex flex-row gap-2 items-center px-4">
+								{item.type === "bottled_water" && (
+									<View className="flex flex-row gap-2 items-center">
+										<View
+											className={`w-2 h-2 rounded-full ${
+												item.cont_count > 0 ? "bg-red-400" : "bg-neutral"
+											}`}
+											style={{
+												backgroundColor:
+													item.cont_count > 0 ? redColor : neutralColor,
+											}}
+										/>
+										<P className="text-xs text-muted-foreground">
+											{item?.cont_count} notices
+										</P>
+									</View>
+								)}
+
+								{item.type === "filter" && (
+									<View className="flex flex-row gap-2 items-center">
+										<View
+											className={`w-2 h-2 rounded-full ${
+												item.cont_not_removed > 0 ? "bg-danger" : "bg-neutral"
+											}`}
+											style={{
+												backgroundColor:
+													item.cont_not_removed > 0 ? redColor : neutralColor,
+											}}
+										/>
+										<P className="text-xs text-muted-foreground">
+											{item.cont_not_removed} notices
+										</P>
+									</View>
+								)}
+							</View>
+						)}
+
+					{variation === "row" && item.brandName && (
+						<Muted>{item.brandName} </Muted>
 					)}
 				</View>
 
-				{variation === "row" && !showVotes && (
+				{variation === "row" && (
 					<View className="absolute mt-4 right-4  z-10  rounded-full p-1 px-2">
 						{hasActiveSub || isItemUnlocked ? (
 							item.score ? (
@@ -244,14 +264,9 @@ const ItemPreviewCard = ({
 						) : (
 							<View className="flex flex-row items-center gap-1">
 								<Octicons name="lock" size={14} color={accentColor} />
+								<Muted>/100</Muted>
 							</View>
 						)}
-					</View>
-				)}
-
-				{variation === "row" && showVotes && (
-					<View className="w-10 h-14 flex items-center justify-center">
-						<Muted>{item.test_request_count || 0}</Muted>
 					</View>
 				)}
 
@@ -271,7 +286,7 @@ const ItemPreviewCard = ({
 								</View>
 							)
 						) : (
-							<View className="flex flex-row items-center gap-1">
+							<View className="flex items-end">
 								<Octicons name="lock" size={14} color={accentColor} />
 							</View>
 						)}

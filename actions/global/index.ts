@@ -172,3 +172,17 @@ export const getLatestActions = async ({ limit = 10 }: { limit?: number }) => {
 
 	return combinedActions;
 };
+
+export const getCategories = async () => {
+	const { data, error } = await supabase
+		.from("categories")
+		.select("*")
+		.order("priority", { ascending: true });
+
+	if (error) {
+		console.error("Error fetching categories:", error);
+		return null;
+	}
+
+	return data;
+};

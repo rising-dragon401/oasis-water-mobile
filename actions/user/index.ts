@@ -72,7 +72,7 @@ export async function getStripeSubscription(uid: string | null) {
 
 		if (
 			subData.metadata.provider === "revenue_cat" ||
-			subData.price_id.includes("pro")
+			subData.price_id.includes("rc_")
 		) {
 			throw new Error("No active Stripe subscription found");
 		}

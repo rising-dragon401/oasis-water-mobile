@@ -158,8 +158,6 @@ export function FilterForm({ id }: Props) {
 		});
 	}, [userData, filter.id, filter.type]);
 
-	console.log("isItemUnlocked: ", isItemUnlocked);
-
 	if (filter.is_draft) {
 		return (
 			<View>This filter has not been rated yet. Please check back later.</View>
@@ -210,7 +208,7 @@ export function FilterForm({ id }: Props) {
 							)}
 
 							{/* <Link href={`/search/company/${filter.company?.name}`}> */}
-							<Link href={`/search/company/${filter.company_id}`}>
+							<Link href={`/search/brand/${filter.brand_id}`}>
 								<Muted>{filter.brand}</Muted>
 							</Link>
 						</View>

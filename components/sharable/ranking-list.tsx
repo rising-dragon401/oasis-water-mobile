@@ -1,4 +1,5 @@
 import { Octicons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { FlatList, TouchableOpacity, View } from "react-native";
@@ -14,10 +15,10 @@ import {
 	DropdownMenuContent,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { H2, Muted, P } from "@/components/ui/typography";
+import { H2, P } from "@/components/ui/typography";
+import { useDataProvider } from "@/context/data-provider";
 import { useSubscription } from "@/context/subscription-provider";
 import { useUserProvider } from "@/context/user-provider";
-import { CATEGORIES as CATEGORIES_CONST } from "@/lib/constants/categories";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 const CATEOGRIES = [
@@ -156,9 +157,10 @@ const categorizeItems = (items: any[]) => {
 export default function RankingList({ categoryId }: { categoryId: string }) {
 	const { uid, user } = useUserProvider();
 	const { hasActiveSub } = useSubscription();
+	const { categories } = useDataProvider();
 	const router = useRouter();
 	const navigation = useNavigation();
-	const { backgroundColor } = useColorScheme();
+	const { backgroundColor, iconColor, accentColor } = useColorScheme();
 	const params = useLocalSearchParams<{ tags?: string; catId?: string }>();
 	const { tags: defaultTags } = params;
 
@@ -168,6 +170,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 	const [openContaminantDropdown, setOpenContaminantDropdown] = useState(false);
 	const [openTypeDropdown, setOpenTypeDropdown] = useState(false);
 	const [tags, setTags] = useState<any[]>([]);
+	const [categoryImage, setCategoryImage] = useState<string>("");
 	const [selectedTags, setSelectedTags] = useState<string[]>([]);
 	const [selectedContaminants, setSelectedContaminants] = useState<string[]>(
 		[],
@@ -198,20 +201,22 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 			items.sort((a: any, b: any) => b.score - a.score);
 
 			setAllItems(items);
+			setLoading(false);
 		} else {
 			setAllItems(categorizedData);
+			setLoading(false);
 		}
-
-		setLoading(false);
 	};
 
 	// Fetch items based on categoryId
 	useEffect(() => {
-		const category = CATEGORIES_CONST.find((item) => item.id === categoryId);
+		const category = categories.find((item: any) => item.ref === categoryId);
 
 		const productType_ = category?.productType || "";
 
-		setTitle(category?.title || "");
+		setCategoryImage(category?.image || "");
+
+		setTitle(category?.label || "");
 
 		navigation.setOptions({
 			title: category?.title || "",
@@ -352,7 +357,14 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 			isOpen: boolean,
 		) => {
 			if (!hasActiveSub) {
-				router.push("/subscribeModal");
+				router.push({
+					pathname: "/subscribeModal",
+					params: {
+						path: "search/top-rated",
+						feature: "top-rated",
+						productType,
+					},
+				});
 			} else {
 				setOpenFunction(isOpen);
 			}
@@ -371,19 +383,24 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 				>
 					<DropdownMenuTrigger asChild>
 						<Button
-							variant={
-								selectedContaminants.length > 0 ? "secondary" : "outline"
-							}
+							variant="secondary"
 							className={
 								selectedContaminants?.length < 1 && openContaminantDropdown
-									? "border-pirmary text-primary"
-									: ""
+									? "border-accent text-accent"
+									: "!text-accent"
 							}
-							label={`Contaminants ${
+							label={`${productType === "water" ? "Contaminants" : "Removes"} ${
 								selectedContaminants.length > 0
 									? `(${selectedContaminants.length})`
 									: ""
 							}`}
+							icon={
+								<Ionicons
+									name="chevron-down-outline"
+									size={14}
+									color={iconColor}
+								/>
+							}
 							size="sm"
 						/>
 					</DropdownMenuTrigger>
@@ -391,9 +408,6 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 						className="w-96 flex flex-col mt-2 py-2 px-2 roounded-2xl"
 						align="start"
 					>
-						<Muted className="text-muted pl-1 mb-1">
-							{productType === "water" ? "Free of:" : "Removes:"}
-						</Muted>
 						<View className="flex flex-row flex-wrap gap-x-2">
 							{(productType === "water"
 								? CONTAMINANTS
@@ -413,8 +427,8 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 										<P
 											className={
 												selectedContaminants.includes(contaminant.id)
-													? "text-muted font-bold"
-													: "text-muted"
+													? "text-muted-foreground font-bold"
+													: "text-muted-foreground"
 											}
 										>
 											{contaminant.label}
@@ -425,6 +439,111 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 						</View>
 					</DropdownMenuContent>
 				</DropdownMenu>
+				{/* <DropdownMenu
+					open={openContaminantDropdown}
+					onOpenChange={(isOpen) =>
+						handleDropdownOpenChange(setOpenContaminantDropdown, isOpen)
+					}
+					className="rounded-xl "
+				>
+					<DropdownMenuTrigger asChild>
+						<Button
+							variant="secondary"
+							className={
+								selectedContaminants?.length < 1 && openContaminantDropdown
+									? "border-accent text-accent"
+									: "!text-accent"
+							}
+							label={`Price ${
+								selectedContaminants.length > 0
+									? `(${selectedContaminants.length})`
+									: ""
+							}`}
+							icon={
+								<Ionicons
+									name="chevron-down-outline"
+									size={14}
+									color={iconColor}
+								/>
+							}
+							size="sm"
+						/>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent
+						className="w-96 flex flex-col mt-2 py-2 px-2 roounded-2xl"
+						align="start"
+					/>
+				</DropdownMenu>
+				<DropdownMenu
+					open={openContaminantDropdown}
+					onOpenChange={(isOpen) =>
+						handleDropdownOpenChange(setOpenContaminantDropdown, isOpen)
+					}
+					className="rounded-xl "
+				>
+					<DropdownMenuTrigger asChild>
+						<Button
+							variant="secondary"
+							className={
+								selectedContaminants?.length < 1 && openContaminantDropdown
+									? "border-accent text-accent"
+									: "!text-accent"
+							}
+							label={`Store ${
+								selectedContaminants.length > 0
+									? `(${selectedContaminants.length})`
+									: ""
+							}`}
+							icon={
+								<Ionicons
+									name="chevron-down-outline"
+									size={14}
+									color={iconColor}
+								/>
+							}
+							size="sm"
+						/>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent
+						className="w-96 flex flex-col mt-2 py-2 px-2 roounded-2xl"
+						align="start"
+					/>
+				</DropdownMenu>
+				<DropdownMenu
+					open={openContaminantDropdown}
+					onOpenChange={(isOpen) =>
+						handleDropdownOpenChange(setOpenContaminantDropdown, isOpen)
+					}
+					className="rounded-xl "
+				>
+					<DropdownMenuTrigger asChild>
+						<Button
+							variant="secondary"
+							className={
+								selectedContaminants?.length < 1 && openContaminantDropdown
+									? "border-accent text-accent"
+									: "!text-accent"
+							}
+							label={`Country ${
+								selectedContaminants.length > 0
+									? `(${selectedContaminants.length})`
+									: ""
+							}`}
+							icon={
+								<Ionicons
+									name="chevron-down-outline"
+									size={14}
+									color={iconColor}
+								/>
+							}
+							size="sm"
+						/>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent
+						className="w-96 flex flex-col mt-2 py-2 px-2 roounded-2xl"
+						align="start"
+					/>
+				</DropdownMenu> */}
 
 				{/* <DropdownMenu
 					open={openTypeDropdown}
@@ -498,22 +617,11 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 
 	return (
 		<View className="flex-1 md:mt-4 mt-0 w-screen px-6">
-			{!hasActiveSub ? (
-				<View className=" pb-2 flex-row gap-4 items-end justify-between w-full">
-					<H2>{title.charAt(0) + title.slice(1)}</H2>
+			<H2> Top rated {title.toLowerCase()} </H2>
 
-					<View className="">{renderFilters()}</View>
-				</View>
-			) : (
-				<View className="pb-2 max-w-sm">
-					<H2>{title.charAt(0) + title.slice(1)}</H2>
-				</View>
-			)}
-
-			{hasActiveSub && renderFilters()}
+			<View className="pb-2">{renderFilters()}</View>
 
 			{loading ? renderLoader() : null}
-
 			{filteredItems?.length > 0 ? (
 				<View className="flex-1 relative">
 					<FlatList
@@ -522,7 +630,6 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 							<View key={item?.id} style={{ width: "100%" }} className="mb-2">
 								<ItemPreviewCard
 									item={item}
-									showFavorite
 									isAuthUser={isAuthUser}
 									isGeneralListing
 									variation="row"
@@ -572,7 +679,14 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 								}
 								iconPosition="left"
 								onPress={() => {
-									router.push("/subscribeModal");
+									router.push({
+										pathname: "/subscribeModal",
+										params: {
+											path: "search/top-rated",
+											feature: "top-rated",
+											productType,
+										},
+									});
 								}}
 							/>
 						</View>

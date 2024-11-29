@@ -4,7 +4,10 @@ import { getFilterDetails } from "@/actions/filters";
 import { getItemDetails } from "@/actions/items";
 import { getLocationDetails } from "@/actions/locations";
 import { supabase } from "@/config/supabase";
-import { CATEGORIES } from "@/lib/constants/categories";
+import {
+	CATEGORIES,
+	FILTER_CONTAMINANT_CATEGORIES,
+} from "@/lib/constants/categories";
 
 export const handleDeleteUser = async (uid: string) => {
 	try {
@@ -184,6 +187,8 @@ export const searchForProduct = async (
 	allItems: any[],
 	allFilters: any[],
 ) => {
+	console.log("productIdentified: ", productIdentified);
+
 	// Normalize input name
 	const productName = productIdentified.name.trim().toLowerCase();
 
@@ -326,42 +331,102 @@ export const getCategoryCounts = async () => {
 	return categoryData;
 };
 
-export const getMostRecentlyUpdatedItems = async () => {
-	const { data: itemsData, error: itemsError } = await supabase
-		.from("items")
-		.select("*")
-		.eq("is_indexed", true)
-		.not("updated_at", "is", null)
-		.order("updated_at", { ascending: false })
-		.limit(5);
+export const fetchTestedPreview = async ({ limit }: { limit: number }) => {
+	try {
+		const { data: items, error } = await supabase
+			.from("items")
+			.select("id, name, image, ingredients, type, updated_at")
+			.eq("is_indexed", true)
+			.not("ingredients", "is", null)
+			.order("updated_at", { ascending: true })
+			.limit(limit);
 
-	const { data: filtersData, error: filtersError } = await supabase
-		.from("water_filters")
-		.select("*")
-		.eq("is_indexed", true)
-		.not("updated_at", "is", null)
-		.order("updated_at", { ascending: false })
-		.limit(5);
+		if (error) {
+			throw new Error(
+				`Error fetchTestedPreview fetching data from items: ${error.message}`,
+			);
+		}
 
-	if (itemsError || filtersError) {
-		console.error(
-			"Error fetching most recently updated items:",
-			itemsError || filtersError,
+		const itemsWithContCount = await Promise.all(
+			items.map(async (item) => {
+				const ingredients = item.ingredients as any[];
+
+				const contCount = ingredients.filter(
+					(ingredient) => ingredient.is_contaminant,
+				).length;
+
+				return {
+					...item,
+					cont_count: contCount,
+				};
+			}),
 		);
+
+		const { data: filters, error: filtersError } = await supabase
+			.from("water_filters")
+			.select(
+				"id, name, image, type, filtered_contaminant_categories, updated_at",
+			)
+			.eq("is_indexed", true)
+			.order("updated_at", { ascending: true })
+			.order("created_at", { ascending: true })
+			.limit(limit);
+
+		if (filtersError) {
+			throw new Error(
+				`Error fetchTestedPreview fetching data from filters: ${filtersError.message}`,
+			);
+		}
+
+		const filtersWithContCount = await Promise.all(
+			filters.map(async (filter) => {
+				const filteredContaminantCategories =
+					filter.filtered_contaminant_categories as any[];
+
+				const contaminantsNotRemoved = FILTER_CONTAMINANT_CATEGORIES.filter(
+					(category) => {
+						const matchedCategory = filteredContaminantCategories.find(
+							(contaminant) => contaminant.category === category,
+						);
+						return !matchedCategory || matchedCategory.percentage < 50;
+					},
+				).length;
+
+				return {
+					...filter,
+					cont_not_removed: contaminantsNotRemoved,
+				};
+			}),
+		);
+
+		// let tapWaterLocations;
+		// const { data: tapWaterLocationsData, error: tapWaterLocationsError } =
+		// 	await supabase
+		// 		.from("tap_water_locations")
+		// 		.select("*")
+		// 		.not("score", "is", null)
+		// 		.order("updated_at", { ascending: true })
+		// 		.order("created_at", { ascending: true })
+		// 		.limit(limit);
+
+		// if (tapWaterLocationsError) {
+		// 	tapWaterLocations = [];
+		// } else {
+		// 	tapWaterLocations = tapWaterLocationsData;
+		// }
+
+		const combinedItems = [...itemsWithContCount, ...filtersWithContCount];
+		combinedItems.sort(
+			(a, b) =>
+				new Date(b.updated_at || 0).getTime() -
+				new Date(a.updated_at || 0).getTime(),
+		);
+
+		return combinedItems;
+	} catch (error) {
+		console.error(error);
 		return [];
 	}
-
-	const combinedData = [...itemsData, ...filtersData];
-
-	// console.log("combinedData", JSON.stringify(combinedData, null, 2));
-
-	// Sort combined data by created_at
-	combinedData.sort(
-		(a, b) =>
-			new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime(),
-	);
-
-	return combinedData;
 };
 
 const getZipCodeLatLng = async (zipCode: string) => {
@@ -484,6 +549,11 @@ export const getNearestLocation = async (
 			} else {
 				console.log("User's nearest location updated successfully.");
 			}
+		} else {
+			const { error: updateError } = await supabase
+				.from("users")
+				.update({ tap_location_id: null })
+				.eq("id", userId);
 		}
 
 		const locationWithDetails = await getLocationDetails(nearestLocation.id);

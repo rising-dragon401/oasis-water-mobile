@@ -42,7 +42,17 @@ export default function WaterScores({
 		}
 
 		return (
-			<TouchableOpacity onPress={() => router.push("/subscribeModal")}>
+			<TouchableOpacity
+				onPress={() =>
+					router.push({
+						pathname: "/subscribeModal",
+						params: {
+							path: "onboarding",
+							feature: "water-scores",
+						},
+					})
+				}
+			>
 				<P className="text-sm px-2 py-1">{name}</P>
 
 				<BlurView

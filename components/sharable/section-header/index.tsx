@@ -1,6 +1,6 @@
 import { View } from "react-native";
 
-import { Large, Muted } from "@/components/ui/typography";
+import { Muted, P } from "@/components/ui/typography";
 
 // Define the Subtitle component
 function Subtitle({ text }: { text: string }) {
@@ -19,7 +19,7 @@ export default function SectionHeader({
 	return (
 		<View className="flex flex-col items-start mb-2">
 			<View className="flex flex-row items-center justify-between w-full">
-				<Large className="">{title}</Large>
+				<P className="text-lg">{title}</P>
 				{iconButton}
 			</View>
 			{subtitle && <Muted className="mt-0">{subtitle}</Muted>}
