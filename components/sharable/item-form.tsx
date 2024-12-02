@@ -4,7 +4,6 @@ import Feather from "@expo/vector-icons/Feather";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { getItemDetails } from "actions/items";
-import { BlurView } from "expo-blur";
 import * as Linking from "expo-linking";
 import { Link, useNavigation, useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
@@ -18,7 +17,6 @@ import MetaDataCard from "./metadata-card";
 import Score from "./score";
 import Sources from "./sources";
 import Typography from "./typography";
-import UntestedRow from "./untested-row";
 
 import { incrementItemsViewed } from "@/actions/user";
 import { H3, Muted } from "@/components/ui/typography";
@@ -237,15 +235,14 @@ export function ItemForm({ id }: Props) {
 										Linking.openURL(item.affiliate_url);
 									}}
 								>
-									<H3 className="pb-1 items-start">
-										{item.name}
-										{` `}
+									<View className="flex flex-row gap-x-1 items-center">
+										<H3 className="pb-1 items-start">{item.name}</H3>
 										<Feather
 											name="arrow-up-right"
-											size={14}
+											size={16}
 											color={iconColor}
 										/>
-									</H3>
+									</View>
 								</TouchableOpacity>
 							) : (
 								<H3 className="pb-1">{item.name}</H3>
@@ -268,7 +265,7 @@ export function ItemForm({ id }: Props) {
 						</View>
 					</View>
 
-					{!isTested && <UntestedRow thing={item} />}
+					{/* {!isTested && <UntestedRow thing={item} />} */}
 
 					<View className="flex flex-col gap-10 gap-y-1 w-full">
 						<View className="flex flex-col gap-y-1 w-full">
@@ -329,9 +326,11 @@ export function ItemForm({ id }: Props) {
 										<ContaminantCard
 											key={contaminant.id || index}
 											data={contaminant}
+											hasActiveSub={hasActiveSub}
+											isItemUnlocked={isItemUnlocked}
 										/>
 
-										{!hasActiveSub && !isItemUnlocked && (
+										{/* {!hasActiveSub && !isItemUnlocked && (
 											<BlurView
 												intensity={32}
 												tint="regular"
@@ -341,13 +340,13 @@ export function ItemForm({ id }: Props) {
 													top: 0,
 													right: 0,
 													bottom: 20,
-													borderRadius: 16,
+													borderRadius: 12,
 													height: "100%",
 													overflow: "hidden",
 													backgroundColor: "rgba(255, 255, 255, 0.2)",
 												}}
 											/>
-										)}
+										)} */}
 									</TouchableOpacity>
 								))}
 							</View>
@@ -366,7 +365,7 @@ export function ItemForm({ id }: Props) {
 										/> */}
 
 										<Typography size="2xl" fontWeight="normal">
-											Minerals found
+											Minerals
 										</Typography>
 									</View>
 									<IngredientsCard

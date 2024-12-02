@@ -167,14 +167,12 @@ export default function SearchLayout() {
 					headerTitle: "Top rated",
 				}}
 			/>
-			<Stack.Screen name="article/[id]" />
 			<Stack.Screen name="bottled-waters/index" />
 			<Stack.Screen name="tap-water/index" />
 			<Stack.Screen name="filters/index" />
 			<Stack.Screen name="oasis/[id]" />
 			<Stack.Screen name="top-rated/[id]" />
 			<Stack.Screen name="company/[id]" />
-			<Stack.Screen name="articles/index" />
 			<Stack.Screen name="community/index" />
 		</Stack>
 	);

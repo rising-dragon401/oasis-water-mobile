@@ -14,6 +14,18 @@ function CustomHeader() {
 	);
 }
 
+export function LogoHeader() {
+	return (
+		<View className="flex items-start justify-start w-24 h-5">
+			<Image
+				source={OasisLogo}
+				style={{ width: "100%", height: "100%" }}
+				contentFit="contain"
+			/>
+		</View>
+	);
+}
+
 export default function ResearchLayout() {
 	const { backgroundColor, textColor } = useColorScheme();
 
@@ -32,15 +44,24 @@ export default function ResearchLayout() {
 					canGoBack && <HeaderBackButton backPath={backPath} />,
 				contentStyle: { backgroundColor },
 				headerStyle: { backgroundColor },
-				headerTitle: () => <CustomHeader />,
+				// headerTitle: () => <CustomHeader />,
 				headerTitleStyle: { color: textColor },
 				headerTitleAlign: "center",
 				headerShadowVisible: false,
 			}}
 		>
-			<Stack.Screen name="index" options={{ headerShown: false }} />
+			<Stack.Screen
+				name="index"
+				options={{
+					headerShown: true,
+					headerTitle: "Lab",
+					headerLeft: () => <LogoHeader />,
+				}}
+			/>
 
-			<Stack.Screen name="view-all/index" options={{ headerShown: true }} />
+			<Stack.Screen name="articles/index" />
+
+			<Stack.Screen name="article/[id]" options={{ headerShown: true }} />
 		</Stack>
 	);
 }

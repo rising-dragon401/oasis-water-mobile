@@ -129,32 +129,6 @@ export const uploadChatImage = async (image: string, uid: string) => {
 	return { success: true, data };
 };
 
-export const getEmbedding = async (text: string) => {
-	const response = await fetch("https://api.openai.com/v1/embeddings", {
-		method: "POST",
-		headers: {
-			Authorization: `Bearer ${process.env.EXPO_PUBLIC_OPENAI_API_KEY}`,
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify({
-			input: text,
-			model: "text-embedding-ada-002",
-			encoding_format: "float",
-		}),
-	});
-
-	if (!response.ok) {
-		const error = await response.json();
-		console.error("Error fetching embedding:", error);
-		return { success: false, error: error.message };
-	}
-
-	const responseData = await response.json();
-	const embedding = responseData.data[0].embedding;
-
-	return { success: true, embedding };
-};
-
 export const getAllItemIdsAndNames = async () => {
 	const { data, error } = await supabase.from("items").select("id, name");
 
@@ -218,14 +192,20 @@ export const searchForProduct = async (
 		// max_tokens: 300,
 	};
 
-	const response = await fetch("https://api.openai.com/v1/chat/completions", {
-		method: "POST",
-		headers: {
-			Authorization: `Bearer ${process.env.EXPO_PUBLIC_OPENAI_API_KEY}`,
-			"Content-Type": "application/json",
+	const response = await fetch(
+		`${process.env.EXPO_PUBLIC_API_ENDPOINT}/api/search-for-product`,
+		{
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(requestBody),
 		},
-		body: JSON.stringify(requestBody),
+	).catch((error) => {
+		console.error("Error sending image to OpenAI:", error);
+		throw error;
 	});
+
 	const responseData = await response.json();
 
 	const rowIdentifiedObject = responseData.choices[0].message.content.match(
@@ -261,6 +241,7 @@ export const searchForProduct = async (
 			return { success: false, message: "Product details not found." };
 		}
 	} catch (detailError) {
+		console.error("Error fetching product details:", detailError);
 		return {
 			success: false,
 			message: `Error fetching details: ${detailError instanceof Error ? detailError.message : "Unknown error"}`,
@@ -331,15 +312,24 @@ export const getCategoryCounts = async () => {
 	return categoryData;
 };
 
-export const fetchTestedPreview = async ({ limit }: { limit: number }) => {
+export const fetchTestedPreview = async ({
+	limit,
+	page = 1,
+}: {
+	limit: number;
+	page?: number;
+}) => {
 	try {
 		const { data: items, error } = await supabase
 			.from("items")
-			.select("id, name, image, ingredients, type, updated_at")
+			.select(
+				"id, name, image, ingredients, type, updated_at, score_updated_at, score",
+			)
 			.eq("is_indexed", true)
 			.not("ingredients", "is", null)
-			.order("updated_at", { ascending: true })
-			.limit(limit);
+			.not("score_updated_at", "is", null)
+			.order("score_updated_at", { ascending: false })
+			.range((page - 1) * limit, page * limit);
 
 		if (error) {
 			throw new Error(
@@ -352,7 +342,7 @@ export const fetchTestedPreview = async ({ limit }: { limit: number }) => {
 				const ingredients = item.ingredients as any[];
 
 				const contCount = ingredients.filter(
-					(ingredient) => ingredient.is_contaminant,
+					(ingredient) => ingredient?.is_contaminant,
 				).length;
 
 				return {
@@ -365,11 +355,12 @@ export const fetchTestedPreview = async ({ limit }: { limit: number }) => {
 		const { data: filters, error: filtersError } = await supabase
 			.from("water_filters")
 			.select(
-				"id, name, image, type, filtered_contaminant_categories, updated_at",
+				"id, name, image, type, filtered_contaminant_categories, score_updated_at, score",
 			)
+			.not("score_updated_at", "is", null)
 			.eq("is_indexed", true)
-			.order("updated_at", { ascending: true })
-			.order("created_at", { ascending: true })
+			.order("score_updated_at", { ascending: true })
+
 			.limit(limit);
 
 		if (filtersError) {
@@ -399,27 +390,31 @@ export const fetchTestedPreview = async ({ limit }: { limit: number }) => {
 			}),
 		);
 
-		// let tapWaterLocations;
-		// const { data: tapWaterLocationsData, error: tapWaterLocationsError } =
-		// 	await supabase
-		// 		.from("tap_water_locations")
-		// 		.select("*")
-		// 		.not("score", "is", null)
-		// 		.order("updated_at", { ascending: true })
-		// 		.order("created_at", { ascending: true })
-		// 		.limit(limit);
+		let tapWaterLocations;
+		const { data: tapWaterLocationsData, error: tapWaterLocationsError } =
+			await supabase
+				.from("tap_water_locations")
+				.select("*")
+				.not("score", "is", null)
+				.not("score_updated_at", "is", null)
+				.order("score_updated_at", { ascending: true })
+				.range((page - 1) * limit, page * limit);
 
-		// if (tapWaterLocationsError) {
-		// 	tapWaterLocations = [];
-		// } else {
-		// 	tapWaterLocations = tapWaterLocationsData;
-		// }
+		if (tapWaterLocationsError) {
+			tapWaterLocations = [];
+		} else {
+			tapWaterLocations = tapWaterLocationsData;
+		}
 
-		const combinedItems = [...itemsWithContCount, ...filtersWithContCount];
+		const combinedItems = [
+			...itemsWithContCount,
+			...filtersWithContCount,
+			...tapWaterLocations,
+		];
 		combinedItems.sort(
 			(a, b) =>
-				new Date(b.updated_at || 0).getTime() -
-				new Date(a.updated_at || 0).getTime(),
+				new Date(b.score_updated_at || 0).getTime() -
+				new Date(a.score_updated_at || 0).getTime(),
 		);
 
 		return combinedItems;

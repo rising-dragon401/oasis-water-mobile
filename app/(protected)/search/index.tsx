@@ -15,6 +15,7 @@ import { getStores } from "@/actions/stores";
 import { BrandsList } from "@/components/sharable/brands-list";
 import CategoryList from "@/components/sharable/category-list";
 import { LocationsList } from "@/components/sharable/locations-list";
+import { PeopleList } from "@/components/sharable/people-list";
 import { RecentsList } from "@/components/sharable/recents-list";
 import Search from "@/components/sharable/search";
 import SectionHeader from "@/components/sharable/section-header";
@@ -28,7 +29,7 @@ export default function TabOneScreen() {
 	const router = useRouter();
 	const { shadowColor } = useColorScheme();
 	const showToast = useToast();
-	const { hasActiveSub } = useSubscription();
+	const { hasActiveSub, checkForSubscription } = useSubscription();
 	const [stores, setStores] = useState<any[]>([]);
 	const [recents, setRecents] = useState<any[]>([]);
 	const [searchInputActive, setSearchInputActive] = useState(false);
@@ -36,11 +37,14 @@ export default function TabOneScreen() {
 
 	useEffect(() => {
 		const fetch = async () => {
+			await checkForSubscription();
+
 			const data = await getStores();
 			setStores(data || []);
 
 			const recentData = await fetchTestedPreview({
-				limit: 20,
+				limit: 10,
+				page: 1,
 			});
 			setRecents(recentData || []);
 		};
@@ -70,7 +74,7 @@ export default function TabOneScreen() {
 			behavior={Platform.OS === "ios" ? "padding" : "height"}
 			className="flex-1 px-6"
 		>
-			<View className="z-50 mb- mt-8 w-full items-center gap-y-10">
+			<View className="z-50 pt-8 w-full items-center gap-y-10 bg-background pb-2">
 				<Search
 					setActive={setSearchInputActive}
 					placeholder="Search water brands and filters"
@@ -78,13 +82,13 @@ export default function TabOneScreen() {
 			</View>
 
 			<ScrollView
-				className="flex-1"
+				className="flex-1 overflow-visible"
 				showsVerticalScrollIndicator={false}
 				contentContainerStyle={{ paddingBottom: 100 }}
 			>
 				<View className="flex-1 justify-center items-center z-10 w-full gap-y-4">
-					<View className="flex flex-col w-full mx-4 mt-6">
-						<SectionHeader title="New scores" />
+					<View className="flex flex-col w-full flex-1 mt-4">
+						<SectionHeader title="New ratings" />
 
 						{recents.length > 0 ? (
 							<RecentsList data={recents} />
@@ -106,17 +110,22 @@ export default function TabOneScreen() {
 						)}
 					</View>
 
-					<View className="flex flex-col w-full mx-4 mt-6">
-						<SectionHeader title="Tap water quality" />
+					<View className="flex flex-col w-full mx-4 mt-2">
+						<SectionHeader title="What others are drinking" />
+						<PeopleList />
+					</View>
+
+					<View className="flex flex-col w-full mx-4 mt-2">
+						{/* <SectionHeader title="Tap water quality" /> */}
 						<LocationsList />
 					</View>
 
-					<View className="flex flex-col w-full mx-4 mt-6">
+					<View className="flex flex-col w-full mx-4 mt-4 overflow-hidden">
 						<SectionHeader title="Popular brands" />
 						<BrandsList />
 					</View>
 
-					<View className="flex flex-col w-full mx-4 mt-6">
+					<View className="flex flex-col w-full mx-4 mt-4 overflow-visible">
 						<SectionHeader title="Top rated" />
 						<CategoryList />
 					</View>

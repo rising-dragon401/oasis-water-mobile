@@ -1,4 +1,3 @@
-import { useUserProvider } from "@/context/user-provider";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { FlatList, View } from "react-native";
@@ -14,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { H1, Large, Muted, P } from "@/components/ui/typography";
+import { useUserProvider } from "@/context/user-provider";
 
 // const ITEM_CATEGORIES = [
 // 	{
@@ -55,7 +55,7 @@ export default function OasisPage({
 	const [recommendedProducts, setRecommendedProducts] = useState<any>(null);
 	const [favorites, setFavorites] = useState<any>([]);
 
-	const isAuthUser = userId === uid;
+	const isAuthUser = false;
 
 	const fetchUserFavorites = async () => {
 		const favorites = await getUserFavorites(userId || "");
@@ -208,11 +208,7 @@ export default function OasisPage({
 										style={{ width: "48%" }}
 										className={`mb-2 ${index < 2 ? "mt-2" : ""}`}
 									>
-										<ItemPreviewCard
-											item={item}
-											showFavorite
-											isAuthUser={isAuthUser}
-										/>
+										<ItemPreviewCard item={item} isAuthUser={isAuthUser} />
 									</View>
 								)}
 								keyExtractor={(item) => item?.id}
@@ -245,11 +241,7 @@ export default function OasisPage({
 										style={{ width: "48%" }}
 										className={`mb-2 ${index < 2 ? "mt-2" : ""}`}
 									>
-										<ItemPreviewCard
-											item={item}
-											showFavorite
-											isAuthUser={isAuthUser}
-										/>
+										<ItemPreviewCard item={item} isAuthUser={isAuthUser} />
 									</View>
 								)}
 								keyExtractor={(item) => item?.id}
@@ -280,11 +272,7 @@ export default function OasisPage({
 										style={{ width: "48%" }}
 										className={`mb-2 ${index < 2 ? "mt-2" : ""}`}
 									>
-										<ItemPreviewCard
-											item={item}
-											showFavorite
-											isAuthUser={isAuthUser}
-										/>
+										<ItemPreviewCard item={item} isAuthUser={isAuthUser} />
 									</View>
 								)}
 								keyExtractor={(item) => item?.id}

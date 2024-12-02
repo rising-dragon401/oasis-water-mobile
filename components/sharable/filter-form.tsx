@@ -13,7 +13,6 @@ import {
 import ItemImage from "./item-image";
 import Score from "./score";
 import Sources from "./sources";
-import UntestedRow from "./untested-row";
 
 import { getFilterDetails } from "@/actions/filters";
 import ContaminantTable from "@/components/sharable/contaminant-table";
@@ -224,7 +223,7 @@ export function FilterForm({ id }: Props) {
 						</View>
 					</View>
 
-					{!isTested && <UntestedRow thing={filter} />}
+					{/* {!isTested && <UntestedRow thing={filter} />} */}
 
 					<View>
 						<FilterMetadata

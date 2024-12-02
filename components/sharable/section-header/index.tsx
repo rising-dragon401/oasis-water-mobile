@@ -17,7 +17,7 @@ export default function SectionHeader({
 	iconButton?: React.ReactNode;
 }) {
 	return (
-		<View className="flex flex-col items-start mb-2">
+		<View className="flex flex-col items-start mb-0">
 			<View className="flex flex-row items-center justify-between w-full">
 				<P className="text-lg">{title}</P>
 				{iconButton}

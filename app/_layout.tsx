@@ -128,6 +128,10 @@ function RootLayout() {
 													}}
 												/>
 												<Stack.Screen
+													name="+not-found"
+													options={{ title: "Oops!" }}
+												/>
+												<Stack.Screen
 													name="subscribeModal"
 													options={{
 														presentation: "modal",

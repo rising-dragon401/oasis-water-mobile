@@ -3,7 +3,6 @@ import { Link, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { Alert, RefreshControl, ScrollView, View } from "react-native";
 
-import { getUserReferralStats } from "@/actions/admin";
 import { addUserToAlgolia } from "@/actions/algolia";
 import {
 	getUserByUsername,
@@ -23,7 +22,8 @@ import { useUserProvider } from "@/context/user-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function SettingsScreen() {
-	const { hasActiveSub, restorePurchases } = useSubscription();
+	const { hasActiveSub, restorePurchases, checkForSubscription } =
+		useSubscription();
 	const { uid, user, userData, refreshUserData, logout } = useUserProvider();
 	const { backgroundColor, iconColor } = useColorScheme();
 	const showToast = useToast();
@@ -34,18 +34,13 @@ export default function SettingsScreen() {
 	const [newBio, setNewBio] = useState("");
 	const [newAvatar, setNewAvatar] = useState("");
 	const [newReferralCode, setNewReferralCode] = useState("");
-	const [referralStats, setReferralStats] = useState({
-		total_earnings: 0,
-		total_paid_referrals: 0,
-		total_trials: 0,
-	});
+
 	const [loading, setLoading] = useState(false);
 	const [socials, setSocials] = useState({
 		instagram: "",
 		youtube: "",
 		twitter: "",
 	});
-	const [loadingSocials, setLoadingSocials] = useState(false);
 	const [refreshing, setRefreshing] = useState(false);
 	const [loadingRestorePurchases, setLoadingRestorePurchases] = useState(false);
 
@@ -54,6 +49,7 @@ export default function SettingsScreen() {
 		// Add your refresh logic here, e.g., refetch user data
 
 		await refreshUserData("all");
+		await checkForSubscription();
 
 		setRefreshing(false);
 		showToast("Refreshed data");
@@ -73,10 +69,8 @@ export default function SettingsScreen() {
 			setNewUsername(userData.username || "");
 
 			if (userData.referred_by) {
-				referredByUser(userData.referred_by);
+				referredByUser(userData.referrred_by);
 			}
-
-			getReferralStats();
 		}
 	}, [userData]);
 
@@ -105,11 +99,6 @@ export default function SettingsScreen() {
 		if (user) {
 			setNewReferralCode(user.username);
 		}
-	};
-
-	const getReferralStats = async () => {
-		const stats = await getUserReferralStats(userData.id);
-		setReferralStats(stats);
 	};
 
 	const handleUpdateProfile = async () => {

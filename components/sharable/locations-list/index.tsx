@@ -42,37 +42,35 @@ const FEATURED_LOCATIONS = [
 ];
 export const LocationsList = ({}: object) => {
 	return (
-		<View>
-			<View className="flex flex-col w-full gap-y-4">
-				<FlatList
-					data={[...FEATURED_LOCATIONS, { id: "see-more", name: "See More" }]}
-					horizontal
-					showsHorizontalScrollIndicator={false}
-					contentContainerStyle={{
-						paddingTop: 8,
-						maxHeight: 90,
-					}}
-					className="overflow-x-scroll"
-					renderItem={({ item: location }) => (
-						<View className="mr-4 w-44">
-							{location.id === "see-more" ? (
-								<TouchableOpacity
-									onPress={() => router.push("/(protected)/search/locations")}
-								>
-									<View className="flex items-center justify-center h-full">
-										<Text>See More</Text>
-									</View>
-								</TouchableOpacity>
-							) : (
-								<Link href={`/search/locations/state/${location.id}`}>
-									<LocationCard location={location} size="md" />
-								</Link>
-							)}
-						</View>
-					)}
-					keyExtractor={(item) => item.id}
-				/>
-			</View>
+		<View className="flex-1 flex-col w-full gap-y-4">
+			<FlatList
+				data={[...FEATURED_LOCATIONS, { id: "see-more", name: "See More" }]}
+				horizontal
+				showsHorizontalScrollIndicator={false}
+				contentContainerStyle={{
+					paddingTop: 8,
+					maxHeight: 100,
+				}}
+				className="overflow-x-scroll"
+				renderItem={({ item: location }) => (
+					<View className="mr-4 w-44">
+						{location.id === "see-more" ? (
+							<TouchableOpacity
+								onPress={() => router.push("/(protected)/search/locations")}
+							>
+								<View className="flex items-center justify-center h-full">
+									<Text>See More</Text>
+								</View>
+							</TouchableOpacity>
+						) : (
+							<Link href={`/search/locations/state/${location.id}`}>
+								<LocationCard location={location} size="lg" />
+							</Link>
+						)}
+					</View>
+				)}
+				keyExtractor={(item) => item.id}
+			/>
 		</View>
 	);
 };

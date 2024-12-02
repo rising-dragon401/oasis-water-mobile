@@ -86,13 +86,14 @@ export default function SavedScreen() {
 					{userHasFavorites ? (
 						<View className="flex flex-row flex-wrap gap-4">
 							{userFavorites.map((item) => (
-								<View key={item?.id} style={{ width: "44%" }} className="mb-2">
+								<View key={item?.id} style={{ width: "48%" }} className="mb-2">
 									<ItemPreviewCard
 										item={item}
 										isAuthUser
 										isGeneralListing
 										variation="square"
 										imageHeight={80}
+										showShadow
 									/>
 								</View>
 							))}

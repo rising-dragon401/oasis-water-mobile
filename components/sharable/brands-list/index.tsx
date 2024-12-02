@@ -57,7 +57,7 @@ export const BrandsList = () => {
 							onPress={() => {
 								router.push(`/search/brand/${brand.id}`);
 							}}
-							className="flex-col items-center justify-center gap-2 bg-card border border-border mr-8 flex rounded-full overflow-hidden w-20 h-20"
+							className="flex-col items-center justify-center gap-2 bg-card border border-border flex rounded-full overflow-hidden w-20 h-20"
 						>
 							<Image
 								source={{

@@ -38,3 +38,7 @@
 		--offwhite: 0 0% 20%; /* dark.fadedblack */
 	}
 }
+
+.oasis-shadow {
+	box-shadow: 0px 4px 12px 0px var(--primary);
+}

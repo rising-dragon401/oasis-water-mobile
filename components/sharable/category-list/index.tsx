@@ -4,27 +4,40 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 
-import { P } from "@/components/ui/typography";
+import { Muted, P } from "@/components/ui/typography";
 import { useDataProvider } from "@/context/data-provider";
 import { useToast } from "@/context/toast-provider";
 import { useColorScheme } from "@/lib/useColorScheme";
 
-export default function CategoryList() {
+export default function CategoryList({
+	showComingSoon = true,
+	limit = 20,
+}: {
+	showComingSoon?: boolean;
+	limit?: number;
+}) {
 	const { categories } = useDataProvider();
-	const { shadowColor, mutedColor } = useColorScheme();
+	const { mutedColor, dropShadowStyles } = useColorScheme();
 	const router = useRouter();
 	const showToast = useToast();
 	const [isExpanded, setIsExpanded] = useState(false);
 
-	const visibleCategories = isExpanded ? categories : categories.slice(0, 12);
+	const visibleCategories = isExpanded
+		? categories.filter((category) => category.status === "active")
+		: categories
+				.filter((category) => category.status === "active")
+				.slice(0, limit);
 
 	const handlePressComingSoon = (category: any) => {
 		showToast("Soon");
 	};
 
 	const handleSeeAll = () => {
-		// @ts-ignore
-		router.push("/(protected)/search/top?backPath=/search");
+		setIsExpanded(true);
+	};
+
+	const handleShowLess = () => {
+		setIsExpanded(false);
 	};
 
 	return (
@@ -37,22 +50,28 @@ export default function CategoryList() {
 					)
 					.map((category, index) => (
 						<View
-							className="flex justify-center rounded-2xl bg-card pr-6 border border-border"
+							key={index}
+							className="flex justify-center rounded-2xl pr-6 bg-card"
 							style={{
 								maxHeight: 60,
 								width: "100%",
-								// shadowColor,
-								// shadowOffset: { width: 0, height: 1 },
-								// shadowOpacity: 0.2,
-								// shadowRadius: 2,
+								...dropShadowStyles,
 							}}
 						>
 							<TouchableOpacity
-								onPress={() => router.push(`/search/top-rated/${category.ref}`)}
+								onPress={() => {
+									if (category.status === "coming_soon") {
+										handlePressComingSoon(category);
+									} else {
+										router.push(
+											`/search/top-rated/${category.ref}?backPath=top`,
+										);
+									}
+								}}
 							>
 								<View className="flex flex-row items-center px-4 justify-between w-full">
 									<View className="flex flex-row items-center gap-4">
-										<View className="rounded-full overflow-hidden ">
+										<View className="overflow-hidden ">
 											<Image
 												source={{ uri: category.image }}
 												alt={category.title}
@@ -68,18 +87,30 @@ export default function CategoryList() {
 										</View>
 									</View>
 									<View className="flex flex-col justify-end items-center gap-2 h-full mr-6">
-										<Ionicons
-											name="chevron-forward"
-											size={18}
-											color={mutedColor}
-										/>
-										<View className="h-3" />
+										{category.status === "coming_soon" ? (
+											<Muted>Comming soon</Muted>
+										) : (
+											<Ionicons
+												name="chevron-forward"
+												size={18}
+												className="mb-6"
+												color={mutedColor}
+											/>
+										)}
 									</View>
 								</View>
 							</TouchableOpacity>
 						</View>
 					))}
 			</View>
+			{categories.length > limit && (
+				<TouchableOpacity
+					onPress={isExpanded ? handleShowLess : handleSeeAll}
+					className="flex justify-center items-center rounded-2xl mt-4"
+				>
+					<Muted>{isExpanded ? "Show Less" : "Show all"}</Muted>
+				</TouchableOpacity>
+			)}
 		</View>
 	);
 }

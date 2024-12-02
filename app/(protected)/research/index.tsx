@@ -1,19 +1,27 @@
-import { useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
-import { ScrollView, View } from "react-native";
+import { Image } from "expo-image";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useContext, useEffect, useState } from "react";
+import {
+	FlatList,
+	RefreshControl,
+	ScrollView,
+	TouchableOpacity,
+	View,
+} from "react-native";
 
 import { fetchTestedPreview } from "@/actions/admin";
 import { ResearchRowList } from "@/components/sharable/research-row-list";
 import SectionHeader from "@/components/sharable/section-header";
 import Skeleton from "@/components/sharable/skeleton";
 import { P } from "@/components/ui/typography";
+import { BlogContext } from "@/context/blogs-provider";
 import { theme } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
 
 export default function ResearchScreen() {
 	const { colorScheme } = useColorScheme();
-	// const { blogs } = useContext(BlogContext);
-
+	const { blogs } = useContext(BlogContext);
+	const router = useRouter();
 	const params = useLocalSearchParams<{ defaultTab?: string }>();
 	const { defaultTab } = params;
 
@@ -30,26 +38,43 @@ export default function ResearchScreen() {
 	const backgroundColor =
 		colorScheme === "dark" ? theme.dark.background : theme.light.background;
 
+	const [refreshing, setRefreshing] = useState(false);
+
+	const [page, setPage] = useState(1);
+
 	useEffect(() => {
 		getTestedItems();
 	}, []);
 
-	const getTestedItems = async () => {
+	const getTestedItems = async (pageNumber = 1) => {
 		setLoading((prevState) => ({
 			...prevState,
 			tested: true,
 		}));
 
 		const data = await fetchTestedPreview({
-			limit: 20,
+			limit: 10,
+			page: pageNumber,
 		});
 
-		setTestedThings(data);
+		setTestedThings((prevData) => [...prevData, ...data]);
 
 		setLoading((prevState) => ({
 			...prevState,
 			tested: false,
 		}));
+	};
+
+	const loadMoreItems = () => {
+		const nextPage = page + 1;
+		setPage(nextPage);
+		getTestedItems(nextPage);
+	};
+
+	const onRefresh = async () => {
+		setRefreshing(true);
+		await getTestedItems();
+		setRefreshing(false);
 	};
 
 	return (
@@ -60,35 +85,17 @@ export default function ResearchScreen() {
 				paddingHorizontal: 28,
 				paddingTop: 10,
 			}}
+			refreshControl={
+				<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+			}
 		>
-			<P className="text-muted-foreground text-sm">
-				💧 Water and product quality can change as frequently as every week.
-				Follow the latest lab results that may affect your health.
+			<P className="text-muted-foreground text-sm border-b border-border my-2">
+				👋💧 Water and product quality can change frequently – always check the
+				latest scores.
 			</P>
-			<View className="flex flex-col mt-4">
-				<SectionHeader title="Latest results" />
 
-				<View>
-					{loading.tested ? (
-						<View className="flex flex-col gap-y-4">
-							{Array.from({ length: 8 }).map((_, index) => (
-								<Skeleton key={index} width="100%" height={40} />
-							))}
-						</View>
-					) : testedThings && testedThings.length > 0 ? (
-						<ResearchRowList
-							data={testedThings || []}
-							limitItems={50}
-							status={tabValue}
-							label="dates"
-							showVotes={false}
-						/>
-					) : null}
-				</View>
-			</View>
-
-			{/* <View className="flex flex-col mb-10">
-				<SectionHeader title="New findings" />
+			<View className="flex flex-col bg-card mt-4">
+				<SectionHeader title="Latest research" />
 				{blogs.length === 0 ? (
 					<FlatList
 						data={[1, 2, 3]}
@@ -97,7 +104,7 @@ export default function ResearchScreen() {
 						contentContainerStyle={{
 							paddingTop: 8,
 							paddingHorizontal: 0,
-						}} 
+						}}
 						className="overflow-x-scroll"
 						renderItem={() => (
 							<Skeleton
@@ -117,20 +124,21 @@ export default function ResearchScreen() {
 						horizontal
 						showsHorizontalScrollIndicator={false}
 						contentContainerStyle={{
-							paddingTop: 8,
 							paddingHorizontal: 0,
 						}}
 						className="overflow-x-scroll"
 						renderItem={({ item }: { item: any }) => (
-							<Link
-								href={`/search/article/${item.id}`}
-								className="flex flex-col mr-1"
+							<TouchableOpacity
+								onPress={() => {
+									router.push(`/research/article/${item.id}`);
+								}}
+								className="flex flex-col mr-4"
 							>
-								<View style={{ width: 140 }}>
+								<View style={{ width: 150 }}>
 									<View
 										style={{
-											width: 140,
-											height: 80,
+											width: 150,
+											height: 100,
 											borderRadius: 8,
 											overflow: "hidden",
 											position: "relative",
@@ -158,7 +166,7 @@ export default function ResearchScreen() {
 											}}
 										>
 											<P
-												className="text-left text-white font-bold text-sm"
+												className="text-left text-white text-sm"
 												numberOfLines={3}
 												ellipsizeMode="tail"
 											>
@@ -167,12 +175,36 @@ export default function ResearchScreen() {
 										</View>
 									</View>
 								</View>
-							</Link>
+							</TouchableOpacity>
 						)}
 						keyExtractor={(item: any) => item.id}
 					/>
 				)}
-			</View> */}
+			</View>
+
+			<View className="flex flex-col mt-8 overflow-visible">
+				<SectionHeader title="Newest ratings" />
+
+				<View className="overflow-visible">
+					{loading.tested ? (
+						<View className="flex flex-col gap-y-4">
+							{Array.from({ length: 5 }).map((_, index) => (
+								<Skeleton key={index} width="100%" height={60} />
+							))}
+						</View>
+					) : testedThings && testedThings.length > 0 ? (
+						<View className="flex flex-col gap-y-4 overflow-visible">
+							<ResearchRowList
+								data={testedThings || []}
+								limitItems={20}
+								status={tabValue}
+								label="dates"
+							/>
+							{/* <Button onPress={loadMoreItems} title="Load More" /> */}
+						</View>
+					) : null}
+				</View>
+			</View>
 		</ScrollView>
 	);
 }

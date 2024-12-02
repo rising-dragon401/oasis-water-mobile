@@ -6,7 +6,7 @@ import { TouchableOpacity, View } from "react-native";
 
 import ScoreIndicator from "./score-indicator";
 
-import { H4, Muted, P } from "@/components/ui/typography";
+import { Muted, P } from "@/components/ui/typography";
 import { useSubscription } from "@/context/subscription-provider";
 import { useUserProvider } from "@/context/user-provider";
 import {
@@ -26,6 +26,8 @@ type Props = {
 	backPath?: string;
 	hideScore?: boolean;
 	showContPreview?: boolean;
+	showShadow?: boolean;
+	titleLines?: number;
 };
 
 const ItemPreviewCard = ({
@@ -38,11 +40,17 @@ const ItemPreviewCard = ({
 	backPath = "",
 	hideScore = false,
 	showContPreview = false,
+	showShadow = false,
+	titleLines = 2,
 }: Props) => {
 	const { userData } = useUserProvider();
 	const { hasActiveSub } = useSubscription(); // should not be calling this here lol
-	const { mutedForegroundColor, accentColor, redColor, neutralColor } =
-		useColorScheme();
+	const {
+		mutedForegroundColor,
+		accentColor,
+
+		dropShadowStyles,
+	} = useColorScheme();
 	const router = useRouter();
 
 	const isItemUnlocked = useMemo(() => {
@@ -69,7 +77,7 @@ const ItemPreviewCard = ({
 
 	const renderImage = () => {
 		const imageStyle = {
-			width: variation === "row" ? 80 : "100%",
+			width: variation === "row" ? 80 : "90%",
 			height: imageHeight || 80,
 			aspectRatio: variation === "row" ? undefined : 1,
 			contentFit: "cover",
@@ -120,7 +128,7 @@ const ItemPreviewCard = ({
 			return (
 				<View className="flex flex-row items-center gap-1">
 					<ScoreIndicator value={value} width={2} height={2} />
-					<H4>{item.score}</H4>
+					<P>{item.score}</P>
 				</View>
 			);
 		}
@@ -136,18 +144,20 @@ const ItemPreviewCard = ({
 				// @ts-ignore
 				router.push(link);
 			}}
+			style={{
+				...(showShadow ? dropShadowStyles : {}),
+			}}
 		>
 			<View
 				className={`relative w-full flex rounded-2xl ${
-					variation === "row"
-						? "flex-row gap-2 px-2 py-2  border border-muted"
-						: "flex-col border border-muted"
-				}  bg-card pt-2 rounded-2xl`}
+					variation === "row" ? "flex-row gap-2 px-2 py-2" : "flex-col gap-y-2"
+				} bg-card`}
+				style={{ paddingHorizontal: variation === "square" ? 0 : undefined }}
 			>
 				<View
 					className={`flex justify-center items-center ${
-						variation === "row" ? "w-1/4" : "w-full "
-					}  ${showData && "rounded-xl"}`}
+						variation === "row" ? "w-1/4" : "pt-2"
+					} ${showData && "rounded-xl"}`}
 					style={{ flex: variation === "row" ? 1 : undefined }}
 				>
 					{renderImage()}
@@ -157,22 +167,31 @@ const ItemPreviewCard = ({
 					className={`flex ${
 						variation === "row"
 							? "flex-col items-start justify-between py-3"
-							: "h-20 justify-center"
+							: "justify-start items-start px-4 pb-2"
 					}`}
 					style={{ flex: variation === "row" ? 3 : undefined }}
 				>
 					{showData ? (
-						<P
-							className={`text-base ${
-								variation === "row"
-									? "text-lg max-w-56 w-56 flex-wrap"
-									: "px-3 text-sm h-12"
-							}`}
-							numberOfLines={2}
-							style={{ lineHeight: 18 }}
-						>
-							{item.name}
-						</P>
+						<>
+							<P
+								className="text-sm font-medium text-left"
+								numberOfLines={titleLines || 2}
+							>
+								{item.name}
+							</P>
+							{item.brandName && (
+								<Muted className="text-xs text-primary">{item.brandName}</Muted>
+							)}
+
+							{showContPreview &&
+							(item.cont_count > 0 || item.cont_not_removed > 0) ? (
+								<P className="text-xs text-muted-foreground italic">
+									{item?.cont_count || item?.cont_not_removed} alerts
+								</P>
+							) : (
+								<View className="h-4" />
+							)}
+						</>
 					) : (
 						<>
 							<View
@@ -200,54 +219,10 @@ const ItemPreviewCard = ({
 							<Muted className="text-xs">{timeSince(item.updated_at)}</Muted>
 						</View>
 					)}
-
-					{showContPreview &&
-						variation === "square" &&
-						(item.cont_count > 0 || item.cont_not_removed > 0) && (
-							<View className="flex flex-row gap-2 items-center px-4">
-								{item.type === "bottled_water" && (
-									<View className="flex flex-row gap-2 items-center">
-										<View
-											className={`w-2 h-2 rounded-full ${
-												item.cont_count > 0 ? "bg-red-400" : "bg-neutral"
-											}`}
-											style={{
-												backgroundColor:
-													item.cont_count > 0 ? redColor : neutralColor,
-											}}
-										/>
-										<P className="text-xs text-muted-foreground">
-											{item?.cont_count} notices
-										</P>
-									</View>
-								)}
-
-								{item.type === "filter" && (
-									<View className="flex flex-row gap-2 items-center">
-										<View
-											className={`w-2 h-2 rounded-full ${
-												item.cont_not_removed > 0 ? "bg-danger" : "bg-neutral"
-											}`}
-											style={{
-												backgroundColor:
-													item.cont_not_removed > 0 ? redColor : neutralColor,
-											}}
-										/>
-										<P className="text-xs text-muted-foreground">
-											{item.cont_not_removed} notices
-										</P>
-									</View>
-								)}
-							</View>
-						)}
-
-					{variation === "row" && item.brandName && (
-						<Muted>{item.brandName} </Muted>
-					)}
 				</View>
 
 				{variation === "row" && (
-					<View className="absolute mt-4 right-4  z-10  rounded-full p-1 px-2">
+					<View className="absolute mt-2 right-2  z-10  rounded-full p-1 px-2">
 						{hasActiveSub || isItemUnlocked ? (
 							item.score ? (
 								renderScore()

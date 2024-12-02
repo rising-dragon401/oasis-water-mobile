@@ -24,7 +24,6 @@ export function StoreForm({ id }: { id: string }) {
 
 	useEffect(() => {
 		const fetchStore = async () => {
-			console.log("fetching ", id);
 			const store = await getStoreAndProducts(id);
 			if (store) {
 				setStore(store);
@@ -70,8 +69,6 @@ export function StoreForm({ id }: { id: string }) {
 		);
 	}
 
-	console.log("hasActiveSub", hasActiveSub);
-
 	if (error) {
 		return (
 			<View className="flex items-center justify-center h-full">
@@ -81,71 +78,77 @@ export function StoreForm({ id }: { id: string }) {
 	}
 
 	return (
-		<ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-			<View className="p-5 rounded-lg flex flex-col items-center justify-start w-full relative">
-				<View className="w-32 h-32 !rounded-full mb-4 shadow-md flex overflow-hidden ">
-					<Image
-						source={{ uri: store?.image || BLUR_IMAGE_PLACEHOLDER }}
-						contentFit="cover"
-						style={{
-							width: "100%",
-							height: "100%",
-							borderRadius: 12,
-						}}
-						className="w-full h-full rounded-2xl shadow-md"
-					/>
-				</View>
-
-				<H2>{store?.name}</H2>
-				<View className="flex flex-row flex-wrap">
-					<Muted>{store?.companyName}</Muted>
-				</View>
-
-				{/* <P className="mb-4">{company?.description}</P> */}
-
-				<View className="h-4" />
-
-				{products && products.length > 0 && (
-					<FlatList
-						data={products}
-						numColumns={1}
-						keyExtractor={(item) => item.id.toString()}
-						renderItem={({ item }) => (
-							<ItemPreviewCard
-								item={item}
-								isGeneralListing
-								variation="row"
-								imageHeight={80}
-							/>
-						)}
-						contentContainerStyle={{ paddingHorizontal: 8 }}
-						className="w-full flex-1 gap-2"
-						scrollEnabled={false}
-						ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
-					/>
-				)}
-
-				{!hasActiveSub && (
-					<View className="absolute bottom-20 w-full flex items-center justify-center">
-						<Button
-							className="w-64 !h-16 mt-2 !py-3 !px-4 shadow-lg"
-							variant="default"
-							label="Unlock top rated"
-							icon={<Octicons name="lock" size={16} color={backgroundColor} />}
-							iconPosition="left"
-							onPress={() => {
-								router.push({
-									pathname: "/subscribeModal",
-									params: {
-										path: "search/store",
-										feature: "store",
-									},
-								});
+		<View>
+			<ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 100 }}>
+				<View className="p-5 rounded-lg flex flex-col items-center justify-start w-full relative">
+					<View className="w-32 h-32 !rounded-full mb-4 shadow-md flex overflow-hidden ">
+						<Image
+							source={{ uri: store?.image || BLUR_IMAGE_PLACEHOLDER }}
+							contentFit="cover"
+							style={{
+								width: "100%",
+								height: "100%",
+								borderRadius: 12,
 							}}
+							className="w-full h-full rounded-2xl shadow-md"
 						/>
 					</View>
-				)}
-			</View>
-		</ScrollView>
+
+					<H2>{store?.name}</H2>
+					<View className="flex flex-row flex-wrap">
+						<Muted>{store?.companyName}</Muted>
+					</View>
+
+					{/* <P className="mb-4">{company?.description}</P> */}
+
+					<View className="h-4" />
+
+					{products && products.length > 0 && (
+						<FlatList
+							data={products}
+							numColumns={1}
+							keyExtractor={(item) => item.id.toString()}
+							renderItem={({ item }) => (
+								<ItemPreviewCard
+									item={item}
+									isGeneralListing
+									variation="row"
+									imageHeight={80}
+								/>
+							)}
+							contentContainerStyle={{ paddingHorizontal: 8 }}
+							className="w-full flex-1 gap-2"
+							scrollEnabled={false}
+							ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+						/>
+					)}
+				</View>
+			</ScrollView>
+			{!hasActiveSub && (
+				<View
+					className="absolute bottom-10 w-full flex items-center justify-center"
+					style={{
+						marginTop: 10,
+					}}
+				>
+					<Button
+						className="w-64 !h-16 mt-2 !py-3 !px-4 shadow-lg"
+						variant="default"
+						label="Unlock top rated"
+						icon={<Octicons name="lock" size={16} color={backgroundColor} />}
+						iconPosition="left"
+						onPress={() => {
+							router.push({
+								pathname: "/subscribeModal",
+								params: {
+									path: "search/store",
+									feature: "store",
+								},
+							});
+						}}
+					/>
+				</View>
+			)}
+		</View>
 	);
 }
