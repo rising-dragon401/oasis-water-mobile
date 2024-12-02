@@ -5,7 +5,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { FlatList, TouchableOpacity, View } from "react-native";
 
 import ItemPreviewCard from "./item-preview-card";
-import Loader from "./loader";
+import Skeleton from "./skeleton";
 
 import { getFilters } from "@/actions/filters";
 import { getItems } from "@/actions/items";
@@ -610,7 +610,10 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 			{Array(10)
 				.fill(0)
 				.map((_, index) => (
-					<Loader key={`loader-${index}`} />
+					<>
+						<Skeleton key={`loader-${index}`} width="100%" height={80} />
+						<View style={{ height: 10 }} />
+					</>
 				))}
 		</>
 	);
@@ -634,6 +637,7 @@ export default function RankingList({ categoryId }: { categoryId: string }) {
 									isGeneralListing
 									variation="row"
 									imageHeight={80}
+									showShadow
 								/>
 							</View>
 						)}

@@ -112,7 +112,11 @@ export default function Search({
 					indexName: "items",
 					query,
 					params: {
-						restrictSearchableAttributes: ["name"],
+						restrictSearchableAttributes: [
+							"name",
+							"brand_name",
+							"company_name",
+						],
 						hitsPerPage: numResults || 10,
 					},
 				},
@@ -240,7 +244,7 @@ export default function Search({
 						className="flex flex-row gap-4 z-20 items-center"
 						style={{ position: "absolute", left: 16 }}
 					>
-						<Feather name="arrow-left" size={20} color={mutedForegroundColor} />
+						<Feather name="arrow-left" size={18} color={mutedForegroundColor} />
 					</TouchableOpacity>
 				)}
 
@@ -255,10 +259,14 @@ export default function Search({
 					)} */}
 
 					{isLoading && (
-						<ActivityIndicator size="small" color={mutedForegroundColor} />
+						<ActivityIndicator
+							size="small"
+							color={mutedForegroundColor}
+							className={value?.length > 0 ? "pr-4" : ""}
+						/>
 					)}
 
-					{!hideScan && (
+					{!hideScan && value?.length === 0 && (
 						<TouchableOpacity onPress={handleScan} className="pr-4">
 							<Feather name="camera" size={20} color={mutedForegroundColor} />
 						</TouchableOpacity>

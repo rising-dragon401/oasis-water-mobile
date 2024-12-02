@@ -109,7 +109,7 @@ export default function ResultsRow({
 								<View className="flex justify-center pl-4 h-12">
 									<TouchableOpacity onPress={handleRequestItem}>
 										<Muted>
-											Looking for something?{" "}
+											Looking for something else?{" "}
 											<Muted style={{ textDecorationLine: "underline" }}>
 												Request it
 											</Muted>

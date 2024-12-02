@@ -219,7 +219,7 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 			// HACK: Prevents app from opening 404 page when logging in
 			setTimeout(() => {
 				SplashScreen.hideAsync();
-			}, 200);
+			}, 500);
 		});
 
 		return () => {
@@ -255,8 +255,8 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 					}
 				}
 			} else if (!session) {
-				if (pathname !== "/(public)/welcome") {
-					router.replace("/(public)/welcome");
+				if (pathname !== "/(public)") {
+					router.replace("/(public)");
 				}
 			}
 		};

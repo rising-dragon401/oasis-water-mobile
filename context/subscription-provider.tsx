@@ -41,6 +41,7 @@ interface SubscriptionProps {
 		subscriptionSource?: SubscriptionSource,
 	) => Promise<boolean>;
 	restorePurchases: () => Promise<CustomerInfo>;
+	checkForSubscription: () => Promise<void>;
 	userSubscription: UserState;
 	hasActiveSub: boolean;
 	packages: {
@@ -188,6 +189,7 @@ export const SubscriptionProvider = ({ children }: any) => {
 		// First check for revenue cat subscription
 		const rcSub = await checkRevenueCatSubscription();
 		console.log("has active rc sub", rcSub);
+		// const rcSub = false;
 		if (rcSub) {
 			setHasActiveSub(true);
 		} else {
@@ -221,7 +223,7 @@ export const SubscriptionProvider = ({ children }: any) => {
 
 		const stripeSubData = await getStripeSubscription(uid);
 
-		const hasActiveStripeSub = stripeSubData.success && stripeSubData.data;
+		const hasActiveStripeSub = stripeSubData.success;
 
 		return hasActiveStripeSub;
 	};
@@ -235,6 +237,7 @@ export const SubscriptionProvider = ({ children }: any) => {
 	const value = {
 		purchasePackage,
 		restorePurchases,
+		checkForSubscription,
 		userSubscription,
 		hasActiveSub,
 		packages,

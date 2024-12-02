@@ -34,7 +34,7 @@ export default function PublicLayout() {
 			}}
 		>
 			<Stack.Screen
-				name="welcome"
+				name="index"
 				options={{
 					headerShown: false,
 				}}

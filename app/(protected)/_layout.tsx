@@ -112,6 +112,7 @@ export default function ProtectedLayout() {
 				options={{
 					title: "Lab",
 					headerTitle: "Lab",
+					headerShown: false,
 					tabBarIcon: ({ color, focused }) => (
 						<Ionicons
 							name={focused ? "flask" : "flask-outline"}
@@ -119,7 +120,7 @@ export default function ProtectedLayout() {
 							color={color}
 						/>
 					),
-					headerLeft: () => <LogoHeader />,
+					// headerLeft: () => <LogoHeader />,
 					// headerLeft: () => <LogoHeader />,
 					// headerRight: () => <UserProfileHeader />,
 					// tabBarButton: () => null,

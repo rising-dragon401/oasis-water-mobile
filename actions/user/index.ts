@@ -61,7 +61,6 @@ export async function getStripeSubscription(uid: string | null) {
 			.from("subscriptions")
 			.select("*")
 			.in("status", ["active"])
-			.not("rc_customer_id", "is", null)
 			.eq("user_id", uid);
 
 		if (!subscription || subscription?.length === 0) {

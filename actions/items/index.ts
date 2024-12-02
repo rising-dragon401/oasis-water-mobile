@@ -15,7 +15,7 @@ export const getItems = async ({
 
 	let query = supabase
 		.from("items")
-		.select(`*, brand:brands(name)`)
+		.select(`*`)
 		.order(orderBy, { ascending: true });
 
 	if (type && type.length > 0) {
@@ -36,16 +36,34 @@ export const getItems = async ({
 
 	items = items.filter((item: any) => !item.is_private);
 
+	// Fetch brand names for each filter
+	const brandIds = items.map((item: any) => item.brand).filter(Boolean);
+
+	const { data: brandData } = await supabase
+		.from("brands")
+		.select("id, name")
+		.in("id", brandIds);
+
+	if (!brandData) {
+		return [];
+	}
+
+	// Map brand names to filters
+	items = items.map((item: any) => {
+		const brand = brandData.find((b) => b.id === item.brand);
+		return {
+			...item,
+			brandName: brand ? brand.name : null,
+		};
+	});
+
 	items = items.sort((a: any, b: any) => {
 		if (a.is_indexed === false) return 1;
 		if (b.is_indexed === false) return -1;
 		return 0;
 	});
 
-	items = items.map((item: any) => ({
-		...item,
-		brandName: item.brand?.name || null,
-	}));
+	// console.log("items", JSON.stringify(items, null, 2));
 
 	return items;
 };

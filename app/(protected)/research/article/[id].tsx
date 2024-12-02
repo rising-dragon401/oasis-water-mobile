@@ -5,18 +5,28 @@ import {
 	useGlobalSearchParams,
 	useLocalSearchParams,
 	useNavigation,
+	useRouter,
 } from "expo-router";
 import { useEffect, useState } from "react";
-import { ScrollView, View, useWindowDimensions } from "react-native";
+import {
+	ScrollView,
+	TouchableOpacity,
+	View,
+	useWindowDimensions,
+} from "react-native";
 import Markdown from "react-native-markdown-display";
 
+import { Button } from "@/components/ui/button";
 import { H1, H2, H3, P } from "@/components/ui/typography";
+import { useSubscription } from "@/context/subscription-provider";
 import { placeHolderImageBlurHash } from "@/lib/constants/images";
 
 export default function ArticlePage() {
 	const glob = useGlobalSearchParams();
 	const local = useLocalSearchParams();
+	const { hasActiveSub } = useSubscription();
 	const navigation = useNavigation();
+	const router = useRouter();
 	const { width: screenWidth } = useWindowDimensions();
 
 	const imageWidth = screenWidth - 48;
@@ -48,26 +58,24 @@ export default function ArticlePage() {
 
 	return (
 		<ScrollView className="px-6 py-2 w-full">
-			<View className="flex w-full justify-center pt-4 pb-2">
+			<View className="flex w-full justify-center py-2 ">
 				<Image
 					source={{ uri: entry?.attributes?.cover?.data?.attributes?.url }}
-					style={{ width: "100%", height: 200, borderRadius: 20 }}
-					className="px-8 py-2"
+					style={{ width: "100%", height: 160, borderRadius: 20 }}
+					className="px-8 py-4"
 					placeholder={placeHolderImageBlurHash}
 					transition={1000}
-					contentFit="cover"
 				/>
 			</View>
-			<H2 className="py-4">{entry?.attributes?.title}</H2>
+			<H2 className="py-4 pb-0">{entry?.attributes?.title}</H2>
 
 			{entry?.attributes?.blocks.map((block: any, index: number) => {
 				const content = (
 					<Markdown
 						key={block.id}
-						// style={markdownStyles}
 						rules={{
 							heading1: (node, children, parent, styles) => (
-								<H1 key={node.key} className="mb-4">
+								<H1 key={node.key} className="mb-4 mt-2">
 									{children}
 								</H1>
 							),
@@ -111,7 +119,40 @@ export default function ArticlePage() {
 					</Markdown>
 				);
 
-				return content;
+				if (index === 0 || index === entry.attributes.blocks.length - 1) {
+					return content;
+				}
+
+				if (index > 0 && !hasActiveSub) {
+					return (
+						<View className="flex flex-col py-4 rounded-2xl relative">
+							<TouchableOpacity onPress={() => router.push("/subscribeModal")}>
+								<View className="flex hover:cursor-pointer w-[90vw] bg-secondary p-4 py-6 rounded-xl gap-x-4 items-center gap-y-4">
+									<P className="text-muted-foreground text-xl border-b border-border my-2">
+										Unlock all research
+									</P>
+									<View className="w-full justify-center items-center gap-y-4">
+										<P>❤️ Stay on top of your health</P>
+										<P>🔬 Latest studies and lab findings</P>
+										<P>🌿 Product recommendations</P>
+										<P>💡 Lists of top rated products</P>
+									</View>
+
+									<Button
+										variant="default"
+										className="mt-4"
+										label="Continue reading for free 🔓"
+										onPress={() => router.push("/subscribeModal")}
+									/>
+								</View>
+							</TouchableOpacity>
+						</View>
+					);
+				}
+
+				if (index > 0 && hasActiveSub) {
+					return content;
+				}
 			})}
 
 			<View style={{ height: 40 }} />

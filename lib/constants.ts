@@ -1,5 +1,12 @@
 // also managed in global.css
 
+export const oasisDropShadow = {
+	shadowColor: "#222529",
+	shadowOffset: { width: 0, height: 1 },
+	shadowOpacity: 0.2,
+	shadowRadius: 2,
+};
+
 export const theme = {
 	light: {
 		background: "#FEFCF9",

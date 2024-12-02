@@ -1,3 +1,4 @@
+import { BlurView } from "expo-blur";
 import { View } from "react-native";
 
 import {
@@ -11,9 +12,15 @@ import { useColorScheme } from "@/lib/useColorScheme";
 
 type Props = {
 	data: any;
+	hasActiveSub: boolean;
+	isItemUnlocked: boolean;
 };
 
-export default function ContaminantCard({ data }: Props) {
+export default function ContaminantCard({
+	data,
+	hasActiveSub,
+	isItemUnlocked,
+}: Props) {
 	const { redColor, iconColor } = useColorScheme();
 
 	// {
@@ -44,7 +51,7 @@ export default function ContaminantCard({ data }: Props) {
 	const exceedsLimit = data?.exceedingLimit > 0;
 
 	return (
-		<Card className="rounded-2xl">
+		<Card className="rounded-2xl relative">
 			<CardHeader>
 				<View className="flex flex-row justify-between items-start">
 					<CardTitle className="flex flex-col justify-between relative text-primary text-xl w-40 text-wrap font-semibold">
@@ -88,6 +95,24 @@ export default function ContaminantCard({ data }: Props) {
 					{data?.risks}
 				</CardDescription>
 			</CardHeader>
+
+			{!hasActiveSub && !isItemUnlocked && (
+				<BlurView
+					intensity={32}
+					tint="regular"
+					style={{
+						position: "absolute",
+						left: 0,
+						top: 0,
+						right: 0,
+						bottom: 20,
+						borderRadius: 12,
+						height: "100%",
+						overflow: "hidden",
+						backgroundColor: "rgba(255, 255, 255, 0.2)",
+					}}
+				/>
+			)}
 
 			{/* <CardFooter className="flex flex-row w-full justify-end px-4 pb-4 gap-x-8">
 				{data.amount && (

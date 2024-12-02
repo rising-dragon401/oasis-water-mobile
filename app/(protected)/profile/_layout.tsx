@@ -5,7 +5,8 @@ import { TouchableOpacity, View } from "react-native";
 
 import { default as OasisTextLogo } from "@/assets/oasis-text.png";
 import HeaderBackButton from "@/components/sharable/header-back-button";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { P } from "@/components/ui/typography";
 import { useUserProvider } from "@/context/user-provider";
 import { PROFILE_AVATAR } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
@@ -14,7 +15,7 @@ function SupportButton() {
 	const { iconColor } = useColorScheme();
 
 	return (
-		<View className="mr-6">
+		<View className="">
 			{/* @ts-ignore */}
 			<TouchableOpacity onPress={() => router.push("/profile/help")}>
 				<Ionicons name="help-buoy-outline" size={24} color={iconColor} />
@@ -42,15 +43,18 @@ function UserProfileHeader() {
 	const { userData } = useUserProvider();
 
 	return (
-		<View className="mr-6">
+		<View className="">
 			<TouchableOpacity
 				onPress={() => {
 					// @ts-ignore
 					router.push("/profile/settings");
 				}}
 			>
-				<Avatar className="h-8 w-8	" alt="oasis pfp">
+				<Avatar className="h-8 w-8" alt="oasis pfp">
 					<AvatarImage src={userData?.avatar_url || PROFILE_AVATAR} />
+					<AvatarFallback>
+						<P className="text-xs font-medium">O</P>
+					</AvatarFallback>
 				</Avatar>
 			</TouchableOpacity>
 		</View>

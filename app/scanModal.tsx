@@ -6,13 +6,7 @@ import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { useNavigation, useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import {
-	ActivityIndicator,
-	Alert,
-	SafeAreaView,
-	TouchableOpacity,
-	View,
-} from "react-native";
+import { Alert, SafeAreaView, TouchableOpacity, View } from "react-native";
 import Animated, {
 	useAnimatedStyle,
 	useSharedValue,
@@ -48,7 +42,8 @@ export default function ScanModal() {
 	const router = useRouter();
 	const { uid } = useUserProvider();
 	const showToast = useToast();
-	const { iconColor, redColor, greenColor, neutralColor } = useColorScheme();
+	const { iconColor, redColor, greenColor, neutralColor, backgroundColor } =
+		useColorScheme();
 	const [permission] = Camera.useCameraPermissions();
 
 	const [loading, setLoading] = useState(false);
@@ -78,6 +73,29 @@ export default function ScanModal() {
 
 	const animatedValue = useSharedValue(0);
 
+	const loadingMessages = [
+		"Checking for toxins...",
+		"Searching latest research...",
+		"Analyzing data...",
+		"Compiling results...",
+	];
+
+	useEffect(() => {
+		let messageIndex = 0;
+		let interval: NodeJS.Timeout;
+
+		if (loading) {
+			interval = setInterval(() => {
+				setLoadingText(loadingMessages[messageIndex]);
+				messageIndex = (messageIndex + 1) % loadingMessages.length;
+			}, 2000); // Change message every 2 seconds
+		} else {
+			setLoadingText("Snap a pic of your water or filter");
+		}
+
+		return () => clearInterval(interval);
+	}, [loading]);
+
 	useEffect(() => {
 		if (loading) {
 			animatedValue.value = withRepeat(
@@ -94,13 +112,13 @@ export default function ScanModal() {
 		return {
 			transform: [
 				{
-					translateY: animatedValue.value * scanGridHeight,
+					translateY: animatedValue.value * scanGridHeight * 0.9,
 				},
 			],
 
-			shadowColor: "white", // Ensure shadow color is set
+			shadowColor: backgroundColor, // Ensure shadow color is set
 			shadowOffset: { width: 2, height: 6 }, // Adjust shadow offset
-			shadowOpacity: 0.8, // Increase shadow opacity
+			shadowOpacity: 0.5, // Increase shadow opacity
 			shadowRadius: 6, // Increase shadow radius
 			elevation: 10, // Increase elevation for Android
 			borderRadius: 50,
@@ -290,8 +308,6 @@ export default function ScanModal() {
 			});
 
 			const responseData = await response.json();
-
-			console.log("responseData", JSON.stringify(responseData, null, 2));
 
 			const productIdentified = responseData.choices[0].message.content;
 
@@ -561,7 +577,7 @@ export default function ScanModal() {
 					{(mode === "scan" || loading) && (
 						<View
 							style={{
-								width: "80%",
+								width: "70%",
 								height: "70%",
 								position: "relative",
 								overflow: "hidden",
@@ -627,35 +643,39 @@ export default function ScanModal() {
 
 							{loading && (
 								<Animated.View
-									style={[
-										{
-											position: "absolute",
+									style={[animatedStyle]}
+									className=" flex flex-col gap-y-1 w-full justify-center"
+								>
+									<P className="mt-4 text-sm font-medium text-background z-50 flex text-center">
+										{loadingText}
+									</P>
+									<View
+										style={{
+											bottom: 0,
 											left: 0,
 											right: 0,
-											height: 2,
-											backgroundColor: "white",
-											opacity: 0.8,
-											transform: [{ scaleY: 1.2 }],
-										},
-										animatedStyle,
-									]}
-								/>
+											height: 4,
+											backgroundColor,
+											// opacity: 0.8,
+											// shadowColor: "blue", // Blue shadow for glow effect
+											// shadowOffset: { width: 0, height: 0 },
+											// shadowOpacity: 0.8,
+											// shadowRadius: 20, // Increase shadow radius for a stronger glow
+										}}
+									/>
+								</Animated.View>
 							)}
 						</View>
 					)}
 
-					{loading && (
+					{/* {loading && (
 						<ActivityIndicator size="small" color="#fff" className="mb-4" />
-					)}
-
-					{mode === "scan" && (
-						<P className="text-white mt-4 text-lg font-medium">{loadingText}</P>
-					)}
+					)} */}
 				</View>
 				{/* Product card */}
 				{product && product.data && mode === "preview" && resultCard()}
 				{/* Scan button */}
-				{!loading && (
+				{!loading ? (
 					<View
 						style={{
 							justifyContent: "center",
@@ -700,6 +720,8 @@ export default function ScanModal() {
 							)}
 						</TouchableOpacity>
 					</View>
+				) : (
+					<View style={{ height: 100 }} />
 				)}
 				{/* Upload existing image button */}
 				{mode === "scan" && !loading && (
@@ -792,7 +814,7 @@ export default function ScanModal() {
 					</View>
 					<View className="flex-1 flex-col ml-4 w-full">
 						<P
-							className="text-xl w-full font-bold text-wrap max-w-56 leading-tight"
+							className="text-xl font-bold text-wrap w-44 leading-tight"
 							numberOfLines={2}
 						>
 							{product?.data?.name || "Unknown Product"}

@@ -45,7 +45,16 @@ export function useColorScheme() {
 	const shadowColor =
 		colorScheme === "dark" ? theme.dark.primary : theme.light.primary;
 
+	const dropShadowStyles = {
+		shadowColor,
+		shadowOffset: { width: 0, height: 1 },
+		shadowOpacity: 0.14,
+		shadowRadius: 4,
+		shadowSpread: 2,
+	};
+
 	return {
+		dropShadowStyles,
 		colorMode: colorScheme,
 		colorScheme: colorScheme ?? "dark",
 		isDarkColorScheme: colorScheme === "dark",

@@ -29,7 +29,7 @@ export default function ScoreBadge({ score }: { score: number }) {
 			{hasActiveSub && (
 				<View className="flex-row items-center gap-x-1">
 					<View
-						className="w-3 h-3 rounded-full"
+						className="w-2 h-2 rounded-full"
 						style={{ backgroundColor: getBgColor() }}
 					/>
 					<Small className=" ">

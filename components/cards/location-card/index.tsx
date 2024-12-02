@@ -53,7 +53,7 @@ export default function LocationCard({
 			)}
 
 			{/* Overlay with location name */}
-			<View className="absolute inset-0 bg-black/50 flex items-center justify-center h-full w-full z-0">
+			<View className="absolute inset-0 bg-black/30 flex items-center justify-center h-full w-full z-0">
 				{location && location.id ? (
 					<P className="text-white text-lg font-semibold">
 						{location.name || "Add location"}

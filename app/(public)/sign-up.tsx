@@ -1,7 +1,7 @@
 import { FontAwesome6 } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
 	Alert,
@@ -64,27 +64,29 @@ export default function SignUp() {
 		},
 	});
 
-	async function onSubmit(data: z.infer<typeof formSchema>) {
-		try {
-			await signUp(data.email, data.password);
+	const onSubmit = useCallback(
+		async (data: z.infer<typeof formSchema>) => {
+			try {
+				await signUp(data.email, data.password);
+				form.reset();
+			} catch (error: Error | any) {
+				console.log(error.message);
+				Alert.alert(
+					"Sign Up Error",
+					error.message,
+					[{ text: "OK", onPress: () => console.log("OK Pressed") }],
+					{ cancelable: false },
+				);
+			}
+		},
+		[signUp, form],
+	);
 
-			form.reset();
-		} catch (error: Error | any) {
-			console.log(error.message);
-			Alert.alert(
-				"Sign Up Error",
-				error.message,
-				[{ text: "OK", onPress: () => console.log("OK Pressed") }],
-				{ cancelable: false },
-			);
-		}
-	}
-
-	const onSignInWithGoogle = async () => {
+	const onSignInWithGoogle = useCallback(async () => {
 		setLoading(true);
 		await signInWithGoogle();
 		setLoading(false);
-	};
+	}, [signInWithGoogle]);
 
 	const iconColor =
 		colorScheme === "dark" ? theme.dark.primary : theme.light.primary;
@@ -152,36 +154,35 @@ export default function SignUp() {
 						</Form>
 					</View>
 				</ScrollView>
+				<View className="gap-y-4 mt-2">
+					<Button
+						size="default"
+						variant="default"
+						onPress={form.handleSubmit(onSubmit)}
+						loading={form.formState.isSubmitting}
+						label="Sign Up"
+					/>
+					<Separator orientation="horizontal" />
+					<Button
+						variant="outline"
+						loading={loading}
+						onPress={() => onSignInWithGoogle()}
+						label="Sign Up with Google"
+						icon={<FontAwesome6 name="google" size={12} color={iconColor} />}
+						iconPosition="left"
+					/>
+					<AppleAuthButton />
+					<Muted
+						className="text-center"
+						onPress={() => {
+							router.replace("/sign-in");
+						}}
+					>
+						Already have an account?{" "}
+						<Muted className="text-foreground">Sign in</Muted>
+					</Muted>
+				</View>
 			</KeyboardAvoidingView>
-
-			<View className="gap-y-4 mt-2">
-				<Button
-					size="default"
-					variant="default"
-					onPress={form.handleSubmit(onSubmit)}
-					loading={form.formState.isSubmitting}
-					label="Sign Up"
-				/>
-				<Separator orientation="horizontal" />
-				<Button
-					variant="outline"
-					loading={loading}
-					onPress={() => onSignInWithGoogle()}
-					label="Sign Up with Google"
-					icon={<FontAwesome6 name="google" size={12} color={iconColor} />}
-					iconPosition="left"
-				/>
-				<AppleAuthButton />
-				<Muted
-					className="text-center"
-					onPress={() => {
-						router.replace("/sign-in");
-					}}
-				>
-					Already have an account?{" "}
-					<Muted className="text-foreground">Sign in</Muted>
-				</Muted>
-			</View>
 		</View>
 	);
 }
